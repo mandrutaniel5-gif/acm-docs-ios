@@ -47,6 +47,81 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
             web.bottomAnchor.constraint(equalTo: root.bottomAnchor), // the page leaves room for the home bar itself
         ])
         self.web = web
+
+        if #available(iOS 26.0, *) { addGlassTabBar(to: root, content: content) }
+    }
+
+    // MARK: iOS 26+: Liquid Glass bottom bar
+
+    private var glassBar: AnyObject?
+
+    /// Watches the page's own bottom bar and reports it: shown (and not covered by a sheet
+    /// or dialog) and which tab is on. Also turns on the glass styles (css/glass.css).
+    static let glassScript = """
+    (function () {
+      if (window.__acmGlass) return; window.__acmGlass = true;
+      document.documentElement.classList.add('ios-glass', 'native-tabbar');
+      var last = '';
+      function check() {
+        var tb = document.getElementById('tabbar'), visible = false, active = '';
+        if (tb) {
+          if (getComputedStyle(tb).display !== 'none' && tb.offsetParent !== null) {
+            var r = tb.getBoundingClientRect();
+            if (r.height > 0) {
+              var el = document.elementFromPoint(r.left + r.width / 2, r.top + Math.min(30, r.height / 2));
+              visible = !!(el && tb.contains(el));
+            }
+          }
+          var on = tb.querySelector('button.on[data-view]');
+          active = on ? on.dataset.view : '';
+        }
+        var key = visible + '|' + active;
+        if (key !== last) {
+          last = key;
+          try { window.webkit.messageHandlers.acm.postMessage({ op: 'tabbar', visible: visible, active: active }); } catch (e) {}
+        }
+      }
+      var queued = false;
+      function q() { if (queued) return; queued = true; requestAnimationFrame(function () { queued = false; check(); }); }
+      new MutationObserver(q).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] });
+      addEventListener('resize', q);
+      setInterval(check, 700);
+      check();
+    })();
+    """
+
+    @available(iOS 26.0, *)
+    private func addGlassTabBar(to root: UIView, content: WKUserContentController) {
+        content.addUserScript(WKUserScript(source: Self.glassScript, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+        let bar = GlassTabBar()
+        bar.isHidden = true
+        bar.alpha = 0
+        bar.translatesAutoresizingMaskIntoConstraints = false
+        root.addSubview(bar)
+        // floats just above the home indicator, like the bars of Apple's own apps
+        let low = bar.bottomAnchor.constraint(equalTo: root.safeAreaLayoutGuide.bottomAnchor, constant: 10)
+        low.priority = .defaultHigh
+        NSLayoutConstraint.activate([
+            bar.leadingAnchor.constraint(equalTo: root.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            bar.trailingAnchor.constraint(equalTo: root.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            bar.heightAnchor.constraint(equalToConstant: 62),
+            bar.bottomAnchor.constraint(lessThanOrEqualTo: root.bottomAnchor, constant: -12),
+            low,
+        ])
+        bar.onSelect = { [weak self] view in
+            let js = "(function(){var b=document.querySelector('#tabbar button[data-view=\"\(view)\"]'); if(b) b.click();})()"
+            self?.web.evaluateJavaScript(js, completionHandler: nil)
+        }
+        bar.onPlus = { [weak self] in
+            self?.web.evaluateJavaScript("(function(){var b=document.getElementById('tab-new'); if(b) b.click();})()", completionHandler: nil)
+        }
+        glassBar = bar
+    }
+
+    func updateTabbar(visible: Bool, active: String) {
+        guard #available(iOS 26.0, *), let bar = glassBar as? GlassTabBar else { return }
+        if !active.isEmpty && active != bar.active { bar.setActive(active, animated: bar.shown) }
+        bar.setShown(visible)
     }
 
     override func viewDidLoad() {

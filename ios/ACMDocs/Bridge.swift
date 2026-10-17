@@ -151,6 +151,13 @@ final class Bridge: NSObject, WKScriptMessageHandler {
     }
 
     func userContentController(_ c: WKUserContentController, didReceive message: WKScriptMessage) {
+        // iOS 26+: the page reports its bottom bar (visible? which tab?) for the native glass bar
+        if let body = message.body as? [String: Any], body["op"] as? String == "tabbar" {
+            let visible = body["visible"] as? Bool ?? false
+            let active = body["active"] as? String ?? ""
+            DispatchQueue.main.async { self.controller?.updateTabbar(visible: visible, active: active) }
+            return
+        }
         guard let body = message.body as? [String: Any], let id = (body["id"] as? NSNumber)?.intValue,
               let op = body["op"] as? String else { return }
         let argsText = body["args"] as? String ?? "{}"
