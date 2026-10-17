@@ -1,0 +1,39 @@
+name: Impactor (Windows)
+
+# Impactor (MIT, github.com/claration/Impactor) built from upstream main at 88e0f3c,
+# which already has the Apple sign-in fix (#290) that is not in a release yet.
+on:
+  push:
+    branches: [impactor-src]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-gnu
+      - name: mingw
+        run: sudo apt-get update && sudo apt-get install -y mingw-w64 nasm
+      - name: Build
+        run: |
+          set -o pipefail
+          cargo build --bins --workspace --release --target x86_64-pc-windows-gnu 2>&1 | tee build.log
+          mkdir -p dist
+          cp target/x86_64-pc-windows-gnu/release/plumeimpactor.exe dist/Impactor-fix-windows-x86_64-portable.exe
+          cp target/x86_64-pc-windows-gnu/release/plumesign.exe dist/plumesign-windows-x86_64.exe
+      - name: Publish to the impactor-build branch
+        if: always()
+        run: |
+          mkdir -p /tmp/out && cp dist/*.exe /tmp/out/ 2>/dev/null || true
+          tail -60 build.log > /tmp/out/build-tail.log 2>/dev/null || true
+          cd /tmp/out && git init -q -b impactor-build
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -q -m "Impactor build ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" impactor-build
