@@ -16,17 +16,29 @@ pub async fn parse_response(
 ) -> Result<plist::Dictionary, Error> {
     let res = res?;
     let status = res.status();
-    
-    if !status.is_success() {
-        return Err(Error::GeneralHttpError {
-            url: res.url().to_string(),
-            status: status.as_u16(),
-            // body: res.text().await?,
-        })
-    }
-    
+    let url = res.url().to_string();
+    let server = res.headers().get("server").and_then(|v| v.to_str().ok()).unwrap_or("-").to_string();
+    let ctype = res.headers().get("content-type").and_then(|v| v.to_str().ok()).unwrap_or("-").to_string();
     let text = res.text().await?;
-    let res: plist::Dictionary = plist::from_bytes(text.as_bytes())?;
+    let snippet = |t: &str| -> String {
+        let flat: String = t.split_whitespace().collect::<Vec<_>>().join(" ");
+        flat.chars().take(400).collect()
+    };
+    if !status.is_success() {
+        return Err(Error::Diagnostic(format!(
+            "HTTP {} from {} [server: {}, type: {}] body: {}",
+            status.as_u16(), url, server, ctype, snippet(&text)
+        )));
+    }
+    let res: plist::Dictionary = match plist::from_bytes(text.as_bytes()) {
+        Ok(d) => d,
+        Err(e) => {
+            return Err(Error::Diagnostic(format!(
+                "Not a plist ({}) - HTTP {} from {} [server: {}, type: {}] body: {}",
+                e, status.as_u16(), url, server, ctype, snippet(&text)
+            )))
+        }
+    };
     let res: plist::Value = res.get("Response").unwrap().to_owned();
     match res {
         plist::Value::Dictionary(dict) => Ok(dict),

@@ -35,6 +35,9 @@ pub enum Error {
         status: u16,
         // body: String,
     },
+    /// ACM: what the server actually answered (status, url, start of body)
+    #[error("{0}")]
+    Diagnostic(String),
     #[error("Request to developer session failed")]
     DeveloperSessionRequestFailed,
     #[error("Authentication SRP error {0}: {1}")]
