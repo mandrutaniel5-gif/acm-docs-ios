@@ -121,6 +121,7 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
     func updateTabbar(visible: Bool, active: String) {
         guard #available(iOS 26.0, *), let bar = glassBar as? GlassTabBar else { return }
         if !active.isEmpty && active != bar.active { bar.setActive(active, animated: bar.shown) }
+        if !active.isEmpty { bar.setPageActive(active) }
         bar.setShown(visible)
     }
 

@@ -61,3 +61,30 @@ targets:
               - com.microsoft.word.doc
               - com.microsoft.excel.xls
               - public.plain-text
+  ACMDocsUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    dependencies:
+      - target: ACMDocs
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: ro.acmcode.docs.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: ACMDocs
+        TARGETED_DEVICE_FAMILY: "1,2"
+schemes:
+  ACMDocs:
+    build:
+      targets:
+        ACMDocs: all
+        ACMDocsUITests: [test]
+    test:
+      config: Debug
+      targets:
+        - ACMDocsUITests
+    run:
+      config: Debug
+    archive:
+      config: Release

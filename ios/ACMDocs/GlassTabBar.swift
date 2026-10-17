@@ -47,7 +47,8 @@ final class GlassTabBar: UIView {
         capsule.contentView.addSubview(stack)
         for item in Self.items {
             let b = TabButton(item: item)
-            b.addAction(UIAction { [weak self] _ in self?.tap(item.view) }, for: .primaryActionTriggered)
+            // TabButton is a plain UIControl: it sends touchUpInside (not primaryActionTriggered)
+            b.addAction(UIAction { [weak self] _ in self?.tap(item.view) }, for: .touchUpInside)
             buttons.append(b)
             stack.addArrangedSubview(b)
         }
@@ -63,6 +64,7 @@ final class GlassTabBar: UIView {
         plusButton.setImage(UIImage(systemName: "plus", withConfiguration: UIImage.SymbolConfiguration(pointSize: 22, weight: .semibold)), for: .normal)
         plusButton.tintColor = .white
         plusButton.accessibilityLabel = "Creează"
+        plusButton.accessibilityIdentifier = "tab-plus"
         plusButton.addAction(UIAction { [weak self] _ in
             self?.feedback.selectionChanged()
             self?.onPlus?()
@@ -102,6 +104,11 @@ final class GlassTabBar: UIView {
         onSelect?(view)
     }
 
+    /// What the page itself says is on (UI tests check it: proves the tap reached the page).
+    func setPageActive(_ view: String) {
+        for b in buttons { b.accessibilityValue = b.item.view == view ? "page-on" : "page-off" }
+    }
+
     func setActive(_ view: String, animated: Bool) {
         active = view
         for b in buttons { b.isOn = b.item.view == view }
@@ -137,6 +144,7 @@ private final class TabButton: UIControl {
             let c: UIColor = isOn ? .systemBlue : .label
             icon.tintColor = c
             label.textColor = c
+            accessibilityTraits = isOn ? [.button, .selected] : .button
         }
     }
 
@@ -160,6 +168,7 @@ private final class TabButton: UIControl {
             col.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
         accessibilityLabel = item.title
+        accessibilityIdentifier = "tab-" + item.view
         accessibilityTraits = .button
         isAccessibilityElement = true
         isOn = false

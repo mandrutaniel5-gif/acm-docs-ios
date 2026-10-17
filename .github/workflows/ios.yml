@@ -12,7 +12,7 @@ permissions:
 jobs:
   build:
     runs-on: macos-15
-    timeout-minutes: 45
+    timeout-minutes: 100
     steps:
       - uses: actions/checkout@v4
 
@@ -67,6 +67,50 @@ jobs:
           find ~/Library/Logs/DiagnosticReports -newer ios/project.yml -name '*.ips' -exec cp {} shots/crash/ \; 2>/dev/null || true
           ls -la shots shots/crash
 
+      # Real taps on several screens: small iPhone (SE), normal, Pro Max, iPad, and iOS 18 (no glass)
+      - name: UI tests (several devices)
+        if: always()
+        run: |
+          set +e
+          cd ios
+          xcodebuild build-for-testing -project ACMDocs.xcodeproj -scheme ACMDocs -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath build-ui CODE_SIGNING_ALLOWED=NO \
+            2>&1 | tee ../uitest-build.log | grep -E "error:|\*\* TEST BUILD" 
+          cd ..
+          mkdir -p uishots
+          python3 - > devices.txt <<'PY'
+          import json, subprocess, re
+          rts = [r for r in json.loads(subprocess.check_output(["xcrun","simctl","list","runtimes","-j"]))["runtimes"] if r["platform"] == "iOS" and r["isAvailable"]]
+          rts.sort(key=lambda r: [int(n) for n in r["version"].split(".")])
+          new = rts[-1]
+          old = [r for r in rts if r["version"].startswith("18")]
+          names = {t["name"]: t["identifier"] for t in new.get("supportedDeviceTypes", [])}
+          def pick(pattern):
+              c = sorted([n for n in names if re.search(pattern, n)])
+              return c[-1] if c else None
+          want = [("se", pick(r"^iPhone SE")), ("iphone", pick(r"^iPhone \d+$")), ("promax", pick(r"Pro Max$")), ("ipad", pick(r"^iPad Air 11") or pick(r"^iPad \(") or pick(r"^iPad"))]
+          for tag, n in want:
+              if n: print(tag, names[n], new["identifier"], n.replace(" ", "_"))
+          if old:
+              o = old[-1]; on = {t["name"]: t["identifier"] for t in o.get("supportedDeviceTypes", [])}
+              n = sorted([x for x in on if re.search(r"^iPhone \d+$", x)])
+              if n: print("ios18", on[n[-1]], o["identifier"], n[-1].replace(" ", "_"))
+          PY
+          cat devices.txt
+          : > uitests-summary.txt
+          while read TAG TYPE RT NAME; do
+            UDID=$(xcrun simctl create "ui-$TAG" "$TYPE" "$RT") || { echo "$TAG: cannot create $NAME" >> uitests-summary.txt; continue; }
+            xcrun simctl boot "$UDID"; xcrun simctl bootstatus "$UDID" -b >/dev/null
+            echo "=== $TAG ($NAME, $RT)" >> uitests-summary.txt
+            TEST_RUNNER_SHOTS_DIR="$PWD/uishots" TEST_RUNNER_DEVICE_TAG="$TAG" \
+              xcodebuild test-without-building -project ios/ACMDocs.xcodeproj -scheme ACMDocs -destination "id=$UDID" \
+              -derivedDataPath ios/build-ui CODE_SIGNING_ALLOWED=NO > "uitest-$TAG.log" 2>&1
+            grep -E "Test Case .*(passed|failed|skipped)|error: |XCTAssert|Skipped|\*\* TEST" "uitest-$TAG.log" | grep -v "^\s*$" >> uitests-summary.txt
+            xcrun simctl shutdown "$UDID"
+          done < devices.txt
+          cat uitests-summary.txt
+          ls uishots | head -100
+
       - name: Build for iPhone (unsigned .ipa)
         run: |
           set -o pipefail
@@ -96,7 +140,8 @@ jobs:
       - name: Publish results to the ios-build branch
         if: always()
         run: |
-          mkdir -p /tmp/out && cp -R shots /tmp/out/ 2>/dev/null || true
+          mkdir -p /tmp/out && cp -R shots uishots /tmp/out/ 2>/dev/null || true
+          cp uitests-summary.txt devices.txt uitest-*.log /tmp/out/ 2>/dev/null || true
           cp ACM-Docs-unsigned.ipa codesign.txt xcode-version.txt runtimes.txt ios/build-sim.log ios/build-dev.log /tmp/out/ 2>/dev/null || true
           cd /tmp/out
           git init -q -b ios-build
