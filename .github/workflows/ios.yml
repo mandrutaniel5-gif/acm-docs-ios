@@ -6,6 +6,9 @@ on:
     paths: ["ios/**", ".github/workflows/ios.yml"]
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-15
@@ -66,3 +69,17 @@ jobs:
             ACM-Docs-unsigned.ipa
             ios/build-sim.log
             ios/build-dev.log
+
+      # the same results on the "ios-build" branch (readable with plain git, no artifact download needed)
+      - name: Publish results to the ios-build branch
+        if: always()
+        run: |
+          mkdir -p /tmp/out && cp -R shots /tmp/out/ 2>/dev/null || true
+          cp ACM-Docs-unsigned.ipa ios/build-sim.log ios/build-dev.log /tmp/out/ 2>/dev/null || true
+          cd /tmp/out
+          git init -q -b ios-build
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A
+          git commit -q -m "iOS build ${GITHUB_SHA::7} (run ${GITHUB_RUN_ID})"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" ios-build
