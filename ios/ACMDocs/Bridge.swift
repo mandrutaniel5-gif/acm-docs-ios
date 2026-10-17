@@ -294,6 +294,7 @@ final class PhotosHelper: NSObject, PHPickerViewControllerDelegate {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("scan", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         var paths = [String?](repeating: nil, count: results.count)
+        let lock = NSLock()
         let group = DispatchGroup()
         let stamp = Int(Date().timeIntervalSince1970 * 1000)
         for (i, r) in results.enumerated() {
@@ -303,7 +304,7 @@ final class PhotosHelper: NSObject, PHPickerViewControllerDelegate {
                 // JPEG with the picture already upright (HEIC photos too)
                 if let img = (obj as? UIImage)?.uprighted(), let jpeg = img.jpegData(compressionQuality: 0.92) {
                     let url = dir.appendingPathComponent("\(stamp)-\(i).jpg")
-                    if (try? jpeg.write(to: url, options: .atomic)) != nil { paths[i] = url.path }
+                    if (try? jpeg.write(to: url, options: .atomic)) != nil { lock.lock(); paths[i] = url.path; lock.unlock() }
                 }
                 group.leave()
             }

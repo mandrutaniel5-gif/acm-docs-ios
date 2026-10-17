@@ -88,7 +88,8 @@ final class SchemeHandler: NSObject, WKURLSchemeHandler {
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard let url = urlSchemeTask.request.url else { return }
         let path = url.path // already decoded
-        if let (data, mime) = serve(path: path) {
+        if let found = serve(path: path) {
+            let (data, mime) = found
             let headers = ["Content-Type": mime, "Content-Length": String(data.count),
                            "Access-Control-Allow-Origin": "*", "Cache-Control": "no-store"]
             let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "HTTP/1.1", headerFields: headers)!
