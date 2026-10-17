@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2f8cff"/>
+      <stop offset="0.55" stop-color="#3d5afe"/>
+      <stop offset="1" stop-color="#6a4cf0"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.85" cy="0.1" r="0.7">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sheet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#eef1ff"/>
+    </linearGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#1a1a6b" flood-opacity=".35"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" rx="228" fill="url(#bg)"/>
+  <rect width="1024" height="1024" rx="228" fill="url(#glow)"/>
+  <g filter="url(#sh)">
+    <path d="M318 196h282l166 166v420a50 50 0 0 1-50 50H318a50 50 0 0 1-50-50V246a50 50 0 0 1 50-50z" fill="url(#sheet)"/>
+  </g>
+  <path d="M600 196l166 166H650a50 50 0 0 1-50-50z" fill="#c9d2ff"/>
+  <rect x="338" y="440" width="300" height="34" rx="17" fill="#3d5afe"/>
+  <rect x="338" y="520" width="348" height="34" rx="17" fill="#b6c1ff"/>
+  <rect x="338" y="600" width="236" height="34" rx="17" fill="#b6c1ff"/>
+  <circle cx="676" cy="716" r="92" fill="#34c759"/>
+  <path d="M630 716l32 32 62-66" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

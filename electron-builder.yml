@@ -1,0 +1,37 @@
+appId: ro.acmandrut.pdfeditor
+productName: ACM Docs
+copyright: © 2026 ACM Code SRL
+directories:
+  output: dist
+files:
+  - main.js
+  - ocr.js
+  - app/**/*
+  - "!app/vendor/**"
+  - "!app/css/fonts-android.css"
+  - "!node_modules/tesseract.js-core/tesseract-core.*"
+  - "!node_modules/tesseract.js-core/tesseract-core-simd.*"
+  - "!node_modules/tesseract.js-core/*.wasm.js"
+  - "!node_modules/**/{README.md,CHANGELOG.md,*.d.ts,*.d.cts,*.map,docs,examples,test,tests,*.md}"
+  - "!node_modules/docx/dist/{charts,math,shapes,watermarks}.*"
+  - "!node_modules/docx/dist/*.{mjs,iife.js,umd.cjs}"
+  - "!node_modules/docx/src/**"
+  - "!node_modules/pptxgenjs/dist/{pptxgen.bundle.js,pptxgen.es.js,pptxgen.min.js}"
+  - "!node_modules/pptxgenjs/{src,types,demos}/**"
+  - "!node_modules/docx-preview/dist/*.{mjs,min.js}"
+  - "!node_modules/xlsx-js-style/dist/{xlsx.bundle.js,cpexcel.full.mjs,shim.min.js}"
+  - "!node_modules/xlsx-js-style/{types,bin}/**"
+  - "!node_modules/@types/**"
+  - "!node_modules/jszip/dist/**"
+asar: true
+asarUnpack:
+  - node_modules/**/*
+  - app/ocr/**/*
+win:
+  target:
+    - target: dir
+      arch: [ia32]
+  icon: build/icon.ico
+  signAndEditExecutable: false
+linux:
+  target: dir

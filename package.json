@@ -1,0 +1,34 @@
+{
+  "name": "acm-docs",
+  "productName": "ACM Docs",
+  "version": "2.0.5",
+  "description": "ACM Docs - PDF, documente si facturi (ACM Code SRL)",
+  "author": "ACM Code SRL",
+  "main": "main.js",
+  "private": true,
+  "dependencies": {
+    "docx": "^9.8.1",
+    "docx-preview": "^0.4.1",
+    "jszip": "^3.10.2",
+    "pptxgenjs": "^3.12.0",
+    "tesseract.js": "^5.1.1",
+    "word-extractor": "^1.0.4",
+    "xlsx-js-style": "^1.2.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "build:win": "sh build/build-win.sh",
+    "build:android": "sh build/build-android.sh"
+  },
+  "devDependencies": {
+    "buffer": "^6.0.3",
+    "electron": "22.3.27",
+    "electron-builder": "26.0.12",
+    "esbuild": "^0.24.2",
+    "events": "^3.3.0",
+    "playwright-core": "^1.47.2",
+    "process": "^0.11.10",
+    "readable-stream": "^4.5.2",
+    "resedit": "^1.7.2"
+  }
+}

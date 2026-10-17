@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <title>ACM Docs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <script src="js/theme.js"></script>
+  <script src="js/i18n-en.js"></script>
+  <script src="js/i18n.js"></script>
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/screens.css">
+  <link rel="stylesheet" href="css/office.css">
+</head>
+<body>
+  <!-- Splash -->
+  <div id="splash"><div class="sp-in"><img src="icon.png" alt=""><b>ACM Docs</b><small>de ACM Code SRL</small></div></div>
+
+  <!-- Main app: Acasă, Fișiere, Facturi, Setări -->
+  <section id="home" class="screen">
+    <nav id="side">
+      <div class="brand"><img src="icon.png" alt=""><div><b>ACM Docs</b><small>de ACM Code SRL</small></div></div>
+      <button class="new-btn" id="side-new"><span data-icon="plus"></span>Creează</button>
+      <div class="nav">
+        <button data-view="home" class="on"><span data-icon="home"></span>Acasă</button>
+        <button data-view="files"><span data-icon="folder"></span>Fișiere</button>
+        <button data-view="invoices"><span data-icon="receipt"></span>Facturi</button>
+        <button data-view="settings"><span data-icon="gear"></span>Setări</button>
+      </div>
+      <div class="spacer"></div>
+      <div class="side-biz" id="side-biz"></div>
+      <div class="side-foot">ACM Docs 2026<br>© ACM Code SRL</div>
+    </nav>
+
+    <main id="views">
+      <!-- Acasă -->
+      <div id="v-home" class="view">
+        <div class="vscroll">
+          <div class="vwrap">
+            <header class="hero">
+              <div class="hero-brand"><img src="icon.png" alt=""><span>ACM Docs</span><small>de ACM Code SRL</small></div>
+              <h1 id="greet">Bună ziua</h1>
+              <p id="greet-sub">Ce facem azi?</p>
+            </header>
+
+            <div class="quick" id="quick">
+              <button class="q" id="act-scan"><span class="qi blue" data-icon="camera"></span><b>Scanează</b><small>Poză → document</small></button>
+              <button class="q" id="act-invoice"><span class="qi green" data-icon="receipt"></span><b>Factură</b><small id="act-invoice-sub">Nouă</small></button>
+              <button class="q" id="act-open"><span class="qi gray" data-icon="folder"></span><b>Deschide</b><small>Orice fișier</small></button>
+              <button class="q" id="act-doc"><span class="qi word" data-icon="wordapp"></span><b>Document</b><small>.docx</small></button>
+              <button class="q" id="act-sheet"><span class="qi sheet" data-icon="sheetapp"></span><b>Tabel</b><small>.xlsx</small></button>
+              <button class="q" id="act-slides"><span class="qi slides" data-icon="slidesapp"></span><b>Prezentare</b><small>.pptx</small></button>
+            </div>
+
+            <div class="cards2">
+              <button class="money-card" id="home-money" type="button">
+                <span class="mc-top"><span>Facturat luna aceasta</span><span data-icon="right"></span></span>
+                <span class="mc-amount" id="mc-amount">0,00</span>
+                <span class="mc-sub" id="mc-sub">Nicio factură încă</span>
+              </button>
+              <div class="biz-card" id="home-biz"></div>
+            </div>
+
+            <div class="sect-h"><h2>Recente</h2><button class="link" id="home-all">Vezi toate</button></div>
+            <div class="list-card" id="recent-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fișiere -->
+      <div id="v-files" class="view hidden">
+        <div class="vscroll">
+          <div class="vwrap">
+            <header class="vhead"><h1>Fișiere</h1><div class="spacer"></div><button class="pill" id="files-open"><span data-icon="folder"></span>Deschide</button></header>
+            <div class="files-tools">
+              <div class="seg" id="file-tabs">
+                <button data-tab="all" class="on">Toate <i></i></button>
+                <button data-tab="original">Originale <i></i></button>
+                <button data-tab="edited">Editate <i></i></button>
+                <button data-tab="invoice">Facturi <i></i></button>
+              </div>
+              <label class="search"><span data-icon="search"></span><input id="files-q" type="search" placeholder="Caută după nume" spellcheck="false"></label>
+            </div>
+            <p class="files-note" id="files-note"></p>
+            <div id="file-grid" class="file-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Facturi -->
+      <div id="v-invoices" class="view hidden">
+        <div class="vscroll">
+          <div class="vwrap" id="inv-list-root"></div>
+        </div>
+      </div>
+
+      <!-- Setări -->
+      <div id="v-settings" class="view hidden">
+        <div class="vscroll">
+          <div class="vwrap narrow" id="settings-root"></div>
+        </div>
+      </div>
+    </main>
+
+    <nav id="tabbar">
+      <button data-view="home" class="on"><span data-icon="home"></span><small>Acasă</small></button>
+      <button data-view="files"><span data-icon="folder"></span><small>Fișiere</small></button>
+      <button class="tb-plus" id="tab-new" aria-label="Creează"><span data-icon="plus"></span></button>
+      <button data-view="invoices"><span data-icon="receipt"></span><small>Facturi</small></button>
+      <button data-view="settings"><span data-icon="gear"></span><small>Setări</small></button>
+    </nav>
+    <div id="drop-overlay" class="hidden"><div><span data-icon="pdf"></span>Lasă fișierul aici ca să-l deschizi</div></div>
+  </section>
+
+  <!-- Invoice program -->
+  <section id="invoice" class="screen hidden">
+    <header id="inv-top" class="bar">
+      <button class="ib" id="inv-back" title="Înapoi" data-icon="back"></button>
+      <div class="inv-tt"><b id="inv-title">Factură</b><small id="inv-subtitle"></small></div>
+      <div class="spacer"></div>
+      <button class="tb phone-only" id="inv-pv-btn" title="Vezi cum arată"><span data-icon="eye"></span><span class="lbl">Previzualizare</span></button>
+      <button class="tb" id="inv-new" title="Începe un document nou"><span data-icon="refresh"></span><span class="lbl">Nou</span></button>
+      <button class="tb" id="inv-adv-btn" title="Schimbă structura, culorile și textele"><span data-icon="palette"></span><span class="lbl">Aspect</span></button>
+      <button class="tb" id="inv-settings" title="Datele firmei"><span data-icon="building"></span><span class="lbl">Firma</span></button>
+    </header>
+    <div id="inv-body">
+      <div id="inv-left">
+        <div id="inv-form"></div>
+        <div id="inv-adv" class="hidden"></div>
+        <div id="inv-bar">
+          <div class="inv-sum"><small>Total de plată</small><b id="inv-total">0,00</b><span id="inv-sub"></span></div>
+          <button class="tb primary big" id="inv-create"><span data-icon="pdf"></span><span class="lbl">Creează PDF</span></button>
+        </div>
+      </div>
+      <div id="inv-preview-box">
+        <div class="pv-label"><span>Previzualizare</span><button class="tb phone-only" id="inv-pv-close"><span data-icon="close"></span><span class="lbl">Închide</span></button></div>
+        <div id="inv-preview-wrap"><iframe id="inv-preview" title="Factura" tabindex="-1"></iframe></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Editor -->
+  <section id="editor" class="screen hidden">
+    <header id="topbar">
+      <button class="ib" id="btn-home" title="Înapoi la început" data-icon="back"></button>
+      <div id="doc-title"><span id="doc-name"></span><span id="dirty-dot" class="hidden" title="Modificări nesalvate"></span></div>
+      <div class="sep"></div>
+      <button class="ib" id="btn-undo" title="Anulează (Ctrl+Z)" data-icon="undo"></button>
+      <button class="ib" id="btn-redo" title="Refă (Ctrl+Y)" data-icon="redo"></button>
+      <div class="vdiv"></div>
+      <button class="ib" id="btn-prev" title="Pagina anterioară" data-icon="left"></button>
+      <span id="page-ind">1 / 1</span>
+      <button class="ib" id="btn-next" title="Pagina următoare" data-icon="right"></button>
+      <div class="vdiv"></div>
+      <button class="ib" id="btn-search" title="Caută în document (Ctrl+F)" data-icon="search"></button>
+      <div class="spacer"></div>
+      <button class="tb" id="btn-open"><span data-icon="folder"></span><span class="lbl">Deschide</span></button>
+      <button class="tb primary" id="btn-save"><span data-icon="save"></span><span class="lbl">Salvează</span></button>
+      <button class="ib" id="btn-more" title="Mai multe" data-icon="more"></button>
+    </header>
+    <div id="toolbar">
+      <div id="tools"></div>
+      <div class="vdiv"></div>
+      <div id="style-controls"></div>
+    </div>
+    <div id="searchbar" class="hidden">
+      <input id="search-input" type="text" placeholder="Caută text în document…" spellcheck="false">
+      <span id="search-info"></span>
+      <button class="ib" id="search-prev" title="Anterior" data-icon="up"></button>
+      <button class="ib" id="search-next" title="Următor" data-icon="down"></button>
+      <div class="spacer"></div>
+      <button class="ib" id="search-close" title="Închide (Esc)" data-icon="close"></button>
+    </div>
+    <main id="main">
+      <aside id="thumbs"></aside>
+      <div id="viewport" tabindex="0"><div id="pages"></div></div>
+      <div id="zoombox">
+        <button class="ib" id="zoom-out" title="Micșorează (Ctrl + rotiță)" data-icon="zoomout"></button>
+        <button id="zoom-val" title="Potrivește pe lățime">100%</button>
+        <button class="ib" id="zoom-in" title="Mărește (Ctrl + rotiță)" data-icon="zoomin"></button>
+        <div class="vdiv"></div>
+        <button class="ib" id="zoom-fit" title="Potrivește pe lățime" data-icon="fit"></button>
+      </div>
+    </main>
+    <footer id="status"><span id="hint"></span><span id="status-right"></span></footer>
+  </section>
+
+
+  <!-- Document (Word) -->
+  <section id="writer" class="screen hidden office">
+    <header class="otop">
+      <button class="ib" id="wr-back" title="Înapoi la început" data-icon="back"></button>
+      <span class="oapp word" data-icon="wordapp"></span>
+      <div class="odoc"><span id="wr-name"></span><span id="wr-dirty" class="odirty hidden" title="Modificări nesalvate"></span></div>
+      <div class="spacer"></div>
+      <button class="tb" id="wr-pdf"><span data-icon="pdf"></span><span class="lbl">Exportă PDF</span></button>
+      <button class="tb primary" id="wr-save"><span data-icon="save"></span><span class="lbl">Salvează</span></button>
+      <button class="ib" id="wr-more" title="Mai multe" data-icon="more"></button>
+    </header>
+    <div class="otools" id="wr-tools"></div>
+    <div id="wr-findbar" class="obar hidden">
+      <input id="wr-find" type="text" placeholder="Caută…" spellcheck="false">
+      <button class="ib" id="wr-fprev" title="Anterior" data-icon="up"></button>
+      <button class="ib" id="wr-fnext" title="Următor" data-icon="down"></button>
+      <input id="wr-replace" type="text" placeholder="Înlocuiește cu…" spellcheck="false">
+      <button class="tb" id="wr-rone">Înlocuiește</button>
+      <button class="tb" id="wr-rall">Înlocuiește tot</button>
+      <span id="wr-findinfo"></span>
+      <div class="spacer"></div>
+      <button class="ib" id="wr-fclose" title="Închide" data-icon="close"></button>
+    </div>
+    <div id="wr-scroll">
+      <div id="wr-page-wrap"><div id="wr-page" contenteditable="true" spellcheck="false"></div></div>
+      <div id="wr-imgbar" class="fbar obar-float hidden"></div>
+      <div id="wr-tblbar" class="fbar obar-float hidden"></div>
+    </div>
+    <footer class="ofoot">
+      <span id="wr-count"></span>
+      <div class="spacer"></div>
+      <button class="ib" id="wr-zout" title="Micșorează" data-icon="zoomout"></button>
+      <button class="zv" id="wr-zoomval" title="Potrivește">100%</button>
+      <button class="ib" id="wr-zin" title="Mărește" data-icon="zoomin"></button>
+    </footer>
+  </section>
+
+  <!-- Tabel (Excel) -->
+  <section id="sheet" class="screen hidden office">
+    <header class="otop">
+      <button class="ib" id="sh-back" title="Înapoi la început" data-icon="back"></button>
+      <span class="oapp sheet" data-icon="sheetapp"></span>
+      <div class="odoc"><span id="sh-name"></span><span id="sh-dirty" class="odirty hidden" title="Modificări nesalvate"></span></div>
+      <div class="spacer"></div>
+      <button class="tb" id="sh-pdf"><span data-icon="pdf"></span><span class="lbl">Exportă PDF</span></button>
+      <button class="tb primary" id="sh-save"><span data-icon="save"></span><span class="lbl">Salvează</span></button>
+      <button class="ib" id="sh-more" title="Mai multe" data-icon="more"></button>
+    </header>
+    <div class="otools" id="sh-tools"></div>
+    <div class="fxrow">
+      <input id="sh-cellname" spellcheck="false" title="Celula selectată (scrie o adresă și apasă Enter)">
+      <span class="fx">fx</span>
+      <input id="sh-input" spellcheck="false" placeholder="Scrie o valoare sau o formulă, ex. =SUM(B2:B10)">
+    </div>
+    <div id="sh-grid">
+      <canvas id="sh-canvas"></canvas>
+      <div id="sh-scroll" tabindex="0"><div id="sh-spacer"></div></div>
+      <textarea id="sh-edit" class="hidden" spellcheck="false"></textarea>
+    </div>
+    <footer class="ofoot">
+      <div id="sh-tabs"></div>
+      <div class="spacer"></div>
+      <span id="sh-stat"></span>
+    </footer>
+  </section>
+
+  <!-- Prezentare (PowerPoint) -->
+  <section id="slides" class="screen hidden office">
+    <header class="otop">
+      <button class="ib" id="sl-back" title="Înapoi la început" data-icon="back"></button>
+      <span class="oapp slides" data-icon="slidesapp"></span>
+      <div class="odoc"><span id="sl-name"></span><span id="sl-dirty" class="odirty hidden" title="Modificări nesalvate"></span></div>
+      <div class="spacer"></div>
+      <button class="tb" id="sl-play" title="Prezintă (F5)"><span data-icon="play"></span><span class="lbl">Prezintă</span></button>
+      <button class="tb" id="sl-pdf"><span data-icon="pdf"></span><span class="lbl">Exportă PDF</span></button>
+      <button class="tb primary" id="sl-save"><span data-icon="save"></span><span class="lbl">Salvează</span></button>
+      <button class="ib" id="sl-more" title="Mai multe" data-icon="more"></button>
+    </header>
+    <div class="otools" id="sl-tools"></div>
+    <div id="sl-body">
+      <aside id="sl-list" tabindex="0"></aside>
+      <div id="sl-stage"><div id="sl-wrap"></div></div>
+    </div>
+    <footer class="ofoot"><span id="sl-pos"></span><div class="spacer"></div><span class="muted small">Dublu-click pe text ca să-l editezi · trage ca să muți · F5 prezintă</span></footer>
+    <div id="sl-present" class="hidden"></div>
+  </section>
+
+  <!-- Scanner: photo -> clean, straight page -->
+  <section id="scanner" class="screen hidden">
+    <header class="bar sc-top">
+      <button class="ib" id="sc-back" title="Înapoi" data-icon="back"></button>
+      <div class="sc-tt"><b>Scanare</b><small id="sc-sub"></small></div>
+      <div class="spacer"></div>
+      <button class="tb" id="sc-rot" title="Rotește pagina"><span data-icon="rotr"></span><span class="lbl">Rotește</span></button>
+      <button class="tb" id="sc-crop" title="Ajustează colțurile foii"><span data-icon="crop"></span><span class="lbl">Margini</span></button>
+      <button class="ib" id="sc-del" title="Șterge pagina" data-icon="del"></button>
+    </header>
+    <div id="sc-stage">
+      <img id="sc-img" class="hidden" alt="">
+      <canvas id="sc-cv"></canvas>
+      <svg id="sc-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="sc-loupe" class="hidden"><canvas></canvas></div>
+      <div id="sc-busy" class="hidden"><div class="sc-busy-box"><div class="spinner"></div><b id="sc-busy-t"></b><div id="sc-busy-bar" class="sc-prog"><i id="sc-busy-p"></i></div></div></div>
+    </div>
+    <div id="sc-cropbar">
+      <p class="sc-hint">Trage colțurile albastre pe colțurile foii.</p>
+      <div class="sc-row">
+        <button class="btn" id="sc-crop-full" type="button">Toată poza</button>
+        <button class="btn" id="sc-crop-auto" type="button">Automat</button>
+        <div class="spacer"></div>
+        <button class="btn" id="sc-crop-cancel" type="button">Anulează</button>
+        <button class="btn primary" id="sc-crop-ok" type="button">Aplică</button>
+      </div>
+    </div>
+    <div id="sc-panel">
+      <div id="sc-filters" class="sc-chips"></div>
+      <div id="sc-strip"></div>
+      <label class="sc-check"><input type="checkbox" id="sc-ocr"><span><b>Text căutabil în PDF</b><small>Citește textul din poză: îl poți căuta și copia</small></span></label>
+      <div class="sc-row sc-actions">
+        <button class="btn" id="sc-word" type="button"><span data-icon="wordapp"></span><span>Text editabil</span></button>
+        <button class="btn primary" id="sc-pdf" type="button"><span data-icon="pdf"></span><span>Salvează PDF</span></button>
+      </div>
+    </div>
+  </section>
+
+  <div id="busy" class="hidden"><div class="busy-box"><div class="spinner"></div><span id="busy-label">Se lucrează…</span></div></div>
+  <div id="modal-root"></div>
+  <div id="toasts"></div>
+
+  <script src="js/pdfium-runtime.js"></script>
+  <script src="js/fonts.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/host.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/pageview.js"></script>
+  <script src="js/panels.js"></script>
+  <script src="js/imagetext.js"></script>
+  <script src="js/scancore.js"></script>
+  <script src="js/scanner.js"></script>
+  <script src="js/business.js"></script>
+  <script src="js/invoice.js"></script>
+  <script src="js/office/common.js"></script>
+  <script src="js/office/formula.js"></script>
+  <script src="js/office/sheet.js"></script>
+  <script src="js/office/writer.js"></script>
+  <script src="js/office/slides.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

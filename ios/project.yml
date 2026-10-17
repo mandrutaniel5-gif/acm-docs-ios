@@ -1,0 +1,63 @@
+name: ACMDocs
+options:
+  bundleIdPrefix: ro.acmcode
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+targets:
+  ACMDocs:
+    type: application
+    platform: iOS
+    sources:
+      - path: ACMDocs
+      - path: www
+        type: folder
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_NAME: ACMDocs
+        PRODUCT_BUNDLE_IDENTIFIER: ro.acmcode.docs
+        MARKETING_VERSION: "2.0.5"
+        CURRENT_PROJECT_VERSION: "20005"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_BITCODE: NO
+        INFOPLIST_FILE: ACMDocs/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+    info:
+      path: ACMDocs/Info.plist
+      properties:
+        CFBundleDisplayName: ACM Docs
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDevelopmentRegion: ro
+        CFBundleLocalizations: [ro, en]
+        LSRequiresIPhoneOS: true
+        UILaunchScreen:
+          UIColorName: ""
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        ITSAppUsesNonExemptEncryption: false
+        NSCameraUsageDescription: "ACM Docs folosește camera ca să scaneze documente (poză → PDF)."
+        NSPhotoLibraryUsageDescription: "ACM Docs deschide pozele alese ca să le transforme în documente."
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Documente
+            CFBundleTypeRole: Editor
+            LSHandlerRank: Alternate
+            LSItemContentTypes:
+              - com.adobe.pdf
+              - public.image
+              - org.openxmlformats.wordprocessingml.document
+              - org.openxmlformats.spreadsheetml.sheet
+              - org.openxmlformats.presentationml.presentation
+              - com.microsoft.word.doc
+              - com.microsoft.excel.xls
+              - public.plain-text
