@@ -992,4 +992,6 @@ window.I18N_EN = {"ACM Docs":"ACM Docs",
 "Aici nu e nimic desenat de șters. Radiera șterge desenele, marcajele și bifele.":"Nothing drawn to erase here. The eraser removes drawings, highlights and ticks.",
 "Alege din galerie (una sau mai multe)":"Choose from the gallery (one or more)",
 "Textul din PDF e gata: îl poți căuta și copia.":"The PDF text is ready: you can search and copy it.",
-"Se pregătesc paginile…":"Preparing the pages…"};
+"Se pregătesc paginile…":"Preparing the pages…",
+"Aplicația Fișiere › Pe iPhone › ACM Docs":"Files app › On My iPhone › ACM Docs",
+"Fișiere › ACM Docs › Scanări":"Files › ACM Docs › Scanări"};
