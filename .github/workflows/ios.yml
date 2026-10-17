@@ -67,6 +67,10 @@ jobs:
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build 2>&1 | tee build-dev.log | grep -E "error:|BUILD (SUCCEEDED|FAILED)" || true
           grep -q "BUILD SUCCEEDED" build-dev.log
           mkdir -p Payload && cp -R build/Build/Products/Release-iphoneos/ACMDocs.app Payload/
+          # ad-hoc signature: Sideloadly / AltStore re-sign it with the user's Apple ID
+          # (a binary with no signature at all fails on the phone: "No code signature found")
+          codesign --force --sign - --timestamp=none Payload/ACMDocs.app
+          codesign -dv Payload/ACMDocs.app 2>&1 | tee ../codesign.txt
           zip -qr ../ACM-Docs-unsigned.ipa Payload
 
       - uses: actions/upload-artifact@v4
@@ -84,7 +88,7 @@ jobs:
         if: always()
         run: |
           mkdir -p /tmp/out && cp -R shots /tmp/out/ 2>/dev/null || true
-          cp ACM-Docs-unsigned.ipa ios/build-sim.log ios/build-dev.log /tmp/out/ 2>/dev/null || true
+          cp ACM-Docs-unsigned.ipa codesign.txt ios/build-sim.log ios/build-dev.log /tmp/out/ 2>/dev/null || true
           cd /tmp/out
           git init -q -b ios-build
           git config user.name "github-actions"
