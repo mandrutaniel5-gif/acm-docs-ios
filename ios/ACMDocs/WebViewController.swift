@@ -112,19 +112,19 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
         });
         return JSON.stringify(out, null, 1);
         """
-        web.callAsyncJavaScript(js, arguments: [:], in: nil, in: .page) { result in
-            let text: String
-            switch result {
-            case .success(let v): text = (v as? String) ?? String(describing: v)
-            case .failure(let e): text = "ERROR " + e.localizedDescription
-            }
-            try? text.write(to: Files.docsRoot.appendingPathComponent("selftest.json"), atomically: true, encoding: .utf8)
-            // a short tour, for the screenshots of the cloud build
-            let steps = ["App.showView('settings')", "Invoice.open({ type: 'invoice' })", "App.showHome(); App.showView('files')"]
-            for (i, s) in steps.enumerated() {
-                DispatchQueue.main.asyncAfter(deadline: .now() + Double(8 * (i + 1))) { self.web.evaluateJavaScript(s, completionHandler: nil) }
-            }
-        }
+        // Plain evaluateJavaScript only: the Swift-only WebKit calls (callAsyncJavaScript with Result)
+        // need libswiftWebKit.dylib, which iOS 18 no longer has (the app would not even start).
+        // The page writes the result itself, then takes a short tour for the cloud build's screenshots.
+        let wrapped = """
+        (async () => {
+          let text;
+          try { text = await (async () => { \(js) })(); } catch (e) { text = 'ERROR ' + (e && e.message || e); }
+          try { AndroidBridge.writeB64(Host.info.docs + '/selftest.json', Host.toB64(new TextEncoder().encode(text))); } catch (e) {}
+          const tour = [() => App.showView('settings'), () => Invoice.open({ type: 'invoice' }), () => { App.showHome(); App.showView('files'); }];
+          tour.forEach((f, i) => setTimeout(() => { try { f(); } catch (e) {} }, 8000 * (i + 1)));
+        })(); 0
+        """
+        web.evaluateJavaScript(wrapped, completionHandler: nil)
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,

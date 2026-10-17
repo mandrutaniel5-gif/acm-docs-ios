@@ -33,6 +33,7 @@ jobs:
       - name: Run in the simulator (self-test + screenshots)
         run: |
           mkdir -p shots
+          for f in ios/build/Build/Products/Debug-iphonesimulator/ACMDocs.app/ACMDocs*; do echo "== $f"; otool -L "$f"; done > shots/linked-libs.txt 2>&1 || true
           UDID=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next(x['udid'] for k,v in d.items() if 'iOS' in k for x in v if x['name'].startswith('iPhone')))")
           echo "simulator $UDID"
           xcrun simctl boot "$UDID"
