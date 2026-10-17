@@ -19,9 +19,17 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-pc-windows-gnu
-      - name: mingw
-        run: sudo apt-get update && sudo apt-get install -y mingw-w64 nasm
+      - name: mingw + swap
+        run: |
+          sudo apt-get update && sudo apt-get install -y mingw-w64 nasm
+          sudo fallocate -l 8G /swapfile2 && sudo chmod 600 /swapfile2 && sudo mkswap /swapfile2 && sudo swapon /swapfile2 && free -g
       - name: Build
+        env:
+          # private-repo runners have ~7 GB RAM: full LTO + full debug info runs out of memory
+          CARGO_PROFILE_RELEASE_LTO: "false"
+          CARGO_PROFILE_RELEASE_DEBUG: "0"
+          CARGO_PROFILE_RELEASE_CODEGEN_UNITS: "16"
+          CARGO_PROFILE_RELEASE_INCREMENTAL: "false"
         run: |
           set -o pipefail
           cargo build --bins --workspace --release --target x86_64-pc-windows-gnu 2>&1 | tee build.log
