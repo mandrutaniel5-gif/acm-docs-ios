@@ -40,15 +40,58 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
         if #available(iOS 16.4, *) { web.isInspectable = true }
         web.translatesAutoresizingMaskIntoConstraints = false
         root.addSubview(web)
+        let bottom = web.bottomAnchor.constraint(equalTo: root.bottomAnchor) // the page leaves room for the home bar itself
         NSLayoutConstraint.activate([
             web.topAnchor.constraint(equalTo: root.safeAreaLayoutGuide.topAnchor),
             web.leadingAnchor.constraint(equalTo: root.leadingAnchor),
             web.trailingAnchor.constraint(equalTo: root.trailingAnchor),
-            web.bottomAnchor.constraint(equalTo: root.bottomAnchor), // the page leaves room for the home bar itself
+            bottom,
         ])
+        webBottom = bottom
         self.web = web
 
+        // the keyboard must never cover what is being typed: the page shrinks to the space above it
+        let nc = NotificationCenter.default
+        nc.addObserver(self, selector: #selector(keyboardChanged(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        nc.addObserver(self, selector: #selector(keyboardChanged(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+
         if #available(iOS 26.0, *) { addGlassTabBar(to: root, content: content) }
+    }
+
+    // MARK: keyboard
+
+    private var webBottom: NSLayoutConstraint?
+    private(set) var keyboardShown = false
+    private var lastTabbarVisible = false
+
+    @objc private func keyboardChanged(_ n: Notification) {
+        guard let info = n.userInfo, isViewLoaded, view.window != nil else { return }
+        let end = (info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue ?? .zero
+        let frame = view.convert(end, from: nil)
+        let hiding = n.name == UIResponder.keyboardWillHideNotification
+        let overlap = hiding ? 0 : max(0, view.bounds.maxY - frame.minY)
+        let open = overlap > 40 // a floating / undocked iPad keyboard does not count
+        guard webBottom?.constant != -overlap || open != keyboardShown else { return }
+        keyboardShown = open
+        webBottom?.constant = open ? -overlap : 0
+        let duration = (info[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0.25
+        let curve = (info[UIResponder.keyboardAnimationCurveUserInfoKey] as? NSNumber)?.uintValue ?? 7
+        UIView.animate(withDuration: duration, delay: 0, options: [UIView.AnimationOptions(rawValue: curve << 16), .beginFromCurrentState]) {
+            self.view.layoutIfNeeded()
+        } completion: { _ in
+            // tell the page (no home-bar gap above the keyboard) and bring the field into view
+            let js = """
+            (function () {
+              document.documentElement.classList.toggle('kb-open', \(open));
+              var e = document.activeElement;
+              if (\(open) && e && e !== document.body && e.scrollIntoView) e.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            })()
+            """
+            // WebKit may have pushed the whole page up on its own: undo it, the page scrolls its panels itself
+            self.web.scrollView.setContentOffset(.zero, animated: false)
+            self.web.evaluateJavaScript(js, completionHandler: nil)
+        }
+        if #available(iOS 26.0, *), let bar = glassBar as? GlassTabBar { bar.setShown(!open && lastTabbarVisible) }
     }
 
     // MARK: iOS 26+: Liquid Glass bottom bar
@@ -122,7 +165,8 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
         guard #available(iOS 26.0, *), let bar = glassBar as? GlassTabBar else { return }
         if !active.isEmpty && active != bar.active { bar.setActive(active, animated: bar.shown) }
         if !active.isEmpty { bar.setPageActive(active) }
-        bar.setShown(visible)
+        lastTabbarVisible = visible
+        bar.setShown(visible && !keyboardShown)
     }
 
     override func viewDidLoad() {

@@ -123,6 +123,35 @@ final class ACMDocsUITests: XCTestCase {
         shot("05-after-plus")
     }
 
+    /// The field being typed into must stay visible above the keyboard (company wizard, step 2:
+    /// a sheet at the bottom of the screen, the worst case).
+    func test4_KeyboardDoesNotCoverField() throws {
+        if app.buttons["tab-home"].exists { app.buttons["tab-home"].tap(); sleep(1) }
+        let invoice = webButton("Factură")
+        guard invoice.waitForExistence(timeout: 8) else { XCTFail("\(device): no Factură on home"); return }
+        invoice.tap()
+        sleep(3)
+        let next = webButton("Continuă")
+        guard next.waitForExistence(timeout: 6) else { shot("10-kb-no-wizard"); throw XCTSkip("company wizard did not open (company already set?)") }
+        next.tap()
+        sleep(2)
+        let fields = app.webViews.textFields.allElementsBoundByIndex.filter { $0.exists && !$0.frame.isEmpty && $0.frame.minY < app.frame.maxY }
+        guard let field = fields.max(by: { $0.frame.minY < $1.frame.minY }) else { shot("10-kb-no-fields"); XCTFail("\(device): no text fields in step 2"); return }
+        shot("10-kb-before")
+        field.tap()
+        let kb = app.keyboards.firstMatch
+        guard kb.waitForExistence(timeout: 6) else { shot("10-kb-none"); throw XCTSkip("no on-screen keyboard in this simulator") }
+        sleep(2) // keyboard animation + the page moving the field into view
+        shot("11-kb-open")
+        let f = field.frame, k = kb.frame
+        XCTAssertLessThanOrEqual(f.maxY, k.minY + 1, "\(device): the keyboard covers the field (field bottom \(f.maxY), keyboard top \(k.minY))")
+        XCTAssertGreaterThanOrEqual(f.minY, 0, "\(device): the field went off the top of the screen")
+        field.typeText("RO123")
+        sleep(1)
+        shot("12-kb-typed")
+        XCTAssertLessThanOrEqual(field.frame.maxY, kb.frame.minY + 1, "\(device): field covered while typing")
+    }
+
     func test3_ScreensAndBack() throws {
         for (name, prefix) in [("document", "Document"), ("tabel", "Tabel"), ("prezentare", "Prezentare"), ("factura", "Factură")] {
             if app.buttons["tab-home"].exists { app.buttons["tab-home"].tap(); sleep(1) }
