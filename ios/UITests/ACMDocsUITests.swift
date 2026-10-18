@@ -47,8 +47,9 @@ final class ACMDocsUITests: XCTestCase {
     }
 
     func dismissSheetIfAny() {
+        // exact names: "Anulează (Ctrl+Z)" is the Undo button of the editors, not a dialog's Cancel
         for label in ["Anulează", "Închide", "Renunță", "Mai târziu"] {
-            let b = webButton(label)
+            let b = app.webViews.buttons.matching(NSPredicate(format: "label == %@", label)).firstMatch
             if b.exists && b.isHittable { b.tap(); sleep(1); return }
         }
     }
@@ -173,6 +174,7 @@ final class ACMDocsUITests: XCTestCase {
             }
             sleep(2)
             dismissSheetIfAny() // e.g. "save changes?"
+            if !homeShown(timeout: 4) { shot("09-\(name)-back-not-home") }
             XCTAssertTrue(homeShown(), "\(device): Back on \(name) did not return home")
             shot("09-\(name)-after-back")
         }
