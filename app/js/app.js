@@ -560,14 +560,17 @@ const App = (() => {
     copyPath = null;
   }
 
-  async function openPath(p) {
+  // `given`: bytes already in memory (a decrypted .acm, never written to disk)
+  async function openPath(p, given) {
     if (!p) return;
     if (!(await ensureSaved())) return;
     if (!(await Office.ensureSaved())) return;
     const name = Host.baseName(p);
+    // a protected (decrypted) document leaves no trace: no recent-files entry, no thumbnail
+    const quietDoc = typeof Shield !== 'undefined' && Shield.isProtected(p);
     let bytes;
     try {
-      bytes = Host.readFile(p);
+      bytes = given || Host.readFile(p);
     } catch (e) {
       UI.toast(`Nu pot citi „${name}”. Poate a fost mutat, șters sau e deschis în alt program.`, { error: true, action: { label: 'Detalii', run: () => UI.errorDetails('Nu pot citi fișierul', e) } });
       forget(p);
@@ -582,6 +585,7 @@ const App = (() => {
       if (kind === 'sheet') await Sheet.open(p, bytes);
       else if (kind === 'slides') await Slides.open(p, bytes);
       else await Writer.open(p, bytes, kind);
+      if (quietDoc) return;
       rememberFile(p, known ? known.kind : kindFromName(p), null, known && known.from);
       const node = kind === 'sheet' ? $('sh-grid') : kind === 'slides' ? $('sl-wrap') : $('wr-page');
       setTimeout(async () => { const t = await Office.thumbOf(node); if (t) setThumb(p, t); }, 900);
@@ -599,7 +603,7 @@ const App = (() => {
         setSource(p, name.replace(/\.pdf$/i, ''));
         const known = files().find((f) => f.path === p);
         const isInvoice = Biz.docs().some((h) => h.path === p);
-        if (!isInvoice) rememberFile(p, known ? known.kind : kindFromName(p), res.doc, known && known.from);
+        if (!isInvoice && !quietDoc) rememberFile(p, known ? known.kind : kindFromName(p), res.doc, known && known.from);
       } else if (kind === 'image') {
         const doc = await imageToDoc(bytes);
         Editor.openDoc(doc, { path: null, name: name.replace(/\.[^.]+$/, '') + '.pdf' });
