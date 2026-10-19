@@ -126,6 +126,8 @@ try {
   }
   if (!enrolled) throw lastErr;
   await signOut(auth3);
+  // a code is good once: wait for the next one before signing in
+  await new Promise((r) => setTimeout(r, (period - (Math.floor(Date.now() / 1000) % period) + 1) * 1000));
   let needs = false, resolver = null;
   try { await signInWithEmailAndPassword(auth3, `${handle}@example.invalid`, password); } catch (e) { needs = e.code === 'auth/multi-factor-auth-required'; if (needs) resolver = getMultiFactorResolver(auth3, e); }
   if (!needs) throw new Error('two-step: the password alone still signed in');
