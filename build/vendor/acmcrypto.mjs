@@ -16,6 +16,7 @@ import { x25519, ed25519 } from '@noble/curves/ed25519.js';
 import { hkdf } from '@noble/hashes/hkdf.js';
 import { sha256 } from '@noble/hashes/sha2.js';
 import { argon2id } from '@noble/hashes/argon2.js';
+import { hmac } from '@noble/hashes/hmac.js';
 import { randomBytes, concatBytes, utf8ToBytes } from '@noble/hashes/utils.js';
 import { xchacha20poly1305 } from '@noble/ciphers/chacha.js';
 import { ml_kem768 } from '@noble/post-quantum/ml-kem.js';
@@ -293,3 +294,6 @@ export function signEd(id, message) { return ed25519.sign(utf8ToBytes(String(mes
 export function verifyEd(pub32, message, sig) { try { return ed25519.verify(toBytes(sig), utf8ToBytes(String(message)), toBytes(pub32)); } catch (e) { return false; } }
 export function edPublic(bundle) { return decodePublicKey(bundle).ed; }
 export { b64 as toB64, unb64 as fromB64 };
+
+/** HMAC-SHA256 of a text with a key derived from the vault key (integrity of local records). */
+export function macText(vkey, label, text) { return hex(hmac(sha256, kdf(vkey, undefined, 'acm/mac/' + label, 32), utf8ToBytes(String(text)))); }

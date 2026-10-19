@@ -292,8 +292,7 @@ const Biz = (() => {
     // The logo the old version used when none was chosen (Windows only).
     if (Host.platform !== 'electron') return null;
     try {
-      const file = require('url').fileURLToPath(new URL('assets/legacy-logo.jpg', location.href));
-      return 'data:image/jpeg;base64,' + Host.toB64(Host.readFile(file));
+      return 'data:image/jpeg;base64,' + Host.toB64(window.ElectronHost.appFile('assets/legacy-logo.jpg'));
     } catch (e) { return null; }
   }
 

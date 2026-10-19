@@ -39,6 +39,34 @@ const Contacts = (() => {
 
   /** 'verified' | 'unverified' | 'changed' */
   const status = (c) => (c.pending ? 'changed' : c.verified ? 'verified' : 'unverified');
+
+  // ---------------------------------------------------------------- integrity of "verified"
+  // Who you verified is signed (HMAC) with a key only the account has. Someone who edits the app's
+  // storage on this device cannot mark a contact as verified: the signature would not match.
+  const macKey = () => 'acm.contacts.mac.' + (me() ? me().uid : '-');
+  const MIGRATED = () => 'contacts.signed.' + (me() ? me().uid : '-');
+  const canon = (map) => JSON.stringify(Object.values(map).filter((c) => c.verified && !c.pending).map((c) => [c.uid, c.fp]).sort());
+  const macOf = (vk, map) => A().macText(vk, 'contacts', canon(map));
+  async function resign() {
+    try {
+      const vk = A().vaultKey(await Account.unlock('Confirmă ca să salvezi verificarea'));
+      localStorage.setItem(macKey(), macOf(vk, all()));
+      await Host.secureSet(MIGRATED(), new Uint8Array([1]), { quiet: true });
+    } catch (e) { console.warn('contacts mac', e); }
+  }
+  /** After an unlock: if the verified list was changed outside the app, nobody counts as verified. */
+  async function checkIntegrity(id) {
+    const vk = A().vaultKey(id);
+    const map = all();
+    const stored = (() => { try { return localStorage.getItem(macKey()); } catch (e) { return null; } })();
+    const signedBefore = !!(await Host.secureGet(MIGRATED(), '', { quiet: true }).catch(() => null));
+    if (!signedBefore) { await resign(); return true; } // first run of this version: sign what is there
+    if (stored === macOf(vk, map)) return true;
+    Object.values(map).forEach((c) => { c.verified = false; });
+    saveAll(map);
+    try { localStorage.setItem(macKey(), macOf(vk, map)); } catch (e) {}
+    return false;
+  }
   const keyBytes = (c) => Host.fromB64(c.key);
   const shortFp = (fp) => String(fp || '').slice(0, 20).toUpperCase().match(/.{4}/g).join(' ');
 
@@ -170,6 +198,7 @@ const Contacts = (() => {
     c.verified = true; c.verifiedAt = Date.now(); delete c.pending;
     Object.assign(c, { handle: p.handle, name: p.name || c.name, fp: p.fp, key: Host.toB64(p.key) });
     put(c);
+    await resign();
     UI.toast(`@${c.handle} este verificat ✓`);
     return c;
   }
@@ -322,19 +351,20 @@ const Contacts = (() => {
     else if (action === 'mark') {
       if (await UI.confirm('Sunt cifrele identice?', 'Marchează verificat doar dacă ați comparat toate cele 60 de cifre față în față sau la telefon, cu vocea persoanei.', 'Da, sunt identice')) {
         put(Object.assign(get(uid), { verified: true, verifiedAt: Date.now() }));
-        UI.toast(`@${escHtml(c.handle)} este verificat ✓`);
+        await resign();
+        UI.toast(`@${c.handle} este verificat ✓`);
       }
       return showContact(uid);
-    } else if (action === 'unmark') { put(Object.assign(get(uid), { verified: false })); return showContact(uid); }
+    } else if (action === 'unmark') { put(Object.assign(get(uid), { verified: false })); await resign(); return showContact(uid); }
     else if (action === 'accept') {
-      if (await UI.confirm('Accepți cheia nouă?', `Documentele trimise de acum vor putea fi deschise doar cu cheia nouă. Dacă nu ești sigur că @${escHtml(c.handle)} și-a schimbat cheile, întreabă-l întâi.`, 'Acceptă')) acceptNewKey(uid, false);
+      if (await UI.confirm('Accepți cheia nouă?', `Documentele trimise de acum vor putea fi deschise doar cu cheia nouă. Dacă nu ești sigur că @${c.handle} și-a schimbat cheile, întreabă-l întâi.`, 'Acceptă')) { acceptNewKey(uid, false); await resign(); }
       return showContact(uid);
     } else if (action === 'delete') {
-      if (await UI.confirm('Ștergi contactul?', `@${escHtml(c.handle)} dispare din contactele tale de pe acest dispozitiv.`, 'Șterge')) remove(uid);
+      if (await UI.confirm('Ștergi contactul?', `@${c.handle} dispare din contactele tale de pe acest dispozitiv.`, 'Șterge')) remove(uid);
     }
   }
 
-  return { scanCode: scan, list, get, put, remove, status, refresh, addFromProfile, acceptNewKey, badge, avatar, contactRow, searchBox, scanAndVerify, showMyCode, showList, showContact, parseQr };
+  return { checkIntegrity, scanCode: scan, list, get, put, remove, status, refresh, addFromProfile, acceptNewKey, badge, avatar, contactRow, searchBox, scanAndVerify, showMyCode, showList, showContact, parseQr };
 })();
 
 const AcmShare = (() => {
@@ -379,6 +409,13 @@ const AcmShare = (() => {
     if (!choice) return;
     let { people, password } = choice;
 
+    let id;
+    try { id = await Account.unlock(`Confirmă criptarea documentului „${name}”`); } catch (e) { if (String(e && e.message) !== 'cancel') UI.toast(Account.say(e), { error: true }); return; }
+    if (!(await Contacts.checkIntegrity(id))) {
+      await UI.confirm('Verificările contactelor au fost resetate', 'Lista contactelor verificate a fost modificată în afara aplicației, așa că aplicația nu mai are încredere în ea. Verifică din nou, prin cod QR, persoanele importante.', 'Am înțeles', 'Închide');
+    }
+    people = people.map((c) => Contacts.get(c.uid) || c);
+
     // last look at the server: a changed padlock stops everything
     UI.busy('Se verifică destinatarii…');
     try { people = await Promise.all(people.map((c) => Contacts.refresh(c))); } finally { UI.busy(); }
@@ -395,8 +432,6 @@ const AcmShare = (() => {
       if (!ok) return;
     }
 
-    let id;
-    try { id = await Account.unlock(`Confirmă criptarea documentului „${name}”`); } catch (e) { if (String(e && e.message) !== 'cancel') UI.toast(Account.say(e), { error: true }); return; }
     UI.busy(password ? 'Se criptează (cu parolă)…' : 'Se criptează…');
     await yieldUI();
     let out;
@@ -484,7 +519,7 @@ const AcmShare = (() => {
           const c = Contacts.addFromProfile(p);
           chosen.set(c.uid, c);
           out.innerHTML = '';
-          out.append(el('p', { class: 'cmsg', text: `@${escHtml(c.handle)} a fost adăugat.` }));
+          out.append(el('p', { class: 'cmsg', text: `@${c.handle} a fost adăugat.` }));
           draw(); update();
         }),
         listBox,
@@ -573,6 +608,7 @@ const AcmShare = (() => {
     if (!(await ensureAccount())) return;
     const res = await decryptBytes(Host.baseName(path), bytes);
     if (!res) return;
+    try { await Contacts.checkIntegrity(await Account.unlock()); } catch (e) {}
     // only documents meant for this account are kept (still encrypted) under Files › Criptate
     try { await keepEncrypted(path, bytes); } catch (e) { console.warn('keep .acm', e); }
     const sender = await describeSender(res.sender);
@@ -593,7 +629,7 @@ const AcmShare = (() => {
     });
     if (go === 'add' && sender.add) {
       const c = Contacts.addFromProfile(sender.add);
-      if (c) UI.toast(`@${escHtml(c.handle)} a fost adăugat la contacte (neverificat).`);
+      if (c) UI.toast(`@${c.handle} a fost adăugat la contacte (neverificat).`);
       return;
     }
     if (go === 'save') return saveDecrypted(res);

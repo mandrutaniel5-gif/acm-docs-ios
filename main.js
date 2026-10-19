@@ -53,9 +53,13 @@ if (!single) {
       icon: path.join(__dirname, 'app', 'icon.png'),
       show: false,
       webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false,
-        sandbox: false,
+        // the page never gets Node.js: it is isolated and talks to the computer only through
+        // the few functions in preload.js
+        nodeIntegration: false,
+        contextIsolation: true,
+        sandbox: false, // the preload needs fs; the page itself has no access to it
+        preload: path.join(__dirname, 'preload.js'),
+        webviewTag: false,
         spellcheck: false,
       },
     });

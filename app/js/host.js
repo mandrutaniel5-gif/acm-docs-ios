@@ -5,15 +5,14 @@
 //   - Android: a WebView with a small Java bridge (window.AndroidBridge)
 
 const Host = (() => {
-  const nodeRequire = typeof require === 'function' ? require : null;
+  // Windows: the page is isolated from Node.js; it talks to the computer only through the small
+  // ElectronHost bridge (preload.js). Phones: window.AndroidBridge (Android) / its iOS twin.
+  const EH = typeof window !== 'undefined' ? window.ElectronHost : null;
   const AB = typeof window !== 'undefined' ? window.AndroidBridge : null;
-  const platform = AB ? 'android' : nodeRequire ? 'electron' : 'web';
-  const fs = platform === 'electron' ? nodeRequire('fs') : null;
-  const pathMod = platform === 'electron' ? nodeRequire('path') : null;
-  let ipc = null;
-  if (platform === 'electron') {
-    try { ipc = nodeRequire('electron').ipcRenderer; } catch (e) { ipc = null; }
-  }
+  const platform = AB ? 'android' : EH ? 'electron' : 'web';
+  const fs = EH ? EH.fs : null;
+  const pathMod = EH ? EH.path : null;
+  const ipc = EH ? { invoke: (...a) => EH.invoke(...a), on: (ch, cb) => EH.on(ch, (...args) => cb(null, ...args)) } : null;
 
   // ---------------------------------------------------------------- base64
   function toB64(bytes) {
@@ -74,7 +73,7 @@ const Host = (() => {
   // ---------------------------------------------------------------- files
   function readFile(p) {
     if (AB) return fromB64(String(p).startsWith('asset:') ? AB.readAsset(String(p).slice(6)) : AB.readB64(p));
-    return new Uint8Array(fs.readFileSync(p));
+    return fs.readFile(p);
   }
 
   /** Same as readFile, without freezing the screen (the phone streams the file instead of copying it as text). */
@@ -86,7 +85,7 @@ const Host = (() => {
       } catch (e) { /* older app: read it the slow way */ }
       return readFile(p);
     }
-    if (!AB && fs && fs.promises) return new Uint8Array(await fs.promises.readFile(p));
+    if (!AB && fs) return fs.readFileAsync(p);
     return readFile(p);
   }
 
@@ -95,37 +94,29 @@ const Host = (() => {
       if (!AB.writeB64(p, toB64(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)))) throw new Error('Nu pot scrie fișierul ' + baseName(p));
       return;
     }
-    // Write next to the target first, then replace it: a crash never leaves half a file.
-    const tmp = p + '.tmp-acmdocs';
-    fs.writeFileSync(tmp, bytes);
-    try {
-      fs.renameSync(tmp, p);
-    } catch (e) {
-      try { fs.unlinkSync(tmp); } catch (_) {}
-      fs.writeFileSync(p, bytes);
-    }
+    fs.writeFile(p, bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)); // atomic (preload)
   }
 
   function exists(p) {
     if (!p) return false;
     if (AB) return AB.isFile(p);
-    try { return fs.statSync(p).isFile(); } catch (e) { return false; }
+    return fs.isFile(p);
   }
   function listDir(d) {
     if (AB) { try { return JSON.parse(AB.listDir(d)); } catch (e) { return []; } }
-    try { return fs.readdirSync(d); } catch (e) { return []; }
+    return fs.readdir(d);
   }
   function mkdirp(d) {
     if (AB) return AB.mkdirs(d);
-    try { fs.mkdirSync(d, { recursive: true }); return true; } catch (e) { return false; }
+    return fs.mkdirp(d);
   }
   function mtime(p) {
     if (AB) return AB.mtime(p);
-    try { return fs.statSync(p).mtimeMs; } catch (e) { return 0; }
+    return fs.mtime(p);
   }
   function remove(p) {
     if (AB) return AB.remove(p);
-    try { fs.unlinkSync(p); return true; } catch (e) { return false; }
+    return fs.remove(p);
   }
 
   // ---------------------------------------------------------------- dialogs
@@ -196,8 +187,7 @@ const Host = (() => {
       const r = await fetch('pdfium/pdfium.wasm');
       return new Uint8Array(await r.arrayBuffer());
     }
-    const file = nodeRequire('url').fileURLToPath(new URL('pdfium/pdfium.wasm', location.href));
-    return fs.readFileSync(file);
+    return EH.appFile('pdfium/pdfium.wasm');
   }
 
   // ---------------------------------------------------------------- fonts
@@ -205,43 +195,7 @@ const Host = (() => {
     if (AB) {
       try { return JSON.parse(AB.fonts()); } catch (e) { return []; }
     }
-    const out = [];
-    if (!nodeRequire) return out;
-    const cp = nodeRequire('child_process');
-    const winDir = process.env.WINDIR || 'C:\\Windows';
-    for (const hive of ['HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts', 'HKCU\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts']) {
-      try {
-        const txt = cp.execSync(`reg query "${hive}"`, { encoding: 'utf8', windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'] });
-        for (const line of txt.split(/\r?\n/)) {
-          const parts = line.split(/\s+REG_(?:EXPAND_)?SZ\s+/);
-          if (parts.length !== 2) continue;
-          let name = parts[0].trim().replace(/\s*\(.*\)\s*$/, '');
-          let file = parts[1].trim();
-          if (!file.includes('\\')) file = `${winDir}\\Fonts\\${file}`;
-          for (const n of name.split('&')) if (n.trim()) out.push({ name: n.trim(), path: file });
-        }
-      } catch (e) {
-        /* key missing */
-      }
-    }
-    if (!out.length) {
-      // Not Windows (or registry blocked): scan the usual folders.
-      const dirs = [`${winDir}\\Fonts`, '/usr/share/fonts', '/usr/local/share/fonts'];
-      const walk = (d, depth) => {
-        let entries = [];
-        try { entries = fs.readdirSync(d, { withFileTypes: true }); } catch (e) { return; }
-        for (const e of entries) {
-          const p = pathMod.join(d, e.name);
-          if (e.isDirectory() && depth < 4) walk(p, depth + 1);
-          else if (/\.(ttf|otf|ttc)$/i.test(e.name)) {
-            const base = e.name.replace(/\.(ttf|otf|ttc)$/i, '').replace(/[-_]/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2');
-            out.push({ name: base, path: p });
-          }
-        }
-      };
-      for (const d of dirs) walk(d, 0);
-    }
-    return out;
+    return EH ? EH.listFonts() : [];
   }
 
   // ---------------------------------------------------------------- OCR
@@ -497,8 +451,7 @@ const Host = (() => {
   function appVersion() {
     if (AB) return info.version || '';
     try {
-      const file = nodeRequire('url').fileURLToPath(new URL('../package.json', location.href));
-      return JSON.parse(fs.readFileSync(file, 'utf8')).version || '';
+      return EH ? EH.appVersion() : '';
     } catch (e) { return ''; }
   }
 
@@ -586,7 +539,7 @@ const Host = (() => {
 
 /** Third-party libraries: Node modules on Windows, pre-built bundles on the phone. */
 const Lib = (() => {
-  const nodeRequire = typeof require === 'function' && !window.AndroidBridge ? require : null;
+  const nodeRequire = null; // no Node.js in the page anywhere: every platform loads the same bundles
   const BUNDLE = { jszip: 'zip', 'docx-preview': 'docx', docx: 'docx', 'word-extractor': 'docx', 'xlsx-js-style': 'xlsx', pptxgenjs: 'pptx' };
   const scripts = new Map();
   function script(src) {
@@ -617,15 +570,15 @@ const Lib = (() => {
   const clipboard = {
     writeText(t) {
       memText = String(t || '');
-      if (nodeRequire) { try { nodeRequire('electron').clipboard.writeText(memText); return; } catch (e) {} }
+      if (window.ElectronHost) { try { window.ElectronHost.clipboard.writeText(memText); return; } catch (e) {} }
       try { navigator.clipboard.writeText(memText).catch(() => {}); } catch (e) {}
     },
     readText() {
-      if (nodeRequire) { try { return nodeRequire('electron').clipboard.readText(); } catch (e) {} }
+      if (window.ElectronHost) { try { return window.ElectronHost.clipboard.readText(); } catch (e) {} }
       return memText;
     },
     async readTextAsync() {
-      if (nodeRequire) return clipboard.readText();
+      if (window.ElectronHost) return clipboard.readText();
       try { return (await navigator.clipboard.readText()) || memText; } catch (e) { return memText; }
     },
   };

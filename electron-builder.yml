@@ -5,6 +5,7 @@ directories:
   output: dist
 files:
   - main.js
+  - preload.js
   - ocr.js
   - app/**/*
   - "!app/vendor/**"
@@ -12,6 +13,11 @@ files:
   - app/vendor/acmcrypto.js
   - app/vendor/firebase.js
   - app/vendor/qr.js
+  # the same document libraries as on the phones (the page has no Node.js on Windows either)
+  - app/vendor/zip.js
+  - app/vendor/docx.js
+  - app/vendor/xlsx.js
+  - app/vendor/pptx.js
   - "!app/css/fonts-android.css"
   - "!node_modules/tesseract.js-core/tesseract-core.*"
   - "!node_modules/tesseract.js-core/tesseract-core-simd.*"

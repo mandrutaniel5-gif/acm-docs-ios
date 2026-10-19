@@ -1677,15 +1677,13 @@ ${CSS}
   function pasteEls() {
     // a picture copied from somewhere else
     try {
-      const cb = require('electron').clipboard;
-      const img = cb.readImage();
-      if (img && !img.isEmpty() && !clipEls) {
-        const s = img.getSize();
-        insertImageUrl(img.toDataURL(), s.width, s.height);
+      const img = window.ElectronHost && window.ElectronHost.clipboard.readImage();
+      if (img && !clipEls) {
+        insertImageUrl(img.url, img.width, img.height);
         return;
       }
       if (!clipEls) {
-        const text = cb.readText();
+        const text = Lib.clipboard.readText();
         if (text) {
           const T = theme();
           const esc = text.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
