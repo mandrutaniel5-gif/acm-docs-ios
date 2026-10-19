@@ -95,7 +95,17 @@ const AccountUI = (() => {
     try { App.renderView(); } catch (e) {}
   }
 
-  const later = (card) => card.append(el('button', { class: 'auth-later', type: 'button', text: 'Mai târziu', onclick: () => { Account.setSkipped(true); close(); } }));
+  // Leaving the setup: an account that is not fully set up on this device (email not confirmed,
+  // keys not recovered, device not added) is never left signed in. Email + password alone
+  // must not open a session on a new device.
+  const later = (card) => {
+    const signed = !!Account.current();
+    card.append(el('button', { class: 'auth-later', type: 'button', text: signed ? 'Deconectează-te' : 'Mai târziu', onclick: async () => {
+      Account.setSkipped(true);
+      if (Account.current()) { try { await Account.signOut(); } catch (e) {} }
+      close();
+    } }));
+  };
 
   const VIEWS = {
     lang(card, d) {
@@ -492,7 +502,8 @@ const AccountUI = (() => {
     const u = Account.current();
     if (!u) { if (!Account.skipped()) render('signin'); else if (picked) close(); return; }
     if (picked) close();
-    if (Account.needsVerification()) return; // reminded in Settings
+    // a setup left unfinished (app closed mid-way): finish it or sign out, never stay half signed in
+    if (Account.needsVerification()) return route();
     try { const st = await Account.keyState(); if (st !== 'ok') await route(); else await afterKeys(); } catch (e) { console.warn('keys', e); }
     banner();
   }
