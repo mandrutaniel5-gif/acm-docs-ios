@@ -230,6 +230,22 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
           w.terminate();
           return res;
         });
+        await step('secure', async () => {
+          const data = new TextEncoder().encode('chei secrete ăîșț');
+          await Host.secureSet('selftest', data);
+          const has = await Host.secureHas('selftest');
+          const back = new TextDecoder().decode(await Host.secureGet('selftest', 'test'));
+          await Host.secureDelete('selftest');
+          return { has, back, gone: !(await Host.secureHas('selftest')) };
+        });
+        await step('acm', async () => {
+          const A = window.__lib.acmcrypto, t = performance.now();
+          const a = A.deriveIdentity(A.generateMnemonic()), m = A.deriveIdentity(A.generateMnemonic());
+          const f = A.seal({ bytes: new TextEncoder().encode('contract'), name: 'c.pdf' }, a, [m.bundle], { password: 'parola-buna-123' });
+          const r = A.open(f, m, { password: 'parola-buna-123' });
+          return { ok: new TextDecoder().decode(r.bytes) === 'contract' && r.sender.fingerprint === a.fingerprint, bytes: f.length, ms: Math.round(performance.now() - t) };
+        });
+        await step('firebase', async () => { await Account.ready(); return { ready: true, user: !!Account.current() }; });
         return JSON.stringify(out, null, 1);
         """
         // Plain evaluateJavaScript only: the Swift-only WebKit calls (callAsyncJavaScript with Result)

@@ -153,6 +153,54 @@ final class ACMDocsUITests: XCTestCase {
         XCTAssertLessThanOrEqual(field.frame.maxY, kb.frame.minY + 1, "\(device): field covered while typing")
     }
 
+    /// A real account on the project's Firebase: create it, see the email step, delete it from Settings.
+    func test5_AccountCreateAndDelete() throws {
+        app.terminate()
+        app.launchArguments = ["-uitest", "-uitest-account"]
+        app.launch()
+        let create = webButton("Creează unul")
+        guard create.waitForExistence(timeout: 40) else { shot("13-auth-none"); XCTFail("\(device): no sign-in screen"); return }
+        sleep(1)
+        shot("13-auth-signin")
+        create.tap()
+        sleep(1)
+        shot("14-auth-signup")
+        let stamp = Int(Date().timeIntervalSince1970)
+        let email = "ci-\(device)-\(stamp)@acmcode-test.ro"
+        let pass = "Test-Parola-2026!"
+        let name = app.webViews.textFields.matching(NSPredicate(format: "label BEGINSWITH %@", "Nume")).firstMatch
+        XCTAssertTrue(name.waitForExistence(timeout: 8), "\(device): no name field")
+        name.tap(); name.typeText("CI \(device)")
+        let mail = app.webViews.textFields.matching(NSPredicate(format: "label BEGINSWITH %@", "Email")).firstMatch
+        mail.tap(); mail.typeText(email)
+        let pw = app.webViews.secureTextFields.firstMatch
+        pw.tap(); pw.typeText(pass + "\n") // Enter sends the form
+        let verify = app.webViews.staticTexts.matching(NSPredicate(format: "label == %@", "Confirmă emailul")).firstMatch
+        guard verify.waitForExistence(timeout: 40) else { shot("15-auth-no-verify"); XCTFail("\(device): account was not created"); return }
+        sleep(1)
+        shot("15-auth-verify")
+        webButton("Mai târziu").tap()
+        sleep(2)
+        if app.buttons["tab-settings"].exists { app.buttons["tab-settings"].tap() } else { webButton("Setări").tap() }
+        sleep(2)
+        shot("16-settings-account")
+        let rowDelete = webButton("Șterge contul")
+        guard rowDelete.waitForExistence(timeout: 10) else { XCTFail("\(device): no delete row"); return }
+        rowDelete.tap()
+        let go = app.webViews.buttons.matching(NSPredicate(format: "label == %@", "Continuă")).firstMatch
+        XCTAssertTrue(go.waitForExistence(timeout: 8)); go.tap()
+        let dp = app.webViews.secureTextFields.firstMatch
+        guard dp.waitForExistence(timeout: 10) else { shot("17-no-password"); XCTFail("\(device): no password step"); return }
+        dp.tap(); dp.typeText(pass)
+        shot("17-delete-password")
+        let confirm = app.webViews.buttons.matching(NSPredicate(format: "label == %@", "Șterge contul"))
+        confirm.element(boundBy: confirm.count - 1).tap()
+        let signedOut = webButton("Intră în cont sau creează unul")
+        XCTAssertTrue(signedOut.waitForExistence(timeout: 40), "\(device): account was not deleted")
+        sleep(1)
+        shot("18-account-deleted")
+    }
+
     func test3_ScreensAndBack() throws {
         for (name, prefix) in [("document", "Document"), ("tabel", "Tabel"), ("prezentare", "Prezentare"), ("factura", "Factură")] {
             if app.buttons["tab-home"].exists { app.buttons["tab-home"].tap(); sleep(1) }

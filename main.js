@@ -183,3 +183,62 @@ ipcMain.handle('capture', async (e, rect) => {
   return img.resize({ width: 220, quality: 'good' }).toJPEG(72).toString('base64');
 });
 
+
+// ---------------------------------------------------------------- account keys (Windows)
+// Encrypted with the Windows user's key (DPAPI, via Electron safeStorage): another Windows
+// account or another computer cannot read them. Kept in userData/secure/<name>.bin.
+const secureDir = () => path.join(app.getPath('userData'), 'secure');
+const secureFile = (name) => path.join(secureDir(), String(name).replace(/[^a-z0-9_.-]/gi, '_') + '.bin');
+ipcMain.handle('secure', async (e, op, args) => {
+  const { safeStorage } = require('electron');
+  const a = args || {};
+  if (op === 'set') {
+    if (!safeStorage.isEncryptionAvailable()) throw new Error('Criptarea Windows nu este disponibilă pe acest calculator.');
+    fs.mkdirSync(secureDir(), { recursive: true });
+    fs.writeFileSync(secureFile(a.name), safeStorage.encryptString(String(a.data)));
+    return true;
+  }
+  if (op === 'get') {
+    const f = secureFile(a.name);
+    if (!fs.existsSync(f)) return null;
+    return safeStorage.decryptString(fs.readFileSync(f));
+  }
+  if (op === 'has') return fs.existsSync(secureFile(a.name));
+  if (op === 'delete') { try { fs.unlinkSync(secureFile(a.name)); } catch (err) {} return true; }
+  if (op === 'confirm') {
+    const win = BrowserWindow.fromWebContents(e.sender);
+    const r = await dialog.showMessageBox(win, { type: 'warning', buttons: ['Anulează', 'Confirm'], defaultId: 0, cancelId: 0, message: String(a.reason || 'Confirmă că ești tu') });
+    return r.response === 1;
+  }
+  throw new Error('secure ' + op);
+});
+
+// Google sign-in in the system browser, back through a one-time local address (127.0.0.1).
+// The page builds the sign-in URL with "{REDIRECT}" where the local address goes.
+ipcMain.handle('oauth', (_e, args) => new Promise((resolve, reject) => {
+  const http = require('http');
+  const server = http.createServer((req, res) => {
+    const port = server.address().port;
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end('<!doctype html><meta charset="utf-8"><body style="font:16px system-ui;padding:40px">Gata. Te poți întoarce în ACM Docs.</body>');
+    server.close();
+    clearTimeout(timer);
+    resolve(`http://127.0.0.1:${port}${req.url}`);
+  });
+  const timer = setTimeout(() => { server.close(); reject(new Error('cancel')); }, 5 * 60 * 1000);
+  server.listen(0, '127.0.0.1', () => {
+    const redirect = `http://127.0.0.1:${server.address().port}`;
+    shell.openExternal(String(args && args.url || '').replace(/\{REDIRECT\}/g, encodeURIComponent(redirect)));
+  });
+}));
+
+// Google sign-in, step 2 (Windows): the one-time code for the ID token. Only Google's token address.
+ipcMain.handle('google-token', (_e, body) => new Promise((resolve, reject) => {
+  const data = Buffer.from(String(body || ''));
+  const req = require('https').request({ host: 'oauth2.googleapis.com', path: '/token', method: 'POST', timeout: 15000,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': data.length } }, (res) => {
+    let out = ''; res.setEncoding('utf8'); res.on('data', (c) => { out += c; }); res.on('end', () => resolve(out));
+  });
+  req.on('error', reject); req.on('timeout', () => req.destroy(new Error('timeout')));
+  req.end(data);
+}));

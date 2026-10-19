@@ -1,0 +1,31 @@
+rules_version = '2';
+// ACM Docs: who may read and write what in Firestore.
+// Paste into Firebase console › Firestore Database › Rules › Publish.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // users/{uid}: the account's PUBLIC key (the "open padlock"), so others can lock documents for it.
+    // Nothing secret is ever stored here.
+    match /users/{uid} {
+      // any signed-in person with a confirmed email can look up a padlock (to send a document)
+      allow read: if request.auth != null && request.auth.token.email_verified == true;
+
+      // only the owner, with a confirmed email, writes their own padlock, in the expected shape
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.auth.token.email_verified == true
+        && request.resource.data.keys().hasOnly(['name', 'email', 'emailLower', 'key', 'fp', 'created'])
+        && request.resource.data.emailLower == request.auth.token.email.lower()
+        && request.resource.data.key is string && request.resource.data.key.size() < 8000
+        && request.resource.data.fp is string && request.resource.data.fp.size() == 64;
+
+      // the owner can delete their own account data
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // everything else: closed
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

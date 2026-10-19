@@ -48,6 +48,7 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         NSCameraUsageDescription: "ACM Docs folosește camera ca să scaneze documente (poză → PDF)."
         NSPhotoLibraryUsageDescription: "ACM Docs deschide pozele alese ca să le transforme în documente."
+        NSFaceIDUsageDescription: "ACM Docs folosește Face ID ca să-ți deblocheze cheile de criptare și să confirme acțiunile importante."
         CFBundleDocumentTypes:
           - CFBundleTypeName: Documente
             CFBundleTypeRole: Editor

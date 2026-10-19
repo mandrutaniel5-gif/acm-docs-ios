@@ -277,6 +277,9 @@ const App = (() => {
     };
     const chev = () => el('span', { class: 'chev', html: svg('right') });
 
+    // Account (encrypted .acm documents)
+    try { if (typeof AccountUI !== 'undefined') root.append(AccountUI.settingsGroup(group, srow, chev)); } catch (e) { console.error(e); }
+
     // Look
     const pref = Theme.get();
     const themeRow = (k, icon, color, label, sub) => {
@@ -1039,6 +1042,8 @@ const App = (() => {
     Sheet.init();
     Writer.init();
     Slides.init();
+    // accounts: sign-in screen on first start, then the account's keys (does not wait for the PDF engine)
+    try { if (typeof AccountUI !== 'undefined') AccountUI.start().catch((e) => console.error('account', e)); } catch (e) { console.error('account', e); }
     window.addEventListener('keydown', onKey);
     // The page itself never scrolls (only the panels inside it do).
     window.addEventListener('scroll', () => { if (window.scrollY || window.scrollX) window.scrollTo(0, 0); });

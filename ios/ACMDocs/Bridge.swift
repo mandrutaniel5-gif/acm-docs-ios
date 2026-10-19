@@ -84,6 +84,7 @@ final class Bridge: NSObject, WKScriptMessageHandler {
                 "sdk": 0, "platform": "ios",
                 "model": UIDevice.current.model + " iOS " + UIDevice.current.systemVersion,
                 "density": UIScreen.main.scale,
+                "args": ProcessInfo.processInfo.arguments.filter { $0.hasPrefix("-uitest") },
             ]
             let d = (try? JSONSerialization.data(withJSONObject: info)) ?? Data()
             return answer(String(data: d, encoding: .utf8) ?? "{}")
@@ -275,6 +276,58 @@ final class Bridge: NSObject, WKScriptMessageHandler {
             vc.web.takeSnapshot(with: cfg) { image, error in
                 if let png = image?.pngData() { self.reply(id, nil, png.base64EncodedString()) } else { self.reply(id, error?.localizedDescription ?? "capture", nil) }
             }
+
+        // ---- account keys (Keychain + Face ID), see Secure.swift
+        case "secureSet":
+            let name = a["name"] as? String ?? ""
+            guard !name.isEmpty, let data = Data(base64Encoded: a["data"] as? String ?? "") else { return reply(id, "secure", nil) }
+            DispatchQueue.global(qos: .userInitiated).async {
+                do { try Secure.set(name, data); self.reply(id, nil, "true") }
+                catch Secure.Failure.noPasscode { self.reply(id, self.t("Setează un cod de deblocare pe telefon: fără el, cheile nu pot fi protejate.", "Set a passcode on this phone: without it the keys cannot be protected."), nil) }
+                catch { self.reply(id, "secure \(error)", nil) }
+            }
+
+        case "secureGet":
+            let name = a["name"] as? String ?? ""
+            let reason = (a["reason"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? t("Deblochează cheile ACM Docs", "Unlock your ACM Docs keys")
+            DispatchQueue.global(qos: .userInitiated).async {
+                do { self.reply(id, nil, try Secure.get(name, reason: reason)?.base64EncodedString()) }
+                catch Secure.Failure.cancelled { self.reply(id, "cancel", nil) }
+                catch { self.reply(id, "secure \(error)", nil) }
+            }
+
+        case "secureHas":
+            let name = a["name"] as? String ?? ""
+            DispatchQueue.global(qos: .userInitiated).async { self.reply(id, nil, Secure.has(name) ? "true" : "false") }
+
+        case "secureDelete":
+            Secure.delete(a["name"] as? String ?? "")
+            reply(id, nil, "true")
+
+        case "confirmOwner":
+            let reason = (a["reason"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? t("Confirmă că ești tu", "Confirm it's you")
+            Secure.confirmOwner(reason: reason) { ok in self.reply(id, ok ? nil : "cancel", ok ? "true" : nil) }
+
+        case "oauth":
+            guard let url = URL(string: a["url"] as? String ?? ""), url.scheme == "https",
+                  let scheme = a["callback"] as? String, !scheme.isEmpty else { return reply(id, "oauth", nil) }
+            let runner = OAuthRunner(anchor: vc.view.window)
+            pending[id] = runner
+            runner.start(url: url, callbackScheme: scheme) { [weak self] back, error in
+                self?.pending[id] = nil
+                self?.reply(id, error, back?.absoluteString)
+            }
+
+        case "googleToken":
+            // Google sign-in, step 2: the one-time code for the ID token. Only Google's token address.
+            var req = URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
+            req.httpMethod = "POST"
+            req.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+            req.httpBody = (a["body"] as? String ?? "").data(using: .utf8)
+            URLSession.shared.dataTask(with: req) { data, _, error in
+                if let data = data, let s = String(data: data, encoding: .utf8) { self.reply(id, nil, s) }
+                else { self.reply(id, error?.localizedDescription ?? "google", nil) }
+            }.resume()
 
         default:
             reply(id, "op " + op, nil)

@@ -502,12 +502,60 @@ const Host = (() => {
     } catch (e) { return ''; }
   }
 
+  // ---------------------------------------------------------------- secure storage
+  // Account keys and the 24 recovery words. iPhone: Keychain, opened only with Face ID / Touch ID
+  // (or the phone's code); Android: Keystore + the phone's lock; Windows: encrypted for the Windows user.
+  const SECURE_WEB = 'acm.secure.'; // browser preview only (not secure, never used by the apps)
+  async function secureSet(name, bytes) {
+    const data = toB64(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes));
+    if (AB) { await call('secureSet', { name, data }); return true; }
+    if (ipc) return ipc.invoke('secure', 'set', { name, data });
+    localStorage.setItem(SECURE_WEB + name, data); return true;
+  }
+  /** null = nothing saved; throws Error('cancel') when the person cancels Face ID. */
+  async function secureGet(name, reason) {
+    let r = null;
+    if (AB) r = await call('secureGet', { name, reason: reason || '' });
+    else if (ipc) r = await ipc.invoke('secure', 'get', { name, reason });
+    else r = localStorage.getItem(SECURE_WEB + name);
+    return r ? fromB64(r) : null;
+  }
+  async function secureHas(name) {
+    if (AB) return (await call('secureHas', { name })) === 'true';
+    if (ipc) return !!(await ipc.invoke('secure', 'has', { name }));
+    return localStorage.getItem(SECURE_WEB + name) != null;
+  }
+  async function secureDelete(name) {
+    if (AB) { await call('secureDelete', { name }); return true; }
+    if (ipc) return ipc.invoke('secure', 'delete', { name });
+    localStorage.removeItem(SECURE_WEB + name); return true;
+  }
+  /** Face ID / fingerprint / phone code before something important (delete the account…). */
+  async function confirmOwner(reason) {
+    if (AB) { try { return (await call('confirmOwner', { reason: reason || '' })) === 'true'; } catch (e) { return false; } }
+    if (ipc) return !!(await ipc.invoke('secure', 'confirm', { reason }));
+    return true;
+  }
+  /** Google sign-in: exchanges the one-time code for the ID token (only oauth2.googleapis.com). */
+  async function googleToken(body) {
+    if (AB) return call('googleToken', { body });
+    if (ipc) return ipc.invoke('google-token', body);
+    throw new Error('Conectarea cu Google merge doar în aplicație.');
+  }
+  /** Sign-in in the system browser (Google): returns the URL the browser came back with. */
+  async function oauth(url, callback) {
+    if (AB) return call('oauth', { url, callback });
+    if (ipc) return ipc.invoke('oauth', { url, callback });
+    throw new Error('Conectarea cu Google merge doar în aplicație.');
+  }
+
   const available = platform !== 'web';
   const mobile = platform === 'android';
 
   return {
     platform, mobile, available, info, readFile, readFileAsync, writeFile, exists, baseName, dirName, openDialog, pickImages, camera, saveDialog, startupFile, onOpenFile, setTitle, wasmBytes, listFonts,
     ocr, ocrWarm, htmlToPdf, capture, ext, showInFolder, openPath, openExternal, fetchText, share, exportCopy, specialDir, listDir, mkdirp, join, mtime, remove, setTheme, exitApp, appVersion, toB64, fromB64,
+    secureSet, secureGet, secureHas, secureDelete, confirmOwner, oauth, googleToken,
   };
 })();
 
