@@ -103,11 +103,11 @@ try {
 
   // two-step verification: with it on, the password alone does not sign in anywhere
   let algo = 'sha1', digits = 6, period = 30;
-  const totp = (b32) => {
+  const totp = (b32, shift = 0) => {
     const alph = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'; let bits = '';
     for (const ch of b32.replace(/=+$/, '').toUpperCase()) bits += alph.indexOf(ch).toString(2).padStart(5, '0');
     const key = Buffer.from(bits.match(/.{8}/g).map((x) => parseInt(x, 2)));
-    const ctr = Buffer.alloc(8); ctr.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 1000 / period)));
+    const ctr = Buffer.alloc(8); ctr.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 1000 / period) + shift));
     const h = createHmac(algo, key).update(ctr).digest(); const o = h[h.length - 1] & 15;
     return String(((h.readUInt32BE(o) & 0x7fffffff) % 10 ** digits)).padStart(digits, '0');
   };
@@ -118,7 +118,13 @@ try {
   algo = String(secret.hashingAlgorithm || 'SHA1').toLowerCase().replace(/[^a-z0-9]/g, '').replace(/^sha(\d)/, 'sha$1');
   digits = secret.codeLength || 6; period = secret.codeIntervalSeconds || 30;
   console.log('totp parameters:', secret.hashingAlgorithm, digits, period);
-  await multiFactor(auth3.currentUser).enroll(TotpMultiFactorGenerator.assertionForEnrollment(secret, totp(secret.secretKey)), 'CI');
+  console.log('totp key length:', String(secret.secretKey).length, /^[A-Z2-7]+=*$/.test(secret.secretKey) ? 'base32' : 'NOT base32');
+  let enrolled = false, lastErr = null;
+  for (const shift of [0, -1, 1, -2, 2]) {
+    try { await multiFactor(auth3.currentUser).enroll(TotpMultiFactorGenerator.assertionForEnrollment(secret, totp(secret.secretKey, shift)), 'CI'); enrolled = true; console.log('totp enrolled with time step shift', shift); break; }
+    catch (e) { lastErr = e; console.log('totp enroll, shift', shift, e.code); if (e.code !== 'auth/invalid-verification-code') break; }
+  }
+  if (!enrolled) throw lastErr;
   await signOut(auth3);
   let needs = false, resolver = null;
   try { await signInWithEmailAndPassword(auth3, `${handle}@example.invalid`, password); } catch (e) { needs = e.code === 'auth/multi-factor-auth-required'; if (needs) resolver = getMultiFactorResolver(auth3, e); }
