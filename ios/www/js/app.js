@@ -90,11 +90,23 @@ const App = (() => {
 
   const typeOfPath = (path) => {
     const ext = Host.ext(path);
+    if (ext === 'acm') return 'acm';
     return /^(docx?|txt|rtf)$/.test(ext) ? 'word' : /^(xlsx?|xlsm|csv|ods)$/.test(ext) ? 'sheet' : /^pptx?$/.test(ext) ? 'slides' : 'pdf';
   };
-  const ICON_OF = { word: 'wordapp', sheet: 'sheetapp', slides: 'slidesapp', pdf: 'pdf' };
+  const ICON_OF = { word: 'wordapp', sheet: 'sheetapp', slides: 'slidesapp', pdf: 'pdf', acm: 'lockfile' };
 
   function fileActions(path, kind, anchor) {
+    if (Host.ext(path) === 'acm') {
+      // encrypted: it stays encrypted; a readable copy only by hand, after a warning
+      UI.menuAt(anchor, [
+        { label: 'Deschide', icon: 'lockfile', run: () => openPath(path) },
+        typeof AcmShare !== 'undefined' ? { label: 'Salvează o copie decriptată…', icon: 'download', run: () => AcmShare.saveDecryptedFromFile(path) } : null,
+        Host.mobile ? { label: 'Trimite fișierul criptat', icon: 'share', run: () => Host.share(path) } : { label: 'Arată în folder', icon: 'folder', run: () => Host.showInFolder(path) },
+        '-',
+        { label: 'Scoate din listă', icon: 'close', run: () => forget(path) },
+      ], Host.baseName(path));
+      return;
+    }
     UI.menuAt(anchor, [
       { label: 'Deschide', icon: 'folder', run: () => openPath(path) },
       Host.mobile ? { label: 'Trimite (WhatsApp, email…)', icon: 'share', run: () => Host.share(path) } : { label: 'Arată în folder', icon: 'folder', run: () => Host.showInFolder(path) },
@@ -137,16 +149,10 @@ const App = (() => {
     box.append(btn);
   }
 
-  function greeting() {
-    const h = new Date().getHours();
-    return h < 5 ? 'Noapte bună' : h < 12 ? 'Bună dimineața' : h < 18 ? 'Bună ziua' : 'Bună seara';
-  }
 
   function renderHome() {
     Biz.migrate();
     const b = Biz.active();
-    $('greet').textContent = greeting();
-    $('greet-sub').textContent = new Date().toLocaleDateString(I18n.locale(), { weekday: 'long', day: 'numeric', month: 'long' }).replace(/^./, (c) => c.toUpperCase());
     // invoices card
     const s = Invoice.summary();
     $('mc-amount').innerHTML = s ? `${Invoice.money(s.month)}<small>${escapeHtml(s.currency)}</small>` : `0,00<small>lei</small>`;
@@ -196,7 +202,7 @@ const App = (() => {
     const tk = typeOfPath(path);
     const name = Host.baseName(path);
     const pic = el('span', { class: 'rth' + (tk === 'slides' ? ' wide' : '') }, [th ? el('img', { src: th.url, alt: '' }) : el('span', { class: 'ftype ' + tk, html: svg(ICON_OF[tk]) })]);
-    const tag = f.kind === 'edited' ? el('span', { class: 'tag-ed', text: 'editat' }) : f.kind === 'invoice' ? el('span', { class: 'tag-inv', text: 'document emis' }) : null;
+    const tag = f.kind === 'edited' ? el('span', { class: 'tag-ed', text: 'editat' }) : f.kind === 'invoice' ? el('span', { class: 'tag-inv', text: 'document emis' }) : f.kind === 'secure' ? el('span', { class: 'tag-sec', text: 'criptat' }) : null;
     const title = el('b', { class: 'no-tr' }, [name]);
     if (tag) title.append(tag);
     const more = el('span', { class: 'rmore', html: svg('morez'), title: 'Mai multe' });
@@ -214,6 +220,7 @@ const App = (() => {
       original: all.filter((f) => f.kind === 'original').length,
       edited: all.filter((f) => f.kind === 'edited').length,
       invoice: all.filter((f) => f.kind === 'invoice').length,
+      secure: all.filter((f) => f.kind === 'secure').length,
     };
     document.querySelectorAll('#file-tabs button').forEach((b) => {
       b.classList.toggle('on', b.dataset.tab === tab);
@@ -227,6 +234,7 @@ const App = (() => {
       original: 'Fișierele tale, neatinse. Editările se salvează separat.',
       edited: 'Copiile salvate după editare (nume_editat_1, _2…).',
       invoice: 'Facturile, proformele și ofertele emise.',
+      secure: 'Documentele .acm primite și trimise. Rămân criptate pe dispozitiv; se deschid doar pentru vizualizare.',
     };
     $('files-note').textContent = notes[tab];
 
@@ -234,15 +242,15 @@ const App = (() => {
     const card = (f) => {
       const path = f.path;
       const th = thumbs[path];
-      if (!th || (th.m && Host.mtime(path) && Math.abs(th.m - Host.mtime(path)) > 1000)) missing.push(path);
+      if (Host.ext(path) !== 'acm' && (!th || (th.m && Host.mtime(path) && Math.abs(th.m - Host.mtime(path)) > 1000))) missing.push(path);
       const ext = Host.ext(path);
       const tkind = typeOfPath(path);
       const thumb = el('div', { class: 'fthumb' }, [th ? el('img', { src: th.url, alt: '', class: tkind === 'slides' ? 'wide' : '' }) : el('span', { class: 'ftype ' + tkind, html: svg(ICON_OF[tkind]) })]);
       if (tkind !== 'pdf') thumb.append(el('span', { class: 'fext ' + tkind, text: ext.toUpperCase() }));
       const name = Host.baseName(path);
       const m = EDITED_RE.exec(name.replace(/\.[^.]+$/, ''));
-      const badge = f.kind === 'edited' ? `editat ${m ? m[1] : ''}`.trim() : f.kind === 'invoice' ? 'emis' : null;
-      if (badge) thumb.append(el('span', { class: 'fbadge ' + (f.kind === 'edited' ? 'ed' : 'inv'), text: badge }));
+      const badge = f.kind === 'edited' ? `editat ${m ? m[1] : ''}`.trim() : f.kind === 'invoice' ? 'emis' : f.kind === 'secure' ? (/Trimise criptat$/.test(Host.dirName(path)) ? 'trimis' : 'primit') : null;
+      if (badge) thumb.append(el('span', { class: 'fbadge ' + (f.kind === 'edited' ? 'ed' : f.kind === 'secure' ? 'sec' : 'inv'), text: badge }));
       const moreBtn = el('button', { title: 'Mai multe', html: svg('morez') });
       moreBtn.addEventListener('click', (e) => { e.stopPropagation(); fileActions(path, f.kind, moreBtn); });
       const sub = f.kind === 'edited' && f.from ? `${escapeHtml(I18n.t('din'))} ${escapeHtml(Host.baseName(f.from))}` : `${when(Host.mtime(path) || f.time)}`;
@@ -257,6 +265,7 @@ const App = (() => {
         original: ['Niciun document deschis încă', 'Fișierele pe care le deschizi apar aici.'],
         edited: ['Nicio copie editată încă', 'Când salvezi un document, apare aici ca „nume_editat_1”. Originalul rămâne neatins.'],
         invoice: ['Niciun document emis încă', 'Facturile, proformele și ofertele create apar aici.'],
+        secure: ['Niciun document criptat încă', 'Fișierele .acm primite sau trimise apar aici. Pentru a trimite unul, alege „Trimite criptat” din meniul ⋯ al unui fișier.'],
       }[tab];
       grid.append(el('div', { class: 'empty-files' }, [el('div', { class: 'empty-state' }, [el('span', { class: 'ei', html: svg('folder') }), el('b', { text: empty[0] }), el('span', { text: empty[1] })])]));
     }
@@ -829,6 +838,7 @@ const App = (() => {
     const cur = Pages.current;
     UI.menu(r.right - 260, r.bottom + 6, [
       { label: 'Salvează ca…', icon: 'save', run: () => saveAs() },
+      typeof AcmShare !== 'undefined' ? { label: 'Trimite criptat (.acm)…', icon: 'lockfile', run: () => sendEncrypted() } : null,
       { label: 'Fă editabil textul din poze (pagina asta)', icon: 'text', run: () => ImageText.run(cur, null) },
       { label: 'Adaugă pagini din alt PDF…', icon: 'addpage', run: () => addPdf() },
       { label: 'Pagină goală după pagina curentă', icon: 'doc', run: () => Pages.guard(() => { Editor.insertBlank(cur + 1); setTimeout(() => Pages.scrollToPage(cur + 1), 60); }) },
@@ -839,6 +849,16 @@ const App = (() => {
       '-',
       { label: 'Închide documentul', icon: 'close', run: () => closeDoc() },
     ]);
+  }
+
+  /** The open PDF, encrypted for chosen people (saved first if it has changes). */
+  async function sendEncrypted() {
+    if (Editor.dirty || !Editor.path) {
+      if (!(await UI.confirm('Salvează întâi', 'Documentul are modificări nesalvate. Îl salvez, apoi îl criptezi.', 'Salvează'))) return;
+      await save();
+      if (Editor.dirty || !Editor.path) return;
+    }
+    await AcmShare.send(Editor.path);
   }
 
   async function deletePage(i) {

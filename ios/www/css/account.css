@@ -195,33 +195,6 @@ button.crow:active { background: var(--fill); }
 html.ios-glass .hb { background: var(--glass); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: inset 0 1px 0 var(--gl-hi), var(--glass-shadow); border: .5px solid var(--gl-rim); }
 html.ios-glass .hb.avatar.on { background: linear-gradient(135deg, rgba(58, 155, 255, .92), rgba(94, 92, 230, .92)); }
 
-/* ---------------------------------------------------------------- Home: encrypted send */
-.sec-card { position: relative; overflow: hidden; border-radius: 26px; padding: 20px 18px 8px; margin: 0 0 18px; color: #fff;
-  background: radial-gradient(120% 140% at 0% 0%, #1d4ed8 0%, #1e1b4b 55%, #0b1026 100%); box-shadow: 0 14px 40px rgba(30, 27, 75, .35); }
-.sec-bg { position: absolute; inset: 0; pointer-events: none; opacity: .5;
-  background-image: linear-gradient(rgba(255, 255, 255, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .06) 1px, transparent 1px);
-  background-size: 22px 22px; -webkit-mask-image: radial-gradient(90% 90% at 100% 0%, #000 0%, transparent 70%); mask-image: radial-gradient(90% 90% at 100% 0%, #000 0%, transparent 70%); }
-.sec-card::after { content: ''; position: absolute; width: 220px; height: 220px; right: -70px; top: -90px; border-radius: 50%; background: radial-gradient(closest-side, rgba(100, 210, 255, .45), transparent); animation: secGlow 7s ease-in-out infinite alternate; pointer-events: none; }
-@keyframes secGlow { from { transform: translate(0, 0) scale(1); } to { transform: translate(-30px, 20px) scale(1.15); } }
-@media (prefers-reduced-motion: reduce) { .sec-card::after { animation: none; } }
-.sec-top { position: relative; z-index: 1; display: flex; gap: 14px; align-items: flex-start; }
-.sec-shield { width: 50px; height: 50px; flex: none; border-radius: 15px; display: grid; place-items: center; background: rgba(255, 255, 255, .14); border: .5px solid rgba(255, 255, 255, .25); box-shadow: 0 0 24px rgba(100, 210, 255, .35); }
-.sec-shield svg { width: 28px; height: 28px; fill: #fff; }
-.sec-t { display: grid; gap: 4px; }
-.sec-t b { font-size: 21px; font-weight: 760; letter-spacing: -.02em; }
-.sec-t small { font-size: 13.5px; line-height: 1.4; color: rgba(255, 255, 255, .78); }
-.sec-chips { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 16px; }
-.sec-chips span { font-size: 11.5px; font-weight: 650; letter-spacing: .01em; padding: 5px 9px; border-radius: 99px; background: rgba(255, 255, 255, .12); border: .5px solid rgba(255, 255, 255, .22); color: #dbeafe; }
-.sec-chips span:first-child { background: linear-gradient(90deg, #22d3ee, #818cf8); color: #0b1026; border: 0; }
-.sec-btns { position: relative; z-index: 1; display: flex; gap: 10px; }
-.sec-main { flex: 1; height: 50px; border-radius: 15px; background: #fff; color: #1e1b4b; font-weight: 700; font-size: 15.5px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform .12s; }
-.sec-main svg { width: 20px; height: 20px; fill: #3b5bdb; }
-.sec-ghost { flex: none; height: 50px; padding: 0 16px; border-radius: 15px; background: rgba(255, 255, 255, .12); border: .5px solid rgba(255, 255, 255, .3); color: #fff; font-weight: 650; font-size: 14.5px; }
-.sec-main:active, .sec-ghost:active { transform: scale(.97); }
-.sec-foot { position: relative; z-index: 1; width: calc(100% + 36px); margin: 14px -18px 0; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; border-top: .5px solid rgba(255, 255, 255, .14); color: rgba(255, 255, 255, .82); font-size: 13px; text-align: left; background: none; }
-.sec-foot .chev svg { width: 18px; height: 18px; fill: rgba(255, 255, 255, .6); }
-@media (min-width: 900px) { .sec-card { padding: 24px 24px 8px; } .sec-btns { max-width: 520px; } .sec-foot { width: calc(100% + 48px); margin: 16px -24px 0; padding: 12px 24px; } }
-
 /* ---------------------------------------------------------------- account sheet */
 .modal.profile { max-width: 480px; }
 .pf-head { display: flex; align-items: center; gap: 14px; margin: 4px 0 14px; }
@@ -251,6 +224,17 @@ html.ios-glass .hb.avatar.on { background: linear-gradient(135deg, rgba(58, 155,
 .sh-ok b { font-size: 14.5px; display: block; }
 .sh-ok small { color: var(--muted); font-size: 13px; line-height: 1.4; }
 .sh-tips { margin: 6px 0 12px; padding-left: 20px; display: grid; gap: 6px; font-size: 13.5px; line-height: 1.45; }
-.sec-main, .sec-ghost { white-space: nowrap; }
-@media (max-width: 380px) { .sec-ghost { padding: 0 12px; font-size: 13.5px; } .sec-main { font-size: 15px; } }
-@media (min-width: 900px) { .sec-main { flex: 0 1 340px; } }
+.hero-top .hero-brand { white-space: nowrap; min-width: 0; }
+.hero-top .hero-brand small { overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 420px) { .hero-top .hero-brand small { display: none; } }
+.hb { width: 38px; height: 38px; }
+.hb svg { width: 20px; height: 20px; }
+.hb.avatar.on { font-size: 15.5px; }
+
+/* Files › Criptate */
+.ftype.acm { background: linear-gradient(160deg, #3b5bdb, #1e1b4b); }
+.ftype.acm svg { fill: #fff; }
+.fbadge.sec { background: rgba(59, 91, 219, .94); }
+.tag-sec { font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: rgba(59, 91, 219, .14); color: #3b5bdb; margin-left: 6px; vertical-align: 1px; }
+:root[data-theme="dark"] .tag-sec { color: #8ea2ff; }
+@media (max-width: 430px) { #file-tabs { display: flex; width: 100%; } #file-tabs button { padding: 0 8px; flex: 1 1 auto; justify-content: center; font-size: 12.5px; } }

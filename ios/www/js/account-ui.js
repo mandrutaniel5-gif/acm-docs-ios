@@ -217,7 +217,7 @@ const AccountUI = (() => {
         el('div', { class: 'auth-icon good', html: svg('shield') }),
         el('h2', { text: 'Contul tău e gata' }),
         el('p', { class: 'auth-sub', text: `Cheile de criptare au fost create pe acest dispozitiv. Codul de recuperare (24 de cuvinte) e salvat aici, protejat de ${bio()}.` }),
-        el('div', { class: 'auth-note' }, [el('span', { html: svg('key') }), el('span', { text: 'Notează codul când ai timp, din Setări › Cont. Îți trebuie doar dacă pierzi acest dispozitiv.' })]),
+        el('div', { class: 'auth-note' }, [el('span', { html: svg('key') }), el('span', { text: 'Îl poți nota oricând din profil (butonul cu inițiala, sus în dreapta). Îți trebuie doar dacă pierzi acest dispozitiv.' })]),
         el('button', { class: 'btn primary auth-main', type: 'button', text: 'Începe', onclick: () => close() }),
         el('button', { class: 'auth-link', type: 'button', text: 'Vezi codul acum', onclick: async () => { close(); await showWords(); } }),
       );
@@ -289,7 +289,7 @@ const AccountUI = (() => {
   async function deleteFlow() {
     const u = Account.current();
     if (!u) return;
-    if (!(await UI.confirm('Ștergi contul?', 'Se șterg contul, lacătul public și cheile de pe acest dispozitiv. Documentele .acm primite nu se vor mai putea deschide. Nu se poate anula.', 'Continuă'))) return;
+    if (!(await UI.confirm('Ștergi contul?', 'Se șterg contul, cheia publică și cheile de pe acest dispozitiv. Documentele .acm primite nu se vor mai putea deschide. Nu se poate anula.', 'Continuă'))) return;
     if (!(await Host.confirmOwner(`Confirmă cu ${bio()} ștergerea contului`))) return UI.toast('Ștergerea a fost anulată.');
     let password = null;
     if (Account.isPasswordUser()) {
@@ -323,7 +323,7 @@ const AccountUI = (() => {
     const del = srow('del', 'red', 'Șterge contul', `Cu ${bio()}`, null, deleteFlow);
     del.classList.add('danger');
     rows.push(del);
-    return group('Cont', rows, 'Cheile de criptare sunt create și păstrate doar pe dispozitivele tale. Serverul are doar lacătul public.');
+    return group('Cont', rows, 'Cheile de criptare sunt create și păstrate doar pe dispozitivele tale. Serverul păstrează doar cheia publică.');
   }
 
   // ---------------------------------------------------------------- the account sheet (avatar on Home)

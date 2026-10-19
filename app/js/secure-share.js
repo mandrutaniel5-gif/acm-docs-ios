@@ -66,7 +66,7 @@ const Contacts = (() => {
 
   async function myBundle() {
     const prof = await Account.profileOf(me().uid);
-    if (!prof) throw new Error('Contul tău nu are încă lacătul publicat.');
+    if (!prof) throw new Error('Profilul contului nu este încă finalizat.');
     return prof.key;
   }
 
@@ -79,7 +79,7 @@ const Contacts = (() => {
 
   /** Reads a QR code: live camera (iPhone native or webcam), else a photo of it. */
   async function scan() {
-    const native = await Host.scanQR('Scanează codul QR al persoanei din aplicația ei (Setări › Codul meu)');
+    const native = await Host.scanQR('Scanează codul QR al persoanei din aplicația ei (Profil › Codul meu)');
     if (native !== undefined) return native;
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try { return await webcamScan(); } catch (e) { console.warn('webcam', e); }
@@ -138,7 +138,7 @@ const Contacts = (() => {
     try { text = await scan(); } catch (e) { return UI.toast(e.message || String(e), { error: true }); }
     if (!text) return null;
     const q = parseQr(text);
-    if (!q) { await UI.confirm('Nu este un cod ACM Docs', 'Codul scanat nu este codul unui cont ACM Docs. Cere persoanei să deschidă Setări › Codul meu.', 'Am înțeles', 'Închide'); return null; }
+    if (!q) { await UI.confirm('Nu este un cod ACM Docs', 'Codul scanat nu este codul unui cont ACM Docs. Persoana își găsește codul în Profil › Codul meu.', 'Am înțeles', 'Închide'); return null; }
     if (q.uid === me().uid) { UI.toast('Acesta este codul tău.'); return null; }
     if (expectUid && q.uid !== expectUid) {
       await UI.confirm('Alt cont', `Codul scanat este al lui @${q.handle}, nu al persoanei pe care o verifici.`, 'Am înțeles', 'Închide');
@@ -152,7 +152,7 @@ const Contacts = (() => {
       // the server's padlock is not the one on the person's own phone: someone is in the middle
       await UI.modal((box, close) => {
         box.append(el('div', { class: 'acm-alert danger', html: svg('warn') }), el('h2', { text: 'Atenție: codurile nu se potrivesc' }),
-          el('p', { text: `Lacătul pe care serverul îl dă pentru @${q.handle} NU este cel din telefonul persoanei. Fie și-a refăcut cheile chiar acum, fie cineva încearcă să intercepteze documentele trimise ei.` }),
+          el('p', { text: `Cheia publică indicată de server pentru @${q.handle} NU este cea de pe dispozitivul persoanei. Fie și-a refăcut cheile chiar acum, fie cineva încearcă să intercepteze documentele trimise ei.` }),
           el('p', { html: '<b>Nu trimite nimic sensibil</b> până nu lămuriți, față în față, ce s-a întâmplat.' }),
           el('div', { class: 'actions' }, [el('button', { class: 'btn primary', type: 'button', text: 'Am înțeles', onclick: () => close() })]));
       });
@@ -227,7 +227,7 @@ const Contacts = (() => {
           el('span', { class: 'qr-h no-tr', text: '@' + Account.handle() }),
           el('small', { class: 'qr-fp no-tr', text: shortFp(fp) }),
         ]),
-        el('p', { class: 'muted', text: 'Cine vrea să-ți trimită documente criptate scanează acest cod din aplicația lui (Setări › Contacte › Scanează). Așa e sigur că lacătul este al tău.' }),
+        el('p', { class: 'muted', text: 'Cine vrea să-ți trimită documente criptate scanează acest cod din aplicația lui (Contacte › Scanează). Așa are certitudinea că cheia este a ta.' }),
         el('div', { class: 'recov-warn', html: `${svg('info')}<span>Scanați codul față în față sau prin apel video. Un cod primit prin mesaj de la altcineva nu dovedește nimic.</span>` }),
         el('div', { class: 'actions' }, [
           el('button', { class: 'btn', type: 'button', text: 'Închide', onclick: () => close() }),
@@ -284,7 +284,7 @@ const Contacts = (() => {
       if (st === 'changed') {
         box.append(
           el('div', { class: 'acm-alert danger', html: svg('warn') }),
-          el('p', { html: `<b>Lacătul lui @${c.handle} s-a schimbat.</b> Se întâmplă dacă și-a refăcut contul sau cheile pe alt telefon fără cele 24 de cuvinte. Poate fi însă și un atac. Până nu verificați din nou, nu-i poți trimite documente.` }),
+          el('p', { html: `<b>Cheia de criptare a lui @${c.handle} s-a schimbat.</b> Se întâmplă dacă și-a refăcut contul sau cheile pe alt dispozitiv fără codul de recuperare. Poate fi însă și o încercare de interceptare. Până nu verificați din nou, nu-i poți trimite documente.` }),
           el('div', { class: 'actions col' }, [
             el('button', { class: 'btn primary', type: 'button', html: svg('camera') + '<span>Scanează codul lui din nou</span>', onclick: () => close('scan') }),
             el('button', { class: 'btn', type: 'button', text: 'Acceptă cheia nouă fără verificare', onclick: () => close('accept') }),
@@ -292,7 +292,7 @@ const Contacts = (() => {
         );
       } else if (st === 'unverified' && !c.gone) {
         box.append(
-          el('div', { class: 'recov-warn', html: `${svg('info')}<span>${justAdded ? 'Contact adăugat. ' : ''}Nu ai verificat încă faptul că lacătul este chiar al lui @${c.handle}. Pentru documente sensibile, verificați-vă codurile față în față.</span>` }),
+          el('div', { class: 'recov-warn', html: `${svg('info')}<span>${justAdded ? 'Contact adăugat. ' : ''}Nu ai verificat încă faptul că cheia este chiar a lui @${c.handle}. Pentru documente sensibile, verificați-vă codurile față în față.</span>` }),
         );
       }
       if (mine && st !== 'changed') {
@@ -378,19 +378,19 @@ const AcmShare = (() => {
     try { people = await Promise.all(people.map((c) => Contacts.refresh(c))); } finally { UI.busy(); }
     const changed = people.filter((c) => Contacts.status(c) === 'changed' || c.gone);
     if (changed.length) {
-      await UI.confirm('Nu pot trimite încă', `${changed.map((c) => '@' + c.handle).join(', ')}: ${changed.some((c) => c.gone) ? 'contul nu mai există sau ' : ''}lacătul s-a schimbat. Deschide contactul din Setări › Contacte și verifică-l din nou.`, 'Am înțeles', 'Închide');
+      await UI.confirm('Nu pot trimite încă', `${changed.map((c) => '@' + c.handle).join(', ')}: ${changed.some((c) => c.gone) ? 'contul nu mai există sau ' : ''}cheia de criptare s-a schimbat. Deschide contactul din Contacte și verifică-l din nou.`, 'Am înțeles', 'Închide');
       return;
     }
     const unverified = people.filter((c) => Contacts.status(c) === 'unverified');
     if (unverified.length) {
       const ok = await UI.confirm('Destinatari neverificați',
-        `Nu ai verificat încă ${unverified.map((c) => '@' + c.handle).join(', ')}. Documentul va fi criptat cu lacătul dat de server; dacă serverul ar fi spart, cineva ar putea pune un lacăt fals. Pentru documente sensibile, scanați întâi codurile QR.`,
+        `Nu ai verificat încă ${unverified.map((c) => '@' + c.handle).join(', ')}. Documentul va fi criptat cu cheia indicată de server; dacă serverul ar fi compromis, cineva ar putea înlocui cheia. Pentru documente sensibile, scanați întâi codurile QR.`,
         'Trimite oricum', 'Anulează');
       if (!ok) return;
     }
 
     let id;
-    try { id = await Account.unlock(`Confirmă cu Face ID criptarea documentului „${name}”`); } catch (e) { if (String(e && e.message) !== 'cancel') UI.toast(Account.say(e), { error: true }); return; }
+    try { id = await Account.unlock(`Confirmă criptarea documentului „${name}”`); } catch (e) { if (String(e && e.message) !== 'cancel') UI.toast(Account.say(e), { error: true }); return; }
     UI.busy(password ? 'Se criptează (cu parolă)…' : 'Se criptează…');
     await yieldUI();
     let out;
@@ -400,6 +400,7 @@ const AcmShare = (() => {
         [...people.map((c) => Host.fromB64(c.key)), id.bundle], { password: password || undefined, handle: Account.handle() });
       out = await freePath(await docsDir('Trimise criptat'), safeName(name.replace(/\.[^.]+$/, '')) + '.acm');
       Host.writeFile(out, sealed);
+      try { App.rememberFile(out, 'secure'); } catch (e) {}
     } catch (e) {
       UI.busy();
       console.error(e);
@@ -437,7 +438,7 @@ const AcmShare = (() => {
         const cs = [...chosen.values()];
         if (!cs.length) return;
         const st = cs.map(Contacts.status);
-        if (st.includes('changed')) summary.append(el('div', { class: 'acm-note bad', html: `${svg('warn')}<span>Un destinatar are lacătul schimbat: verifică-l din nou înainte să-i trimiți.</span>` }));
+        if (st.includes('changed')) summary.append(el('div', { class: 'acm-note bad', html: `${svg('warn')}<span>Un destinatar are cheia de criptare schimbată: verifică-l din nou înainte să-i trimiți.</span>` }));
         else if (st.includes('unverified')) summary.append(el('div', { class: 'acm-note warn', html: `${svg('info')}<span>Ai destinatari neverificați. Pentru documente sensibile, scanați-vă întâi codurile QR.</span>` }));
         else summary.append(el('div', { class: 'acm-note ok', html: `${svg('verified')}<span>Toți destinatarii sunt verificați.</span>` }));
       };
@@ -491,64 +492,103 @@ const AcmShare = (() => {
   // ---------------------------------------------------------------- open
   const isAcm = (path, bytes) => Host.ext(path) === 'acm' || (bytes && bytes.length > 4 && bytes[0] === 0x41 && bytes[1] === 0x43 && bytes[2] === 0x4d && bytes[3] === 0x31);
 
-  async function openFile(path, bytes) {
-    const name = Host.baseName(path);
+  const secureDir = () => docsDir('Criptate');
+  /** Every .acm that reaches the app is kept (still encrypted) in "Criptate" and listed under Files › Criptate. */
+  async function keepEncrypted(path, bytes) {
+    const dir = await secureDir();
+    if (Host.dirName(path) === dir || /[\\/]Trimise criptat$/.test(Host.dirName(path))) { App.rememberFile(path, 'secure'); return path; }
+    const known = (App.recentFiles ? App.recentFiles() : []).find((f) => f.kind === 'secure' && Host.baseName(f.path) === Host.baseName(path) && Host.dirName(f.path) === dir);
+    if (known) { App.rememberFile(known.path, 'secure'); return known.path; }
+    const out = await freePath(dir, safeName(Host.baseName(path)));
+    Host.writeFile(out, bytes);
+    App.rememberFile(out, 'secure');
+    return out;
+  }
+
+  async function decryptBytes(name, bytes) {
     let info;
-    try { info = A().inspect(bytes); } catch (e) { return UI.toast(e.message || 'Nu este un fișier .acm.', { error: true }); }
-    if (!(await ensureAccount())) return;
+    try { info = A().inspect(bytes); } catch (e) { UI.toast(e.message || 'Nu este un fișier .acm.', { error: true }); return null; }
     let id;
-    try { id = await Account.unlock(`Confirmă cu Face ID ca să deschizi „${name}”`); } catch (e) { if (String(e && e.message) !== 'cancel') UI.toast(Account.say(e), { error: true }); return; }
-    let password = null, res = null, wrong = false;
+    try { id = await Account.unlock(`Confirmă ca să deschizi „${name}”`); } catch (e) { if (String(e && e.message) !== 'cancel') UI.toast(Account.say(e), { error: true }); return null; }
+    let password = null, wrong = false;
     for (;;) {
       if (info.password) {
         password = await askDocPassword(wrong);
-        if (password == null) return;
+        if (password == null) return null;
       }
       UI.busy('Se deschide documentul criptat…');
       await yieldUI();
-      try { res = A().open(bytes, id, { password: password || undefined }); UI.busy(); break; } catch (e) {
+      try { const r = A().open(bytes, id, { password: password || undefined }); UI.busy(); return r; } catch (e) {
         UI.busy();
         if (e.code === 'BAD_PASSWORD_OR_NOT_FOR_YOU') { wrong = true; continue; }
         const msg = {
-          NOT_FOR_YOU: 'Acest document nu îți este adresat: a fost criptat pentru alte persoane. Dacă ar trebui să-l poți deschide, cere expeditorului să ți-l trimită din nou, pe @' + (Account.handle() || 'numele tău') + '.',
+          NOT_FOR_YOU: 'Acest document a fost criptat pentru alte persoane, nu pentru contul tău. Dacă ar trebui să-l poți deschide, cere expeditorului să ți-l trimită din nou, pe @' + (Account.handle() || 'numele tău') + '.',
           TAMPERED: 'Fișierul a fost modificat sau s-a deteriorat pe drum. Cere expeditorului să-l trimită din nou.',
           BAD_SIGNATURE: 'Semnătura expeditorului nu este validă: fișierul a fost falsificat. Nu-l folosi.',
           NEWER_VERSION: 'Fișierul a fost creat cu o versiune mai nouă a aplicației. Actualizează ACM Docs.',
         }[e.code];
-        return UI.confirm('Nu pot deschide documentul', msg || e.message || String(e), 'Am înțeles', 'Închide');
+        await UI.confirm('Documentul nu poate fi deschis', msg || e.message || String(e), 'Am înțeles', 'Închide');
+        return null;
       }
     }
+  }
 
+  async function openFile(path, bytes) {
+    try { A().inspect(bytes); } catch (e) { return UI.toast(e.message || 'Nu este un fișier .acm.', { error: true }); }
+    if (!(await ensureAccount())) return;
+    try { await keepEncrypted(path, bytes); } catch (e) { console.warn('keep .acm', e); }
+    const res = await decryptBytes(Host.baseName(path), bytes);
+    if (!res) return;
     const sender = await describeSender(res.sender);
-    const keep = el('input', { type: 'checkbox', id: 'acm-keep' });
-    let keepCopy = false;
     const go = await UI.modal((box, close) => {
-      keep.addEventListener('change', () => { keepCopy = keep.checked; });
       box.classList.add('acm-recv');
       box.append(
-        el('div', { class: 'send-head' }, [el('span', { class: 'send-i ok', html: svg('lockfile') }), el('div', {}, [el('h2', { text: 'Document criptat deschis' }), el('small', { class: 'muted no-tr', text: res.name })])]),
+        el('div', { class: 'send-head' }, [el('span', { class: 'send-i ok', html: svg('lockfile') }), el('div', {}, [el('h2', { text: 'Document criptat' }), el('small', { class: 'muted no-tr', text: res.name })])]),
         el('div', { class: 'recv-from' }, [el('small', { class: 'muted', text: 'Trimis de' }), sender.row]),
         sender.note,
-        el('p', { class: 'muted small', text: 'Semnătura expeditorului a fost verificată: documentul nu a fost modificat pe drum.' }),
-        el('label', { class: 'chk' }, [keep, 'Păstrează o copie decriptată pe acest dispozitiv']),
-        el('small', { class: 'muted small', text: 'Altfel, copia decriptată se șterge când închizi documentul.' }),
-        el('div', { class: 'actions' }, [
-          sender.add ? el('button', { class: 'btn', type: 'button', text: 'Adaugă la contacte', onclick: () => close('add') }) : el('button', { class: 'btn', type: 'button', text: 'Închide', onclick: () => close(null) }),
-          el('button', { class: 'btn primary', type: 'button', text: 'Deschide documentul', onclick: () => close('open') }),
+        el('p', { class: 'muted small', text: 'Semnătura expeditorului este validă: documentul nu a fost modificat pe drum. Se deschide doar pentru vizualizare; pe dispozitiv rămâne criptat.' }),
+        el('div', { class: 'actions col' }, [
+          el('button', { class: 'btn primary', type: 'button', text: 'Deschide', onclick: () => close('open') }),
+          el('button', { class: 'btn', type: 'button', html: svg('download') + '<span>Salvează o copie decriptată…</span>', onclick: () => close('save') }),
+          sender.add ? el('button', { class: 'btn', type: 'button', text: 'Adaugă expeditorul la contacte', onclick: () => close('add') }) : null,
+          el('button', { class: 'btn', type: 'button', text: 'Închide', onclick: () => close(null) }),
         ]),
       );
     });
     if (go === 'add' && sender.add) {
       const c = Contacts.addFromProfile(sender.add);
       UI.toast(`@${c.handle} a fost adăugat la contacte (neverificat).`);
+      return;
     }
-    if (!go) return;
-    // a temporary copy (wiped when you leave the document), unless "keep" was ticked
-    const temporary = !keepCopy;
-    const out = await freePath(temporary ? await Shield.tempDir() : await docsDir('Primite criptat'), safeName(res.name));
+    if (go === 'save') return saveDecrypted(res);
+    if (go !== 'open') return;
+    // view only: a temporary copy, wiped as soon as the document is closed
+    const out = await freePath(await Shield.tempDir(), safeName(res.name));
     Host.writeFile(out, res.bytes);
-    Shield.watchOpen(out, temporary);
+    Shield.watchOpen(out, true);
     await App.openPath(out);
+    UI.toast('Document confidențial: copia decriptată se șterge când îl închizi.', { duration: 6000 });
+  }
+
+  /** The only way a decrypted copy stays on the device: chosen by hand, after a warning. */
+  async function saveDecrypted(res) {
+    const ok = await UI.confirm('Salvezi o copie decriptată?',
+      'Copia salvată nu mai este protejată: oricine are acces la acest dispozitiv o poate citi. Nu o trimite mai departe, nu o încărca în cloud și nu o posta. Dacă trebuie să ajungă la altcineva, trimite-o criptat.',
+      'Salvează copia', 'Anulează');
+    if (!ok) return null;
+    const out = await freePath(await docsDir('Decriptate'), safeName(res.name));
+    Host.writeFile(out, res.bytes);
+    try { App.rememberFile(out, 'original', /\.pdf$/i.test(out) ? res.bytes : null); } catch (e) {}
+    UI.toast(`Copia a fost salvată în „Decriptate”: ${Host.baseName(out)}`, { duration: 6000 });
+    return out;
+  }
+
+  /** "Save a decrypted copy" from the file menu: unlock, then the same warning. */
+  async function saveDecryptedFromFile(path) {
+    if (!(await ensureAccount())) return;
+    const bytes = await Host.readFileAsync(path);
+    const res = await decryptBytes(Host.baseName(path), bytes);
+    if (res) await saveDecrypted(res);
   }
 
   async function describeSender(s) {
@@ -563,7 +603,7 @@ const AcmShare = (() => {
     if (changed) {
       return {
         row: Contacts.contactRow(Object.assign({}, changed, { pending: true }), null),
-        note: el('div', { class: 'acm-note bad', html: `${svg('warn')}<span>Documentul e semnat cu alt lacăt decât cel pe care îl ai pentru @${s.handle}. Poate și-a refăcut cheile, sau cineva se dă drept el. Întreabă-l direct înainte să ai încredere în document.</span>` }),
+        note: el('div', { class: 'acm-note bad', html: `${svg('warn')}<span>Documentul e semnat cu altă cheie decât cea pe care o ai pentru @${s.handle}. Poate și-a refăcut cheile, sau cineva se dă drept el. Întreabă-l direct înainte să ai încredere în document.</span>` }),
       };
     }
     if (s.handle) {
@@ -571,11 +611,11 @@ const AcmShare = (() => {
       try { p = await Account.lookup(s.handle); } catch (e) {}
       if (p && p.fp === s.fingerprint) {
         const c = { uid: p.uid, handle: p.handle, name: p.name, verified: false };
-        return { row: Contacts.contactRow(c, null), add: p, note: el('div', { class: 'acm-note warn', html: `${svg('info')}<span>Nu este în contactele tale. Serverul confirmă că lacătul este al lui @${p.handle}, dar nu l-ai verificat față în față.</span>` }) };
+        return { row: Contacts.contactRow(c, null), add: p, note: el('div', { class: 'acm-note warn', html: `${svg('info')}<span>Nu este în contactele tale. Serverul confirmă că cheia este a lui @${p.handle}, dar nu l-ai verificat față în față.</span>` }) };
       }
       return {
         row: Contacts.contactRow({ handle: s.handle, name: 'Expeditor neconfirmat', verified: false, pending: true }, null),
-        note: el('div', { class: 'acm-note bad', html: `${svg('warn')}<span>Expeditorul spune că este @${s.handle}, dar lacătul lui nu corespunde contului @${s.handle} de pe server. Tratează documentul cu suspiciune.</span>` }),
+        note: el('div', { class: 'acm-note bad', html: `${svg('warn')}<span>${p ? `Expeditorul spune că este @${s.handle}, dar cheia lui nu corespunde contului @${s.handle} de pe server.` : `Expeditorul spune că este @${s.handle}, dar acest cont nu (mai) există.`} Tratează documentul cu suspiciune.</span>` }),
       };
     }
     return {
@@ -600,11 +640,10 @@ const AcmShare = (() => {
     });
   }
 
-  // ---------------------------------------------------------------- Home: account buttons + the encrypted-send card
+  // ---------------------------------------------------------------- Home: contacts + account buttons (top right)
   function renderHome() {
     const acts = document.getElementById('hero-acts');
-    const slot = document.getElementById('home-secure');
-    if (!acts || !slot || typeof Account === 'undefined') return;
+    if (!acts || typeof Account === 'undefined') return;
     const u = Account.current();
     acts.innerHTML = '';
     const people = el('button', { class: 'hb', type: 'button', id: 'home-contacts', title: 'Contacte', 'aria-label': 'Contacte', html: svg('people') });
@@ -615,34 +654,6 @@ const AcmShare = (() => {
     if (u) acts.append(people);
     acts.append(me);
 
-    slot.innerHTML = '';
-    const nContacts = u ? Contacts.list().length : 0;
-    const nVerified = u ? Contacts.list().filter((c) => Contacts.status(c) === 'verified').length : 0;
-    const card = el('section', { class: 'sec-card', 'aria-label': 'Trimite criptat' }, [
-      el('div', { class: 'sec-bg', 'aria-hidden': 'true' }),
-      el('div', { class: 'sec-top' }, [
-        el('span', { class: 'sec-shield', html: svg('shield') }),
-        el('div', { class: 'sec-t' }, [
-          el('b', { text: 'Trimite criptat' }),
-          el('small', { text: 'Doar destinatarul îl poate deschide. Nici noi, nici serverul, nici un computer cuantic.' }),
-        ]),
-      ]),
-      el('div', { class: 'sec-chips' }, [
-        el('span', { text: 'Post-cuantic' }), el('span', { text: 'ML-KEM-768 + X25519' }), el('span', { text: 'Semnat ML-DSA' }),
-      ]),
-      el('div', { class: 'sec-btns' }, u ? [
-        el('button', { class: 'sec-main', type: 'button', id: 'home-send', html: svg('lockfile') + '<span>Alege fișierul</span>', onclick: chooseAndSend }),
-        el('button', { class: 'sec-ghost', type: 'button', id: 'home-open-acm', text: 'Deschide .acm', onclick: openAcmDialog }),
-      ] : [
-        el('button', { class: 'sec-main', type: 'button', html: '<span>Creează cont gratuit</span>', onclick: () => { Account.setSkipped(false); AccountUI.show('signup'); } }),
-        el('button', { class: 'sec-ghost', type: 'button', text: 'Am deja cont', onclick: () => { Account.setSkipped(false); AccountUI.show('signin'); } }),
-      ]),
-      u ? el('button', { class: 'sec-foot', type: 'button', onclick: () => Contacts.showList() }, [
-        el('span', { text: nContacts ? `${nContacts} ${nContacts === 1 ? 'contact' : 'contacte'} · ${nVerified} ${nVerified === 1 ? 'verificat' : 'verificate'}` : 'Adaugă primul contact după @nume sau cod QR' }),
-        el('span', { class: 'chev', html: svg('right') }),
-      ]) : null,
-    ]);
-    slot.append(card);
   }
 
   /** From Home: pick what to send (recent files or any file), then the usual send flow. */
@@ -675,5 +686,5 @@ const AcmShare = (() => {
     if (p) await App.openPath(p);
   }
 
-  return { send, openFile, isAcm, ensureAccount, renderHome, chooseAndSend };
+  return { send, openFile, isAcm, ensureAccount, renderHome, chooseAndSend, saveDecryptedFromFile };
 })();

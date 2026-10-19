@@ -201,7 +201,7 @@ const Account = (() => {
   /** Picks (or changes) the @name; the padlock comes from the server copy or from this device. */
   async function setHandle(handle) {
     let pub = profile && profile.key && profile.fp && store.get(LS.fp(user.uid)) === profile.fp ? { key: profile.key, fp: profile.fp } : null;
-    if (!pub) pub = pubOf(await unlock('Publică lacătul contului tău'));
+    if (!pub) pub = pubOf(await unlock('Confirmă ca să actualizezi profilul'));
     await publish(pub, handle);
   }
   const handle = () => (profile && profile.handle) || (user && store.get(LS.handle(user.uid))) || null;
