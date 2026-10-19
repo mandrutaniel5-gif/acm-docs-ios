@@ -24,6 +24,7 @@ const AccountUI = (() => {
   function close() { if (root) { root.classList.add('out'); const r = root; root = null; setTimeout(() => r.remove(), 320); } view = null; refreshAround(); }
   function refreshAround() {
     try { banner(); } catch (e) {}
+    try { if (typeof AcmShare !== 'undefined') AcmShare.renderHome(); } catch (e) {}
     try { if (document.querySelector('#v-settings:not(.hidden)')) App.showView('settings'); } catch (e) {}
   }
 
@@ -263,6 +264,7 @@ const AccountUI = (() => {
     try { w = await Account.words(`Confirmă cu ${bio()} ca să vezi codul de recuperare`); } catch (e) { if (String(e && e.message) !== 'cancel') UI.toast(Account.say(e), { error: true }); return; }
     if (!w) return UI.toast('Codul nu este pe acest dispozitiv.', { error: true });
     const list = w.split(' ');
+    if (typeof Shield !== 'undefined') await Shield.protect(true);
     await UI.modal((box, done) => {
       box.classList.add('recov');
       const grid = el('ol', { class: 'recov-grid no-tr' }, list.map((x) => el('li', { text: x })));
@@ -279,6 +281,7 @@ const AccountUI = (() => {
         el('div', { class: 'actions' }, [el('button', { class: 'btn', type: 'button', text: 'Închide', onclick: () => done(false) }), ok]),
       );
     });
+    if (typeof Shield !== 'undefined') await Shield.protect(false);
     banner();
   }
 
@@ -323,6 +326,64 @@ const AccountUI = (() => {
     return group('Cont', rows, 'Cheile de criptare sunt create și păstrate doar pe dispozitivele tale. Serverul are doar lacătul public.');
   }
 
+  // ---------------------------------------------------------------- the account sheet (avatar on Home)
+  async function showProfile() {
+    const u = Account.current();
+    if (!u) { Account.setSkipped(false); return render('signin'); }
+    if (Account.needsVerification()) return render('verify');
+    const h = Account.handle();
+    const qrText = h && Account.fingerprint() ? `ACMC1:${h}:${u.uid}:${Account.fingerprint()}` : null;
+    const integrity = typeof Shield !== 'undefined' ? await Shield.integrity() : null;
+    const act = await UI.modal((box, close) => {
+      box.classList.add('profile');
+      const row = (icon, color, label, sub, key, cls) => {
+        const r = el('button', { class: 'srow' + (cls ? ' ' + cls : ''), type: 'button' }, [
+          el('span', { class: 'si ' + color, html: svg(icon) }),
+          el('span', { class: 'stx' }, [el('b', { text: label }), sub ? el('small', { text: sub }) : null]),
+          el('span', { class: 'chev', html: svg('right') }),
+        ]);
+        r.addEventListener('click', () => close(key));
+        return r;
+      };
+      box.append(
+        el('div', { class: 'pf-head' }, [
+          el('span', { class: 'pf-av', text: ((u.displayName || u.email || '?').trim()[0] || '?').toUpperCase() }),
+          el('div', { class: 'pf-id' }, [el('b', { class: 'no-tr', text: u.displayName || 'Contul meu' }), el('span', { class: 'pf-h no-tr', text: h ? '@' + h : '' }), el('small', { class: 'muted no-tr', text: u.email || '' })]),
+        ]),
+        qrText ? el('button', { class: 'pf-qr', type: 'button', title: 'Codul meu', onclick: () => close('code') }, [
+          el('span', { class: 'pf-qr-img', html: window.__lib.qr.svg(qrText) }),
+          el('span', { class: 'pf-qr-t' }, [el('b', { text: 'Codul meu' }), el('small', { text: 'Arată-l cuiva ca să te adauge și să te verifice. Atinge pentru mărire.' })]),
+        ]) : null,
+        el('div', { class: 'list-card' }, [
+          row('people', 'green', 'Contacte', 'Caută după @nume, scanează coduri QR', 'contacts'),
+          row('lockfile', 'blue', 'Trimite un document criptat', 'Criptare post-cuantică', 'send'),
+        ]),
+        el('h3', { class: 'csub', text: 'Securitate' }),
+        el('div', { class: 'list-card' }, [
+          row('key', Account.wordsSaved() ? 'green' : 'orange', 'Codul de recuperare', Account.wordsSaved() ? 'Notat ✓' : 'Nenotat încă: notează-l', 'words'),
+          row('shield', integrity && integrity.risk ? 'red' : 'indigo', 'Protecție anti-spyware', integrity && integrity.risk ? 'Atenție: telefonul pare modificat' : 'Ce face aplicația și ce poți face tu', 'shield'),
+          h ? row('edit', 'gray', 'Schimbă numele de utilizator', '@' + h, 'handle') : null,
+        ]),
+        el('div', { class: 'list-card' }, [
+          row('logout', 'gray', 'Deconectează-te', 'Cheile rămân pe acest dispozitiv', 'logout'),
+          row('del', 'red', 'Șterge contul', `Cu ${bio()} și parola`, 'delete', 'danger'),
+        ]),
+        el('div', { class: 'actions' }, [el('button', { class: 'btn', type: 'button', text: 'Închide', onclick: () => close() })]),
+      );
+    });
+    if (act === 'code') { await Contacts.showMyCode(); return showProfile(); }
+    if (act === 'contacts') return Contacts.showList();
+    if (act === 'send') return AcmShare.chooseAndSend();
+    if (act === 'words') { await showWords(); return showProfile(); }
+    if (act === 'shield') { await Shield.showInfo(); return showProfile(); }
+    if (act === 'handle') return render('handle', { change: true });
+    if (act === 'logout') {
+      if (await UI.confirm('Te deconectezi?', 'Cheile și contactele rămân pe acest dispozitiv. Când intri din nou, le găsești la fel.', 'Deconectează-te')) { await Account.signOut(); refreshAround(); }
+      return;
+    }
+    if (act === 'delete') { await deleteFlow(); refreshAround(); }
+  }
+
   // ---------------------------------------------------------------- reminder on Home
   function banner() {
     const old = document.getElementById('acct-banner');
@@ -346,7 +407,7 @@ const AccountUI = (() => {
     const args = (Host.info && Host.info.args) || [];
     if (args.includes('-uitest') && !args.includes('-uitest-account')) return; // automatic tests of other screens
     Account.init();
-    Account.onChange(() => banner());
+    Account.onChange(() => { banner(); try { if (typeof AcmShare !== 'undefined') AcmShare.renderHome(); } catch (e) {} });
     await Account.ready();
     const u = Account.current();
     if (!u) { if (!Account.skipped()) render('signin'); return; }
@@ -355,5 +416,5 @@ const AccountUI = (() => {
     banner();
   }
 
-  return { start, show: (v) => render(v || 'signin'), settingsGroup, showWords, route, get view() { return view; } };
+  return { start, showProfile, show: (v) => render(v || 'signin'), settingsGroup, showWords, route, get view() { return view; } };
 })();

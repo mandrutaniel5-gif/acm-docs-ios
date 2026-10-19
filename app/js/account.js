@@ -271,6 +271,8 @@ const Account = (() => {
     identity = A().importSecrets(blob);
     return identity;
   }
+  /** Forgets the unlocked keys (the next use asks for Face ID again). */
+  function lock() { identity = null; }
   async function words(reason) {
     const b = await Host.secureGet(SEC.words(user.uid), reason || 'Vezi codul de recuperare');
     return b ? new TextDecoder().decode(b) : null;
@@ -307,7 +309,7 @@ const Account = (() => {
   return {
     init, ready, onChange, current, needsVerification, isPasswordUser, say,
     signUp, signIn, resetPassword, resendVerification, refresh, signOut, google,
-    keyState, createKeys, restoreKeys, setHandle, handle, fingerprint, lookup, profileOf, handleProblem, suggestHandle, cleanHandle, unlock, words, wordsSaved, markWordsSaved, deleteAccount,
+    keyState, createKeys, restoreKeys, setHandle, handle, fingerprint, lookup, profileOf, handleProblem, suggestHandle, cleanHandle, unlock, lock, words, wordsSaved, markWordsSaved, deleteAccount,
     skipped, setSkipped,
     get googleReady() { return !!(Host.info && Host.info.platform === 'ios' ? GOOGLE.ios : (!Host.mobile && GOOGLE.desktop)); },
   };

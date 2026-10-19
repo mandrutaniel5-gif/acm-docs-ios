@@ -56,6 +56,7 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
         nc.addObserver(self, selector: #selector(keyboardChanged(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
 
         if #available(iOS 26.0, *) { addGlassTabBar(to: root, content: content) }
+        PrivacyGuard.shared.attach(self)
     }
 
     // MARK: keyboard

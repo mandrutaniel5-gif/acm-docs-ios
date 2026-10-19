@@ -555,13 +555,26 @@ const Host = (() => {
     return undefined;
   }
 
+  /** Sensitive content on screen: block screenshots / recording where the system allows it. */
+  async function privacy(on) {
+    try {
+      if (AB) await call('privacy', { on: !!on });
+      else if (ipc) await ipc.invoke('privacy', !!on);
+    } catch (e) { /* older app */ }
+  }
+  /** Signs of a jailbroken / rooted device: { risk, signs[] } */
+  async function integrity() {
+    try { if (AB) return JSON.parse(await call('integrity', {})); } catch (e) {}
+    return { risk: false, signs: [] };
+  }
+
   const available = platform !== 'web';
   const mobile = platform === 'android';
 
   return {
     platform, mobile, available, info, readFile, readFileAsync, writeFile, exists, baseName, dirName, openDialog, pickImages, camera, saveDialog, startupFile, onOpenFile, setTitle, wasmBytes, listFonts,
     ocr, ocrWarm, htmlToPdf, capture, ext, showInFolder, openPath, openExternal, fetchText, share, exportCopy, specialDir, listDir, mkdirp, join, mtime, remove, setTheme, exitApp, appVersion, toB64, fromB64,
-    secureSet, secureGet, secureHas, secureDelete, confirmOwner, oauth, googleToken, scanQR,
+    secureSet, secureGet, secureHas, secureDelete, confirmOwner, oauth, googleToken, scanQR, privacy, integrity,
   };
 })();
 

@@ -65,7 +65,10 @@ public class MainActivity extends Activity {
     static final String HOST = "appassets.androidplatform.net";
     static final String ORIGIN = "https://" + HOST + "/";
 
-    static final int REQ_OPEN = 11, REQ_CAMERA = 12, REQ_EXPORT = 13, REQ_CHOOSER = 14, REQ_PERM = 15, REQ_IMAGES = 16;
+    static final int REQ_OPEN = 11, REQ_CAMERA = 12, REQ_EXPORT = 13, REQ_CHOOSER = 14, REQ_PERM = 15, REQ_IMAGES = 16, REQ_AUTH = 17;
+    SecureStore secure;
+    int authId = 0;
+    Runnable authRetry = null;
 
     WebView web;
     android.widget.FrameLayout root;
@@ -364,6 +367,15 @@ public class MainActivity extends Activity {
             }
             return;
         }
+        if (requestCode == REQ_AUTH) {
+            final int id = authId;
+            final Runnable retry = authRetry;
+            authId = 0;
+            authRetry = null;
+            if (resultCode == RESULT_OK && retry != null) new Thread(retry).start();
+            else if (id != 0) reply(id, "cancel", null);
+            return;
+        }
         if (requestCode != pendingReq) return;
         final int id = pendingId;
         final File file = pendingFile;
@@ -411,6 +423,57 @@ public class MainActivity extends Activity {
                 reply(id, "Nu am putut salva copia: " + e.getMessage(), null);
             }
         }
+    }
+
+    // ------------------------------------------------------------------ account keys (Keystore + screen lock)
+
+    void secureOp(final int id, final String op, final JSONObject a, final boolean retried) {
+        if (!SecureStore.supported()) { reply(id, t("Conturile ACM Docs au nevoie de Android 6 sau mai nou.", "ACM Docs accounts need Android 6 or newer."), null); return; }
+        if (secure == null) secure = new SecureStore(this);
+        final String name = a.optString("name", "");
+        if ("secureHas".equals(op)) { reply(id, null, secure.has(name) ? "true" : "false"); return; }
+        if ("secureDelete".equals(op)) { secure.delete(name); reply(id, null, "true"); return; }
+        if ("confirmOwner".equals(op)) {
+            if (!secure.deviceSecure()) { reply(id, "nolock", null); return; }
+            askOwner(id, a.optString("reason", ""), new Runnable() { @Override public void run() { reply(id, null, "true"); } });
+            return;
+        }
+        new Thread(new Runnable() {
+            @Override public void run() {
+                try {
+                    if ("secureSet".equals(op)) {
+                        secure.set(name, Base64.decode(a.optString("data", ""), Base64.NO_WRAP));
+                        reply(id, null, "true");
+                    } else {
+                        byte[] b = secure.get(name);
+                        reply(id, null, b == null ? null : Base64.encodeToString(b, Base64.NO_WRAP));
+                    }
+                } catch (SecureStore.NoLock e) {
+                    reply(id, t("Setează un PIN, un model sau amprenta pentru ecranul de blocare al telefonului: fără ele cheile contului nu pot fi protejate.", "Set a screen lock (PIN, pattern or fingerprint) on this phone: without it the account keys cannot be protected."), null);
+                } catch (SecureStore.NeedAuth e) {
+                    if (retried) { reply(id, "cancel", null); return; }
+                    String reason = a.optString("reason", "");
+                    askOwner(id, reason, new Runnable() { @Override public void run() { secureOp(id, op, a, true); } });
+                } catch (Exception e) {
+                    reply(id, "secure: " + e, null);
+                }
+            }
+        }).start();
+    }
+
+    /** PIN / pattern / fingerprint of the phone, then `then` (or "cancel"). */
+    void askOwner(final int id, final String reason, final Runnable then) {
+        runOnUiThread(new Runnable() {
+            @Override public void run() {
+                android.app.KeyguardManager km = (android.app.KeyguardManager) getSystemService(KEYGUARD_SERVICE);
+                Intent i = km == null ? null : km.createConfirmDeviceCredentialIntent("ACM Docs", reason.isEmpty() ? t("Confirmă că ești tu", "Confirm it's you") : reason);
+                if (i == null) { new Thread(then).start(); return; } // no screen lock: nothing to confirm with
+                if (authId != 0) reply(authId, "cancel", null);
+                authId = id;
+                authRetry = then;
+                try { startActivityForResult(i, REQ_AUTH); } catch (ActivityNotFoundException e) { authId = 0; authRetry = null; reply(id, "cancel", null); }
+            }
+        });
     }
 
     void startFor(int id, int req, File file, Intent intent) {
@@ -559,6 +622,27 @@ public class MainActivity extends Activity {
             bmp.compress(Bitmap.CompressFormat.JPEG, 75, o);
             bmp.recycle();
             reply(id, null, Base64.encodeToString(o.toByteArray(), Base64.NO_WRAP));
+        } else if ("privacy".equals(op)) {
+            final boolean on = a.optBoolean("on", false);
+            runOnUiThread(new Runnable() {
+                @Override public void run() {
+                    // no screenshots, no screen recording, blank in the recent-apps list
+                    if (on) getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE);
+                    else getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE);
+                }
+            });
+            reply(id, null, "true");
+        } else if ("integrity".equals(op)) {
+            JSONArray signs = new JSONArray();
+            String[] su = { "/system/bin/su", "/system/xbin/su", "/sbin/su", "/su/bin/su", "/system/app/Superuser.apk", "/data/adb/magisk", "/system/bin/magisk", "/data/local/xbin/su", "/data/local/bin/su" };
+            for (String p : su) if (new File(p).exists()) signs.put(p);
+            if (Build.TAGS != null && Build.TAGS.contains("test-keys")) signs.put("test-keys");
+            JSONObject o = new JSONObject();
+            o.put("risk", signs.length() > 0);
+            o.put("signs", signs);
+            reply(id, null, o.toString());
+        } else if ("secureSet".equals(op) || "secureGet".equals(op) || "secureHas".equals(op) || "secureDelete".equals(op) || "confirmOwner".equals(op)) {
+            secureOp(id, op, a, false);
         } else {
             reply(id, "Operație necunoscută: " + op, null);
         }

@@ -190,6 +190,12 @@ ipcMain.handle('capture', async (e, rect) => {
 // account or another computer cannot read them. Kept in userData/secure/<name>.bin.
 const secureDir = () => path.join(app.getPath('userData'), 'secure');
 const secureFile = (name) => path.join(secureDir(), String(name).replace(/[^a-z0-9_.-]/gi, '_') + '.bin');
+// sensitive screens (recovery words, a decrypted .acm): invisible to screenshots and screen sharing
+ipcMain.handle('privacy', (e, on) => {
+  const w = BrowserWindow.fromWebContents(e.sender);
+  if (w) w.setContentProtection(!!on);
+  return true;
+});
 ipcMain.handle('secure', async (e, op, args) => {
   const { safeStorage } = require('electron');
   const a = args || {};

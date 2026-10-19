@@ -304,6 +304,14 @@ final class Bridge: NSObject, WKScriptMessageHandler {
             Secure.delete(a["name"] as? String ?? "")
             reply(id, nil, "true")
 
+        case "privacy":
+            let on = (a["on"] as? Bool) ?? false
+            DispatchQueue.main.async { PrivacyGuard.shared.set(on); self.reply(id, nil, "true") }
+
+        case "integrity":
+            let d = (try? JSONSerialization.data(withJSONObject: PrivacyGuard.integrity())) ?? Data("{}".utf8)
+            reply(id, nil, String(data: d, encoding: .utf8))
+
         case "scanqr":
             let title = (a["title"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? t("Îndreaptă camera spre codul QR", "Point the camera at the QR code")
             let scanner = QRScannerViewController(title: title) { [weak self] code, error in

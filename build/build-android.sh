@@ -32,6 +32,11 @@ cp "$W/base.apk" "$W/unsigned.apk"
 
 echo "== sign"
 zipalign -f -p 4 "$W/unsigned.apk" "$W/aligned.apk"
+mkdir -p "$OUT"
+if [ ! -f "$ROOT/build/android/acmdocs-release.jks" ]; then
+  # the signing key stays on the owner's computer: sign there with apksigner
+  cp "$W/aligned.apk" "$OUT/ACM-Docs-$VERSION-unsigned.apk"; ls -la "$OUT"; exit 0
+fi
 PW=$(sed -n 's/^storePassword=//p' "$ROOT/build/android/keystore.properties")
 mkdir -p "$OUT"
 APK="$OUT/ACM-Docs-$VERSION.apk"

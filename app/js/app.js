@@ -183,6 +183,7 @@ const App = (() => {
     if (!recent.length) {
       list.append(el('div', { class: 'row', style: { cursor: 'default' } }, [el('span', { class: 'rt' }, [el('b', { text: 'Niciun fișier încă' }), el('small', { text: Host.mobile ? 'Scanează o foaie sau deschide un PDF din telefon.' : 'Deschide un PDF, o poză sau trage un fișier în fereastră.' })])]));
     }
+    try { if (typeof AcmShare !== 'undefined') AcmShare.renderHome(); } catch (e) { console.error(e); }
     hydrateIcons($('v-home'));
     if (missing.length && !quiet) makeThumbs(missing);
   }
@@ -1078,7 +1079,7 @@ const App = (() => {
   document.addEventListener('DOMContentLoaded', boot);
 
   return {
-    chooseTool, pickImage, openPath, ensureClosed: async () => (await ensureSaved()) && (await Office.ensureSaved()), quietScanHint, save, saveAs, closeDoc, addPdf, showScreen, showHome, showView, rememberFile, scan, back,
+    chooseTool, pickImage, openPath, recentFiles: () => files().filter((f) => Host.exists(f.path)), renderView, ensureClosed: async () => (await ensureSaved()) && (await Office.ensureSaved()), quietScanHint, save, saveAs, closeDoc, addPdf, showScreen, showHome, showView, rememberFile, scan, back,
     get copyPath() { return copyPath; },
   };
 })();

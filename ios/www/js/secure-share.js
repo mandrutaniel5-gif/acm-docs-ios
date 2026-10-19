@@ -520,13 +520,18 @@ const AcmShare = (() => {
     }
 
     const sender = await describeSender(res.sender);
+    const keep = el('input', { type: 'checkbox', id: 'acm-keep' });
+    let keepCopy = false;
     const go = await UI.modal((box, close) => {
+      keep.addEventListener('change', () => { keepCopy = keep.checked; });
       box.classList.add('acm-recv');
       box.append(
         el('div', { class: 'send-head' }, [el('span', { class: 'send-i ok', html: svg('lockfile') }), el('div', {}, [el('h2', { text: 'Document criptat deschis' }), el('small', { class: 'muted no-tr', text: res.name })])]),
         el('div', { class: 'recv-from' }, [el('small', { class: 'muted', text: 'Trimis de' }), sender.row]),
         sender.note,
         el('p', { class: 'muted small', text: 'Semnătura expeditorului a fost verificată: documentul nu a fost modificat pe drum.' }),
+        el('label', { class: 'chk' }, [keep, 'Păstrează o copie decriptată pe acest dispozitiv']),
+        el('small', { class: 'muted small', text: 'Altfel, copia decriptată se șterge când închizi documentul.' }),
         el('div', { class: 'actions' }, [
           sender.add ? el('button', { class: 'btn', type: 'button', text: 'Adaugă la contacte', onclick: () => close('add') }) : el('button', { class: 'btn', type: 'button', text: 'Închide', onclick: () => close(null) }),
           el('button', { class: 'btn primary', type: 'button', text: 'Deschide documentul', onclick: () => close('open') }),
@@ -538,8 +543,11 @@ const AcmShare = (() => {
       UI.toast(`@${c.handle} a fost adăugat la contacte (neverificat).`);
     }
     if (!go) return;
-    const out = await freePath(await docsDir('Primite criptat'), safeName(res.name));
+    // a temporary copy (wiped when you leave the document), unless "keep" was ticked
+    const temporary = !keepCopy;
+    const out = await freePath(temporary ? await Shield.tempDir() : await docsDir('Primite criptat'), safeName(res.name));
     Host.writeFile(out, res.bytes);
+    Shield.watchOpen(out, temporary);
     await App.openPath(out);
   }
 
@@ -592,5 +600,80 @@ const AcmShare = (() => {
     });
   }
 
-  return { send, openFile, isAcm, ensureAccount };
+  // ---------------------------------------------------------------- Home: account buttons + the encrypted-send card
+  function renderHome() {
+    const acts = document.getElementById('hero-acts');
+    const slot = document.getElementById('home-secure');
+    if (!acts || !slot || typeof Account === 'undefined') return;
+    const u = Account.current();
+    acts.innerHTML = '';
+    const people = el('button', { class: 'hb', type: 'button', id: 'home-contacts', title: 'Contacte', 'aria-label': 'Contacte', html: svg('people') });
+    people.addEventListener('click', () => Contacts.showList());
+    const me = el('button', { class: 'hb avatar' + (u ? ' on' : ''), type: 'button', id: 'home-me', title: u ? 'Contul meu' : 'Intră în cont', 'aria-label': u ? 'Contul meu' : 'Intră în cont' });
+    if (u) me.textContent = ((u.displayName || u.email || '?').trim()[0] || '?').toUpperCase(); else me.innerHTML = svg('user');
+    me.addEventListener('click', () => (u ? AccountUI.showProfile() : (Account.setSkipped(false), AccountUI.show('signin'))));
+    if (u) acts.append(people);
+    acts.append(me);
+
+    slot.innerHTML = '';
+    const nContacts = u ? Contacts.list().length : 0;
+    const nVerified = u ? Contacts.list().filter((c) => Contacts.status(c) === 'verified').length : 0;
+    const card = el('section', { class: 'sec-card', 'aria-label': 'Trimite criptat' }, [
+      el('div', { class: 'sec-bg', 'aria-hidden': 'true' }),
+      el('div', { class: 'sec-top' }, [
+        el('span', { class: 'sec-shield', html: svg('shield') }),
+        el('div', { class: 'sec-t' }, [
+          el('b', { text: 'Trimite criptat' }),
+          el('small', { text: 'Doar destinatarul îl poate deschide. Nici noi, nici serverul, nici un computer cuantic.' }),
+        ]),
+      ]),
+      el('div', { class: 'sec-chips' }, [
+        el('span', { text: 'Post-cuantic' }), el('span', { text: 'ML-KEM-768 + X25519' }), el('span', { text: 'Semnat ML-DSA' }),
+      ]),
+      el('div', { class: 'sec-btns' }, u ? [
+        el('button', { class: 'sec-main', type: 'button', id: 'home-send', html: svg('lockfile') + '<span>Alege fișierul</span>', onclick: chooseAndSend }),
+        el('button', { class: 'sec-ghost', type: 'button', id: 'home-open-acm', text: 'Deschide .acm', onclick: openAcmDialog }),
+      ] : [
+        el('button', { class: 'sec-main', type: 'button', html: '<span>Creează cont gratuit</span>', onclick: () => { Account.setSkipped(false); AccountUI.show('signup'); } }),
+        el('button', { class: 'sec-ghost', type: 'button', text: 'Am deja cont', onclick: () => { Account.setSkipped(false); AccountUI.show('signin'); } }),
+      ]),
+      u ? el('button', { class: 'sec-foot', type: 'button', onclick: () => Contacts.showList() }, [
+        el('span', { text: nContacts ? `${nContacts} ${nContacts === 1 ? 'contact' : 'contacte'} · ${nVerified} ${nVerified === 1 ? 'verificat' : 'verificate'}` : 'Adaugă primul contact după @nume sau cod QR' }),
+        el('span', { class: 'chev', html: svg('right') }),
+      ]) : null,
+    ]);
+    slot.append(card);
+  }
+
+  /** From Home: pick what to send (recent files or any file), then the usual send flow. */
+  async function chooseAndSend() {
+    if (!(await ensureAccount())) return;
+    const recent = (App.recentFiles ? App.recentFiles() : []).filter((f) => Host.ext(f.path) !== 'acm').slice(0, 8);
+    const pick = await UI.modal((box, close) => {
+      box.classList.add('acm-pick');
+      box.append(el('div', { class: 'send-head' }, [el('span', { class: 'send-i', html: svg('lockfile') }), el('div', {}, [el('h2', { text: 'Ce trimiți criptat?' }), el('small', { class: 'muted', text: 'PDF, Word, Excel, poze… orice fișier' })])]));
+      const list = el('div', { class: 'clist' });
+      for (const f of recent) {
+        const r = el('button', { class: 'crow', type: 'button' }, [
+          el('span', { class: 'cav file', html: svg('doc') }),
+          el('span', { class: 'ctx' }, [el('b', { class: 'no-tr', text: Host.baseName(f.path) }), el('small', { class: 'no-tr', text: Host.baseName(Host.dirName(f.path)) })]),
+          el('span', { class: 'chev', html: svg('right') }),
+        ]);
+        r.addEventListener('click', () => close(f.path));
+        list.append(r);
+      }
+      if (recent.length) box.append(el('h3', { class: 'csub', text: 'Recente' }), list);
+      box.append(el('div', { class: 'actions col' }, [
+        el('button', { class: 'btn primary', type: 'button', html: svg('folder') + '<span>Alege alt fișier…</span>', onclick: async () => { const p = await Host.openDialog('pdf'); close(p || null); } }),
+        el('button', { class: 'btn', type: 'button', text: 'Anulează', onclick: () => close(null) }),
+      ]));
+    });
+    if (pick) await send(pick);
+  }
+  async function openAcmDialog() {
+    const p = await Host.openDialog('pdf');
+    if (p) await App.openPath(p);
+  }
+
+  return { send, openFile, isAcm, ensureAccount, renderHome, chooseAndSend };
 })();
