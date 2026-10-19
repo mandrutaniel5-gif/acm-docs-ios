@@ -102,18 +102,22 @@ try {
   console.log('LIVE OK: a sign-in with the password is reported to the devices');
 
   // two-step verification: with it on, the password alone does not sign in anywhere
+  let algo = 'sha1', digits = 6, period = 30;
   const totp = (b32) => {
     const alph = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'; let bits = '';
     for (const ch of b32.replace(/=+$/, '').toUpperCase()) bits += alph.indexOf(ch).toString(2).padStart(5, '0');
     const key = Buffer.from(bits.match(/.{8}/g).map((x) => parseInt(x, 2)));
-    const ctr = Buffer.alloc(8); ctr.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30000)));
-    const h = createHmac('sha1', key).update(ctr).digest(); const o = h[h.length - 1] & 15;
-    return String(((h.readUInt32BE(o) & 0x7fffffff) % 1000000)).padStart(6, '0');
+    const ctr = Buffer.alloc(8); ctr.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 1000 / period)));
+    const h = createHmac(algo, key).update(ctr).digest(); const o = h[h.length - 1] & 15;
+    return String(((h.readUInt32BE(o) & 0x7fffffff) % 10 ** digits)).padStart(digits, '0');
   };
   const app3 = clientApp({ apiKey: 'AIzaSyDsXxKCjxhOeGTZYyYIsm_S6SO6zADe25w', authDomain: `${PROJECT}.firebaseapp.com`, projectId: PROJECT }, 'mfa');
   const auth3 = clientAuth(app3);
   await signInWithEmailAndPassword(auth3, `${handle}@example.invalid`, password);
   const secret = await TotpMultiFactorGenerator.generateSecret(await multiFactor(auth3.currentUser).getSession());
+  algo = String(secret.hashingAlgorithm || 'SHA1').toLowerCase().replace(/[^a-z0-9]/g, '').replace(/^sha(\d)/, 'sha$1');
+  digits = secret.codeLength || 6; period = secret.codeIntervalSeconds || 30;
+  console.log('totp parameters:', secret.hashingAlgorithm, digits, period);
   await multiFactor(auth3.currentUser).enroll(TotpMultiFactorGenerator.assertionForEnrollment(secret, totp(secret.secretKey)), 'CI');
   await signOut(auth3);
   let needs = false, resolver = null;
