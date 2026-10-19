@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail,
   updateProfile, signOut, onAuthStateChanged, reload, deleteUser, reauthenticateWithCredential,
   EmailAuthProvider, GoogleAuthProvider, signInWithCredential, signInWithCustomToken, getIdTokenResult,
+  multiFactor, getMultiFactorResolver, TotpMultiFactorGenerator,
 } from 'firebase/auth';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, query, where, limit, getDocs, serverTimestamp, writeBatch, orderBy, updateDoc } from 'firebase/firestore/lite';
@@ -13,7 +14,7 @@ import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, query, where,
 window.__lib = window.__lib || {};
 window.__lib.firebase = {
   initializeApp,
-  auth: { initializeAuth, indexedDBLocalPersistence, browserLocalPersistence, inMemoryPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, updateProfile, signOut, onAuthStateChanged, reload, deleteUser, reauthenticateWithCredential, EmailAuthProvider, GoogleAuthProvider, signInWithCredential, signInWithCustomToken, getIdTokenResult },
+  auth: { initializeAuth, indexedDBLocalPersistence, browserLocalPersistence, inMemoryPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, updateProfile, signOut, onAuthStateChanged, reload, deleteUser, reauthenticateWithCredential, EmailAuthProvider, GoogleAuthProvider, signInWithCredential, signInWithCustomToken, getIdTokenResult, multiFactor, getMultiFactorResolver, TotpMultiFactorGenerator },
   functions: { getFunctions, httpsCallable },
   firestore: { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, query, where, limit, getDocs, serverTimestamp, writeBatch, orderBy, updateDoc },
 };

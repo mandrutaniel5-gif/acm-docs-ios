@@ -381,6 +381,7 @@ const AccountUI = (() => {
       const sec = [];
       if (typeof Sync !== 'undefined') sec.push(srow('refresh', 'teal', 'Sincronizare în cloud', Sync.summary(), chev(), () => Sync.show()));
       if (typeof Devices !== 'undefined') sec.push(srow('lock', 'indigo', 'Dispozitive', 'Vezi și administrează dispozitivele conectate', chev(), () => Devices.show()));
+      if (Account.isPasswordUser()) sec.push(srow('key', Account.twoStep() ? 'green' : 'orange', 'Verificare în doi pași', Account.twoStep() ? 'Activă: la conectarea cu parola se cere și un cod' : 'Oprită: pornește-o ca parola singură să nu fie de ajuns', chev(), async () => { await twoStepFlow(); App.showView('settings'); }));
       if (typeof AppLock !== 'undefined') sec.push(srow('lock', 'blue', 'Blocarea aplicației', AppLock.summary(), chev(), async () => { await AppLock.settings(); App.showView('settings'); }));
       sec.push(srow('key', Account.wordsSaved() ? 'green' : 'orange', 'Codul de recuperare', Account.wordsSaved() ? 'Notat ✓' : 'Nenotat încă: notează-l', chev(), showWords));
       if (typeof Shield !== 'undefined') sec.push(srow('shield', 'indigo', 'Protecție anti-spyware', 'Ce face aplicația și ce poți face tu', chev(), () => Shield.showInfo()));
@@ -392,6 +393,83 @@ const AccountUI = (() => {
     leave.push(del);
     out.append(group(null, leave));
     return out;
+  }
+
+  // ---------------------------------------------------------------- two-step verification
+  /** The 6-digit code from the authenticator app (asked at sign-in and for sensitive changes). */
+  function askCode(again) {
+    return UI.modal((box, done) => {
+      const inp = el('input', { type: 'text', class: 'in code-in no-tr', id: 'mfa-code', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '7', placeholder: '123456', autofocus: true });
+      const go = () => { const v = inp.value.replace(/\D/g, ''); if (v.length === 6) done(v); else inp.focus(); };
+      inp.addEventListener('input', () => { if (inp.value.replace(/\D/g, '').length === 6) go(); });
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+      box.classList.add('acm-ui');
+      box.append(
+        el('div', { class: 'acm-alert', html: svg('key') }),
+        el('h2', { text: 'Codul de verificare' }),
+        el('p', { text: 'Scrie codul de 6 cifre afișat acum pentru ACM Docs în aplicația ta de autentificare.' }),
+        again ? el('p', { class: 'auth-err on', text: 'Codul nu este corect. Folosește codul afișat acum în aplicația de autentificare.' }) : null,
+        inp,
+        el('div', { class: 'actions' }, [el('button', { class: 'btn', type: 'button', text: 'Anulează', onclick: () => done(null) }), el('button', { class: 'btn primary', type: 'button', id: 'mfa-go', text: 'Confirmă', onclick: go })]),
+      );
+    });
+  }
+  function askPassword(title, text, action) {
+    return UI.modal((box, done) => {
+      const p = el('input', { type: 'password', class: 'in', id: 'mfa-pass', placeholder: 'Parola contului', autocomplete: 'current-password', autofocus: true });
+      p.addEventListener('keydown', (e) => { if (e.key === 'Enter') done(p.value); });
+      box.classList.add('acm-ui');
+      box.append(el('h2', { text: title }), el('p', { text }), p,
+        el('div', { class: 'actions' }, [el('button', { class: 'btn', type: 'button', text: 'Anulează', onclick: () => done(null) }), el('button', { class: 'btn primary', type: 'button', id: 'mfa-pass-go', text: action, onclick: () => done(p.value) })]));
+    });
+  }
+  /** After a password check this device is back on its own device session (rules need it). */
+  async function backToDevice() { try { if (typeof Devices !== 'undefined') await Devices.ensure(); } catch (e) { console.warn('device session', e); } }
+
+  async function twoStepFlow() {
+    if (Account.twoStep()) {
+      const pw = await askPassword('Oprești verificarea în doi pași?', 'Fără ea, cine îți află parola se poate conecta (fără să-ți poată deschide documentele). Confirmă cu parola contului.', 'Oprește');
+      if (!pw) return;
+      UI.busy('Se oprește…');
+      try { await Account.twoStepOff(pw); UI.busy(); UI.toast('Verificarea în doi pași a fost oprită.'); }
+      catch (e) { UI.busy(); if (String(e && e.message) !== 'cancel') UI.toast(Account.say(e), { error: true }); }
+      finally { await backToDevice(); }
+      return;
+    }
+    const pw = await askPassword('Verificare în doi pași', 'La conectarea cu parola se va cere și un cod de 6 cifre dintr-o aplicație de autentificare (Google Authenticator, Microsoft Authenticator, 1Password etc.). Dispozitivele tale deja conectate nu sunt afectate. Începe cu parola contului.', 'Continuă');
+    if (!pw) return;
+    let st;
+    UI.busy('Se pregătește…');
+    try { st = await Account.twoStepStart(pw); } catch (e) { UI.busy(); await backToDevice(); if (String(e && e.message) !== 'cancel') UI.toast(Account.say(e), { error: true }); return; }
+    UI.busy();
+    const key = String(st.key || '');
+    const done = await UI.modal((box, close) => {
+      const inp = el('input', { type: 'text', class: 'in code-in no-tr', id: 'mfa-new-code', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '7', placeholder: '123456' });
+      const errBox = el('p', { class: 'auth-err', role: 'alert' });
+      const go = el('button', { class: 'btn primary', type: 'button', id: 'mfa-enroll', text: 'Activează' });
+      go.addEventListener('click', async () => {
+        const v = inp.value.replace(/\D/g, '');
+        if (v.length !== 6) { inp.focus(); return; }
+        go.disabled = true;
+        try { await Account.twoStepFinish(st.secret, v); close(true); }
+        catch (e) { errBox.textContent = Account.say(e); errBox.classList.add('on'); go.disabled = false; }
+      });
+      box.classList.add('acm-ui', 'mfa-set');
+      box.append(
+        el('h2', { text: 'Adaugă ACM Docs în aplicația de autentificare' }),
+        el('p', { text: 'Scanează codul QR cu aplicația de autentificare sau copiază cheia în ea. Apoi scrie aici codul de 6 cifre pe care ți-l arată.' }),
+        el('div', { class: 'qr-card' }, [el('div', { class: 'qr-img', html: window.__lib.qr.svg(st.uri) })]),
+        el('div', { class: 'mfa-key no-tr', text: key.match(/.{1,4}/g) ? key.match(/.{1,4}/g).join(' ') : key }),
+        el('div', { class: 'actions' }, [
+          el('button', { class: 'btn', type: 'button', text: 'Copiază cheia', onclick: () => { Lib.clipboard.writeText(key); UI.toast('Cheia a fost copiată.'); } }),
+          Host.mobile ? el('button', { class: 'btn', type: 'button', text: 'Deschide aplicația', onclick: () => Host.openExternal(st.uri) }) : null,
+        ]),
+        inp, errBox,
+        el('div', { class: 'actions' }, [el('button', { class: 'btn', type: 'button', text: 'Anulează', onclick: () => close(false) }), go]),
+      );
+    });
+    await backToDevice();
+    if (done) UI.toast('Verificarea în doi pași este activă.');
   }
 
   /** Signing out is never one accidental tap away. */
@@ -498,6 +576,7 @@ const AccountUI = (() => {
     }
     if (!window.__lib || !window.__lib.firebase || !window.__lib.acmcrypto) { if (picked) close(); return; }
     Account.init();
+    Account.setCodePrompt(askCode);
     Account.onChange(() => { banner(); try { if (typeof AcmShare !== 'undefined') AcmShare.renderHome(); } catch (e) {} });
     await Account.ready();
     // a session closed from outside (e.g. the password was changed): this device signs back in with its own key

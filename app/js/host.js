@@ -442,7 +442,8 @@ const Host = (() => {
   }
   /** E-mail (mailto:) or a web page, in the user's own app. */
   function openExternal(url) {
-    if (!/^(mailto:|https?:)/i.test(url)) return;
+    // otpauth: hands the two-step secret to the phone's authenticator app
+    if (!/^(mailto:|https?:)/i.test(url) && !(AB && /^otpauth:\/\/totp\//i.test(url))) return;
     if (AB) { call('external', { url }).catch((e) => UI.toast(e.message, { error: true })); return; }
     if (ipc) ipc.invoke('open-external', url);
     else window.open(url, '_blank');

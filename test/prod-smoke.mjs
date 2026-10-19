@@ -90,6 +90,15 @@ try {
   if (del.ok) throw new Error('auth: the sign-in was deleted with the password only');
   await signOut(auth2);
   console.log('LIVE OK: with the password only, the profile cannot be changed and the sign-in cannot be deleted');
+  // that password sign-in was reported to the account's devices (beforeSignIn → event "password")
+  let seen = false;
+  for (let i = 0; i < 6 && !seen; i++) {
+    const evs = await getDocs(collection(db, 'accounts', user.uid, 'events'));
+    seen = evs.docs.some((d) => d.data().type === 'password');
+    if (!seen) await new Promise((r) => setTimeout(r, 1500));
+  }
+  if (!seen) throw new Error('no "password" sign-in event for the devices');
+  console.log('LIVE OK: a sign-in with the password is reported to the devices');
 
   // pairing limit: made-up addresses in X-Forwarded-For do not get around it
   const pk = A.deriveIdentity(A.generateMnemonic());
