@@ -4,7 +4,7 @@
 import { createRequire } from 'node:module';
 import { initializeApp as clientApp } from 'firebase/app';
 import { getAuth as clientAuth, signInWithCustomToken, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { getFirestore, doc, getDoc, writeBatch, getDocs, collection, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, writeBatch, getDocs, collection, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import * as A from '../build/vendor/acmcrypto.mjs';
 
@@ -13,6 +13,8 @@ const { initializeApp, cert } = require('firebase-admin/app');
 const { readFileSync } = require('node:fs');
 const { getAuth } = require('firebase-admin/auth');
 const { getFirestore: adminDb } = require('firebase-admin/firestore');
+const { getStorage } = require('firebase-admin/storage');
+const BUCKET = `${'acm-docs-52280'}.firebasestorage.app`;
 
 const PROJECT = 'acm-docs-52280';
 initializeApp({ credential: cert(JSON.parse(readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8'))), projectId: PROJECT });
@@ -45,14 +47,38 @@ try {
   const ts2 = Date.now();
   const s = await call('deviceSession', { uid: user.uid, dev: r.dev, ts: ts2, sig: A.toB64(A.signEd(dev, `acm-session\n${user.uid}\n${r.dev}\n${ts2}`)) });
   if (!s.token) throw new Error('deviceSession');
-  ok = true;
   console.log('LIVE OK: device registered, session issued, rules let the device in');
+
+  // cloud sync: one encrypted record in Firestore and one encrypted block in Storage
+  const vk = A.vaultKey(acct);
+  await setDoc(doc(db, 'accounts', user.uid, 'vault', 'r1'), { b: A.toB64(A.vaultSealText(vk, { kind: 'kv', k: 'x', v: 'y', t: 1 }, 'rec:r1')), v: 1, at: serverTimestamp() });
+  const recs = await getDocs(query(collection(db, 'accounts', user.uid, 'vault'), orderBy('at')));
+  if (recs.size !== 1 || A.vaultOpenText(vk, A.fromB64(recs.docs[0].data().b), 'rec:r1').v !== 'y') throw new Error('vault record');
+  const tok = await auth.currentUser.getIdToken();
+  const id = 'ab'.repeat(16), name = `accounts/${user.uid}/blobs/${id}`;
+  const base = `https://firebasestorage.googleapis.com/v0/b/${BUCKET}/o`;
+  const sealed = A.vaultSeal(vk, new TextEncoder().encode('document'), 'blob:' + id);
+  let res = await fetch(`${base}?uploadType=media&name=${encodeURIComponent(name)}`, { method: 'POST', headers: { Authorization: 'Firebase ' + tok, 'Content-Type': 'application/octet-stream' }, body: sealed });
+  if (!res.ok) throw new Error('storage upload ' + res.status + ' ' + (await res.text()).slice(0, 300));
+  res = await fetch(`${base}/${encodeURIComponent(name)}?alt=media`, { headers: { Authorization: 'Firebase ' + tok } });
+  if (!res.ok) throw new Error('storage download ' + res.status);
+  if (new TextDecoder().decode(A.vaultOpen(vk, new Uint8Array(await res.arrayBuffer()), 'blob:' + id)) !== 'document') throw new Error('storage content');
+  // another account's folder stays closed, and so does an anonymous request
+  res = await fetch(`${base}?uploadType=media&name=${encodeURIComponent(`accounts/someoneelse/blobs/${id}`)}`, { method: 'POST', headers: { Authorization: 'Firebase ' + tok, 'Content-Type': 'application/octet-stream' }, body: sealed });
+  if (res.ok) throw new Error('storage: wrote into another account');
+  res = await fetch(`${base}/${encodeURIComponent(name)}?alt=media`);
+  if (res.ok) throw new Error('storage: anonymous read');
+  res = await fetch(`${base}/${encodeURIComponent(name)}`, { method: 'DELETE', headers: { Authorization: 'Firebase ' + tok } });
+  if (!res.ok) throw new Error('storage delete ' + res.status);
+  ok = true;
+  console.log('LIVE OK: cloud sync record + encrypted block (upload, download, delete), other folders closed');
 } finally {
   try { await signOut(auth); } catch (e) {}
   const store = adminDb();
   await store.recursiveDelete(store.collection('accounts').doc(user.uid)).catch(() => {});
   await store.collection('users').doc(user.uid).delete().catch(() => {});
   await store.collection('usernames').doc(handle).delete().catch(() => {});
+  await getStorage().bucket(BUCKET).deleteFiles({ prefix: `accounts/${user.uid}/` }).catch(() => {});
   await admin.deleteUser(user.uid).catch(() => {});
   if (!ok) process.exitCode = 1;
 }
