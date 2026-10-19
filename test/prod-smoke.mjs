@@ -9,12 +9,13 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import * as A from '../build/vendor/acmcrypto.mjs';
 
 const require = createRequire(new URL('../functions/package.json', import.meta.url));
-const { initializeApp, applicationDefault } = require('firebase-admin/app');
+const { initializeApp, cert } = require('firebase-admin/app');
+const { readFileSync } = require('node:fs');
 const { getAuth } = require('firebase-admin/auth');
 const { getFirestore: adminDb } = require('firebase-admin/firestore');
 
 const PROJECT = 'acm-docs-52280';
-initializeApp({ credential: applicationDefault(), projectId: PROJECT });
+initializeApp({ credential: cert(JSON.parse(readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8'))), projectId: PROJECT });
 const admin = getAuth();
 const app = clientApp({ apiKey: 'AIzaSyDsXxKCjxhOeGTZYyYIsm_S6SO6zADe25w', authDomain: `${PROJECT}.firebaseapp.com`, projectId: PROJECT });
 const auth = clientAuth(app), db = getFirestore(app), fn = getFunctions(app, 'europe-west1');
