@@ -57,7 +57,7 @@ const Shield = (() => {
       if (!seenOpen) return;
       clearInterval(watch); watch = null;
       protect(false);
-      if (temporary) { Host.remove(path); temps.delete(path); try { App.renderView(); } catch (e) {} }
+      if (temporary) { Host.remove(path); temps.delete(path); approved.delete(path); try { App.renderView(); } catch (e) {} }
     }, 800);
   }
 
@@ -105,5 +105,26 @@ const Shield = (() => {
   setTimeout(wipeTemp, 1500);
   poke();
 
-  return { protect, guarded, watchOpen, wipeTemp, tempDir, integrity, showInfo };
+  // ---------------------------------------------------------------- saving a decrypted document
+  const approved = new Set();
+  /** The open document is the temporary copy of an encrypted .acm. */
+  const isProtected = (p) => !!p && temps.has(p);
+  /**
+   * Before any save of a protected document: one warning, then the copy goes to "Decriptate"
+   * (never next to the temporary copy, which is wiped). Returns that folder, or null if refused.
+   */
+  async function plainSaveDir(p) {
+    if (!approved.has(p)) {
+      const ok = await UI.confirm('Salvezi o copie decriptată?',
+        'Documentul a fost primit criptat. Copia salvată nu mai este protejată: oricine are acces la acest dispozitiv o poate citi. Nu o trimite mai departe, nu o încărca în cloud și nu o posta. Dacă trebuie să ajungă la altcineva, trimite-o criptat.',
+        'Salvează copia', 'Anulează');
+      if (!ok) return null;
+      approved.add(p);
+    }
+    const dir = Host.join(await Host.specialDir('documents'), 'Decriptate');
+    Host.mkdirp(dir);
+    return dir;
+  }
+
+  return { protect, guarded, watchOpen, wipeTemp, tempDir, integrity, showInfo, isProtected, plainSaveDir };
 })();

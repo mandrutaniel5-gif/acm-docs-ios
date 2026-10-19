@@ -124,13 +124,24 @@ const Office = (() => {
   }
 
   /** Path to save [st] to. st: {source, copyPath}. */
+  /** A document received encrypted: saving asks first and goes to "Decriptate". */
+  async function guardProtected(st) {
+    if (typeof Shield === 'undefined' || !st.source || !Shield.isProtected(st.source.path)) return true;
+    const dir = await Shield.plainSaveDir(st.source.path);
+    if (!dir) return false;
+    st.source.dir = dir;
+    return true;
+  }
+
   async function target(st, ext, newBase, title) {
+    if (!(await guardProtected(st))) return null;
     if (st.copyPath) return st.copyPath;
     if (st.source && st.source.dir) return nextCopy(st.source.dir, st.source.base, ext);
     return askName({ title: title || 'Salvează', base: newBase, ext });
   }
 
   async function saveAsDialog(st, ext, newBase) {
+    if (!(await guardProtected(st))) return null;
     const suggestion = st.source && st.source.dir ? nextCopy(st.source.dir, st.source.base, ext) : Host.join(await docsDir(), freeName(await docsDir(), newBase, ext) + '.' + ext);
     const p = await Host.saveDialog(Host.baseName(suggestion), Host.dirName(suggestion), ext);
     if (!p) return null;
@@ -175,6 +186,7 @@ const Office = (() => {
 
   /** Turns HTML into a PDF next to the document (asks the name), offers to open it. */
   async function exportPdf(st, html, newBase, opts) {
+    if (!(await guardProtected(st))) return;
     const dir = st.source && st.source.dir ? st.source.dir : await docsDir();
     const base = st.copyPath ? Host.baseName(st.copyPath).replace(/\.[^.]+$/, '') : st.source ? st.source.base : newBase;
     const p = await askName({ title: 'Exportă ca PDF', base, dir, ext: 'pdf' });

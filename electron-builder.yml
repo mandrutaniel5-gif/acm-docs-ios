@@ -8,6 +8,10 @@ files:
   - ocr.js
   - app/**/*
   - "!app/vendor/**"
+  # the account / encryption bundles are the same on every platform
+  - app/vendor/acmcrypto.js
+  - app/vendor/firebase.js
+  - app/vendor/qr.js
   - "!app/css/fonts-android.css"
   - "!node_modules/tesseract.js-core/tesseract-core.*"
   - "!node_modules/tesseract.js-core/tesseract-core-simd.*"

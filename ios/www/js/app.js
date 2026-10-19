@@ -721,8 +721,18 @@ const App = (() => {
     return Host.join(dir, `${base}_editat_${max + 1}.pdf`);
   }
 
+  /** A document received encrypted: saving asks first and goes to "Decriptate". */
+  async function guardProtected() {
+    if (typeof Shield === 'undefined' || !source || !Shield.isProtected(source.path)) return true;
+    const dir = await Shield.plainSaveDir(source.path);
+    if (!dir) return false;
+    source.dir = dir;
+    return true;
+  }
+
   async function save() {
     if (!Editor.doc) return false;
+    if (!(await guardProtected())) return false;
     Pages.closeEditor(true);
     const target = copyPath || (await nextCopyPath());
     return writeTo(target);
@@ -730,6 +740,7 @@ const App = (() => {
 
   async function saveAs() {
     if (!Editor.doc) return false;
+    if (!(await guardProtected())) return false;
     Pages.closeEditor(true);
     const suggestion = await nextCopyPath();
     const p = await Host.saveDialog(Host.baseName(suggestion), Host.dirName(suggestion));
