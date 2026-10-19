@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
     static final String ORIGIN = "https://" + HOST + "/";
 
     static final int REQ_OPEN = 11, REQ_CAMERA = 12, REQ_EXPORT = 13, REQ_CHOOSER = 14, REQ_PERM = 15, REQ_IMAGES = 16, REQ_AUTH = 17;
-    SecureStore secure;
+    SecureStore secure, secureQuiet;
     int authId = 0;
     Runnable authRetry = null;
 
@@ -430,9 +430,11 @@ public class MainActivity extends Activity {
     void secureOp(final int id, final String op, final JSONObject a, final boolean retried) {
         if (!SecureStore.supported()) { reply(id, t("Conturile ACM Docs au nevoie de Android 6 sau mai nou.", "ACM Docs accounts need Android 6 or newer."), null); return; }
         if (secure == null) secure = new SecureStore(this);
+        if (secureQuiet == null) secureQuiet = new SecureStore(this, true);
+        final SecureStore store = a.optBoolean("quiet", false) ? secureQuiet : secure;
         final String name = a.optString("name", "");
-        if ("secureHas".equals(op)) { reply(id, null, secure.has(name) ? "true" : "false"); return; }
-        if ("secureDelete".equals(op)) { secure.delete(name); reply(id, null, "true"); return; }
+        if ("secureHas".equals(op)) { reply(id, null, store.has(name) ? "true" : "false"); return; }
+        if ("secureDelete".equals(op)) { store.delete(name); reply(id, null, "true"); return; }
         if ("confirmOwner".equals(op)) {
             if (!secure.deviceSecure()) { reply(id, "nolock", null); return; }
             askOwner(id, a.optString("reason", ""), new Runnable() { @Override public void run() { reply(id, null, "true"); } });
@@ -442,10 +444,10 @@ public class MainActivity extends Activity {
             @Override public void run() {
                 try {
                     if ("secureSet".equals(op)) {
-                        secure.set(name, Base64.decode(a.optString("data", ""), Base64.NO_WRAP));
+                        store.set(name, Base64.decode(a.optString("data", ""), Base64.NO_WRAP));
                         reply(id, null, "true");
                     } else {
-                        byte[] b = secure.get(name);
+                        byte[] b = store.get(name);
                         reply(id, null, b == null ? null : Base64.encodeToString(b, Base64.NO_WRAP));
                     }
                 } catch (SecureStore.NoLock e) {
@@ -661,6 +663,10 @@ public class MainActivity extends Activity {
             JSONObject o = new JSONObject();
             try {
                 o.put("docs", docsRoot != null ? docsRoot.getAbsolutePath() : "");
+                // app-private storage (other apps and file managers cannot see it): decrypted copies
+                File priv = new File(getNoBackupFilesDir(), "private");
+                priv.mkdirs();
+                o.put("priv", priv.getAbsolutePath());
                 o.put("version", getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
                 o.put("sdk", Build.VERSION.SDK_INT);
                 o.put("model", Build.MANUFACTURER + " " + Build.MODEL);

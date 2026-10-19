@@ -7,7 +7,11 @@ const AppLock = (() => {
   const KEY = 'acm.applock';
   const A = () => window.__lib.acmcrypto;
   let cfg = load();
-  let locked = false, hiddenAt = 0, root = null, fails = 0, waitUntil = 0;
+  let locked = false, hiddenAt = 0, root = null;
+  // wrong attempts survive a restart of the app (closing it does not reset the wait)
+  const TRIES = 'acm.applock.tries';
+  const tries = () => { try { return Object.assign({ n: 0, until: 0 }, JSON.parse(localStorage.getItem(TRIES) || '{}')); } catch (e) { return { n: 0, until: 0 }; } };
+  const setTries = (t) => { try { localStorage.setItem(TRIES, JSON.stringify(t)); } catch (e) {} };
 
   function load() {
     try { return Object.assign({ bio: false, pw: null, after: 60000 }, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { return { bio: false, pw: null, after: 60000 }; }
@@ -35,15 +39,18 @@ const AppLock = (() => {
       const form = el('form', { class: 'auth-form', novalidate: true }, [input, err, go]);
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (Date.now() < waitUntil) { err.textContent = `Prea multe încercări. Așteaptă ${Math.ceil((waitUntil - Date.now()) / 1000)} secunde.`; err.classList.add('on'); return; }
+        const t0 = tries();
+        if (Date.now() < t0.until) { err.textContent = `Prea multe încercări. Așteaptă ${Math.ceil((t0.until - Date.now()) / 1000)} secunde.`; err.classList.add('on'); return; }
         go.disabled = true; go.classList.add('busy');
         await new Promise((r) => setTimeout(r, 30));
         let ok = false;
         try { ok = A().passwordVerifier(input.value, cfg.pw.s).h === cfg.pw.h; } catch (x) { ok = false; }
         go.disabled = false; go.classList.remove('busy');
-        if (ok) { fails = 0; return unlock(); }
-        fails++;
-        if (fails >= 5) waitUntil = Date.now() + Math.min(300, 15 * 2 ** (fails - 5)) * 1000;
+        if (ok) { setTries({ n: 0, until: 0 }); return unlock(); }
+        const t = tries();
+        t.n++;
+        if (t.n >= 5) t.until = Date.now() + Math.min(3600, 30 * 2 ** (t.n - 5)) * 1000;
+        setTries(t);
         input.value = '';
         err.textContent = 'Parola nu este corectă.'; err.classList.add('on');
       });

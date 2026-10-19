@@ -21,14 +21,18 @@ enum Secure {
 
     enum Failure: Error { case noPasscode, cancelled, failed(OSStatus) }
 
-    static func set(_ name: String, _ data: Data) throws {
+    /// quiet: a device-only item read without Face ID (the device's own session key). Never leaves
+    /// this phone, not in backups, readable only after the first unlock since the phone started.
+    static func set(_ name: String, _ data: Data, quiet: Bool = false) throws {
         let base: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
                                    kSecAttrService as String: service,
                                    kSecAttrAccount as String: name]
         SecItemDelete(base as CFDictionary)
         var item = base
         item[kSecValueData as String] = data
-        if testBypass {
+        if quiet {
+            item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        } else if testBypass {
             item[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
         } else {
             var err: Unmanaged<CFError>?
@@ -45,13 +49,13 @@ enum Secure {
     }
 
     /// Asks for Face ID with `reason`. nil = nothing saved under this name.
-    static func get(_ name: String, reason: String) throws -> Data? {
+    static func get(_ name: String, reason: String, quiet: Bool = false) throws -> Data? {
         var q: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
                                 kSecAttrService as String: service,
                                 kSecAttrAccount as String: name,
                                 kSecReturnData as String: true,
                                 kSecMatchLimit as String: kSecMatchLimitOne]
-        if !testBypass {
+        if !testBypass && !quiet {
             let ctx = LAContext()
             ctx.localizedReason = reason
             q[kSecUseAuthenticationContext as String] = ctx

@@ -80,6 +80,8 @@ final class Bridge: NSObject, WKScriptMessageHandler {
         case "info":
             let info: [String: Any] = [
                 "docs": Files.docsRoot.path,
+                // app-private folder (not visible in the Files app, not in backups): decrypted copies
+                "priv": Files.privateRoot.path,
                 "version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "",
                 "sdk": 0, "platform": "ios",
                 "model": UIDevice.current.model + " iOS " + UIDevice.current.systemVersion,
@@ -282,7 +284,7 @@ final class Bridge: NSObject, WKScriptMessageHandler {
             let name = a["name"] as? String ?? ""
             guard !name.isEmpty, let data = Data(base64Encoded: a["data"] as? String ?? "") else { return reply(id, "secure", nil) }
             DispatchQueue.global(qos: .userInitiated).async {
-                do { try Secure.set(name, data); self.reply(id, nil, "true") }
+                do { try Secure.set(name, data, quiet: (a["quiet"] as? Bool) ?? false); self.reply(id, nil, "true") }
                 catch Secure.Failure.noPasscode { self.reply(id, self.t("Setează un cod de deblocare pe telefon: fără el, cheile nu pot fi protejate.", "Set a passcode on this phone: without it the keys cannot be protected."), nil) }
                 catch { self.reply(id, "secure \(error)", nil) }
             }
@@ -291,7 +293,7 @@ final class Bridge: NSObject, WKScriptMessageHandler {
             let name = a["name"] as? String ?? ""
             let reason = (a["reason"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? t("Deblochează cheile ACM Docs", "Unlock your ACM Docs keys")
             DispatchQueue.global(qos: .userInitiated).async {
-                do { self.reply(id, nil, try Secure.get(name, reason: reason)?.base64EncodedString()) }
+                do { self.reply(id, nil, try Secure.get(name, reason: reason, quiet: (a["quiet"] as? Bool) ?? false)?.base64EncodedString()) }
                 catch Secure.Failure.cancelled { self.reply(id, "cancel", nil) }
                 catch { self.reply(id, "secure \(error)", nil) }
             }

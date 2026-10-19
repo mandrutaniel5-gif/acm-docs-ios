@@ -212,7 +212,7 @@ await attack('S51', 'MARE', 'Dispozitiv membru își dă singur rolul de princip
   const ts = Date.now();
   return ok(mc.call('claimPrimary', { ts, sig: b64(A.signEd(memberKey, `acm-primary\n${victim.uid}\n${pm.dev}\n${ts}`)) }));
 });
-await attack('S52', 'MARE', 'Dispozitiv membru șterge toate datele contului (wipeAccount), inclusiv lista de dispozitive blocate', async () => {
+await attack('S52', 'MARE', 'Dispozitiv membru șterge contul (wipeAccount) fără semnătura cheilor contului', async () => {
   // run on a throwaway copy: a fresh account with a member
   const acc = await makeAccount('wipe');
   const k = A.deriveIdentity(A.generateMnemonic());
@@ -222,6 +222,10 @@ await attack('S52', 'MARE', 'Dispozitiv membru șterge toate datele contului (wi
   const r = await c.call('pairPoll', { pid: p.pid, sig: b64(A.signEd(k, `acm-pair\n${p.pid}`)) });
   await signInWithCustomToken(c.auth, r.token);
   return ok(c.call('wipeAccount', {}));
+});
+await attack('S54', 'CRITIC', 'Sesiune de dispozitiv furată: șterge contul semnând cu cheia dispozitivului (nu a contului)', async () => {
+  const ts = Date.now();
+  return ok(vc.call('wipeAccount', { ts, sig: b64(A.signEd(victim.dk, `acm-wipe\n${victim.uid}\n${victim.dev}\n${ts}`)) }));
 });
 await attack('S53', 'MEDIU', 'Seif: un dispozitiv scrie 900 KB într-un singur document (abuz de spațiu / cost)', () => ok(setDoc(doc(vc.db, 'accounts', victim.uid, 'vault', 'big'), { b: 'x'.repeat(900000) })));
 

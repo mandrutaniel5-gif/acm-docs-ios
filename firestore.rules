@@ -1,14 +1,26 @@
 rules_version = '2';
-// ACM Docs: who may read and write what in Firestore.
-// Paste into Firebase console › Firestore Database › Rules › Publish.
+// ACM Docs: who may read and write what in Firestore. Published from GitHub (workflow "Server").
 //
-// Only public things live here: @name, display name and the account's PUBLIC key (the "open padlock").
+// Only public things live here: @name, display name and the account's PUBLIC key.
 // No emails, no phone numbers, nothing secret. And no lists: you can look up ONE exact @name,
 // never download all users.
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function signedIn() { return request.auth != null && request.auth.token.email_verified == true; }
+    function deviceDoc(uid, dev) { return get(/databases/$(database)/documents/accounts/$(uid)/devices/$(dev)); }
+    function devId() { return request.auth.token.get('dev', null); }
+    // a device session must be renewed by its device key at least once a day
+    function freshSession() { return request.auth.token.auth_time * 1000 > request.time.toMillis() - 26 * 3600 * 1000; }
+    /** this exact device session is active (not blocked, not removed) and recent */
+    function activeDeviceOf(uid) {
+      return request.auth != null && request.auth.uid == uid && devId() is string
+        && freshSession() && deviceDoc(uid, devId()).data.status == 'active';
+    }
+    // signed in with a confirmed email; a device session of a blocked device gets nothing
+    function signedIn() {
+      return request.auth != null && request.auth.token.email_verified == true
+        && (devId() == null || deviceDoc(request.auth.uid, devId()).data.status == 'active');
+    }
     function validHandle(h) {
       return h is string && h.matches('^[a-z0-9_]{3,20}$')
         && !(h in ['admin', 'administrator', 'acm', 'acmdocs', 'acm_docs', 'acmcode', 'acm_code', 'support', 'suport', 'help', 'ajutor', 'root', 'system', 'official', 'oficial', 'security', 'securitate']);
@@ -16,24 +28,30 @@ service cloud.firestore {
     function validProfile(d, uid) {
       return d.keys().hasOnly(['name', 'handle', 'key', 'fp', 'created'])
         && d.keys().hasAll(['name', 'handle', 'key', 'fp'])
-        && d.name is string && d.name.size() <= 60
+        // a display name, never markup or control characters
+        && d.name is string && d.name.size() <= 60 && !d.name.matches('.*[<>&"`\\\\{}].*')
         && validHandle(d.handle)
-        && d.key is string && d.key.size() < 8000
-        && d.fp is string && d.fp.size() == 64
+        // ACMK v1 public key bundle: 3205 bytes = 4276 base64 characters
+        && d.key is string && d.key.size() == 4276 && d.key.matches('^[A-Za-z0-9+/]+=*$')
+        && d.fp is string && d.fp.matches('^[0-9a-f]{64}$')
         // the @name in the profile must be reserved for this same account (in the same write)
         && getAfter(/databases/$(database)/documents/usernames/$(d.handle)).data.uid == uid;
     }
 
-    // users/{uid}: public profile + padlock, so others can lock documents for this account
+    // users/{uid}: public profile + public key, so others can lock documents for this account
     match /users/{uid} {
       allow get: if signedIn();
       allow create: if signedIn() && request.auth.uid == uid && validProfile(request.resource.data, uid);
-      // changing @name: the old one must be released in the same write (one name per account)
+      // the public key never changes once published: a stolen password cannot swap it.
+      // Changing @name: the old one must be released in the same write (one name per account)
       allow update: if signedIn() && request.auth.uid == uid && validProfile(request.resource.data, uid)
+        && request.resource.data.key == resource.data.key
+        && request.resource.data.fp == resource.data.fp
         && (resource.data.get('handle', '') == ''
             || resource.data.handle == request.resource.data.handle
             || !existsAfter(/databases/$(database)/documents/usernames/$(resource.data.handle)));
-      allow delete: if request.auth != null && request.auth.uid == uid;
+      // deleting the profile goes through the server (account deletion, signed with the account keys)
+      allow delete: if false;
     }
 
     // usernames/{handle} → { uid }: who owns each @name (unique, first come first served)
@@ -43,36 +61,35 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['uid'])
         && request.resource.data.uid == request.auth.uid
         && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.handle == handle;
-      // released only by its owner, when the profile no longer uses it (rename or account deleted)
-      allow delete: if request.auth != null && resource.data.uid == request.auth.uid
-        && (!existsAfter(/databases/$(database)/documents/users/$(request.auth.uid))
-            || getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.handle != handle);
+      // released only by its owner, when the profile no longer uses it (rename)
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid
+        && existsAfter(/databases/$(database)/documents/users/$(request.auth.uid))
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.handle != handle;
     }
 
-    // accounts/{uid}: devices, sign-in events and (later) the encrypted cloud data of an account.
-    // Only a device of that account, signed in with its own device session and not blocked, gets in.
-    // Everything readable here is either encrypted on the devices or just ids and dates.
+    // accounts/{uid}: devices, sign-in events and the encrypted cloud data of an account.
+    // Only a device of that account, signed in with its own recent device session and not blocked,
+    // gets in. Everything readable here is either encrypted on the devices or just ids and dates.
     match /accounts/{uid} {
-      function activeDevice() {
-        return request.auth != null && request.auth.uid == uid
-          && request.auth.token.dev is string
-          && get(/databases/$(database)/documents/accounts/$(uid)/devices/$(request.auth.token.dev)).data.status == 'active';
-      }
       match /devices/{d} {
-        allow read: if activeDevice();
+        allow read: if activeDeviceOf(uid);
         // a device only fills in its own (encrypted) description
-        allow update: if activeDevice() && d == request.auth.token.dev
+        allow update: if activeDeviceOf(uid) && d == devId()
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['info'])
           && request.resource.data.info is string && request.resource.data.info.size() < 4000;
       }
       match /events/{e} {
-        allow read: if activeDevice();
+        allow read: if activeDeviceOf(uid);
       }
+      // encrypted records: { b: base64 ciphertext, v: version, at: time }, at most ~500 KB each
       match /vault/{rest=**} {
-        allow read, write: if activeDevice();
+        allow read, delete: if activeDeviceOf(uid);
+        allow create, update: if activeDeviceOf(uid)
+          && request.resource.data.keys().hasOnly(['b', 'v', 'at'])
+          && request.resource.data.b is string && request.resource.data.b.size() <= 700000;
       }
     }
-    // pairings: only the server functions touch them
+    // pairings, rate limits: only the server functions touch them
 
     // everything else: closed
     match /{document=**} {

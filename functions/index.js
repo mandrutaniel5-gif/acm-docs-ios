@@ -107,13 +107,39 @@ export const deviceSession = onCall(async (req) => {
   const d = snap.data();
   if (d.status !== 'active') fail('permission-denied', 'device blocked');
   if (!verify(unb64(d.pub), `acm-session\n${uid}\n${dev}\n${ts}`, sig)) fail('permission-denied', 'bad signature');
-  await ref.update({ lastSeen: FieldValue.serverTimestamp() });
+  // a signature is good once: the next one must carry a later time (no replay)
+  const fresh = await db.runTransaction(async (tx) => {
+    const cur = await tx.get(ref);
+    if ((cur.data().lastTs || 0) >= ts) return false;
+    tx.update(ref, { lastTs: ts, lastSeen: FieldValue.serverTimestamp() });
+    return true;
+  });
+  if (!fresh) fail('permission-denied', 'replayed signature');
   return { token: await token(uid, dev) };
 });
 
 // ------------------------------------------------------------------ QR pairing
 /** New device: publishes a one-time key and gets a pairing id to show as a QR code. */
+const PAIR_LIMIT = 10;              // QR codes per address…
+const PAIR_WINDOW_MS = 10 * 60 * 1000; // …per 10 minutes
+async function rateLimit(req, bucket, max, windowMs) {
+  const who = String((req.rawRequest && (req.rawRequest.headers['x-forwarded-for'] || req.rawRequest.ip)) || 'unknown').split(',')[0].trim();
+  const key = hex(sha256(new TextEncoder().encode(bucket + '|' + who))).slice(0, 40); // no raw IPs stored
+  const ref = db.collection('limits').doc(key);
+  const ok = await db.runTransaction(async (tx) => {
+    const s = await tx.get(ref);
+    const now = Date.now();
+    const d = s.exists ? s.data() : null;
+    if (!d || d.start + windowMs < now) { tx.set(ref, { start: now, n: 1, expires: Timestamp.fromMillis(now + windowMs) }); return true; }
+    if (d.n >= max) return false;
+    tx.update(ref, { n: d.n + 1 });
+    return true;
+  });
+  if (!ok) fail('resource-exhausted', 'too many requests, try again later');
+}
+
 export const pairStart = onCall(async (req) => {
+  await rateLimit(req, 'pair', PAIR_LIMIT, PAIR_WINDOW_MS);
   const { bundle } = req.data || {};
   const { fp } = parseBundle(bundle);
   const pid = newId();
@@ -223,9 +249,25 @@ export const claimPrimary = onCall(async (req) => {
   return { ok: true };
 });
 
-/** Account deleted: its devices, events and cloud data go with it. */
+/**
+ * Account deletion. Needs a device session AND a signature with the account keys (24 words),
+ * so neither a stolen password nor a stolen session alone can destroy an account.
+ * Removes the public profile, the @name, devices, events, cloud data and the sign-in itself.
+ */
 export const wipeAccount = onCall(async (req) => {
-  const { uid } = await needDevice(req);
+  const { uid, dev } = await needDevice(req);
+  const { ts, sig } = req.data || {};
+  if (typeof ts !== 'number' || Math.abs(Date.now() - ts) > SESSION_SKEW_MS) fail('deadline-exceeded', 'clock');
+  const pref = db.collection('users').doc(uid);
+  const profile = await pref.get();
+  if (!profile.exists) fail('failed-precondition', 'no profile');
+  if (!verify(parseBundle(profile.data().key).ed, `acm-wipe\n${uid}\n${dev}\n${ts}`, sig)) fail('permission-denied', 'bad signature');
+  const handle = profile.data().handle;
+  const batch = db.batch();
+  if (handle) batch.delete(db.collection('usernames').doc(handle));
+  batch.delete(pref);
+  await batch.commit();
   await db.recursiveDelete(db.collection('accounts').doc(uid));
+  await getAuth().deleteUser(uid);
   return { ok: true };
 });

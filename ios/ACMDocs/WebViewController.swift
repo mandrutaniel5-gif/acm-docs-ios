@@ -37,7 +37,9 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
         web.scrollView.bounces = false
         web.scrollView.isScrollEnabled = false // the app scrolls its own panels
         web.scrollView.contentInsetAdjustmentBehavior = .never
-        if #available(iOS 16.4, *) { web.isInspectable = true }
+        #if DEBUG
+        if #available(iOS 16.4, *) { web.isInspectable = true } // Safari Web Inspector: test builds only
+        #endif
         web.translatesAutoresizingMaskIntoConstraints = false
         root.addSubview(web)
         let bottom = web.bottomAnchor.constraint(equalTo: root.bottomAnchor) // the page leaves room for the home bar itself

@@ -294,15 +294,15 @@ const Account = (() => {
       await Au.reauthenticateWithCredential(user, Au.EmailAuthProvider.credential(user.email, password));
     }
     const uid = user.uid;
-    try { if (typeof Devices !== 'undefined' && Devices.myDevice()) await call('wipeAccount', {}); } catch (e) { console.warn('wipe', e); }
-    try {
-      const snap = await Fs.getDoc(userDoc());
-      const b = Fs.writeBatch(db);
-      if (snap.exists() && snap.data().handle) b.delete(nameDoc(snap.data().handle));
-      b.delete(userDoc());
-      await b.commit();
-    } catch (e) { if (e.code !== 'not-found') console.warn(e); }
-    await Au.deleteUser(user);
+    // the server removes profile, @name, devices, cloud data and the sign-in, but only with a
+    // signature made by the account keys (a stolen password or session alone cannot do it)
+    const id = await unlock('Confirmă ștergerea contului');
+    const dev = typeof Devices !== 'undefined' ? Devices.myDevice() : null;
+    if (typeof Devices !== 'undefined') await Devices.ensure();
+    const ts = Date.now();
+    await call('wipeAccount', { ts, sig: Host.toB64(A().signEd(id, `acm-wipe\n${uid}\n${Devices.myDevice() || dev}\n${ts}`)) });
+    void Fs;
+    try { await F().auth.signOut(auth); } catch (e) {}
     await Host.secureDelete(SEC.words(uid));
     await Host.secureDelete(SEC.secrets(uid));
     [LS.saved(uid), LS.fp(uid), LS.handle(uid), 'acm.contacts.' + uid].forEach(store.del);

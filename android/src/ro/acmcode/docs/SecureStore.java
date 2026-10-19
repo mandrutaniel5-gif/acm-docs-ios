@@ -39,9 +39,16 @@ final class SecureStore {
     private final Context ctx;
     private final File dir;
 
-    SecureStore(Context ctx) {
+    private final boolean quiet;
+    private final String alias;
+
+    SecureStore(Context ctx) { this(ctx, false); }
+    /** quiet: no PIN / fingerprint needed (the device's own session key); still only in this phone's Keystore. */
+    SecureStore(Context ctx, boolean quiet) {
         this.ctx = ctx;
-        this.dir = new File(ctx.getNoBackupFilesDir(), "secure");
+        this.quiet = quiet;
+        this.alias = quiet ? "acm-docs-quiet-v1" : ALIAS;
+        this.dir = new File(ctx.getNoBackupFilesDir(), quiet ? "secure-q" : "secure");
         dir.mkdirs();
     }
 
@@ -59,21 +66,20 @@ final class SecureStore {
     private SecretKey key() throws Exception {
         KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
         ks.load(null);
-        if (ks.containsAlias(ALIAS)) return (SecretKey) ks.getKey(ALIAS, null);
-        if (!deviceSecure()) throw new NoLock();
+        if (ks.containsAlias(alias)) return (SecretKey) ks.getKey(alias, null);
+        if (!quiet && !deviceSecure()) throw new NoLock();
         KeyGenerator kg = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
-        kg.init(new KeyGenParameterSpec.Builder(ALIAS, KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+        KeyGenParameterSpec.Builder b = new KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                .setKeySize(256)
-                .setUserAuthenticationRequired(true)
-                .setUserAuthenticationValidityDurationSeconds(VALID_SECONDS)
-                .build());
+                .setKeySize(256);
+        if (!quiet) b.setUserAuthenticationRequired(true).setUserAuthenticationValidityDurationSeconds(VALID_SECONDS);
+        kg.init(b.build());
         return kg.generateKey();
     }
 
     void set(String name, byte[] data) throws Exception {
-        if (!deviceSecure()) throw new NoLock();
+        if (!quiet && !deviceSecure()) throw new NoLock();
         Cipher c = Cipher.getInstance("AES/GCM/NoPadding");
         try {
             c.init(Cipher.ENCRYPT_MODE, key());
@@ -121,7 +127,7 @@ final class SecureStore {
         try {
             KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
             ks.load(null);
-            ks.deleteEntry(ALIAS);
+            ks.deleteEntry(alias);
         } catch (Exception e) { /* nothing to remove */ }
         File[] fs = dir.listFiles();
         if (fs != null) for (File f : fs) f.delete();

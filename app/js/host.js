@@ -472,7 +472,7 @@ const Host = (() => {
     return Promise.resolve();
   }
   async function specialDir(name) {
-    if (AB) return info.docs;
+    if (AB) return name === 'private' && info.priv ? info.priv : info.docs;
     return ipc ? ipc.invoke('special-dir', name) : null;
   }
   function setTheme(dark, bar, pref) {
@@ -506,27 +506,27 @@ const Host = (() => {
   // Account keys and the 24 recovery words. iPhone: Keychain, opened only with Face ID / Touch ID
   // (or the phone's code); Android: Keystore + the phone's lock; Windows: encrypted for the Windows user.
   const SECURE_WEB = 'acm.secure.'; // browser preview only (not secure, never used by the apps)
-  async function secureSet(name, bytes) {
+  async function secureSet(name, bytes, opts) {
     const data = toB64(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes));
-    if (AB) { await call('secureSet', { name, data }); return true; }
+    if (AB) { await call('secureSet', { name, data, quiet: !!(opts && opts.quiet) }); return true; }
     if (ipc) return ipc.invoke('secure', 'set', { name, data });
     localStorage.setItem(SECURE_WEB + name, data); return true;
   }
   /** null = nothing saved; throws Error('cancel') when the person cancels Face ID. */
-  async function secureGet(name, reason) {
+  async function secureGet(name, reason, opts) {
     let r = null;
-    if (AB) r = await call('secureGet', { name, reason: reason || '' });
+    if (AB) r = await call('secureGet', { name, reason: reason || '', quiet: !!(opts && opts.quiet) });
     else if (ipc) r = await ipc.invoke('secure', 'get', { name, reason });
     else r = localStorage.getItem(SECURE_WEB + name);
     return r ? fromB64(r) : null;
   }
   async function secureHas(name) {
-    if (AB) return (await call('secureHas', { name })) === 'true';
+    if (AB) return (await call('secureHas', { name, quiet: !!(arguments[1] && arguments[1].quiet) })) === 'true';
     if (ipc) return !!(await ipc.invoke('secure', 'has', { name }));
     return localStorage.getItem(SECURE_WEB + name) != null;
   }
   async function secureDelete(name) {
-    if (AB) { await call('secureDelete', { name }); return true; }
+    if (AB) { await call('secureDelete', { name, quiet: !!(arguments[1] && arguments[1].quiet) }); return true; }
     if (ipc) return ipc.invoke('secure', 'delete', { name });
     localStorage.removeItem(SECURE_WEB + name); return true;
   }

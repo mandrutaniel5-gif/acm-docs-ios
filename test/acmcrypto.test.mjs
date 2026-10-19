@@ -191,3 +191,8 @@ test('device signatures', () => {
   assert.ok(!A.verifyEd(A.edPublic(ana.bundle), 'acm-session\nuid\ndev\n2', s));
   assert.ok(!A.verifyEd(A.edPublic(mihai.bundle), 'acm-session\nuid\ndev\n1', s));
 });
+
+test('at most 64 recipients (a file cannot make the app work for minutes)', () => {
+  const many = Array.from({ length: 65 }, () => mihai.bundle);
+  assert.throws(() => A.seal(doc(), ana, many), /TOO_MANY|64/);
+});

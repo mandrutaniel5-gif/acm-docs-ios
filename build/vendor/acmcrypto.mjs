@@ -26,6 +26,7 @@ import { wordlist } from '@scure/bip39/wordlists/english.js';
 export const VERSION = 1;
 const MAGIC = utf8ToBytes('ACM1');      // .acm file
 const KEY_MAGIC = utf8ToBytes('ACMK');  // public key bundle
+const MAX_RECIPIENTS = 64; // each envelope costs a post-quantum decapsulation when opening
 const PW_DEFAULTS = { t: 2, m: 32768, p: 1 }; // Argon2id: 32 MiB, 2 passes (~1 s on a phone)
 
 export class AcmError extends Error {
@@ -172,6 +173,7 @@ function unwrapKeyInner(entry, id, pwKey) {
  */
 export function seal(doc, sender, recipients, opts = {}) {
   if (!recipients || !recipients.length) throw new AcmError('NO_RECIPIENTS', 'Alege cel puțin o persoană.');
+  if (recipients.length > MAX_RECIPIENTS) throw new AcmError('TOO_MANY', `Cel mult ${MAX_RECIPIENTS} destinatari.`);
   const dek = randomBytes(32);
   const nonce = randomBytes(24);
   let pw = null, pwKey = null;
@@ -215,6 +217,7 @@ function parse(file) {
   let header;
   try { header = JSON.parse(td.decode(f.subarray(9, 9 + hl))); } catch (e) { throw new AcmError('TAMPERED', 'Fișierul este deteriorat.'); }
   if (!header || !Array.isArray(header.r)) throw new AcmError('TAMPERED', 'Fișierul este deteriorat.');
+  if (header.r.length > MAX_RECIPIENTS) throw new AcmError('TAMPERED', 'Fișierul are prea mulți destinatari.');
   return { f, header, prefix: f.subarray(0, 9 + hl), ct: f.subarray(9 + hl) };
 }
 

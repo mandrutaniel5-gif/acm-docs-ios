@@ -22,15 +22,23 @@ const Devices = (() => {
 
   // ---------------------------------------------------------------- this device
   function myDevice() { return uid() ? ls.get(LS.dev(uid())) : null; }
-  function loadKey() {
+  // the device key lives in the system's protected storage (Keychain / Keystore / Windows DPAPI),
+  // readable without Face ID but never leaving this device
+  const SECRET = (u) => 'devkey.' + u;
+  async function loadKey() {
     if (devKey) return devKey;
-    const b = uid() && ls.get(LS.key(uid()));
-    if (b) devKey = A().importSecrets(Host.fromB64(b));
+    const u = uid();
+    if (!u) return null;
+    const old = ls.get(LS.key(u)); // versions before 2.2.1 kept it in page storage: move it
+    if (old) { await Host.secureSet(SECRET(u), Host.fromB64(old), { quiet: true }); ls.del(LS.key(u)); }
+    const b = await Host.secureGet(SECRET(u), '', { quiet: true });
+    if (b) devKey = A().importSecrets(b);
     return devKey;
   }
   function newKey() { devKey = A().deriveIdentity(A().generateMnemonic()); return devKey; }
-  function keep(u, dev, key) { ls.set(LS.dev(u), dev); ls.set(LS.key(u), Host.toB64(A().exportSecrets(key))); devKey = key; }
-  function forget(u) { [LS.dev(u), LS.key(u), LS.seen(u)].forEach(ls.del); devKey = null; vkey = null; }
+  async function keep(u, dev, key) { await Host.secureSet(SECRET(u), A().exportSecrets(key), { quiet: true }); ls.set(LS.dev(u), dev); devKey = key; }
+  function forget(u) { [LS.dev(u), LS.key(u), LS.seen(u)].forEach(ls.del); Host.secureDelete(SECRET(u), { quiet: true }).catch(() => {}); devKey = null; vkey = null; }
+  const SESSION_MAX_S = 20 * 3600; // renewed with the device key well before the server's 26 h limit
 
   function describe() {
     const ua = navigator.userAgent || '';
@@ -54,9 +62,9 @@ const Devices = (() => {
     const u = uid();
     if (!u) return 'none';
     const dev = myDevice();
-    if (dev && loadKey()) {
+    if (dev && (await loadKey())) {
       const c = await Account.claims();
-      if (c.dev === dev) return 'ok';
+      if (c.dev === dev && Date.now() / 1000 - (c.auth_time || 0) < SESSION_MAX_S) return 'ok';
       try {
         const ts = Date.now();
         const r = await Account.call('deviceSession', { uid: u, dev, ts, sig: Host.toB64(A().signEd(devKey, `acm-session\n${u}\n${dev}\n${ts}`)) });
@@ -73,7 +81,7 @@ const Devices = (() => {
     const key = newKey();
     const ts = Date.now();
     const r = await Account.call('registerDevice', { bundle: Host.toB64(key.bundle), ts, proof: Host.toB64(A().signEd(id, `acm-register\n${u}\n${key.fingerprint}\n${ts}`)) });
-    keep(u, r.dev, key);
+    await keep(u, r.dev, key);
     await Account.signInWithToken(r.token);
     vkey = A().vaultKey(id);
     try { await saveInfo(); } catch (e) { console.warn('device info', e); }
@@ -118,6 +126,7 @@ const Devices = (() => {
   async function checkAlerts() {
     const u = uid();
     if (!u || !myDevice() || document.hidden) return;
+    try { if ((await ensure()) === 'blocked') { stop(); return; } } catch (e) { /* offline: try later */ }
     let evs;
     try { evs = await events(); } catch (e) { if (/permission/i.test(String(e && (e.code || e.message)))) { const st = await ensure().catch(() => null); if (st === 'blocked') stop(); } return; }
     const seen = +(ls.get(LS.seen(u)) || 0);
@@ -307,7 +316,17 @@ const Devices = (() => {
       await Account.signInWithToken(result.token);
       const profile = await Account.profileOf(result.uid);
       if (!profile || profile.fp !== opened.sender.fingerprint) throw new Error('Cheile primite nu aparțin acestui cont.');
-      keep(result.uid, result.dev, key);
+      UI.busy();
+      // whoever scanned the code decides the account: the person must see which one it is
+      const mine = await UI.confirm(`Te conectezi la contul @${profile.handle}?`, `Codul a fost aprobat de contul @${profile.handle}${profile.name ? ' (' + profile.name + ')' : ''}. Continuă doar dacă este contul tău.`, 'Da, este contul meu', 'Nu este al meu');
+      if (!mine) {
+        try { await Account.call('leaveDevice', {}); } catch (e) {}
+        await Account.signOut();
+        UI.toast('Conectarea a fost anulată.');
+        return false;
+      }
+      UI.busy('Se conectează…');
+      await keep(result.uid, result.dev, key);
       await Account.restoreKeys(pl.words);
       vkey = A().vaultKey(await Account.unlock());
       try { await saveInfo(); } catch (e) { console.warn('device info', e); }

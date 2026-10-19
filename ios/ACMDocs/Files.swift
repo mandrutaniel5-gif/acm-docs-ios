@@ -71,6 +71,18 @@ enum Files {
         return target
     }
 
+    /// Private to the app: not shown in the Files app, excluded from iCloud / iTunes backups.
+    static var privateRoot: URL {
+        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("private", isDirectory: true)
+        if !FileManager.default.fileExists(atPath: base.path) {
+            try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true, attributes: [.protectionKey: FileProtectionType.complete])
+            var u = base
+            var v = URLResourceValues(); v.isExcludedFromBackup = true
+            try? u.setResourceValues(v)
+        }
+        return base
+    }
+
     static func types(forMimes mimes: [String]) -> [UTType] {
         if mimes.isEmpty || mimes.contains("*/*") { return [.item] }
         var out: [UTType] = []

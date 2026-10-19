@@ -36,8 +36,13 @@ const Shield = (() => {
   ['pointerdown', 'keydown'].forEach((t) => document.addEventListener(t, poke, { passive: true, capture: true }));
 
   // ---------------------------------------------------------------- temporary decrypted copies
-  async function tempDir() { return Host.join(await Host.specialDir('documents'), '.acm-temp'); }
+  // decrypted copies: in the app's private storage (not Documents, not visible to other apps)
+  async function tempDir() { return Host.join(await Host.specialDir('private'), 'acm-temp'); }
   async function wipeTemp() {
+    try { // copies left by 2.2.0 and older, in Documents
+      const old = Host.join(await Host.specialDir('documents'), '.acm-temp');
+      for (const n of Host.listDir(old)) Host.remove(Host.join(old, n));
+    } catch (e) {}
     try {
       const d = await tempDir();
       for (const n of Host.listDir(d)) Host.remove(Host.join(d, n));

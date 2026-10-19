@@ -145,7 +145,7 @@ ipcMain.handle('fetch-text', (_e, url) => new Promise((resolve, reject) => {
 }));
 ipcMain.handle('open-external', (_e, url) => { if (/^(mailto:|https?:)/i.test(String(url))) shell.openExternal(String(url)); });
 ipcMain.handle('open-path', (_e, p) => shell.openPath(p));
-ipcMain.handle('special-dir', (_e, name) => app.getPath(name));
+ipcMain.handle('special-dir', (_e, name) => (name === 'private' ? path.join(app.getPath('userData'), 'private') : app.getPath(name)));
 // Light / dark / like Windows (also colors the window frame on Windows 10/11).
 ipcMain.handle('set-theme', (_e, pref) => { nativeTheme.themeSource = pref === 'dark' || pref === 'light' ? pref : 'system'; });
 

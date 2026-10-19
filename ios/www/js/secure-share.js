@@ -16,6 +16,11 @@ Object.assign(Icons, {
   lockfile: 'M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm1 15c0 .55-.45 1-1 1h-4c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1v-1c0-1.1.9-2 2-2s2 .9 2 2v1c.55 0 1 .45 1 1v3zm-2-4v-1c0-.55-.45-1-1-1s-1 .45-1 1v1h2zm0-4V3.5L18.5 9H13z',
 });
 
+/** Text placed inside HTML markup: always escaped. */
+const escHtml = (v) => String(v == null ? '' : v).replace(/[&<>"'`]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;' }[c]));
+/** An @name as it may appear anywhere: only the allowed characters, else nothing. */
+const safeHandle = (h) => (typeof h === 'string' && /^[a-z0-9_]{3,20}$/.test(h) ? h : null);
+
 const Contacts = (() => {
   const A = () => window.__lib.acmcrypto;
   const QR_PREFIX = 'ACMC1';
@@ -285,7 +290,7 @@ const Contacts = (() => {
       if (st === 'changed') {
         box.append(
           el('div', { class: 'acm-alert danger', html: svg('warn') }),
-          el('p', { html: `<b>Cheia de criptare a lui @${c.handle} s-a schimbat.</b> Se întâmplă dacă și-a refăcut contul sau cheile pe alt dispozitiv fără codul de recuperare. Poate fi însă și o încercare de interceptare. Până nu verificați din nou, nu-i poți trimite documente.` }),
+          el('p', { html: `<b>Cheia de criptare a lui @${escHtml(c.handle)} s-a schimbat.</b> Se întâmplă dacă și-a refăcut contul sau cheile pe alt dispozitiv fără codul de recuperare. Poate fi însă și o încercare de interceptare. Până nu verificați din nou, nu-i poți trimite documente.` }),
           el('div', { class: 'actions col' }, [
             el('button', { class: 'btn primary', type: 'button', html: svg('camera') + '<span>Scanează codul lui din nou</span>', onclick: () => close('scan') }),
             el('button', { class: 'btn', type: 'button', text: 'Acceptă cheia nouă fără verificare', onclick: () => close('accept') }),
@@ -293,7 +298,7 @@ const Contacts = (() => {
         );
       } else if (st === 'unverified' && !c.gone) {
         box.append(
-          el('div', { class: 'recov-warn', html: `${svg('info')}<span>${justAdded ? 'Contact adăugat. ' : ''}Nu ai verificat încă faptul că cheia este chiar a lui @${c.handle}. Pentru documente sensibile, verificați-vă codurile față în față.</span>` }),
+          el('div', { class: 'recov-warn', html: `${svg('info')}<span>${justAdded ? 'Contact adăugat. ' : ''}Nu ai verificat încă faptul că cheia este chiar a lui @${escHtml(c.handle)}. Pentru documente sensibile, verificați-vă codurile față în față.</span>` }),
         );
       }
       if (mine && st !== 'changed') {
@@ -317,15 +322,15 @@ const Contacts = (() => {
     else if (action === 'mark') {
       if (await UI.confirm('Sunt cifrele identice?', 'Marchează verificat doar dacă ați comparat toate cele 60 de cifre față în față sau la telefon, cu vocea persoanei.', 'Da, sunt identice')) {
         put(Object.assign(get(uid), { verified: true, verifiedAt: Date.now() }));
-        UI.toast(`@${c.handle} este verificat ✓`);
+        UI.toast(`@${escHtml(c.handle)} este verificat ✓`);
       }
       return showContact(uid);
     } else if (action === 'unmark') { put(Object.assign(get(uid), { verified: false })); return showContact(uid); }
     else if (action === 'accept') {
-      if (await UI.confirm('Accepți cheia nouă?', `Documentele trimise de acum vor putea fi deschise doar cu cheia nouă. Dacă nu ești sigur că @${c.handle} și-a schimbat cheile, întreabă-l întâi.`, 'Acceptă')) acceptNewKey(uid, false);
+      if (await UI.confirm('Accepți cheia nouă?', `Documentele trimise de acum vor putea fi deschise doar cu cheia nouă. Dacă nu ești sigur că @${escHtml(c.handle)} și-a schimbat cheile, întreabă-l întâi.`, 'Acceptă')) acceptNewKey(uid, false);
       return showContact(uid);
     } else if (action === 'delete') {
-      if (await UI.confirm('Ștergi contactul?', `@${c.handle} dispare din contactele tale de pe acest dispozitiv.`, 'Șterge')) remove(uid);
+      if (await UI.confirm('Ștergi contactul?', `@${escHtml(c.handle)} dispare din contactele tale de pe acest dispozitiv.`, 'Șterge')) remove(uid);
     }
   }
 
@@ -479,7 +484,7 @@ const AcmShare = (() => {
           const c = Contacts.addFromProfile(p);
           chosen.set(c.uid, c);
           out.innerHTML = '';
-          out.append(el('p', { class: 'cmsg', text: `@${c.handle} a fost adăugat.` }));
+          out.append(el('p', { class: 'cmsg', text: `@${escHtml(c.handle)} a fost adăugat.` }));
           draw(); update();
         }),
         listBox,
@@ -588,7 +593,7 @@ const AcmShare = (() => {
     });
     if (go === 'add' && sender.add) {
       const c = Contacts.addFromProfile(sender.add);
-      if (c) UI.toast(`@${c.handle} a fost adăugat la contacte (neverificat).`);
+      if (c) UI.toast(`@${escHtml(c.handle)} a fost adăugat la contacte (neverificat).`);
       return;
     }
     if (go === 'save') return saveDecrypted(res);
@@ -623,6 +628,8 @@ const AcmShare = (() => {
   }
 
   async function describeSender(s) {
+    // the @name inside a file is just a claim by whoever made it: only a valid @name is used at all
+    s = Object.assign({}, s, { handle: safeHandle(s.handle) });
     if (Account.fingerprint() && s.fingerprint === Account.fingerprint()) {
       return { row: Contacts.contactRow({ handle: Account.handle() || '', name: 'Tu', verified: true }, null, el('span')), note: null };
     }
@@ -630,14 +637,14 @@ const AcmShare = (() => {
     if (known) {
       return {
         row: Contacts.contactRow(known, null),
-        note: Contacts.status(known) === 'verified' ? null : el('div', { class: 'acm-note warn', html: `${svg('info')}<span>@${known.handle} este în contactele tale, dar nu l-ai verificat încă prin cod QR.</span>` }),
+        note: Contacts.status(known) === 'verified' ? null : el('div', { class: 'acm-note warn', html: `${svg('info')}<span>@${escHtml(known.handle)} este în contactele tale, dar nu l-ai verificat încă prin cod QR.</span>` }),
       };
     }
     const changed = s.handle && Contacts.list().find((c) => c.handle === s.handle);
     if (changed) {
       return {
         row: Contacts.contactRow(Object.assign({}, changed, { pending: true }), null),
-        note: el('div', { class: 'acm-note bad', html: `${svg('warn')}<span>Documentul e semnat cu altă cheie decât cea pe care o ai pentru @${s.handle}. Poate și-a refăcut cheile, sau cineva se dă drept el. Întreabă-l direct înainte să ai încredere în document.</span>` }),
+        note: el('div', { class: 'acm-note bad', html: `${svg('warn')}<span>Documentul e semnat cu altă cheie decât cea pe care o ai pentru @${escHtml(s.handle)}. Poate și-a refăcut cheile, sau cineva se dă drept el. Întreabă-l direct înainte să ai încredere în document.</span>` }),
       };
     }
     if (s.handle) {
@@ -645,11 +652,11 @@ const AcmShare = (() => {
       try { p = await Account.lookup(s.handle); } catch (e) {}
       if (p && p.fp === s.fingerprint) {
         const c = { uid: p.uid, handle: p.handle, name: p.name, verified: false };
-        return { row: Contacts.contactRow(c, null), add: p, note: el('div', { class: 'acm-note warn', html: `${svg('info')}<span>Nu este în contactele tale. Serverul confirmă că cheia este a lui @${p.handle}, dar nu l-ai verificat față în față.</span>` }) };
+        return { row: Contacts.contactRow(c, null), add: p, note: el('div', { class: 'acm-note warn', html: `${svg('info')}<span>Nu este în contactele tale. Serverul confirmă că cheia este a lui @${escHtml(p.handle)}, dar nu l-ai verificat față în față.</span>` }) };
       }
       return {
         row: Contacts.contactRow({ handle: s.handle, name: 'Expeditor neconfirmat', verified: false, pending: true }, null),
-        note: el('div', { class: 'acm-note bad', html: `${svg('warn')}<span>${p ? `Expeditorul spune că este @${s.handle}, dar cheia lui nu corespunde contului @${s.handle} de pe server.` : `Expeditorul spune că este @${s.handle}, dar acest cont nu (mai) există.`} Tratează documentul cu suspiciune.</span>` }),
+        note: el('div', { class: 'acm-note bad', html: `${svg('warn')}<span>${p ? `Expeditorul spune că este @${escHtml(s.handle)}, dar cheia lui nu corespunde contului @${escHtml(s.handle)} de pe server.` : `Expeditorul spune că este @${escHtml(s.handle)}, dar acest cont nu (mai) există.`} Tratează documentul cu suspiciune.</span>` }),
       };
     }
     return {
