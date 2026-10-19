@@ -1,0 +1,16 @@
+{
+  "name": "acm-docs-functions",
+  "private": true,
+  "description": "ACM Docs server functions: device sessions, QR sign-in, blocking devices. They never see any decrypted data.",
+  "main": "index.js",
+  "engines": {
+    "node": "22"
+  },
+  "dependencies": {
+    "@noble/curves": "^2.4.0",
+    "firebase-admin": "^14.5.0",
+    "firebase-functions": "^7.4.0",
+    "@noble/hashes": "^2.0.0"
+  },
+  "type": "module"
+}

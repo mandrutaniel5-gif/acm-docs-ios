@@ -172,3 +172,22 @@ test('the sender @name travels signed inside the box', () => {
   const g = A.seal({ bytes: new Uint8Array([1]), name: 'b' }, ana, [mihai.bundle]);
   assert.equal(A.open(g, mihai).sender.handle, null);
 });
+
+test('vault: round trip, label bound, tamper detected, only the account opens it', () => {
+  const k = A.vaultKey(ana);
+  assert.equal(A.vaultKey(A.importSecrets(A.exportSecrets(ana))).length, 32);
+  assert.deepEqual(A.vaultKey(A.importSecrets(A.exportSecrets(ana))), k); // same on every device of the account
+  const blob = A.vaultSealText(k, { firma: 'ACM Code SRL', cui: 'RO123' }, 'settings');
+  assert.deepEqual(A.vaultOpenText(k, blob, 'settings'), { firma: 'ACM Code SRL', cui: 'RO123' });
+  assert.throws(() => A.vaultOpen(k, blob, 'other'), /TAMPERED/);
+  assert.throws(() => A.vaultOpen(A.vaultKey(mihai), blob, 'settings'), /TAMPERED/);
+  const t = blob.slice(); t[t.length - 3] ^= 1;
+  assert.throws(() => A.vaultOpen(k, t, 'settings'), /TAMPERED/);
+});
+
+test('device signatures', () => {
+  const s = A.signEd(ana, 'acm-session\nuid\ndev\n1');
+  assert.ok(A.verifyEd(A.edPublic(ana.bundle), 'acm-session\nuid\ndev\n1', s));
+  assert.ok(!A.verifyEd(A.edPublic(ana.bundle), 'acm-session\nuid\ndev\n2', s));
+  assert.ok(!A.verifyEd(A.edPublic(mihai.bundle), 'acm-session\nuid\ndev\n1', s));
+});

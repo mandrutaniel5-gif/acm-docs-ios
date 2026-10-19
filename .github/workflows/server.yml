@@ -1,0 +1,48 @@
+name: Server
+
+# Cloud Functions + Firestore rules: tested against the Firebase emulators on every change,
+# then published to Firebase when the deploy key is set (secret FIREBASE_SERVICE_ACCOUNT).
+on:
+  push:
+    branches: [main]
+    paths: ["functions/**", "firestore.rules", "firebase.json", "test/server.test.mjs", ".github/workflows/server.yml"]
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Publish to Firebase after the tests"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+
+      - name: Install
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          (cd functions && npm ci --no-audit --no-fund)
+          npm i -g firebase-tools@14
+
+      - name: Test against the emulators
+        run: firebase emulators:exec --project acm-docs-52280 --only auth,firestore,functions "node --test test/server.test.mjs"
+
+      - name: Publish rules and functions
+        if: github.event_name == 'push' || inputs.deploy
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$SA" ]; then echo "No deploy key yet (secret FIREBASE_SERVICE_ACCOUNT): tests only."; exit 0; fi
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          firebase deploy --project acm-docs-52280 --only firestore:rules,functions --force --non-interactive
+          rm -f "$RUNNER_TEMP/sa.json"

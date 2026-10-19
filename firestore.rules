@@ -49,6 +49,31 @@ service cloud.firestore {
             || getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.handle != handle);
     }
 
+    // accounts/{uid}: devices, sign-in events and (later) the encrypted cloud data of an account.
+    // Only a device of that account, signed in with its own device session and not blocked, gets in.
+    // Everything readable here is either encrypted on the devices or just ids and dates.
+    match /accounts/{uid} {
+      function activeDevice() {
+        return request.auth != null && request.auth.uid == uid
+          && request.auth.token.dev is string
+          && get(/databases/$(database)/documents/accounts/$(uid)/devices/$(request.auth.token.dev)).data.status == 'active';
+      }
+      match /devices/{d} {
+        allow read: if activeDevice();
+        // a device only fills in its own (encrypted) description
+        allow update: if activeDevice() && d == request.auth.token.dev
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['info'])
+          && request.resource.data.info is string && request.resource.data.info.size() < 4000;
+      }
+      match /events/{e} {
+        allow read: if activeDevice();
+      }
+      match /vault/{rest=**} {
+        allow read, write: if activeDevice();
+      }
+    }
+    // pairings: only the server functions touch them
+
     // everything else: closed
     match /{document=**} {
       allow read, write: if false;

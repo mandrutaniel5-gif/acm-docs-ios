@@ -249,3 +249,44 @@ export function open(file, id, opts = {}) {
   if (!okEd || !okDsa) throw new AcmError('BAD_SIGNATURE', 'Semnătura expeditorului nu este validă.');
   return { bytes, name: meta.name, mime: meta.mime, created: meta.created, sender: { bundle: senderBundle, fingerprint: fingerprint(senderBundle), handle: meta.from.h || null } };
 }
+
+// ------------------------------------------------------------------ account vault (encrypted cloud) and devices
+/**
+ * The account's data key: everything the app keeps in the cloud is encrypted with it.
+ * It comes from the account's private keys, so every device of the account (and only those)
+ * has it; the server never does.
+ */
+export function vaultKey(id) {
+  return kdf(concatBytes(id.secret.xSk, id.secret.edSk), utf8ToBytes('ACM Docs vault v1'), 'acm/vault', 32);
+}
+const VAULT_MAGIC = utf8ToBytes('ACMV');
+/** Encrypts data for the cloud: XChaCha20-Poly1305, Padmé-padded, bound to `label` (e.g. the record name). */
+export function vaultSeal(key, bytes, label) {
+  const data = toBytes(bytes);
+  const body = concatBytes(u32(data.length), data);
+  const padded = new Uint8Array(Math.max(body.length, padme(body.length)));
+  padded.set(body);
+  const nonce = randomBytes(24);
+  const aad = concatBytes(VAULT_MAGIC, utf8ToBytes(String(label || '')));
+  return concatBytes(VAULT_MAGIC, new Uint8Array([VERSION]), nonce, xchacha20poly1305(key, nonce, aad).encrypt(padded));
+}
+export function vaultOpen(key, blob, label) {
+  const b = toBytes(blob);
+  if (b.length < 5 + 24 + 16 || !equal(b.subarray(0, 4), VAULT_MAGIC)) throw new AcmError('NOT_VAULT');
+  if (b[4] !== VERSION) throw new AcmError('NEWER_VERSION');
+  const nonce = b.subarray(5, 29);
+  const aad = concatBytes(VAULT_MAGIC, utf8ToBytes(String(label || '')));
+  let padded;
+  try { padded = xchacha20poly1305(key, nonce, aad).decrypt(b.subarray(29)); } catch (e) { throw new AcmError('TAMPERED'); }
+  const n = readU32(padded, 0);
+  if (n > padded.length - 4) throw new AcmError('TAMPERED');
+  return padded.slice(4, 4 + n);
+}
+export const vaultSealText = (key, obj, label) => vaultSeal(key, te.encode(JSON.stringify(obj)), label);
+export const vaultOpenText = (key, blob, label) => JSON.parse(td.decode(vaultOpen(key, blob, label)));
+
+/** Signature with an identity's Ed25519 key (device sessions with the server). */
+export function signEd(id, message) { return ed25519.sign(utf8ToBytes(String(message)), id.secret.edSk); }
+export function verifyEd(pub32, message, sig) { try { return ed25519.verify(toBytes(sig), utf8ToBytes(String(message)), toBytes(pub32)); } catch (e) { return false; } }
+export function edPublic(bundle) { return decodePublicKey(bundle).ed; }
+export { b64 as toB64, unb64 as fromB64 };
