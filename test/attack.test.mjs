@@ -181,12 +181,6 @@ await attack('S40', 'MARE', 'Pairing: alt cont aprobă codul QR al victimei (vic
   return { ok: !!got, detail: 'pid-ul (128 biți) trebuie văzut fizic pe ecranul victimei; riscul e de phishing' };
 });
 await attack('S41', 'MARE', 'Pairing: preia cheile cu altă cheie decât cea din QR (poll cu semnătură falsă)', () => ok(client().call('pairPoll', { pid, sig: b64(A.signEd(evil, `acm-pair\n${pid}`)) })));
-await attack('S42', 'MEDIU', 'Pairing: flood de coduri QR fără cont (200 cereri)', async () => {
-  const c = client();
-  let made = 0;
-  await Promise.all(Array.from({ length: 200 }, async () => { if (await ok(c.call('pairStart', { bundle: b64(laptopKey.bundle) }))) made++; }));
-  return { ok: made > 50, detail: `${made}/200 create; documentele nu au TTL (rămân în baza de date)` };
-});
 await attack('S43', 'MIC', 'Replay: aceeași semnătură de sesiune folosită de două ori în 5 minute', async () => {
   const ts = Date.now();
   const sig = b64(A.signEd(victim.dk, `acm-session\n${victim.uid}\n${victim.dev}\n${ts}`));
@@ -260,6 +254,13 @@ await attack('S72', 'MIC', 'Funcții: pairApprove cu „sealed” de 10 MB', asy
   return ok(vc.call('pairApprove', { pid: p.pid, fp: k.fingerprint, sealed: 'x'.repeat(10 * 1024 * 1024) }));
 });
 
+// last: it trips the per-address limit for everything after it
+await attack('S42', 'MEDIU', 'Pairing: flood de coduri QR fără cont (200 cereri)', async () => {
+  const c = client();
+  let made = 0;
+  await Promise.all(Array.from({ length: 200 }, async () => { if (await ok(c.call('pairStart', { bundle: b64(laptopKey.bundle) }))) made++; }));
+  return { ok: made > 50, detail: `${made}/200 create` };
+});
 for (const c of [victim.c, other.c, thief, mc]) { try { await signOut(c.auth); } catch (e) {} }
 fs.writeFileSync('attack-log.json', JSON.stringify(log, null, 2));
 const bad = log.filter((x) => x.result === 'VULNERABIL');
