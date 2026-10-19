@@ -59,9 +59,57 @@ const AccountUI = (() => {
     if (f && !Host.mobile) setTimeout(() => f.focus(), 60);
   }
 
+  /** The list of languages: tapping one switches the app to it at once. */
+  function langList(onPick) {
+    const cur = I18n.lang;
+    const dev = I18n.deviceLang();
+    const order = I18n.LANGS.slice().sort((a, b) => (b.code === dev) - (a.code === dev));
+    const list = el('div', { class: 'lang-list', role: 'listbox' });
+    for (const L of order) {
+      const b = el('button', { class: 'lang-item no-tr' + (L.code === cur ? ' on' : ''), type: 'button', role: 'option', lang: L.code, dir: L.rtl ? 'rtl' : 'ltr', 'aria-selected': String(L.code === cur) }, [
+        el('span', { class: 'lang-code', text: L.code.toUpperCase() }), el('b', { text: L.name }), el('span', { class: 'lang-check', html: svg('check') }),
+      ]);
+      b.addEventListener('click', async () => {
+        list.querySelectorAll('.lang-item').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-selected', String(x === b)); });
+        await I18n.set(L.code);
+        onPick && onPick(L.code);
+      });
+      list.append(b);
+    }
+    return list;
+  }
+  /** Small button with the current language (on the sign-in screens). */
+  const langChip = (back) => el('button', { class: 'lang-chip no-tr', type: 'button', 'aria-label': 'Limba aplicației', html: svg('globe') + `<span>${I18n.name}</span>`, onclick: () => render('lang', { next: back }) });
+
+  /** Settings › Language: the same list, in a sheet. */
+  async function chooseLanguage() {
+    await UI.modal((box, close) => {
+      box.classList.add('acm-ui', 'lang-sheet');
+      box.append(
+        el('h2', { text: 'Limba aplicației' }),
+        el('p', { class: 'muted small', text: 'Limba facturilor se alege separat, la fiecare document (Limba documentului), sau implicit în Datele firmei.' }),
+        langList(() => setTimeout(() => close(), 180)),
+        el('div', { class: 'actions' }, [el('button', { class: 'btn', type: 'button', text: 'Închide', onclick: () => close() })]),
+      );
+    });
+    try { App.renderView(); } catch (e) {}
+  }
+
   const later = (card) => card.append(el('button', { class: 'auth-later', type: 'button', text: 'Mai târziu', onclick: () => { Account.setSkipped(true); close(); } }));
 
   const VIEWS = {
+    lang(card, d) {
+      card.append(
+        el('h2', { text: 'Alege limba' }),
+        el('p', { class: 'auth-sub', text: 'Poți schimba limba oricând din Setări.' }),
+        langList(() => render('lang', d)),
+        el('button', { class: 'btn primary auth-main', type: 'button', text: 'Continuă', onclick: async () => {
+          await I18n.set(I18n.lang); // remembers the choice (also when the suggested language is kept)
+          if (d.next === 'close') close(); else if (d.next !== 'stay') render(d.next || 'signin');
+        } }),
+      );
+    },
+
     signin(card) {
       const box = err();
       const email = field('Email', { type: 'email', id: 'auth-email', autocomplete: 'username', inputmode: 'email' });
@@ -70,6 +118,7 @@ const AccountUI = (() => {
       const form = el('form', { class: 'auth-form', novalidate: true }, [email.node, pass.node, box, go]);
       form.addEventListener('submit', (e) => { e.preventDefault(); showErr(box, ''); busy(go, async () => { try { await Account.signIn(email.input.value, pass.input.value); await route(); } catch (x) { showErr(box, x); } }); });
       card.append(
+        langChip('signin'),
         el('h2', { text: 'Bine ai revenit' }),
         el('p', { class: 'auth-sub', text: 'Intră în contul ACM Docs ca să trimiți și să primești documente criptate.' }),
         form,
@@ -268,7 +317,7 @@ const AccountUI = (() => {
     const list = w.split(' ');
     if (typeof Shield !== 'undefined') await Shield.protect(true);
     await UI.modal((box, done) => {
-      box.classList.add('recov');
+      box.classList.add('acm-ui', 'recov');
       const grid = el('ol', { class: 'recov-grid no-tr' }, list.map((x) => el('li', { text: x })));
       const chk = el('input', { type: 'checkbox', id: 'recov-ok' });
       const ok = el('button', { class: 'btn primary', type: 'button', text: 'Gata', disabled: !Account.wordsSaved(), onclick: () => { if (chk.checked) Account.markWordsSaved(); done(true); } });
@@ -362,7 +411,7 @@ const AccountUI = (() => {
     const h = Account.handle();
     const qrText = h && Account.fingerprint() ? `ACMC1:${h}:${u.uid}:${Account.fingerprint()}` : null;
     const act = await UI.modal((box, close) => {
-      box.classList.add('profile');
+      box.classList.add('acm-ui', 'profile');
       const row = (icon, color, label, sub, key, cls) => {
         const r = el('button', { class: 'srow' + (cls ? ' ' + cls : ''), type: 'button' }, [
           el('span', { class: 'si ' + color, html: svg(icon) }),
@@ -426,18 +475,27 @@ const AccountUI = (() => {
 
   // ---------------------------------------------------------------- start
   async function start() {
-    if (!window.__lib || !window.__lib.firebase || !window.__lib.acmcrypto) return;
     const args = (Host.info && Host.info.args) || [];
     if (args.includes('-uitest') && !args.includes('-uitest-account')) return; // automatic tests of other screens
+    // first start: the app opens in the device's language and asks once which one to use
+    let picked = false;
+    if (!I18n.chosen) {
+      await I18n.set(I18n.deviceLang(), { save: false });
+      render('lang', { next: 'stay' });
+      await new Promise((resolve) => { const t = setInterval(() => { if (I18n.chosen) { clearInterval(t); resolve(); } }, 200); });
+      picked = true;
+    }
+    if (!window.__lib || !window.__lib.firebase || !window.__lib.acmcrypto) { if (picked) close(); return; }
     Account.init();
     Account.onChange(() => { banner(); try { if (typeof AcmShare !== 'undefined') AcmShare.renderHome(); } catch (e) {} });
     await Account.ready();
     const u = Account.current();
-    if (!u) { if (!Account.skipped()) render('signin'); return; }
+    if (!u) { if (!Account.skipped()) render('signin'); else if (picked) close(); return; }
+    if (picked) close();
     if (Account.needsVerification()) return; // reminded in Settings
     try { const st = await Account.keyState(); if (st !== 'ok') await route(); else await afterKeys(); } catch (e) { console.warn('keys', e); }
     banner();
   }
 
-  return { start, showProfile, show: (v) => render(v || 'signin'), settingsGroup, showWords, route, get view() { return view; } };
+  return { start, chooseLanguage, showProfile, show: (v) => render(v || 'signin'), settingsGroup, showWords, route, get view() { return view; } };
 })();

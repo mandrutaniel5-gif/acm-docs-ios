@@ -93,7 +93,7 @@ const EXT = {
   word: ['docx', 'doc', 'txt', 'rtf'], sheet: ['xlsx', 'xls', 'xlsm', 'csv', 'ods'], slides: ['pptx', 'ppt'],
 };
 ipcMain.handle('dialog-open', async (_e, kind, lang) => {
-  const en = lang === 'en';
+  const en = !!lang && lang !== 'ro';
   const all = [...EXT.pdf, ...EXT.word, ...EXT.sheet, ...EXT.slides, ...EXT.image, 'acm'];
   const filters = kind === 'image' || kind === 'images'
     ? [{ name: en ? 'Images' : 'Imagini', extensions: EXT.image }]
@@ -114,7 +114,7 @@ ipcMain.handle('dialog-open', async (_e, kind, lang) => {
 
 ipcMain.handle('dialog-save', async (_e, suggestedName, defaultDir, ext, lang) => {
   ext = (ext || 'pdf').toLowerCase();
-  const names = lang === 'en'
+  const names = lang && lang !== 'ro'
     ? { pdf: 'PDF documents', docx: 'Word document', xlsx: 'Excel workbook', pptx: 'PowerPoint presentation' }
     : { pdf: 'Documente PDF', docx: 'Document Word', xlsx: 'Registru Excel', pptx: 'Prezentare PowerPoint' };
   const r = await dialog.showSaveDialog(win, {

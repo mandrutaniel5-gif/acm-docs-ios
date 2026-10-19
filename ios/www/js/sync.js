@@ -16,7 +16,7 @@ const Sync = (() => {
 
   // data that belongs to the account (device-only data such as app lock or device keys stays local)
   const SHARED = ['acm.businesses', 'acm.business', 'acm.invoiceItems', 'acm.invoiceClients', 'acm.docs', 'acm.invoiceDraft',
-    'pdfeditor.signatures', 'acm.theme', 'acm.lang', 'acm.scan', 'acm.print'];
+    'pdfeditor.signatures', 'acm.theme', 'acm.scan', 'acm.print']; // the language is chosen on each device
   const PER_ACCOUNT = ['acm.contacts.', 'acm.contacts.mac.', 'acm.sent.', 'acm.words.saved.'];
   // lists joined on a device's first sync, so nothing made before signing in is lost
   const MERGE = ['acm.businesses', 'acm.invoiceItems', 'acm.invoiceClients', 'acm.docs', 'pdfeditor.signatures'];
@@ -321,14 +321,14 @@ const Sync = (() => {
     if (s.err === 'storage') return 'Stocarea în cloud nu este activată încă';
     if (s.err) return 'Nesincronizat (fără internet?)';
     if (!s.lastSync) return 'Pornește…';
-    return 'Sincronizat ' + new Date(s.lastSync).toLocaleTimeString(I18n.locale(), { hour: '2-digit', minute: '2-digit' });
+    return I18n.t('Sincronizat') + ' ' + new Date(s.lastSync).toLocaleTimeString(I18n.locale(), { hour: '2-digit', minute: '2-digit' });
   }
   async function show() {
     if (!(await AcmShare.ensureAccount())) return;
     const s = state();
     const act = await UI.modal((box, close) => {
-      box.classList.add('sync-set');
-      const sw = (on) => el('span', { class: 'sw' + (on ? ' on' : ''), 'aria-hidden': 'true' });
+      box.classList.add('acm-ui', 'sync-set');
+      const sw = (on) => el('span', { class: 'acm-sw' + (on ? ' on' : ''), 'aria-hidden': 'true' });
       const row = el('button', { class: 'srow', type: 'button' }, [el('span', { class: 'stx' }, [el('b', { text: 'Sincronizare în cloud' }), el('small', { text: summary() })]), sw(s.mode === 'cloud')]);
       row.addEventListener('click', () => close('toggle'));
       box.append(

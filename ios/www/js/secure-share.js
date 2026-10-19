@@ -144,7 +144,7 @@ const Contacts = (() => {
       video.srcObject = stream;
       const end = () => { stop = true; stream.getTracks().forEach((t) => t.stop()); };
       const res = UI.modal((box, close) => {
-        box.classList.add('qr-scan');
+        box.classList.add('acm-ui', 'qr-scan');
         box.append(el('h2', { text: 'Scanează codul QR' }), el('div', { class: 'qr-cam' }, [video, el('i')]),
           el('p', { class: 'muted', text: 'Ține codul persoanei în fața camerei.' }),
           el('div', { class: 'actions' }, [el('button', { class: 'btn', type: 'button', text: 'Anulează', onclick: () => close(null) })]));
@@ -253,7 +253,7 @@ const Contacts = (() => {
     try { bundle = await myBundle(); } catch (e) { return UI.toast(Account.say(e), { error: true }); }
     const fp = A().fingerprint(bundle);
     await UI.modal((box, close) => {
-      box.classList.add('mycode');
+      box.classList.add('acm-ui', 'mycode');
       box.append(
         el('h2', { text: 'Codul meu' }),
         el('div', { class: 'qr-card' }, [
@@ -276,7 +276,7 @@ const Contacts = (() => {
   async function showList() {
     if (!(await AcmShare.ensureAccount())) return;
     await UI.modal((box, close) => {
-      box.classList.add('contacts');
+      box.classList.add('acm-ui', 'contacts');
       const listBox = el('div', { class: 'clist' });
       const draw = () => {
         listBox.innerHTML = '';
@@ -311,7 +311,7 @@ const Contacts = (() => {
     try { mine = await myBundle(); } catch (e) {}
     const st = status(c);
     const action = await UI.modal((box, close) => {
-      box.classList.add('contact');
+      box.classList.add('acm-ui', 'contact');
       box.append(
         el('div', { class: 'chead' }, [avatar(c), el('div', {}, [el('h2', { class: 'no-tr', text: c.name || '@' + c.handle }), el('span', { class: 'muted no-tr', text: '@' + c.handle })]), badge(c)]),
       );
@@ -461,7 +461,7 @@ const AcmShare = (() => {
 
   function pickRecipients(name) {
     return UI.modal((box, close) => {
-      box.classList.add('acm-send');
+      box.classList.add('acm-ui', 'acm-send');
       box.dataset.sticky = '1';
       const chosen = new Map();
       const listBox = el('div', { class: 'clist pick' });
@@ -588,7 +588,7 @@ const AcmShare = (() => {
     const rec = Sent.get(path);
     const when = rec ? new Date(rec.at).toLocaleString(I18n.locale(), { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : null;
     const act = await UI.modal((box, close) => {
-      box.classList.add('acm-recv');
+      box.classList.add('acm-ui', 'acm-recv');
       box.append(
         el('div', { class: 'send-head' }, [el('span', { class: 'send-i', html: svg('lockfile') }), el('div', {}, [el('h2', { text: 'Document trimis' }), el('small', { class: 'muted no-tr', text: rec ? rec.name : Host.baseName(path) })])]),
         rec ? el('div', { class: 'recv-from' }, [el('small', { class: 'muted', text: 'Trimis către' }), el('b', { class: 'no-tr', text: rec.to.map((h) => '@' + h).join(', ') }), el('small', { class: 'muted', text: when })]) : null,
@@ -613,7 +613,7 @@ const AcmShare = (() => {
     try { await keepEncrypted(path, bytes); } catch (e) { console.warn('keep .acm', e); }
     const sender = await describeSender(res.sender);
     const go = await UI.modal((box, close) => {
-      box.classList.add('acm-recv');
+      box.classList.add('acm-ui', 'acm-recv');
       box.append(
         el('div', { class: 'send-head' }, [el('span', { class: 'send-i ok', html: svg('lockfile') }), el('div', {}, [el('h2', { text: 'Document criptat' }), el('small', { class: 'muted no-tr', text: res.name })])]),
         el('div', { class: 'recv-from' }, [el('small', { class: 'muted', text: 'Trimis de' }), sender.row]),
@@ -738,7 +738,7 @@ const AcmShare = (() => {
     if (!(await ensureAccount())) return;
     const recent = (App.recentFiles ? App.recentFiles() : []).filter((f) => Host.ext(f.path) !== 'acm').slice(0, 8);
     const pick = await UI.modal((box, close) => {
-      box.classList.add('acm-pick');
+      box.classList.add('acm-ui', 'acm-pick');
       box.append(el('div', { class: 'send-head' }, [el('span', { class: 'send-i', html: svg('lockfile') }), el('div', {}, [el('h2', { text: 'Ce trimiți criptat?' }), el('small', { class: 'muted', text: 'PDF, Word, Excel, poze… orice fișier' })])]));
       const list = el('div', { class: 'clist' });
       for (const f of recent) {

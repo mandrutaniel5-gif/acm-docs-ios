@@ -1,13 +1,25 @@
 'use strict';
-// Language of the app (Română / English). The app is written in Romanian; in
-// English every piece of text shown on screen is swapped from the dictionary
-// (window.I18N_EN), also text that appears later (dialogs, menus, messages).
+// Language of the app. The app is written in Romanian; in any other language every piece of text
+// shown on screen is swapped from that language's dictionary (English: window.I18N_EN, the others:
+// js/i18n/<code>.js, loaded only when chosen), also text that appears later (dialogs, menus, messages).
 // Documents (invoices) have their own language, chosen per document.
 
 const I18n = (() => {
   const KEY = 'acm.lang';
-  let lang = 'ro';
-  try { lang = localStorage.getItem(KEY) === 'en' ? 'en' : 'ro'; } catch (e) {}
+  // code, name in its own language, locale for dates and numbers, right-to-left
+  const LANGS = [
+    ['ro', 'Română', 'ro-RO'], ['en', 'English', 'en-GB'], ['de', 'Deutsch', 'de-DE'], ['fr', 'Français', 'fr-FR'],
+    ['es', 'Español', 'es-ES'], ['it', 'Italiano', 'it-IT'], ['pt', 'Português', 'pt-PT'], ['hu', 'Magyar', 'hu-HU'],
+    ['pl', 'Polski', 'pl-PL'], ['uk', 'Українська', 'uk-UA'], ['ru', 'Русский', 'ru-RU'], ['tr', 'Türkçe', 'tr-TR'],
+    ['ar', 'العربية', 'ar', true], ['hi', 'हिन्दी', 'hi-IN'], ['zh', '中文（简体）', 'zh-CN'], ['ja', '日本語', 'ja-JP'], ['ko', '한국어', 'ko-KR'],
+  ].map(([code, name, locale, rtl]) => ({ code, name, locale, rtl: !!rtl }))
+    // languages whose dictionary is finished (the others are added as they are translated)
+    .filter((x) => ['ro', 'en'].includes(x.code));
+  const known = (l) => LANGS.some((x) => x.code === l);
+  let saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  let lang = known(saved) ? saved : 'ro';
+  if (lang !== 'ro') document.documentElement.classList.add('i18n-wait'); // hidden until the dictionary is in
   const exact = new Map();
   const lower = new Map();
   const patterns = []; // {re, out: [text, groupIndex, text, ...]}
@@ -15,8 +27,10 @@ const I18n = (() => {
   const SKIP = '#wr-page, #sl-live, #sl-list, #sl-present, .text-edit, #sh-grid, datalist, .fname, .no-tr, #inv-preview-wrap, .page';
   const ATTRS = ['title', 'placeholder', 'aria-label'];
 
+  const dictOf = (l) => (l === 'en' ? window.I18N_EN : (window.I18N_DICT || {})[l]);
   function build() {
-    const D = window.I18N_EN || {};
+    exact.clear(); lower.clear(); patterns.length = 0;
+    const D = dictOf(lang) || {};
     for (const [ro, en] of Object.entries(D)) {
       if (!ro || ro === en) continue;
       if (ro.includes('${')) {
@@ -48,7 +62,7 @@ const I18n = (() => {
     if (!t) return s;
     const e = exact.get(t) || lower.get(t.toLowerCase());
     if (!e) return s;
-    if (t === t.toLowerCase()) return e.toLowerCase();
+    if (t === t.toLowerCase() && t !== t.toUpperCase()) return e.toLocaleLowerCase(locale());
     return e;
   }
 
@@ -108,7 +122,7 @@ const I18n = (() => {
 
   let obs = null;
   function start() {
-    if (lang !== 'en' || obs) return;
+    if (lang === 'ro' || obs) return;
     walk(document.body);
     obs = new MutationObserver((list) => {
       for (const m of list) {
@@ -137,35 +151,73 @@ const I18n = (() => {
   function titleFix() {
     const t = document.querySelector('title');
     if (!t || titleObs) return;
-    const fix = () => { if (lang !== 'en') return; const v = tr(document.title); if (v && v !== document.title) document.title = v; };
+    const fix = () => { if (lang === 'ro') return; const v = tr(document.title); if (v && v !== document.title) document.title = v; };
     titleObs = new MutationObserver(fix);
     titleObs.observe(t, { childList: true, characterData: true, subtree: true });
     fix();
   }
 
-  function set(l) {
-    l = l === 'en' ? 'en' : 'ro';
-    if (l === lang) return;
+  /** Loads the dictionary of a language (once). */
+  function load(l) {
+    if (l === 'ro' || dictOf(l)) return Promise.resolve();
+    return new Promise((resolve) => {
+      const sc = document.createElement('script');
+      sc.src = 'js/i18n/' + l + '.js';
+      sc.onload = sc.onerror = () => resolve();
+      document.head.appendChild(sc);
+    });
+  }
+  function applyDir() {
+    const L = LANGS.find((x) => x.code === lang);
+    document.documentElement.lang = lang;
+    document.documentElement.dir = L && L.rtl ? 'rtl' : 'ltr';
+  }
+
+  /** Changes the language; {save: false} only shows it (the first start, before the person picks). */
+  async function set(l, opts) {
+    if (!known(l)) l = 'ro';
+    if (!opts || opts.save !== false) { try { localStorage.setItem(KEY, l); } catch (e) {} saved = l; }
+    if (l === lang && (l === 'ro' || obs)) return;
+    await load(l);
+    stop();
     lang = l;
-    try { localStorage.setItem(KEY, l); } catch (e) {}
-    document.documentElement.lang = l;
-    if (l === 'en') start(); else stop();
+    build();
+    applyDir();
+    start();
     for (const f of listeners) { try { f(l); } catch (e) {} }
   }
 
-  function init() {
+  async function init() {
+    applyDir();
+    if (lang === 'ro') return;
+    // the screen waits (briefly) for the dictionary, so it never flashes in another language
+    const done = () => document.documentElement.classList.remove('i18n-wait');
+    const guard = setTimeout(done, 2500);
+    await load(lang);
     build();
-    document.documentElement.lang = lang;
     start();
+    clearTimeout(guard);
+    done();
+  }
+
+  /** The language the device is set to, if the app has it. */
+  function deviceLang() {
+    const prefs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'ro']).map((x) => String(x).toLowerCase());
+    for (const p of prefs) { const c = p.split(/[-_]/)[0]; if (known(c)) return c; }
+    return 'en';
   }
 
   /** Text in the app's language (for strings built in code). */
-  const t = (ro) => (lang === 'en' ? (tr(ro) || ro) : ro);
+  const t = (ro) => (lang === 'ro' ? ro : (tr(ro) || ro));
+  const locale = () => (LANGS.find((x) => x.code === lang) || LANGS[0]).locale;
 
   return {
-    init, set, t, tr,
+    init, set, t, tr, load, deviceLang, LANGS,
     get lang() { return lang; },
-    locale: () => (lang === 'en' ? 'en-GB' : 'ro-RO'),
+    /** false until the person picks a language the first time */
+    get chosen() { return known(saved); },
+    get name() { return (LANGS.find((x) => x.code === lang) || LANGS[0]).name; },
+    locale,
     onChange: (f) => listeners.push(f),
   };
 })();

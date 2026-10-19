@@ -802,7 +802,7 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void setLang(String l) {
-            lang = "en".equals(l) ? "en" : "ro";
+            lang = "ro".equals(l) ? "ro" : "en"; // every other language: English for the few native messages
         }
 
         @JavascriptInterface

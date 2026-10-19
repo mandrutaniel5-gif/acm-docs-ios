@@ -201,7 +201,7 @@ const Devices = (() => {
     try { UI.busy('Se încarcă…'); await ensure(); await load(); } catch (e) { UI.busy(); return UI.toast(Account.say(e), { error: true }); } finally { UI.busy(); }
     let live = null;
     const act = await UI.modal((box, close) => {
-      box.classList.add('devices');
+      box.classList.add('acm-ui', 'devices');
       const body = el('div');
       const draw = () => {
         body.innerHTML = '';
@@ -283,7 +283,7 @@ const Devices = (() => {
     const qr = `ACMP1:${pid}:${key.fingerprint}`;
     let stopPoll = false;
     const result = await UI.modal((box, close) => {
-      box.classList.add('mycode');
+      box.classList.add('acm-ui', 'mycode');
       const status = el('p', { class: 'muted small', text: 'Așteptăm confirmarea…' });
       box.append(
         el('h2', { text: 'Conectează-te cu cod QR' }),

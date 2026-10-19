@@ -34,7 +34,7 @@ const Invoice = (() => {
 
   const r2 = (v) => Math.round((v + Number.EPSILON) * 100) / 100;
   const money = (v, loc) => (Number.isFinite(v) ? v : 0).toLocaleString(loc || I18n.locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const moneyC = (v, cur) => `${money(v)} ${I18n.lang === 'en' && (cur || 'RON') === 'RON' ? 'RON' : Biz.curSymbol(cur || 'RON')}`;
+  const moneyC = (v, cur) => `${money(v)} ${I18n.lang !== 'ro' && (cur || 'RON') === 'RON' ? 'RON' : Biz.curSymbol(cur || 'RON')}`;
 
   // Words on the document itself when it is written in English
   const DOC_EN = {
@@ -616,7 +616,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
       inv.rate = rate;
       buildForm();
       changed();
-      if (!quiet) UI.toast(`${I18n.t('Curs BNR')}: 1 ${cur} = ${String(rate).replace('.', I18n.lang === 'en' ? '.' : ',')} lei`);
+      if (!quiet) UI.toast(`${I18n.t('Curs BNR')}: 1 ${cur} = ${String(rate).replace('.', I18n.lang !== 'ro' ? '.' : ',')} lei`);
     } catch (e) {
       if (!quiet) UI.toast(I18n.t('Nu am putut lua cursul BNR (verifică internetul). Îl poți scrie de mână.'), { error: true });
     }
@@ -1651,7 +1651,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     const received = invs.filter((d) => isPaid(d) && ym(d.paidAt || d.date) === thisMonth);
     const unpaid = invs.filter((d) => !isPaid(d));
     const late = unpaid.filter(isLate);
-    const cs = I18n.lang === 'en' && curMain === 'RON' ? 'RON' : Biz.curSymbol(curMain);
+    const cs = I18n.lang !== 'ro' && curMain === 'RON' ? 'RON' : Biz.curSymbol(curMain);
     const mSum = sumOf(month), pSum = sumOf(prev);
     const delta = pSum > 0 ? Math.round(((mSum - pSum) / pSum) * 100) : null;
     const mName = monthName(thisMonth), pName = monthName(lastMonth);
@@ -1772,7 +1772,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     const month = invs.filter((d) => (d.date || '').slice(0, 7) === thisMonth);
     const unpaid = invs.filter((d) => d.paid === false);
     return {
-      currency: I18n.lang === 'en' && (b.currency || 'RON') === 'RON' ? 'RON' : Biz.curSymbol(b.currency || 'RON'), month: r2(month.reduce((s, d) => s + (d.total || 0), 0)), monthCount: month.length,
+      currency: I18n.lang !== 'ro' && (b.currency || 'RON') === 'RON' ? 'RON' : Biz.curSymbol(b.currency || 'RON'), month: r2(month.reduce((s, d) => s + (d.total || 0), 0)), monthCount: month.length,
       unpaid: r2(unpaid.reduce((s, d) => s + (d.total || 0), 0)), unpaidCount: unpaid.length, late: unpaid.filter(isLate).length, last: Biz.docs().find((d) => d.bizId === b.id) || null,
     };
   }

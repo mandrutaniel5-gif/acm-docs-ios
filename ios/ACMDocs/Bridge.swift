@@ -136,7 +136,7 @@ final class Bridge: NSObject, WKScriptMessageHandler {
             DispatchQueue.main.async { self.controller?.setTheme(dark: dark, color: color) }
             return answer(true)
         case "setLang":
-            lang = s0 == "en" ? "en" : "ro"
+            lang = s0 == "ro" ? "ro" : "en" // every other language: English for the few native messages
             return answer(true)
         default:
             return failure("unknown " + m)

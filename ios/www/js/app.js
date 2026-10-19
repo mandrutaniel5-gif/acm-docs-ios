@@ -309,16 +309,8 @@ const App = (() => {
     ]));
 
     // Language of the app (documents have their own, in the invoice form)
-    const langRow = (k, flag, label, sub) => {
-      const r = srow(null, '', label, sub, el('span', { class: 'check', html: I18n.lang === k ? svg('check') : '' }), () => { I18n.set(k); renderView(); });
-      r.prepend(el('span', { class: 'si flag no-tr', text: flag }));
-      if (I18n.lang === k) r.classList.add('on');
-      return r;
-    };
-    root.append(group('Limba aplicației', [
-      langRow('ro', 'RO', 'Română', null),
-      langRow('en', 'EN', 'English', null),
-    ], 'Limba facturilor se alege separat, la fiecare document (Limba documentului), sau implicit în Datele firmei.'));
+    const langRow = srow('globe', 'blue', 'Limba aplicației', I18n.name, chev(), () => AccountUI.chooseLanguage());
+    root.append(group('Limba', [langRow], 'Limba facturilor se alege separat, la fiecare document (Limba documentului), sau implicit în Datele firmei.'));
 
     // Businesses
     const act = Biz.active();

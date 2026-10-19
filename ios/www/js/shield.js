@@ -79,7 +79,7 @@ const Shield = (() => {
     const android = Host.mobile && !ios;
     const ok = (t, s) => el('li', { class: 'sh-ok' }, [el('span', { html: svg('check') }), el('div', {}, [el('b', { text: t }), el('small', { text: s })])]);
     await UI.modal((box, close) => {
-      box.classList.add('shield-info');
+      box.classList.add('acm-ui', 'shield-info');
       box.append(
         el('div', { class: 'acm-alert' + (ig.risk ? ' danger' : ' good'), html: svg(ig.risk ? 'warn' : 'shield') }),
         el('h2', { text: 'Protecție anti-spyware' }),

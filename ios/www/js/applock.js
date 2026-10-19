@@ -110,8 +110,8 @@ const AppLock = (() => {
   async function settings() {
     const hasBio = await Host.biometricsAvailable();
     const act = await UI.modal((box, close) => {
-      box.classList.add('applock-set');
-      const sw = (on) => el('span', { class: 'sw' + (on ? ' on' : ''), 'aria-hidden': 'true' });
+      box.classList.add('acm-ui', 'applock-set');
+      const sw = (on) => el('span', { class: 'acm-sw' + (on ? ' on' : ''), 'aria-hidden': 'true' });
       const row = (label, sub, on, key, disabled) => {
         const r = el('button', { class: 'srow', type: 'button', disabled: disabled || null }, [el('span', { class: 'stx' }, [el('b', { text: label }), sub ? el('small', { text: sub }) : null]), on === null ? el('span', { class: 'chev', html: svg('right') }) : sw(on)]);
         r.addEventListener('click', () => close(key));
