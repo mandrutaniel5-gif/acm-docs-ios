@@ -311,21 +311,27 @@ const AccountUI = (() => {
   // ---------------------------------------------------------------- Settings › Cont
   function settingsGroup(group, srow, chev) {
     const u = Account.current();
-    if (!u) return group('Cont', [srow('user', 'blue', 'Intră în cont sau creează unul', 'Pentru documente criptate .acm', chev(), () => { Account.setSkipped(false); render('signin'); })]);
+    if (!u) return group('Cont', [srow('user', 'blue', 'Intră în cont sau creează unul', 'Pentru documente criptate și sincronizare în cloud', chev(), () => { Account.setSkipped(false); render('signin'); })]);
     const h = Account.handle();
-    const rows = [srow('user', 'blue', u.displayName || u.email, (h ? '@' + h + ' · ' : '') + (u.displayName ? u.email : 'Cont ACM Docs'), null, null)];
-    if (!Account.needsVerification() && typeof Contacts !== 'undefined') {
-      rows.push(srow('qr', 'blue', 'Codul meu', 'QR-ul cu care te adaugă alții', chev(), () => Contacts.showMyCode()));
-      rows.push(srow('people', 'green', 'Contacte', 'Persoanele cărora le trimiți .acm', chev(), () => Contacts.showList()));
-      if (h) rows.push(srow('edit', 'gray', 'Schimbă numele de utilizator', '@' + h, chev(), () => render('handle', { change: true })));
+    const out = document.createDocumentFragment();
+    const acct = [srow('user', 'blue', u.displayName || u.email, (h ? '@' + h + ' · ' : '') + 'Profil, cod QR, contacte', chev(), showProfile)];
+    if (Account.needsVerification()) acct.push(srow('mail', 'orange', 'Confirmă emailul', 'Fără confirmare nu poți primi documente', chev(), () => render('verify')));
+    out.append(group('Cont', acct));
+    if (!Account.needsVerification()) {
+      const sec = [];
+      if (typeof Sync !== 'undefined') sec.push(srow('refresh', 'teal', 'Sincronizare în cloud', Sync.summary(), chev(), () => Sync.show()));
+      if (typeof Devices !== 'undefined') sec.push(srow('lock', 'indigo', 'Dispozitive', 'Vezi și administrează dispozitivele conectate', chev(), () => Devices.show()));
+      if (typeof AppLock !== 'undefined') sec.push(srow('lock', 'blue', 'Blocarea aplicației', AppLock.summary(), chev(), async () => { await AppLock.settings(); App.showView('settings'); }));
+      sec.push(srow('key', Account.wordsSaved() ? 'green' : 'orange', 'Codul de recuperare', Account.wordsSaved() ? 'Notat ✓' : 'Nenotat încă: notează-l', chev(), showWords));
+      if (typeof Shield !== 'undefined') sec.push(srow('shield', 'indigo', 'Protecție anti-spyware', 'Ce face aplicația și ce poți face tu', chev(), () => Shield.showInfo()));
+      out.append(group('Securitate', sec, 'Cheile de criptare sunt create și păstrate doar pe dispozitivele tale. Serverul păstrează doar date criptate și cheia publică.'));
     }
-    if (Account.needsVerification()) rows.push(srow('mail', 'orange', 'Confirmă emailul', 'Fără confirmare nu poți primi documente', chev(), () => render('verify')));
-    else rows.push(srow('key', 'green', 'Codul de recuperare', Account.wordsSaved() ? 'Notat ✓' : 'Nenotat încă: notează-l', chev(), showWords));
-    rows.push(srow('logout', 'gray', 'Deconectează-te', 'Cheile rămân pe acest dispozitiv', null, async () => { if (await confirmSignOut()) App.showView('settings'); }));
-    const del = srow('del', 'red', 'Șterge contul', `Cu ${bio()}`, null, deleteFlow);
+    const leave = [srow('logout', 'gray', 'Deconectează-te', 'Cheile rămân pe acest dispozitiv', null, async () => { if (await confirmSignOut()) App.showView('settings'); })];
+    const del = srow('del', 'red', 'Șterge contul', `Cu ${bio()} și parola`, null, deleteFlow);
     del.classList.add('danger');
-    rows.push(del);
-    return group('Cont', rows, 'Cheile de criptare sunt create și păstrate doar pe dispozitivele tale. Serverul păstrează doar cheia publică.');
+    leave.push(del);
+    out.append(group(null, leave));
+    return out;
   }
 
   /** Signing out is never one accidental tap away. */
@@ -355,7 +361,6 @@ const AccountUI = (() => {
     if (Account.needsVerification()) return render('verify');
     const h = Account.handle();
     const qrText = h && Account.fingerprint() ? `ACMC1:${h}:${u.uid}:${Account.fingerprint()}` : null;
-    const integrity = typeof Shield !== 'undefined' ? await Shield.integrity() : null;
     const act = await UI.modal((box, close) => {
       box.classList.add('profile');
       const row = (icon, color, label, sub, key, cls) => {
@@ -379,15 +384,9 @@ const AccountUI = (() => {
         el('div', { class: 'list-card' }, [
           row('people', 'green', 'Contacte', 'Caută după @nume, scanează coduri QR', 'contacts'),
           row('lockfile', 'blue', 'Trimite un document criptat', 'Criptare post-cuantică', 'send'),
-          typeof Devices !== 'undefined' ? row('lock', 'indigo', 'Dispozitive', 'Vezi și administrează dispozitivele conectate', 'devices') : null,
-        ]),
-        el('h3', { class: 'csub', text: 'Securitate' }),
-        el('div', { class: 'list-card' }, [
-          row('key', Account.wordsSaved() ? 'green' : 'orange', 'Codul de recuperare', Account.wordsSaved() ? 'Notat ✓' : 'Nenotat încă: notează-l', 'words'),
-          typeof AppLock !== 'undefined' ? row('lock', 'blue', 'Blocarea aplicației', AppLock.summary(), 'applock') : null,
-          row('shield', integrity && integrity.risk ? 'red' : 'indigo', 'Protecție anti-spyware', integrity && integrity.risk ? 'Atenție: telefonul pare modificat' : 'Ce face aplicația și ce poți face tu', 'shield'),
           h ? row('edit', 'gray', 'Schimbă numele de utilizator', '@' + h, 'handle') : null,
         ]),
+        el('button', { class: 'auth-link', type: 'button', text: 'Securitate, dispozitive și cloud: în Setări', onclick: () => close('settings') }),
         el('div', { class: 'list-card' }, [
           row('logout', 'gray', 'Deconectează-te', 'Cheile rămân pe acest dispozitiv', 'logout'),
           row('del', 'red', 'Șterge contul', `Cu ${bio()} și parola`, 'delete', 'danger'),
@@ -401,6 +400,7 @@ const AccountUI = (() => {
     if (act === 'words') { await showWords(); return showProfile(); }
     if (act === 'shield') { await Shield.showInfo(); return showProfile(); }
     if (act === 'handle') return render('handle', { change: true });
+    if (act === 'settings') return App.showView('settings');
     if (act === 'devices') return Devices.show();
     if (act === 'applock') { await AppLock.settings(); return showProfile(); }
     if (act === 'logout') { if (await confirmSignOut()) refreshAround(); return; }
