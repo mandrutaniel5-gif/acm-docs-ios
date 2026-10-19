@@ -1560,6 +1560,37 @@ const Sheet = (() => {
     return /^[0-9a-f]{6}$/i.test(h) ? '#' + h.toLowerCase() : null;
   };
 
+  /**
+   * Excel files come from anywhere, so they are parsed in a separate worker: a file made to attack
+   * the parser cannot reach the app. If workers are not available, the parse runs here and the app
+   * checks that the built-in objects were not tampered with (and refuses the file if they were).
+   */
+  function readInWorker(bytes, opts) {
+    return new Promise((resolve, reject) => {
+      let wk;
+      try { wk = new Worker('js/office/xlsx-worker.js'); } catch (e) { reject(Object.assign(new Error('worker'), { noWorker: true })); return; }
+      const t = setTimeout(() => { wk.terminate(); reject(new Error('Fișierul Excel nu a putut fi citit: durează prea mult. Poate fi deteriorat.')); }, 90000);
+      wk.onmessage = (e) => { clearTimeout(t); wk.terminate(); if (e.data && e.data.ok) resolve(e.data.w); else reject(new Error((e.data && e.data.error) || 'Excel')); };
+      wk.onerror = (e) => { e.preventDefault(); clearTimeout(t); wk.terminate(); reject(Object.assign(new Error((e && e.message) || 'worker'), { noWorker: true })); };
+      const copy = new Uint8Array(bytes).slice();
+      wk.postMessage({ bytes: copy, opts }, [copy.buffer]);
+    });
+  }
+  const PROTOS = [Object.prototype, Array.prototype, String.prototype, Number.prototype, Function.prototype];
+  function guardedRead(X, bytes, opts) {
+    const before = PROTOS.map((p) => new Set(Reflect.ownKeys(p)));
+    let w, bad = false;
+    try { w = X.read(bytes, opts); } finally {
+      PROTOS.forEach((p, i) => { for (const k of Reflect.ownKeys(p)) if (!before[i].has(k)) { bad = true; try { delete p[k]; } catch (e) {} } });
+    }
+    if (bad) throw new Error('Fișierul Excel conține date care încearcă să modifice aplicația. Nu a fost deschis.');
+    return w;
+  }
+  async function safeRead(X, bytes, opts) {
+    try { return await readInWorker(bytes, opts); } catch (e) { if (!e.noWorker) throw e; console.warn('xlsx worker', e.message); }
+    return guardedRead(X, bytes, opts);
+  }
+
   async function readWorkbook(bytes, ext) {
     const X = XL();
     let w;
@@ -1572,7 +1603,7 @@ const Sheet = (() => {
       rows.forEach((row, r) => row.forEach((v, c) => { if (v !== '') setInput(s, r, c, v); }));
       return { sheets: [s], active: 0 };
     }
-    w = X.read(bytes, { type: 'buffer', cellFormula: true, cellStyles: true, cellNF: true, cellDates: false });
+    w = await safeRead(X, bytes, { type: 'buffer', cellFormula: true, cellStyles: true, cellNF: true, cellDates: false });
     const extra = ext === 'xlsx' || ext === 'xlsm' ? await xlsxStyles(bytes).catch((e) => { console.warn('styles', e); return null; }) : null;
     const out = { sheets: [], active: 0 };
     for (const name of w.SheetNames) {

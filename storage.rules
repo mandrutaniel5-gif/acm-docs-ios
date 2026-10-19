@@ -15,6 +15,7 @@ service firebase.storage {
       allow get, delete: if id.matches('^[0-9a-f]{32}$') && activeDevice(uid);
       // new blocks only (a block is never rewritten), up to 110 MB
       allow create: if id.matches('^[0-9a-f]{32}$') && activeDevice(uid)
+        && resource == null
         && request.resource.size <= 110 * 1024 * 1024
         && request.resource.contentType == 'application/octet-stream';
       allow list, update: if false;

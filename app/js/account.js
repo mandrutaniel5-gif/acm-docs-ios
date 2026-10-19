@@ -124,7 +124,10 @@ const Account = (() => {
   async function resetPassword(email) { await ready(); await F().auth.sendPasswordResetEmail(auth, email.trim()); }
   async function resendVerification() { if (user) await F().auth.sendEmailVerification(user); }
   async function refresh() { if (user) { await F().auth.reload(user); user = auth.currentUser; await user.getIdToken(true); } return user; }
-  async function signOut() { identity = null; profile = null; await F().auth.signOut(auth); }
+  // set while this device signs out on purpose (otherwise a closed session is resumed with the device key)
+  let leaving = false;
+  async function signOut() { identity = null; profile = null; leaving = true; try { await F().auth.signOut(auth); } finally { setTimeout(() => { leaving = false; }, 3000); } }
+  const signingOut = () => leaving;
 
   // ---------------------------------------------------------------- keys
   const Fs = () => F().firestore;
@@ -297,7 +300,7 @@ const Account = (() => {
   const internals = () => ({ F: F(), db, auth });
 
   return {
-    call, signInWithToken, claims, internals,
+    call, signInWithToken, claims, internals, signingOut,
     init, ready, onChange, current, needsVerification, isPasswordUser, say,
     signUp, signIn, resetPassword, resendVerification, refresh, signOut,
     keyState, createKeys, restoreKeys, setHandle, handle, fingerprint, lookup, profileOf, handleProblem, suggestHandle, cleanHandle, unlock, lock, checkPassword, words, wordsSaved, markWordsSaved, deleteAccount,

@@ -500,6 +500,9 @@ const AccountUI = (() => {
     Account.init();
     Account.onChange(() => { banner(); try { if (typeof AcmShare !== 'undefined') AcmShare.renderHome(); } catch (e) {} });
     await Account.ready();
+    // a session closed from outside (e.g. the password was changed): this device signs back in with its own key
+    if (!Account.current() && typeof Devices !== 'undefined') { try { await Devices.resume(); } catch (e) {} }
+    Account.onChange((x) => { if (!x && !Account.signingOut() && typeof Devices !== 'undefined') Devices.resume().catch(() => {}); });
     const u = Account.current();
     if (!u) { if (!Account.skipped()) render('signin'); else if (picked) close(); return; }
     if (picked) close();
