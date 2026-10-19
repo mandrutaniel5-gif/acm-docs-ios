@@ -123,6 +123,11 @@ export function safetyCode(bundleA, bundleB) {
 }
 
 // ------------------------------------------------------------------ password
+/** App-lock password check value (Argon2id, 32 MiB): { s: salt b64, h: hash b64 } */
+export function passwordVerifier(password, saltB64) {
+  const salt = saltB64 ? unb64(saltB64) : randomBytes(16);
+  return { s: b64(salt), h: b64(passwordKey(password, salt, PW_DEFAULTS)), t: PW_DEFAULTS.t, m: PW_DEFAULTS.m };
+}
 function passwordKey(password, salt, p) {
   return argon2id(utf8ToBytes(String(password).normalize('NFKC')), salt, { t: p.t, m: p.m, p: p.p, dkLen: 32 });
 }

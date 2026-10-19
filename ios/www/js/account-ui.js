@@ -319,11 +319,29 @@ const AccountUI = (() => {
     }
     if (Account.needsVerification()) rows.push(srow('mail', 'orange', 'Confirmă emailul', 'Fără confirmare nu poți primi documente', chev(), () => render('verify')));
     else rows.push(srow('key', 'green', 'Codul de recuperare', Account.wordsSaved() ? 'Notat ✓' : 'Nenotat încă: notează-l', chev(), showWords));
-    rows.push(srow('logout', 'gray', 'Deconectează-te', 'Cheile rămân pe acest dispozitiv', null, async () => { await Account.signOut(); App.showView('settings'); }));
+    rows.push(srow('logout', 'gray', 'Deconectează-te', 'Cheile rămân pe acest dispozitiv', null, async () => { if (await confirmSignOut()) App.showView('settings'); }));
     const del = srow('del', 'red', 'Șterge contul', `Cu ${bio()}`, null, deleteFlow);
     del.classList.add('danger');
     rows.push(del);
     return group('Cont', rows, 'Cheile de criptare sunt create și păstrate doar pe dispozitivele tale. Serverul păstrează doar cheia publică.');
+  }
+
+  /** Signing out is never one accidental tap away. */
+  async function confirmSignOut() {
+    const ok = await UI.modal((box, close) => {
+      box.append(
+        el('div', { class: 'acm-alert', html: svg('logout') }),
+        el('h2', { text: 'Te deconectezi de pe acest dispozitiv?' }),
+        el('p', { text: 'Nu vei mai putea trimite sau deschide documente criptate aici până te conectezi din nou. Cheile și contactele rămân pe dispozitiv, protejate.' }),
+        el('div', { class: 'actions col' }, [
+          el('button', { class: 'btn danger', type: 'button', id: 'signout-go', text: 'Da, deconectează-mă', onclick: () => close(true) }),
+          el('button', { class: 'btn', type: 'button', text: 'Rămân conectat', onclick: () => close(false) }),
+        ]),
+      );
+    });
+    if (!ok) return false;
+    await Account.signOut();
+    return true;
   }
 
   // ---------------------------------------------------------------- the account sheet (avatar on Home)
@@ -361,6 +379,7 @@ const AccountUI = (() => {
         el('h3', { class: 'csub', text: 'Securitate' }),
         el('div', { class: 'list-card' }, [
           row('key', Account.wordsSaved() ? 'green' : 'orange', 'Codul de recuperare', Account.wordsSaved() ? 'Notat ✓' : 'Nenotat încă: notează-l', 'words'),
+          typeof AppLock !== 'undefined' ? row('lock', 'blue', 'Blocarea aplicației', AppLock.summary(), 'applock') : null,
           row('shield', integrity && integrity.risk ? 'red' : 'indigo', 'Protecție anti-spyware', integrity && integrity.risk ? 'Atenție: telefonul pare modificat' : 'Ce face aplicația și ce poți face tu', 'shield'),
           h ? row('edit', 'gray', 'Schimbă numele de utilizator', '@' + h, 'handle') : null,
         ]),
@@ -377,10 +396,8 @@ const AccountUI = (() => {
     if (act === 'words') { await showWords(); return showProfile(); }
     if (act === 'shield') { await Shield.showInfo(); return showProfile(); }
     if (act === 'handle') return render('handle', { change: true });
-    if (act === 'logout') {
-      if (await UI.confirm('Te deconectezi?', 'Cheile și contactele rămân pe acest dispozitiv. Când intri din nou, le găsești la fel.', 'Deconectează-te')) { await Account.signOut(); refreshAround(); }
-      return;
-    }
+    if (act === 'applock') { await AppLock.settings(); return showProfile(); }
+    if (act === 'logout') { if (await confirmSignOut()) refreshAround(); return; }
     if (act === 'delete') { await deleteFlow(); refreshAround(); }
   }
 

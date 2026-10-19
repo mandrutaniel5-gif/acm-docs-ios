@@ -271,6 +271,12 @@ const Account = (() => {
     identity = A().importSecrets(blob);
     return identity;
   }
+  /** The account password is right (asked by the server). */
+  async function checkPassword(password) {
+    const { auth: Au } = F();
+    await Au.reauthenticateWithCredential(user, Au.EmailAuthProvider.credential(user.email, password));
+    return true;
+  }
   /** Forgets the unlocked keys (the next use asks for Face ID again). */
   function lock() { identity = null; }
   async function words(reason) {
@@ -309,7 +315,7 @@ const Account = (() => {
   return {
     init, ready, onChange, current, needsVerification, isPasswordUser, say,
     signUp, signIn, resetPassword, resendVerification, refresh, signOut, google,
-    keyState, createKeys, restoreKeys, setHandle, handle, fingerprint, lookup, profileOf, handleProblem, suggestHandle, cleanHandle, unlock, lock, words, wordsSaved, markWordsSaved, deleteAccount,
+    keyState, createKeys, restoreKeys, setHandle, handle, fingerprint, lookup, profileOf, handleProblem, suggestHandle, cleanHandle, unlock, lock, checkPassword, words, wordsSaved, markWordsSaved, deleteAccount,
     skipped, setSkipped,
     get googleReady() { return !!(Host.info && Host.info.platform === 'ios' ? GOOGLE.ios : (!Host.mobile && GOOGLE.desktop)); },
   };

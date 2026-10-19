@@ -536,6 +536,12 @@ const Host = (() => {
     if (ipc) return !!(await ipc.invoke('secure', 'confirm', { reason }));
     return true;
   }
+  /** Can this device confirm the owner with biometrics / Windows Hello / the phone's lock? */
+  async function biometricsAvailable() {
+    if (AB) return true; // Face ID / Touch ID / fingerprint or the phone's code
+    if (ipc) { try { return !!(await ipc.invoke('secure', 'hello', {})); } catch (e) { return false; } }
+    return false;
+  }
   /** Google sign-in: exchanges the one-time code for the ID token (only oauth2.googleapis.com). */
   async function googleToken(body) {
     if (AB) return call('googleToken', { body });
@@ -574,7 +580,7 @@ const Host = (() => {
   return {
     platform, mobile, available, info, readFile, readFileAsync, writeFile, exists, baseName, dirName, openDialog, pickImages, camera, saveDialog, startupFile, onOpenFile, setTitle, wasmBytes, listFonts,
     ocr, ocrWarm, htmlToPdf, capture, ext, showInFolder, openPath, openExternal, fetchText, share, exportCopy, specialDir, listDir, mkdirp, join, mtime, remove, setTheme, exitApp, appVersion, toB64, fromB64,
-    secureSet, secureGet, secureHas, secureDelete, confirmOwner, oauth, googleToken, scanQR, privacy, integrity,
+    secureSet, secureGet, secureHas, secureDelete, confirmOwner, oauth, googleToken, scanQR, privacy, integrity, biometricsAvailable,
   };
 })();
 

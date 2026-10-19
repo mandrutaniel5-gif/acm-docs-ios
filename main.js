@@ -196,6 +196,27 @@ ipcMain.handle('privacy', (e, on) => {
   if (w) w.setContentProtection(!!on);
   return true;
 });
+/** Windows Hello through the Windows Runtime (PowerShell). 'check' → Available | …; 'verify' → Verified | Canceled | … */
+function windowsHello(mode, message) {
+  if (process.platform !== 'win32') return Promise.resolve('NotSupported');
+  const msg = String(message || '').replace(/'/g, "''");
+  const script = [
+    "$ErrorActionPreference='Stop'",
+    'Add-Type -AssemblyName System.Runtime.WindowsRuntime',
+    "$asTask = ([System.WindowsRuntimeSystemExtensions].GetMethods() | Where-Object { $_.Name -eq 'AsTask' -and $_.GetParameters().Count -eq 1 -and $_.GetParameters()[0].ParameterType.Name -eq 'IAsyncOperation`1' })[0]",
+    'function Await($op, [Type]$t) { $task = $asTask.MakeGenericMethod($t).Invoke($null, @($op)); $task.Wait(-1) | Out-Null; $task.Result }',
+    '[Windows.Security.Credentials.UI.UserConsentVerifier,Windows.Security.Credentials.UI,ContentType=WindowsRuntime] | Out-Null',
+    mode === 'check'
+      ? '$r = Await ([Windows.Security.Credentials.UI.UserConsentVerifier]::CheckAvailabilityAsync()) ([Windows.Security.Credentials.UI.UserConsentVerifierAvailability])'
+      : `$r = Await ([Windows.Security.Credentials.UI.UserConsentVerifier]::RequestVerificationAsync('${msg}')) ([Windows.Security.Credentials.UI.UserConsentVerificationResult])`,
+    'Write-Output $r',
+  ].join('; ');
+  return new Promise((resolve) => {
+    require('child_process').execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', script],
+      { windowsHide: true, timeout: mode === 'check' ? 15000 : 120000 }, (err, out) => resolve(err ? 'Error' : String(out || '').trim()));
+  });
+}
+
 ipcMain.handle('secure', async (e, op, args) => {
   const { safeStorage } = require('electron');
   const a = args || {};
@@ -212,10 +233,15 @@ ipcMain.handle('secure', async (e, op, args) => {
   }
   if (op === 'has') return fs.existsSync(secureFile(a.name));
   if (op === 'delete') { try { fs.unlinkSync(secureFile(a.name)); } catch (err) {} return true; }
+  if (op === 'hello') return (await windowsHello('check')) === 'Available';
   if (op === 'confirm') {
+    // Windows Hello (face, fingerprint or PIN) when the PC has it; otherwise a plain confirmation
+    const r = await windowsHello('verify', String(a.reason || 'Confirmă că ești tu'));
+    if (r === 'Verified') return true;
+    if (r === 'Canceled' || r === 'RetriesExhausted') return false;
     const win = BrowserWindow.fromWebContents(e.sender);
-    const r = await dialog.showMessageBox(win, { type: 'warning', buttons: ['Anulează', 'Confirm'], defaultId: 0, cancelId: 0, message: String(a.reason || 'Confirmă că ești tu') });
-    return r.response === 1;
+    const d = await dialog.showMessageBox(win, { type: 'warning', buttons: ['Anulează', 'Confirm'], defaultId: 0, cancelId: 0, message: String(a.reason || 'Confirmă că ești tu') });
+    return d.response === 1;
   }
   throw new Error('secure ' + op);
 });
