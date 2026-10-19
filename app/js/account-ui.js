@@ -305,7 +305,8 @@ const AccountUI = (() => {
       const st = await Account.keyState();
       if (st === 'create') return render('handle', { create: true });
       if (st === 'restore') return render('restore');
-      if (st === 'handle') return render('handle', {});
+      // the profile is changed only from a device of the account: add this device first
+      if (st === 'handle') { await afterKeys(); return render('handle', {}); }
       void t0;
       await afterKeys();
       close();

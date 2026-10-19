@@ -68,10 +68,39 @@ try {
   if (res.ok) throw new Error('storage: wrote into another account');
   res = await fetch(`${base}/${encodeURIComponent(name)}?alt=media`);
   if (res.ok) throw new Error('storage: anonymous read');
+  // a block is never rewritten, and only as unreadable bytes (never a web page)
+  res = await fetch(`${base}?uploadType=media&name=${encodeURIComponent(name)}`, { method: 'POST', headers: { Authorization: 'Firebase ' + tok, 'Content-Type': 'application/octet-stream' }, body: sealed });
+  if (res.ok) throw new Error('storage: an existing block was rewritten');
+  const html = `accounts/${user.uid}/blobs/${'cd'.repeat(16)}`;
+  res = await fetch(`${base}?uploadType=media&name=${encodeURIComponent(html)}`, { method: 'POST', headers: { Authorization: 'Firebase ' + tok, 'Content-Type': 'text/html' }, body: '<b>x</b>' });
+  if (res.ok) throw new Error('storage: accepted a text/html block');
   res = await fetch(`${base}/${encodeURIComponent(name)}`, { method: 'DELETE', headers: { Authorization: 'Firebase ' + tok } });
   if (!res.ok) throw new Error('storage delete ' + res.status);
+  console.log('LIVE OK: cloud sync record + encrypted block (upload, download, delete), other folders closed, no rewrite, no HTML');
+
+  // email + password only (no device): the profile cannot be changed, the sign-in cannot be deleted
+  const app2 = clientApp({ apiKey: 'AIzaSyDsXxKCjxhOeGTZYyYIsm_S6SO6zADe25w', authDomain: `${PROJECT}.firebaseapp.com`, projectId: PROJECT }, 'pw');
+  const auth2 = clientAuth(app2), db2 = getFirestore(app2);
+  await signInWithEmailAndPassword(auth2, `${handle}@example.invalid`, password);
+  const cur = (await getDoc(doc(db2, 'users', user.uid))).data();
+  let renamed = true;
+  try { await setDoc(doc(db2, 'users', user.uid), { ...cur, name: 'Renamed' }); } catch (e) { renamed = false; }
+  if (renamed) throw new Error('rules: profile changed with the password only');
+  const del = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:delete?key=AIzaSyDsXxKCjxhOeGTZYyYIsm_S6SO6zADe25w`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idToken: await auth2.currentUser.getIdToken() }) });
+  if (del.ok) throw new Error('auth: the sign-in was deleted with the password only');
+  await signOut(auth2);
+  console.log('LIVE OK: with the password only, the profile cannot be changed and the sign-in cannot be deleted');
+
+  // pairing limit: made-up addresses in X-Forwarded-For do not get around it
+  const pk = A.deriveIdentity(A.generateMnemonic());
+  let made = 0;
+  for (let i = 0; i < 14; i++) {
+    const r2 = await fetch(`https://europe-west1-${PROJECT}.cloudfunctions.net/pairStart`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': `10.77.${i}.${i + 1}` }, body: JSON.stringify({ data: { bundle: A.toB64(pk.bundle) } }) });
+    if (r2.ok) made++;
+  }
+  if (made > 10) throw new Error(`pairing limit bypassed with a fake X-Forwarded-For: ${made}/14`);
+  console.log(`LIVE OK: pairing limit holds with fake addresses (${made}/14 accepted)`);
   ok = true;
-  console.log('LIVE OK: cloud sync record + encrypted block (upload, download, delete), other folders closed');
 } finally {
   try { await signOut(auth); } catch (e) {}
   const store = adminDb();

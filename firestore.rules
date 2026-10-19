@@ -44,7 +44,11 @@ service cloud.firestore {
       allow create: if signedIn() && request.auth.uid == uid && validProfile(request.resource.data, uid);
       // the public key never changes once published: a stolen password cannot swap it.
       // Changing @name: the old one must be released in the same write (one name per account)
+      // Changes (display name, @name) come only from a device of the account: the password alone
+      // cannot rename someone or free their @name for an impostor. The one exception: an old
+      // profile that never had an @name picks its first one.
       allow update: if signedIn() && request.auth.uid == uid && validProfile(request.resource.data, uid)
+        && (activeDeviceOf(uid) || resource.data.get('handle', '') == '')
         && request.resource.data.key == resource.data.key
         && request.resource.data.fp == resource.data.fp
         && (resource.data.get('handle', '') == ''

@@ -123,8 +123,18 @@ export const deviceSession = onCall(async (req) => {
 /** New device: publishes a one-time key and gets a pairing id to show as a QR code. */
 const PAIR_LIMIT = 10;              // QR codes per address…
 const PAIR_WINDOW_MS = 10 * 60 * 1000; // …per 10 minutes
-async function rateLimit(req, bucket, max, windowMs) {
-  const who = String((req.rawRequest && (req.rawRequest.headers['x-forwarded-for'] || req.rawRequest.ip)) || 'unknown').split(',')[0].trim();
+const PAIR_GLOBAL_LIMIT = 600;      // all addresses together, per 10 minutes
+/**
+ * The caller's address. The first entries of X-Forwarded-For are whatever the caller wrote; Google's
+ * front end appends the address it really saw, so only the LAST entry can be trusted.
+ */
+function clientAddress(req) {
+  const h = req.rawRequest && req.rawRequest.headers ? req.rawRequest.headers['x-forwarded-for'] : null;
+  const list = String(h || '').split(',').map((x) => x.trim()).filter(Boolean);
+  return list.length ? list[list.length - 1] : String((req.rawRequest && req.rawRequest.ip) || 'unknown');
+}
+async function rateLimit(req, bucket, max, windowMs, global) {
+  const who = global ? '*' : clientAddress(req);
   const key = hex(sha256(new TextEncoder().encode(bucket + '|' + who))).slice(0, 40); // no raw IPs stored
   const ref = db.collection('limits').doc(key);
   const ok = await db.runTransaction(async (tx) => {
@@ -141,6 +151,8 @@ async function rateLimit(req, bucket, max, windowMs) {
 
 export const pairStart = onCall(async (req) => {
   await rateLimit(req, 'pair', PAIR_LIMIT, PAIR_WINDOW_MS);
+  // a ceiling for everyone together, whatever addresses the requests claim
+  await rateLimit(req, 'pair-all', PAIR_GLOBAL_LIMIT, PAIR_WINDOW_MS, true);
   const { bundle } = req.data || {};
   const { fp } = parseBundle(bundle);
   const pid = newId();

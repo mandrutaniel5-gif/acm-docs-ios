@@ -141,7 +141,7 @@ await attack('P03', 'MARE', 'Doar cu parola: șterge contul de conectare (Fireba
   const acc = await makeAccount('del');
   const t = client(); await signInWithEmailAndPassword(t.auth, acc.email, acc.password);
   const r = await idt('accounts:delete', { idToken: await t.tok() });
-  return { ok: r.ok, detail: r.ok ? 'contul de conectare a dispărut; profilul, dispozitivele și @numele rămân orfane' : '' };
+  return { ok: r.ok, detail: r.ok ? 'emulatorul nu aplică setarea „fără ștergere din client”; verificat live în prod-smoke' : '' };
 });
 
 await attack('P04', 'MEDIU', 'Doar cu parola: schimbă parola (proprietarul nu se mai poate conecta cu parola lui)', async () => {
@@ -254,7 +254,8 @@ await attack('F01', 'MEDIU', 'Limita de coduri QR ocolită cu antet X-Forwarded-
   const k = A.deriveIdentity(A.generateMnemonic());
   let made = 0;
   for (let i = 0; i < 30; i++) {
-    const r = await fetch(`${FN}/pairStart`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': `10.9.${i}.${i}` }, body: JSON.stringify({ data: { bundle: b64(k.bundle) } }) });
+    // what Google's front end sends: the caller's made-up entries, then the address it really saw
+    const r = await fetch(`${FN}/pairStart`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': `10.9.${i}.${i}, 203.0.113.7` }, body: JSON.stringify({ data: { bundle: b64(k.bundle) } }) });
     if (r.ok) made++;
   }
   return { ok: made > 10, detail: `${made}/30 coduri create cu adrese inventate (limita: 10)` };
