@@ -1,0 +1,198 @@
+[
+  {
+    "code": "P01",
+    "severity": "MARE",
+    "title": "Doar cu parola: schimbă numele afișat al victimei (văzut de toți contactele noi)",
+    "result": "VULNERABIL",
+    "detail": ""
+  },
+  {
+    "code": "P02",
+    "severity": "MARE",
+    "title": "Doar cu parola: eliberează @numele victimei, apoi alt cont îl preia (impersonare pentru contactele noi)",
+    "result": "VULNERABIL",
+    "detail": "@victimmvfrri7h a ajuns la contul atacatorului"
+  },
+  {
+    "code": "P03",
+    "severity": "MARE",
+    "title": "Doar cu parola: șterge contul de conectare (Firebase Auth) direct prin API",
+    "result": "VULNERABIL",
+    "detail": "contul de conectare a dispărut; profilul, dispozitivele și @numele rămân orfane"
+  },
+  {
+    "code": "P04",
+    "severity": "MEDIU",
+    "title": "Doar cu parola: schimbă parola (proprietarul nu se mai poate conecta cu parola lui)",
+    "result": "VULNERABIL",
+    "detail": "proprietarul își recuperează accesul doar prin „Ai uitat parola?”"
+  },
+  {
+    "code": "P05",
+    "severity": "MARE",
+    "title": "Doar cu parola: schimbă emailul contului direct (fără confirmare pe emailul vechi)",
+    "result": "VULNERABIL",
+    "detail": "în emulator merge; în producție o blochează „email enumeration protection” dacă e activă — de verificat"
+  },
+  {
+    "code": "P06",
+    "severity": "MARE",
+    "title": "Doar cu parola: funcțiile de dispozitiv (aprobare QR, blocare, ieșire, principal)",
+    "result": "BLOCAT",
+    "detail": "pairGet:false pairApprove:false block:false leave:false primary:false"
+  },
+  {
+    "code": "P07",
+    "severity": "CRITIC",
+    "title": "Doar cu parola: citește / scrie / șterge blocurile criptate din cloud (Storage)",
+    "result": "BLOCAT",
+    "detail": "citire:false scriere:false ștergere:false"
+  },
+  {
+    "code": "P08",
+    "severity": "MARE",
+    "title": "Doar cu parola: scrie / șterge înregistrări din seiful cloud (Firestore)",
+    "result": "BLOCAT",
+    "detail": "scriere:false ștergere:false"
+  },
+  {
+    "code": "P09",
+    "severity": "MEDIU",
+    "title": "Doar cu parola: proprietarul nu află că cineva a intrat cu parola lui (nicio alertă)",
+    "result": "VULNERABIL",
+    "detail": "evenimente „conectare” vizibile proprietarului: 1 (doar crearea contului)"
+  },
+  {
+    "code": "P10",
+    "severity": "MIC",
+    "title": "Doar cu parola: citește profilurile publice și caută @nume",
+    "result": "VULNERABIL",
+    "detail": "date publice prin natura lor (cheie publică + @nume); de închis odată cu P01"
+  },
+  {
+    "code": "V01",
+    "severity": "CRITIC",
+    "title": "Alt cont: citește blocul criptat al victimei (știind calea)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "V02",
+    "severity": "CRITIC",
+    "title": "Alt cont: scrie un bloc în folderul victimei",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "V03",
+    "severity": "CRITIC",
+    "title": "Alt cont: șterge blocul victimei",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "V04",
+    "severity": "MEDIU",
+    "title": "Alt cont / propriul dispozitiv: listează blocurile (enumerare)",
+    "result": "BLOCAT",
+    "detail": "alt cont:false propriul:false"
+  },
+  {
+    "code": "V05",
+    "severity": "MARE",
+    "title": "Dispozitivul victimei: rescrie un bloc existent (înlocuire de fișier sincronizat)",
+    "result": "VULNERABIL",
+    "detail": ""
+  },
+  {
+    "code": "V06",
+    "severity": "MEDIU",
+    "title": "Nume de bloc ne-hex / cu ../ (ieșire din folder)",
+    "result": "BLOCAT",
+    "detail": "traversare:false nume liber:false alt folder:false"
+  },
+  {
+    "code": "V07",
+    "severity": "MEDIU",
+    "title": "Bloc cu tip HTML (servit ca pagină web de pe domeniul Firebase)",
+    "result": "VULNERABIL",
+    "detail": ""
+  },
+  {
+    "code": "V08",
+    "severity": "MEDIU",
+    "title": "Bloc peste limita de 110 MB",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "V09",
+    "severity": "CRITIC",
+    "title": "Neautentificat: citește / listează blocuri",
+    "result": "BLOCAT",
+    "detail": "citire:false listare:false"
+  },
+  {
+    "code": "V10",
+    "severity": "MEDIU",
+    "title": "Seif: înregistrare cu câmpuri în plus (date necriptate strecurate lângă cele criptate)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "V11",
+    "severity": "MEDIU",
+    "title": "Cost: un singur dispozitiv scrie 300 de înregistrări în seif într-un minut (fără cotă)",
+    "result": "VULNERABIL",
+    "detail": "300/300 acceptate — abuz de cost posibil doar din contul propriu"
+  },
+  {
+    "code": "V12",
+    "severity": "CRITIC",
+    "title": "Dispozitiv blocat: citește / scrie blocurile din cloud",
+    "result": "BLOCAT",
+    "detail": "citire:false scriere:false"
+  },
+  {
+    "code": "V13",
+    "severity": "CRITIC",
+    "title": "Dispozitiv ieșit din cont (deconectat): citește seiful și blocurile cu sesiunea veche",
+    "result": "BLOCAT",
+    "detail": "bloc:false seif:false"
+  },
+  {
+    "code": "V14",
+    "severity": "MARE",
+    "title": "Dispozitiv ieșit din cont: cere o sesiune nouă cu cheia lui",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "F01",
+    "severity": "MEDIU",
+    "title": "Limita de coduri QR ocolită cu antet X-Forwarded-For fals",
+    "result": "VULNERABIL",
+    "detail": "30/30 coduri create cu adrese inventate (limita: 10)"
+  },
+  {
+    "code": "F02",
+    "severity": "MIC",
+    "title": "pairPoll: cine nu are cheia de unică folosință nu află nici măcar starea",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "F03",
+    "severity": "MARE",
+    "title": "Cont cu email neconfirmat (doar parola): înregistrează un dispozitiv / creează profil",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "F04",
+    "severity": "MEDIU",
+    "title": "Sesiune de dispozitiv folosită pentru a schimba parola contului (fără parola veche)",
+    "result": "VULNERABIL",
+    "detail": "o sesiune de dispozitiv (furată) poate schimba parola"
+  }
+]
