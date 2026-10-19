@@ -1,0 +1,690 @@
+700	Lista numerada
+701	Diminuir avanço
+702	Aumentar avanço
+703	Espaçamento entre linhas
+704	Inserir imagem
+705	Nova página (quebra de página)
+706	Limpar formatação
+707	Procurar e substituir (Ctrl+F)
+708	Pequeno
+709	Médio
+710	Grande
+711	Largura total
+712	Centrado
+713	+ Linha acima
+714	+ Linha abaixo
+715	+ Coluna à esquerda
+716	+ Coluna à direita
+717	− Linha
+718	− Coluna
+719	Mostrar / ocultar contornos
+720	Eliminar tabela
+721	Não encontrado
+722	${n} substituídos
+723	A abrir o documento…
+724	Documento Word antigo (.doc): o texto foi mantido; a formatação pode faltar. Será guardado como .docx.
+725	Ficheiro RTF: o texto foi mantido. Será guardado como .docx.
+726	Não foi possível abrir o documento
+727	Documento novo.docx
+728	Guardar documento
+729	Não foi possível preparar o documento
+730	Margens: estreitas (1,27 cm)
+731	${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} · os clientes devem-lhe ${Invoice.money(s.unpaid)} ${s.currency}
+732	${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} este mês · tudo pago
+733	Faturação profissional para qualquer negócio
+734	Faturação profissional para a sua empresa
+735	Idioma da aplicação
+736	O idioma das faturas escolhe-se à parte em cada documento (Idioma do documento) ou por predefinição nos Dados da empresa.
+737	Escreva-nos
+738	Copiar endereço
+739	Endereço copiado.
+740	PDF, documentos, folhas de cálculo, apresentações e faturas numa só aplicação. Os seus dados ficam neste dispositivo.
+741	CEO · Administrador, ACM Code SRL
+742	Dúvidas, problemas ou sugestões — respondemos por email
+743	Versão ${ver || '2.0.1'} · ${Host.mobile ? 'Android' : 'Windows'} · 2026
+744	Vencimento (prazo de pagamento)
+745	Até ${dateRo(inv.due)}
+746	Forma de pagamento
+747	Idioma do documento
+748	Menos opções
+749	Desconto e observações
+750	O cliente pagou?
+751	Sim, pago
+752	Dinheiro já recebido
+753	Paga mais tarde
+754	Escolher o vencimento
+755	Idioma do documento
+756	Texto no documento (inglês)
+757	Texto no documento (romeno)
+758	Cada idioma do documento tem o seu próprio texto. Mude o idioma no formulário (Idioma do documento) para editar o outro.
+759	Faturado
+760	Pago
+761	Por pagar
+762	Ainda não pago
+763	dos quais vencido
+764	Mês
+765	Ver como tabela
+766	Ver gráfico
+767	Evolução mensal
+768	Quanto faturou em cada mês e quanto disso já recebeu.
+769	Principais clientes ${year}
+770	Pelo valor faturado este ano.
+771	Faturado em ${mName}
+772	${delta >= 0 ? '▲' : '▼'} ${Math.abs(delta)}% face a ${pName}
+773	Recebido em ${mName}
+774	Os clientes devem-lhe
+775	Todas as faturas estão pagas
+776	${money(sumOf(late))} ${cs} vencido
+777	${unpaid.length} ${unpaid.length === 1 ? 'factură neplătită' : 'facturi neplătite'}, ainda não vencidas
+778	Por pagar
+779	Vencidas
+780	${daysLate(d)} ${daysLate(d) === 1 ? 'zi' : 'zile'} de atraso
+781	Por pagar
+782	vence a ${dateRo(d.due)}
+783	Paga
+784	O cliente pagou — marcar como paga
+785	Fatura marcada como paga.
+786	Marcar como por pagar
+787	Faturas por mês
+788	fatura
+789	faturas
+790	fatura paga
+791	faturas pagas
+792	fatura por pagar
+793	faturas por pagar
+794	dia
+795	dias
+796	linha
+797	linhas
+798	página
+799	páginas
+800	palavra
+801	palavras
+802	linha de texto ficou editável
+803	linhas de texto ficaram editáveis
+804	por pagar
+805	RON
+806	Não foi encontrada nenhuma aplicação de email neste telemóvel.
+807	Aplicação de câmara não encontrada.
+808	Não foi encontrada nenhuma aplicação para isto.
+809	Nenhuma aplicação deste telemóvel consegue abrir este ficheiro.
+810	O ficheiro já não existe.
+811	O telemóvel abriu o ecrã de impressão: escolha «Guardar como PDF».
+812	hoje, ${hm}
+813	ontem, ${hm}
+814	de
+815	Desenvolvido por
+816	Última:
+817	meses
+818	vence
+819	c/ IVA
+820	Faturas, pró-formas, propostas
+821	Faturas: Documentos\Facturi · edições: junto ao original
+822	NIF
+823	vencidas
+824	Escolher dos clientes guardados
+825	Clientes guardados
+826	Escolha um cliente e os dados preenchem-se sozinhos, incluindo a forma como costuma pagar.
+827	Pesquisar por nome, NIF ou telefone
+828	Nenhum cliente encontrado
+829	Ainda sem clientes guardados
+830	Os clientes são guardados automaticamente quando cria um documento.
+831	Eliminar cliente
+832	Eliminar «${c.name}» dos clientes?
+833	Os documentos emitidos ficam inalterados.
+834	Câmbio BNR de hoje
+835	Câmbio BNR
+836	Taxa de câmbio (1 ${inv.currency} = ? RON)
+837	Esta moeda não consta dos câmbios BNR.
+838	Não foi possível obter o câmbio BNR (verifique a internet). Pode escrevê-lo.
+839	A criação do PDF está a demorar demasiado. Tente novamente.
+840	Repor predefinições
+841	Ver
+842	Modelos
+843	Escolha um modelo e ajuste-o abaixo (cores, letra, estrutura). Os seus textos e a ordem das secções mantêm-se.
+844	Clássico
+845	Equilibrado, serve a todos
+846	Cabeçalho colorido, forte
+847	Sóbrio, para empresas
+848	Só o essencial, arejado
+849	Letra clássica, tons quentes
+850	Técnico
+851	Grelha clara, muitas linhas
+852	Económico
+853	Gasta o mínimo de tinta
+854	Para salões e lojas
+855	Idioma da fatura
+856	Fatura em romeno
+857	Fatura em inglês
+858	Cada idioma tem os seus textos
+859	Produto ou serviço
+860	Outro produto
+861	Não foi possível mostrar a lista
+862	Foto → documento
+863	Digitalizar
+864	Rodar página
+865	Rodar
+866	Ajustar os cantos da página
+867	Arraste os cantos azuis para os cantos da folha.
+868	Foto inteira
+869	Aplicar
+870	Texto pesquisável no PDF
+871	Lê o texto da foto para o poder pesquisar e copiar
+872	Guardar PDF
+873	Cinzento
+874	Preto e branco
+875	Página
+876	Página
+877	Adicionar página
+878	Nova página
+879	Tirar foto
+880	Escolher foto do telemóvel
+881	A preparar a página…
+882	A limpar a página…
+883	A rodar…
+884	A abrir a foto…
+885	A endireitar a página…
+886	A ler o texto…
+887	A compor o documento…
+888	Não foram encontradas as margens da folha. Mova os cantos com o dedo.
+889	Não foram encontradas as margens da folha. Toque em «Margens» para as definir.
+890	Não foi possível usar a foto
+891	Não foi possível processar a foto
+892	Não foi possível rodar a página
+893	Eliminar a página?
+894	A área selecionada é demasiado pequena.
+895	Não foi possível ler o texto; o PDF é guardado apenas com as imagens.
+896	PDF guardado em
+897	Não foi encontrado texto na foto. Experimente uma foto mais nítida, mais perto e com boa luz.
+898	O documento está pronto. Verifique as palavras marcadas a amarelo
+899	O documento está pronto e pode ser editado.
+900	Não foi possível ler o texto
+901	Descartar a digitalização?
+902	As páginas digitalizadas não foram guardadas.
+903	Descartar
+904	Dados da aplicação
+905	Limpar a memória temporária
+906	Pré-visualizações e preferências de impressão. Nada de importante é apagado.
+907	Memória temporária limpa.
+908	Eliminar todos os dados da aplicação
+909	Empresas, clientes, lista de documentos, modelos e definições. Os ficheiros guardados ficam.
+910	Use isto se tinha uma versão antiga e algo parece errado. A aplicação arranca como na primeira instalação.
+911	Eliminar todos os dados da aplicação?
+912	São eliminados empresas, clientes, a lista de documentos emitidos, modelos e definições. Os PDF e faturas guardados ficam na sua pasta. Não é possível anular.
+913	Eliminar tudo
+914	Tem a certeza?
+915	A aplicação arrancará como na primeira instalação.
+916	Sim, eliminar
+917	Borracha
+918	Apaga desenhos, realces, áreas tapadas e vistos: passe por cima (E)
+919	Não há nada para apagar aqui. A borracha remove desenhos, realces e vistos.
+920	Escolher da galeria (uma ou várias)
+921	O texto do PDF está pronto: pode pesquisá-lo e copiá-lo.
+922	A preparar as páginas…
+923	App Ficheiros › No meu iPhone › ACM Docs
+924	Ficheiros › ACM Docs › Scanări
+925	Documentos, faturas e PDF, protegidos
+926	Mostrar palavra-passe
+927	Mais tarde
+928	Iniciar sessão
+929	Bem-vindo de volta
+930	Inicie sessão na sua conta ACM Docs para enviar e receber documentos encriptados.
+931	Iniciar sessão com código QR
+932	O dispositivo foi ligado à conta.
+933	Criar uma
+934	Nome
+935	Palavra-passe (pelo menos 8 carateres)
+936	Confirmar palavra-passe
+937	Criar conta
+938	Nova conta
+939	A sua conta recebe chaves de encriptação pós-quântica, criadas neste dispositivo. Mais ninguém as tem.
+940	Enviámos-lhe um email para definir uma nova palavra-passe.
+941	Nova palavra-passe
+942	Enviamos-lhe por email um link para escolher uma nova palavra-passe.
+943	Já confirmei
+944	Ainda não vemos a confirmação. Abra o link no email e toque novamente.
+945	Confirme o seu email
+946	Enviámos um link para
+947	Usar outra conta
+948	Nome de utilizador
+949	3–20 carateres: minúsculas, algarismos e _
+950	O seu nome de utilizador é agora @${v}.
+951	Mudar o nome de utilizador
+952	Escolha o seu nome de utilizador
+953	É assim que o encontram as pessoas que lhe enviam documentos encriptados. O seu email continua privado: ninguém o pode procurar por ele.
+954	A preparar as suas chaves
+955	As chaves de encriptação pós-quântica da conta estão a ser criadas neste dispositivo. Demora alguns segundos.
+956	Não foi possível preparar as chaves
+957	Tentar novamente
+958	A sua conta está pronta
+959	As chaves de encriptação foram criadas neste dispositivo. O código de recuperação (24 palavras) está guardado aqui, protegido por ${bio()}.
+960	Pode anotá-lo quando quiser a partir do perfil (o botão com a inicial, no canto superior direito). Só precisa dele se perder este dispositivo.
+961	Começar
+962	as 24 palavras, por ordem, separadas por espaços
+963	Recuperar chaves
+964	A sua conta já tem chaves, criadas noutro dispositivo. Escreva as 24 palavras do código de recuperação para as trazer também para aqui.
+965	Confirme com ${bio()} para ver o código de recuperação
+966	O código não está neste dispositivo.
+967	Código de recuperação
+968	Escreva estas 24 palavras em papel, por ordem, e guarde a folha num local seguro. Com elas recupera as chaves noutro dispositivo.
+969	Não as fotografe nem as envie a ninguém. Ninguém da ACM Docs lhe pedirá alguma vez estas palavras.
+970	Anotei-as num local seguro
+971	Eliminar a sua conta?
+972	A conta, a chave pública e as chaves deste dispositivo serão eliminadas. Os documentos .acm recebidos deixam de poder ser abertos. Não é possível anular.
+973	Confirme com ${bio()} a eliminação da conta
+974	Eliminação cancelada.
+975	Confirmar com a palavra-passe
+976	Eliminar conta
+977	A eliminar a conta…
+978	A conta foi eliminada.
+979	Conta
+980	Inicie sessão ou crie uma conta
+981	Para documentos encriptados e sincronização na nuvem
+982	Sem confirmação não pode receber documentos
+983	Sincronização na nuvem
+984	Dispositivos
+985	Ver e gerir os dispositivos ligados
+986	Bloqueio da aplicação
+987	Anotado ✓
+988	Ainda não anotado: anote-o
+989	Proteção contra spyware
+990	O que a aplicação faz e o que pode fazer
+991	Segurança
+992	As chaves de encriptação são criadas e guardadas apenas nos seus dispositivos. O servidor guarda só dados encriptados e a chave pública.
+993	Terminar sessão
+994	As chaves ficam neste dispositivo
+995	Com ${bio()} e palavra-passe
+996	Terminar sessão neste dispositivo?
+997	Não poderá enviar nem abrir documentos encriptados aqui até voltar a iniciar sessão. As chaves e os contactos ficam protegidos no dispositivo.
+998	Sim, terminar sessão
+999	Manter sessão
+1000	A terminar sessão…
+1001	A minha conta
+1002	O meu código
+1003	Mostre-o a alguém para que o adicione e o verifique. Toque para ampliar.
+1004	Contactos
+1005	Pesquisar por @nome, digitalizar códigos QR
+1006	Encriptação pós-quântica
+1007	Segurança, dispositivos e nuvem: em Definições
+1008	Anote o código de recuperação
+1009	Precisa dele se perder este dispositivo
+1010	O nome de utilizador tem pelo menos 3 carateres.
+1011	O nome de utilizador tem no máximo 20 carateres.
+1012	Use só minúsculas sem acentos, algarismos e _.
+1013	Este nome está reservado. Escolha outro.
+1014	Já existe uma conta com este email. Inicie sessão ou reponha a palavra-passe.
+1015	O endereço de email não é válido.
+1016	O email ou a palavra-passe estão incorretos.
+1017	A palavra-passe está incorreta.
+1018	Não existe nenhuma conta com este email.
+1019	A palavra-passe é demasiado fraca: use pelo menos 8 carateres.
+1020	Demasiadas tentativas. Tente novamente dentro de alguns minutos.
+1021	Sem ligação à internet.
+1022	Por segurança, inicie sessão novamente e tente outra vez.
+1023	O servidor recusou o pedido. Confirme o email e tente novamente.
+1024	O servidor não responde. Verifique a ligação à internet.
+1025	Escreva o seu nome.
+1026	As palavras-passe não coincidem. Escreva a mesma palavra-passe duas vezes.
+1027	Confirme para atualizar o perfil
+1028	As palavras não estão corretas. Verifique a ordem e a ortografia.
+1029	Estas palavras pertencem a outra conta.
+1030	Desbloquear as chaves do ACM Docs
+1031	As chaves da conta não estão neste dispositivo.
+1032	Ver código de recuperação
+1033	Confirmar a eliminação da conta
+1034	Guardar uma cópia desencriptada…
+1035	Enviar o ficheiro encriptado
+1036	Documentos .acm recebidos e enviados. Ficam encriptados no dispositivo e abrem-se só para visualização.
+1037	Ainda sem documentos encriptados
+1038	Os ficheiros .acm recebidos ou enviados aparecem aqui. Para enviar um, escolha «Enviar encriptado» no menu ⋯ de um ficheiro.
+1039	· edições: junto ao original
+1040	Falha ao guardar:
+1041	Guardar primeiro
+1042	O documento tem alterações não guardadas. Guardo-o e depois pode encriptá-lo.
+1043	Ocorreu um erro:
+1044	impressão digital ou bloqueio do ecrã
+1045	Desbloqueie com ${bioName()} ou com a palavra-passe da aplicação.
+1046	Escreva a palavra-passe da aplicação.
+1047	Desbloqueie com ${bioName()}.
+1048	Palavra-passe da aplicação
+1049	Desbloquear
+1050	Demasiadas tentativas. Aguarde ${Math.ceil((t0.until - Date.now()) / 1000)} segundos.
+1051	Desbloquear com ${bioName()}
+1052	Esqueci a palavra-passe da aplicação
+1053	Desbloquear o ACM Docs
+1054	A palavra-passe não pode ser recuperada
+1055	Desbloqueie com ${bioName()} e depois mude a palavra-passe em Perfil › Segurança.
+1056	A palavra-passe da aplicação só pode ser reposta com a palavra-passe da conta ACM Docs. Sem conta, reinstale a aplicação (os dados locais perdem-se).
+1057	Repor a palavra-passe da aplicação
+1058	Confirme com a palavra-passe da conta ${u.email}. A palavra-passe da aplicação será removida e pode defini-la de novo a partir do Perfil.
+1059	Confirmar
+1060	A palavra-passe da aplicação foi removida.
+1061	Imediatamente
+1062	Após 1 minuto
+1063	Após 5 minutos
+1064	Após 15 minutos
+1065	Opcional. Ao arrancar e ao voltar à aplicação, o ACM Docs pede a sua confirmação. A definição é separada em cada dispositivo.
+1066	Desbloqueio com ${bioName()}
+1067	Indisponível neste dispositivo
+1068	Ativa · toque para alterar ou desligar
+1069	Desligada
+1070	Bloquear
+1071	Ativar o desbloqueio do ACM Docs
+1072	Quando bloqueia
+1073	Assim que sai da aplicação
+1074	Mudar palavra-passe
+1075	Desligar palavra-passe
+1076	Palavra-passe atual
+1077	Confirme com a palavra-passe atual da aplicação.
+1078	A palavra-passe atual está incorreta.
+1079	A palavra-passe da aplicação foi desligada.
+1080	Pelo menos 6 carateres. Não a use noutro lado.
+1081	A palavra-passe da aplicação está ativa.
+1082	Nova palavra-passe
+1083	Palavra-passe
+1084	A palavra-passe tem pelo menos 6 carateres.
+1085	As palavras-passe não coincidem.
+1086	palavra-passe
+1087	Matrícula
+1088	N.º de pessoas
+1089	Telemóvel Android
+1090	Computador Windows
+1091	Desbloquear as chaves da conta
+1092	Confirme para adicionar este dispositivo à conta
+1093	Outro dispositivo da conta bloqueou este dispositivo. As chaves da conta foram apagadas daqui. Se foi engano, inicie sessão novamente: vai precisar do código de recuperação ou de um código QR de outro dispositivo.
+1094	Dispositivo
+1095	Novo início de sessão na sua conta
+1096	Se não foi você, bloqueie o dispositivo agora: perde de imediato o acesso à conta e não pode abrir dados novos.
+1097	Se não foi você, bloqueie-o a partir do dispositivo principal e mude a palavra-passe da conta.
+1098	Não fui eu: bloquear
+1099	O dispositivo perde de imediato o acesso à conta e aos dados na nuvem. O bloqueio é definitivo: para o voltar a usar, terá de ser ligado de raiz.
+1100	Confirme o bloqueio do dispositivo «${name}»
+1101	A bloquear…
+1102	Desbloqueie para ver os dispositivos da conta
+1103	A carregar…
+1104	Principal
+1105	Este
+1106	visto
+1107	Adicionado ${when(d.created)} · ${VIA[d.via] || ''}
+1108	Este é o dispositivo principal: pode bloquear qualquer outro dispositivo da conta.
+1109	Este dispositivo só pode bloquear dispositivos do mesmo nível. O principal pode bloqueá-los todos.
+1110	Bloqueados
+1111	Ligar um dispositivo novo
+1112	Confirme para ligar um dispositivo novo
+1113	Digitalize o código QR apresentado no dispositivo novo
+1114	Não é um código de início de sessão
+1115	No dispositivo novo, escolha «Iniciar sessão com código QR» e digitalize o código apresentado.
+1116	A verificar…
+1117	O código expirou. Gere um novo no dispositivo novo.
+1118	O código não corresponde
+1119	A chave recebida do servidor não é a do código QR. Não continue: tente de novo com um código novo.
+1120	O dispositivo terá acesso total à conta: documentos encriptados, contactos e dados na nuvem. Ligue apenas dispositivos que lhe pertençam.
+1121	Ligar
+1122	Confirme a ligação do dispositivo novo
+1123	O código de recuperação não está neste dispositivo.
+1124	A ligar…
+1125	A preparar o código…
+1126	A aguardar confirmação…
+1127	Abra o ACM Docs num dispositivo já ligado à conta.
+1128	Perfil › Dispositivos › Ligar um dispositivo novo.
+1129	Confirme com Face ID / impressão digital e digitalize este código.
+1130	O código expirou. Feche e tente novamente.
+1131	As chaves recebidas não pertencem a esta conta.
+1132	Iniciar sessão na conta @${profile.handle}?
+1133	O código foi aprovado pela conta @${profile.handle}${profile.name ? ' (' + profile.name + ')' : ''}. Continue apenas se for a sua conta.
+1134	Início de sessão cancelado.
+1135	O início de sessão com código QR falhou
+1136	Memória insuficiente
+1137	O ficheiro não pode ser lido.
+1138	O ficheiro não é um PDF válido ou está danificado.
+1139	Palavra-passe errada.
+1140	O documento usa uma proteção não suportada.
+1141	A página não foi encontrada ou contém erros.
+1142	Erro desconhecido ao abrir o PDF (código ${code}).
+1143	O documento está protegido por palavra-passe.
+1144	A página não existe.
+1145	A página não pode ser carregada.
+1146	Memória insuficiente para a apresentar.
+1147	A letra não pode ser usada.
+1148	Memória insuficiente para a imagem.
+1149	Não foi possível adicionar a imagem.
+1150	O formato da imagem não é suportado.
+1151	O documento tem de ter pelo menos uma página.
+1152	Falha ao mover a página.
+1153	Não foi possível adicionar as páginas.
+1154	Falha ao guardar o PDF.
+1155	Não é possível escrever o ficheiro
+1156	Não foi possível carregar
+1157	Adicione produtos ou serviços
+1158	Adicionar
+1159	Cliente Exemplo, Lda.
+1160	Documento novo?
+1161	Contagem:
+1162	Soma:
+1163	Folha${n}
+1164	Folha vazia
+1165	SUM, AVERAGE, MIN, MAX, COUNT, COUNTA, COUNTIF, SUMIF, IF, IFERROR, AND, OR, NOT, ROUND, ROUNDUP, ROUNDDOWN, INT, ABS, SQRT, POWER, MOD, PRODUCT, CONCATENATE, LEN, UPPER, LOWER, TRIM, LEFT, RIGHT, MID, TODAY, NOW, DATE, YEAR, MONTH, DAY, VLOOKUP. Exemplo: =SUM(B2:B10) ou =B2*C2.
+1166	A operação falhou:
+1167	Digitalizações
+1168	Confirme para guardar a verificação
+1169	O perfil da conta ainda não está concluído.
+1170	Digitalize o código QR da pessoa a partir da aplicação dela (Perfil › O meu código)
+1171	Não foi encontrado nenhum código QR na foto. Tente novamente, mais perto.
+1172	Digitalizar código QR
+1173	Segure o código da pessoa à frente da câmara.
+1174	O código digitalizado não é um código de conta ACM Docs. A pessoa encontra o código em Perfil › O meu código.
+1175	Este é o seu código.
+1176	Outra conta
+1177	O código digitalizado é de @${q.handle}, não da pessoa que está a verificar.
+1178	Conta inexistente
+1179	A conta @${q.handle} já não existe.
+1180	Atenção: os códigos não correspondem
+1181	A chave pública indicada pelo servidor para @${q.handle} NÃO é a do dispositivo da pessoa. Ou acabou de refazer as chaves, ou alguém está a tentar intercetar os documentos que lhe são enviados.
+1182	até esclarecerem, pessoalmente, o que aconteceu.
+1183	Verificado
+1184	Não verificado
+1185	Pesquisar
+1186	Não existe nenhuma conta @${h}. Verifique a escrita.
+1187	Esta é a sua conta.
+1188	Quem quiser enviar-lhe documentos encriptados digitaliza este código na sua aplicação (Contactos › Digitalizar). Assim tem a certeza de que a chave é sua.
+1189	Digitalizem o código pessoalmente ou por videochamada. Um código recebido por mensagem de outra pessoa não prova nada.
+1190	Digitalizar outro código
+1191	Ainda sem contactos. Pesquise alguém por @nome ou digitalize o código QR dessa pessoa.
+1192	Digitalizar o código QR de alguém
+1193	Esta conta foi eliminada. Já não lhe pode enviar documentos.
+1194	A chave de encriptação de @${escHtml(c.handle)} mudou.
+1195	Acontece se refez a conta ou as chaves noutro dispositivo sem o código de recuperação. Mas também pode ser uma tentativa de interceção. Até verificarem de novo, não lhe pode enviar documentos.
+1196	Digitalizar o código de novo
+1197	Aceitar a chave nova sem verificação
+1198	${justAdded ? 'Contact adăugat. ' : ''}Ainda não verificou que a chave pertence mesmo a @${escHtml(c.handle)}. Para documentos sensíveis, comparem os códigos pessoalmente.
+1199	Contacto adicionado.
+1200	Código de segurança
+1201	Os mesmos 60 algarismos aparecem no telemóvel dessa pessoa quando abre o seu contacto. Se forem idênticos, ninguém está no meio.
+1202	Verificar por código QR
+1203	Os algarismos são idênticos: marcar como verificado
+1204	Anular a verificação
+1205	Eliminar contacto
+1206	Marque como verificado só se compararam os 60 algarismos pessoalmente ou ao telefone, ouvindo a voz da pessoa.
+1207	Aceitar a chave nova?
+1208	Os documentos enviados a partir de agora só poderão ser abertos com a chave nova. Se não tem a certeza de que @${c.handle} mudou as chaves, pergunte primeiro.
+1209	Aceitar
+1210	Eliminar o contacto?
+1211	Precisa de uma conta
+1212	Os documentos encriptados .acm enviam-se e abrem-se apenas com uma conta ACM Docs. Demora um minuto.
+1213	Confirme a encriptação do documento «${name}»
+1214	As verificações dos contactos foram repostas
+1215	A lista de contactos verificados foi alterada fora da aplicação, por isso a aplicação já não confia nela. Verifique novamente por código QR as pessoas importantes.
+1216	A verificar destinatários…
+1217	Ainda não é possível enviar
+1218	${changed.map((c) => '@' + c.handle).join(', ')}: ${changed.some((c) => c.gone) ? 'contul nu mai există sau ' : ''}a chave de encriptação mudou. Abra o contacto em Contactos e verifique-o novamente.
+1219	a conta já não existe ou
+1220	Destinatários não verificados
+1221	Ainda não verificou ${unverified.map((c) => '@' + c.handle).join(', ')}. O documento será encriptado com a chave indicada pelo servidor; se o servidor estivesse comprometido, alguém poderia substituir a chave. Para documentos sensíveis, digitalizem primeiro os códigos QR.
+1222	A encriptar (com palavra-passe)…
+1223	A encriptar…
+1224	Encriptado para ${who}. Escolha como o enviar.
+1225	Documento encriptado com ACM Docs. Só abre na aplicação ACM Docs, na conta do destinatário.
+1226	Encriptar e enviar
+1227	O destinatário precisa também da palavra-passe, além da conta. Diga-lha por outra via (ao telefone, pessoalmente).
+1228	A chave de encriptação de um destinatário mudou: verifique-o novamente antes de enviar.
+1229	Tem destinatários não verificados. Para documentos sensíveis, digitalizem primeiro os vossos códigos QR.
+1230	Todos os destinatários estão verificados.
+1231	Ainda sem contactos. Pesquise a pessoa por @nome.
+1232	A palavra-passe do documento tem pelo menos 6 carateres.
+1233	Só as pessoas escolhidas poderão abrir o ficheiro .acm, na aplicação ACM Docs. Depois de encriptado, nem você o poderá abrir, por isso guarde o original se precisar dele.
+1234	@${c.handle} foi adicionado.
+1235	Adicionar também uma palavra-passe (opcional)
+1236	Encriptados
+1237	Não é um ficheiro .acm.
+1238	Confirme para abrir «${name}»
+1239	Este documento foi encriptado para outras pessoas, não para a sua conta. Se devia conseguir abri-lo, peça ao remetente que lho envie novamente, para @
+1240	o seu nome
+1241	O ficheiro foi alterado ou danificado pelo caminho. Peça ao remetente que o envie novamente.
+1242	A assinatura do remetente não é válida: o ficheiro foi falsificado. Não o use.
+1243	O ficheiro foi criado com uma versão mais recente da aplicação. Atualize o ACM Docs.
+1244	O documento não pode ser aberto
+1245	Documento enviado
+1246	Enviado para
+1247	Este ficheiro só pode ser aberto pelos destinatários. Nem você, como remetente, o pode desencriptar: aqui fica apenas o registo do envio.
+1248	Enviar novamente o ficheiro encriptado
+1249	Documento encriptado
+1250	Enviado por
+1251	A assinatura do remetente é válida: o documento não foi alterado pelo caminho. Abre-se só para visualização; no dispositivo continua encriptado.
+1252	Adicionar o remetente aos contactos
+1253	@${c.handle} foi adicionado aos contactos (não verificado).
+1254	Documento confidencial: a cópia desencriptada é apagada ao fechar.
+1255	Guardar uma cópia desencriptada?
+1256	A cópia guardada já não está protegida: qualquer pessoa com acesso a este dispositivo a pode ler. Não a reencaminhe, não a carregue na nuvem nem a publique. Se tiver de chegar a outra pessoa, envie-a encriptada.
+1257	Guardar cópia
+1258	Desencriptados
+1259	A cópia foi guardada em «Desencriptados»: ${Host.baseName(out)}
+1260	Você
+1261	@${escHtml(known.handle)} está nos seus contactos, mas ainda não o verificou por código QR.
+1262	O documento está assinado com uma chave diferente da que tem para @${escHtml(s.handle)}. Talvez tenha refeito as chaves, ou alguém se está a fazer passar por essa pessoa. Pergunte-lhe diretamente antes de confiar no documento.
+1263	Não está nos seus contactos. O servidor confirma que a chave é de @${escHtml(p.handle)}, mas não o verificou pessoalmente.
+1264	O remetente diz ser @${escHtml(s.handle)}, mas a chave não corresponde à conta @${escHtml(s.handle)} no servidor.
+1265	O remetente diz ser @${escHtml(s.handle)}, mas esta conta não existe (ou já não existe).
+1266	Não sabemos quem enviou o documento. A assinatura é válida, mas não pertence a nenhum contacto.
+1267	O documento tem palavra-passe
+1268	O remetente definiu também uma palavra-passe. Escreva a palavra-passe que lhe disse.
+1269	O que envia encriptado?
+1270	PDF, Word, Excel, fotos… qualquer ficheiro
+1271	Escolher outro ficheiro…
+1272	Fez uma captura de ecrã de um documento protegido. Apague-a se não precisar dela: as fotos acabam muitas vezes na nuvem.
+1273	Num telemóvel assim, outras aplicações podem ler o que o ACM Docs faz. Não abra documentos sensíveis nele.
+1274	O que o ACM Docs faz para não poder ser espiado:
+1275	Chaves fechadas no telemóvel
+1276	As chaves privadas só abrem com ${ios ? 'Face ID' : Host.mobile ? 'amprenta sau PIN-ul' : 'confirmarea Windows'} e voltam a fechar-se quando sai da aplicação ou após 3 minutos sem atividade.
+1277	Sem capturas de ecrã
+1278	O código de recuperação e os documentos desencriptados ficam ocultos quando o ecrã é gravado ou partilhado, e na lista de aplicações abertas.
+1279	O código de recuperação e os documentos desencriptados não podem ser capturados nem gravados.
+1280	Um documento .acm aberto é apagado do telemóvel ao fechar, a menos que escolha mantê-lo.
+1281	Mesmo que alguém copie agora os ficheiros .acm, não os poderá abrir, nem com um futuro computador quântico.
+1282	Verificação do telemóvel: problema
+1283	Encontrámos sinais de jailbreak/root.
+1284	Não encontrámos sinais de jailbreak nem root.
+1285	O que pode fazer
+1286	Mantenha o telemóvel atualizado. O spyware do tipo Pegasus usa falhas que as atualizações corrigem.
+1287	Ative
+1288	(Lockdown Mode): Definições › Privacidade e segurança › Modo de isolamento. É a proteção mais forte da Apple contra o Pegasus.
+1289	Proteção avançada
+1290	(Android 16+): Definições › Segurança e privacidade › Proteção avançada.
+1291	Reinicie o telemóvel uma vez por dia: muitos programas espiões não sobrevivem a um reinício.
+1292	Não abra links nem ficheiros de desconhecidos e não instale aplicações fora da loja.
+1293	Sinceramente: nenhuma aplicação se consegue defender totalmente de um spyware que tomou conta de todo o telemóvel. As medidas acima reduzem muito o que poderia roubar, e quando.
+1294	O documento foi recebido encriptado. A cópia guardada já não está protegida: qualquer pessoa com acesso a este dispositivo a pode ler. Não a reencaminhe, não a carregue na nuvem nem a publique. Se tiver de chegar a outra pessoa, envie-a encriptada.
+1295	Confirme para iniciar a sincronização encriptada
+1296	Requer uma conta
+1297	Desligada: os dados ficam só neste dispositivo
+1298	O armazenamento na nuvem ainda não está ativo
+1299	Não sincronizado (sem internet?)
+1300	A iniciar…
+1301	Sincronizado
+1302	Nuvem encriptada
+1303	As suas empresas, faturas, clientes, assinaturas, definições, contactos e documentos aparecem iguais em todos os dispositivos da conta.
+1304	${(s.counts && s.counts.files) || 0} documentos e ${(s.counts && s.counts.data) || 0} conjuntos de dados sincronizados.
+1305	Tudo é encriptado no dispositivo antes de sair, com a chave da conta e uma encriptação que resiste também aos computadores quânticos. O servidor guarda só blocos encriptados, sem nomes nem conteúdo legível. Nem o ACM Docs os consegue ler.
+1306	Sincronizar agora
+1307	Eliminar os meus dados da nuvem
+1308	Parar a sincronização?
+1309	Os dados novos deste dispositivo deixam de chegar aos outros. O que já está na nuvem fica lá, encriptado, até o eliminar.
+1310	Parar
+1311	A sincronizar…
+1312	Eliminar os dados da nuvem?
+1313	Todos os dados encriptados da conta são eliminados da nuvem. Os dados deste dispositivo ficam. Os outros dispositivos com a sincronização ativa voltarão a carregar os seus.
+1314	A eliminar…
+1315	Os dados da nuvem foram eliminados.
+1316	Conta ACM Docs
+1317	Esqueceu a palavra-passe?
+1318	Não tem conta?
+1319	Já tem conta?
+1320	Enviar o link
+1321	Reenviar o email
+1322	Email reenviado.
+1323	Ver o código agora
+1324	As chaves foram recuperadas.
+1325	Palavra-passe da conta
+1326	Último passo: a palavra-passe da conta ${u.email}.
+1327	Perfil, código QR, contactos
+1328	Enviar um documento encriptado
+1329	A conta foi desativada.
+1330	Não foi possível reservar @${h}. Talvez alguém o tenha acabado de escolher: escolha outro nome.
+1331	Enviar (WhatsApp, email…)
+1332	Enviar encriptado (.acm)…
+1333	Substituir o original?
+1334	Não foi possível ler a imagem:
+1335	Qualquer atividade, serviços diversos
+1336	Projetos, horas, subscrições
+1337	Catering, eventos, menus
+1338	Este dispositivo foi bloqueado
+1339	Fui eu
+1340	Bloquear «${name}»?
+1341	Só o dispositivo principal pode bloquear o dispositivo principal.
+1342	Ligar o dispositivo novo?
+1343	O dispositivo novo foi ligado.
+1344	Sim, é a minha conta
+1345	Não é a minha
+1346	Não foi possível criar o documento PDF.
+1347	Não foi possível criar o texto.
+1348	Não foi possível escrever o texto.
+1349	Não é possível ler a imagem.
+1350	Não foi possível atualizar a imagem.
+1351	Não foi possível inserir a página.
+1352	Não foi possível escrever a página ${i + 1}.
+1353	Página ${pi + 1} de ${list.length} ·
+1354	Nome da empresa *
+1355	Taxa de IVA (%)
+1356	Rua, n.º
+1357	Série de propostas / orçamentos
+1358	Vazio = automático (empresa · telefone · email)
+1359	Itálico (Ctrl+I)
+1360	Sublinhado (Ctrl+U)
+1361	Imagem (formato não suportado)
+1362	Panorâmico (16:9)
+1363	Padrão (4:3)
+1364	Margens: normais (2,54 cm)
+1365	Margens: largas (3,18 cm)
+1366	Concluído (Ctrl+Enter)
+1367	Não é um código ACM Docs
+1368	Não envie nada sensível
+1369	A chave mudou
+1370	Os algarismos são idênticos?
+1371	Sim, são idênticos
+1372	Enviar mesmo assim
+1373	Enviados encriptados
+1374	Não foi possível encriptar o documento
+1375	Encriptado para ${who}: ${Host.baseName(out)}
+1376	Palavra-passe do documento
+1377	Enviar encriptado
+1378	A abrir o documento encriptado…
+1379	Remetente não confirmado
+1380	Remetente desconhecido
+1381	O telemóvel parece modificado (${ios ? 'jailbreak' : 'root'}).
+1382	Cópias desencriptadas temporárias
+1383	Telemóvel verificado
+1384	Modo de isolamento
+1385	A sincronização começou.
+1386	Escolha o seu idioma
+1387	Pode mudar o idioma quando quiser em Definições.
+1388	Idioma
+1389	Versão ${ver || '2.0.5'} · ${Host.mobile ? (Host.info.platform === 'ios' ? 'iOS' : 'Android') : 'Windows'} · 2026

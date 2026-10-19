@@ -1445,7 +1445,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     // language of the document, right above the preview
     const pvl = el('div', { class: 'chips pv-lang', id: 'pv-lang' });
     for (const [c, n] of [['ro', 'RO'], ['en', 'EN']]) {
-      const b = el('button', { class: 'chip no-tr', type: 'button', text: n, title: c === 'ro' ? 'Factură în română' : 'Factură în engleză' });
+      const b = el('button', { class: 'chip no-tr', type: 'button', text: n, title: I18n.t(c === 'ro' ? 'Factură în română' : 'Factură în engleză') });
       b.dataset.v = c;
       b.addEventListener('click', () => { if (!inv || inv.lang === c) return; inv.lang = c; if (advOpen) buildAdvanced(); else buildForm(); changed(); });
       pvl.append(b);

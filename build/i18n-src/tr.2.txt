@@ -1,0 +1,690 @@
+700	Numaralı liste
+701	Girintiyi azalt
+702	Girintiyi artır
+703	Satır aralığı
+704	Görüntü ekle
+705	Yeni sayfa (sayfa sonu)
+706	Biçimlendirmeyi temizle
+707	Bul ve değiştir (Ctrl+F)
+708	Küçük
+709	Orta
+710	Büyük
+711	Tam genişlik
+712	Ortalanmış
+713	+ Üste satır
+714	+ Alta satır
+715	+ Sola sütun
+716	+ Sağa sütun
+717	− Satır
+718	− Sütun
+719	Kenarlıkları göster / gizle
+720	Tabloyu sil
+721	Bulunamadı
+722	${n} değiştirildi
+723	Belge açılıyor…
+724	Eski Word belgesi (.doc): metin korundu; biçimlendirme eksik olabilir. .docx olarak kaydedilecek.
+725	RTF dosyası: metin korundu. .docx olarak kaydedilecek.
+726	Belge açılamadı
+727	Yeni belge.docx
+728	Belgeyi kaydet
+729	Belge hazırlanamadı
+730	Kenar boşlukları: dar (1,27 cm)
+731	${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} · müşterilerin size borcu ${Invoice.money(s.unpaid)} ${s.currency}
+732	Bu ay ${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} · hepsi ödendi
+733	Her işletme için profesyonel faturalama
+734	İşletmeniz için profesyonel faturalama
+735	Uygulama dili
+736	Fatura dili her belge için ayrı seçilir (Belge dili) veya varsayılan olarak Şirket bilgilerinde.
+737	Bize e-posta gönderin
+738	Adresi kopyala
+739	Adres kopyalandı.
+740	PDF'ler, belgeler, tablolar, sunular ve faturalar tek uygulamada. Verileriniz bu cihazda kalır.
+741	CEO · Genel Müdür, ACM Code SRL
+742	Sorular, sorunlar veya öneriler — e-postayla yanıtlıyoruz
+743	Sürüm ${ver || '2.0.1'} · ${Host.mobile ? 'Android' : 'Windows'} · 2026
+744	Vade (ödeme süresi)
+745	Son tarih ${dateRo(inv.due)}
+746	Ödeme şekli
+747	Belge dili
+748	Daha az seçenek
+749	İndirim ve notlar
+750	Müşteri ödedi mi?
+751	Evet, ödendi
+752	Para zaten alındı
+753	Sonra ödeyecek
+754	Vadeyi seç
+755	Belge dili
+756	Belgedeki metin (İngilizce)
+757	Belgedeki metin (Rumence)
+758	Her belge dilinin kendi metni vardır. Diğerini düzenlemek için formda dili değiştirin (Belge dili).
+759	Faturalanan
+760	Ödenen
+761	Ödenmemiş
+762	Henüz ödenmedi
+763	bunun vadesi geçmiş kısmı
+764	Ay
+765	Tablo olarak göster
+766	Grafiği göster
+767	Aylık gidişat
+768	Her ay ne kadar faturaladığınız ve bunun ne kadarını aldığınız.
+769	En iyi müşteriler ${year}
+770	Bu yıl faturalanan tutara göre.
+771	Faturalanan: ${mName}
+772	${delta >= 0 ? '▲' : '▼'} ${Math.abs(delta)}% (${pName} ile karşılaştırıldığında)
+773	Tahsil edilen: ${mName}
+774	Müşterilerin size borcu
+775	Tüm faturalar ödendi
+776	${money(sumOf(late))} ${cs} vadesi geçmiş
+777	${unpaid.length} ${unpaid.length === 1 ? 'factură neplătită' : 'facturi neplătite'}, henüz vadesi gelmemiş
+778	Ödenmemiş
+779	Vadesi geçmiş
+780	${daysLate(d)} ${daysLate(d) === 1 ? 'zi' : 'zile'} gecikmiş
+781	Ödenmemiş
+782	vade ${dateRo(d.due)}
+783	Ödendi
+784	Müşteri ödedi — ödendi olarak işaretle
+785	Fatura ödendi olarak işaretlendi.
+786	Ödenmedi olarak işaretle
+787	Aylara göre faturalar
+788	fatura
+789	fatura
+790	ödenmiş fatura
+791	ödenmiş fatura
+792	ödenmemiş fatura
+793	ödenmemiş fatura
+794	gün
+795	gün
+796	kalem
+797	kalem
+798	sayfa
+799	sayfa
+800	kelime
+801	kelime
+802	metin satırı düzenlenebilir oldu
+803	metin satırı düzenlenebilir oldu
+804	ödenmemiş
+805	RON
+806	Bu telefonda e-posta uygulaması bulunamadı.
+807	Kamera uygulaması bulunamadı.
+808	Bunun için uygulama bulunamadı.
+809	Bu telefondaki hiçbir uygulama bu dosyayı açamıyor.
+810	Dosya artık mevcut değil.
+811	Telefon yazdırma ekranını açtı: “PDF olarak kaydet”i seçin.
+812	bugün, ${hm}
+813	dün, ${hm}
+814	gönderen
+815	Geliştiren
+816	Son:
+817	ay
+818	vade
+819	KDV dahil
+820	Faturalar, proformalar, teklifler
+821	Faturalar: Belgeler\Facturi · düzenlemeler: orijinalin yanında
+822	Vergi no
+823	vadesi geçmiş
+824	Kayıtlı müşterilerden seç
+825	Kayıtlı müşteriler
+826	Bir müşteri seçin; bilgileri, genellikle nasıl ödediği dahil otomatik dolar.
+827	Ada, vergi no'ya veya telefona göre ara
+828	Müşteri bulunamadı
+829	Henüz kayıtlı müşteri yok
+830	Müşteriler, belge oluşturduğunuzda otomatik kaydedilir.
+831	Müşteriyi sil
+832	“${c.name}” müşterilerden silinsin mi?
+833	Düzenlenen belgeler değişmez.
+834	Bugünkü BNR kuru
+835	BNR kuru
+836	Döviz kuru (1 ${inv.currency} = ? RON)
+837	Bu para birimi BNR kurlarında yok.
+838	BNR kuru alınamadı (interneti kontrol edin). Elle yazabilirsiniz.
+839	PDF oluşturma çok uzun sürüyor. Lütfen tekrar deneyin.
+840	Varsayılanlara dön
+841	Görünüm
+842	Şablonlar
+843	Bir şablon seçin, ardından aşağıda ince ayar yapın (renkler, yazı tipi, yapı). Metinleriniz ve bölüm sırası sizde kalır.
+844	Klasik
+845	Dengeli, herkese uygun
+846	Renkli başlık, belirgin
+847	Sade, şirketler için
+848	Yalnızca gerekenler, ferah
+849	Klasik yazı tipi, sıcak tonlar
+850	Teknik
+851	Net ızgara, çok satır
+852	Ekonomik
+853	En az mürekkebi harcar
+854	Salonlar ve mağazalar için
+855	Fatura dili
+856	Rumence fatura
+857	İngilizce fatura
+858	Her dilin kendi metinleri vardır
+859	Ürün veya hizmet
+860	Başka ürün
+861	Liste gösterilemedi
+862	Fotoğraf → belge
+863	Tara
+864	Sayfayı döndür
+865	Döndür
+866	Sayfa köşelerini ayarla
+867	Mavi köşeleri kâğıdın köşelerine sürükleyin.
+868	Fotoğrafın tamamı
+869	Uygula
+870	PDF'te aranabilir metin
+871	Fotoğraftaki metni okur, böylece arayıp kopyalayabilirsiniz
+872	PDF'i kaydet
+873	Gri
+874	Siyah beyaz
+875	Sayfa
+876	Sayfa
+877	Sayfa ekle
+878	Yeni sayfa
+879	Fotoğraf çek
+880	Telefondan fotoğraf seç
+881	Sayfa hazırlanıyor…
+882	Sayfa temizleniyor…
+883	Döndürülüyor…
+884	Fotoğraf açılıyor…
+885	Sayfa düzleştiriliyor…
+886	Metin okunuyor…
+887	Belge düzenleniyor…
+888	Kâğıdın kenarları bulunamadı. Köşeleri parmağınızla taşıyın.
+889	Kâğıdın kenarları bulunamadı. Ayarlamak için “Kenarlar”a dokunun.
+890	Fotoğraf kullanılamadı
+891	Fotoğraf işlenemedi
+892	Sayfa döndürülemedi
+893	Sayfa silinsin mi?
+894	Seçilen alan çok küçük.
+895	Metin okunamadı; PDF yalnızca görüntülerle kaydedildi.
+896	PDF şuraya kaydedildi:
+897	Fotoğrafta metin bulunamadı. Daha net, daha yakından ve iyi ışıkta çekilmiş bir fotoğraf deneyin.
+898	Belge hazır. Sarıyla işaretlenmiş kelimeleri kontrol edin
+899	Belge hazır ve düzenlenebilir.
+900	Metin okunamadı
+901	Tarama iptal edilsin mi?
+902	Taranan sayfalar kaydedilmedi.
+903	İptal et
+904	Uygulama verileri
+905	Geçici belleği temizle
+906	Önizlemeler ve yazdırma tercihleri. Önemli hiçbir şey silinmez.
+907	Geçici bellek temizlendi.
+908	Tüm uygulama verilerini sil
+909	Şirketler, müşteriler, belge listesi, şablonlar ve ayarlar. Kaydedilmiş dosyalar kalır.
+910	Eski bir sürümünüz vardıysa ve bir şey yanlış görünüyorsa bunu kullanın. Uygulama ilk kurulumdaki gibi başlar.
+911	Tüm uygulama verileri silinsin mi?
+912	Şirketler, müşteriler, düzenlenen belgelerin listesi, şablonlar ve ayarlar silinir. Kaydedilmiş PDF'ler ve faturalar klasörlerinde kalır. Bu işlem geri alınamaz.
+913	Her şeyi sil
+914	Emin misiniz?
+915	Uygulama ilk kurulumdaki gibi başlayacak.
+916	Evet, sil
+917	Silgi
+918	Çizimleri, vurgulamaları, kapatmaları ve onay işaretlerini siler: üzerinden sürükleyin (E)
+919	Burada silinecek bir şey yok. Silgi çizimleri, vurgulamaları ve onay işaretlerini kaldırır.
+920	Galeriden seç (bir veya daha fazla)
+921	PDF metni hazır: arayabilir ve kopyalayabilirsiniz.
+922	Sayfalar hazırlanıyor…
+923	Dosyalar uygulaması › iPhone'umda › ACM Docs
+924	Dosyalar › ACM Docs › Scanări
+925	Belgeler, faturalar ve PDF'ler, korumalı
+926	Parolayı göster
+927	Daha sonra
+928	Giriş yap
+929	Tekrar hoş geldiniz
+930	Şifreli belge göndermek ve almak için ACM Docs hesabınıza giriş yapın.
+931	QR koduyla giriş yap
+932	Cihaz hesaba bağlandı.
+933	Bir tane oluşturun
+934	Ad
+935	Parola (en az 8 karakter)
+936	Parolayı onayla
+937	Hesap oluştur
+938	Yeni hesap
+939	Hesabınız, bu cihazda oluşturulan kuantum sonrası şifreleme anahtarları alır. Başka kimsede yoktur.
+940	Yeni parola belirlemeniz için bir e-posta gönderdik.
+941	Yeni parola
+942	Yeni bir parola seçmeniz için e-postayla bir bağlantı gönderiyoruz.
+943	Onayladım
+944	Onayı henüz göremiyoruz. E-postadaki bağlantıyı açın, sonra tekrar dokunun.
+945	E-postanızı onaylayın
+946	Şu adrese bir bağlantı gönderdik:
+947	Başka hesap kullan
+948	Kullanıcı adı
+949	3–20 karakter: küçük harf, rakam ve _
+950	Kullanıcı adınız artık @${v}.
+951	Kullanıcı adını değiştir
+952	Kullanıcı adınızı seçin
+953	Size şifreli belge gönderenler sizi böyle bulur. E-postanız gizli kalır: kimse sizi onunla arayamaz.
+954	Anahtarlarınız hazırlanıyor
+955	Hesabın kuantum sonrası şifreleme anahtarları bu cihazda oluşturuluyor. Birkaç saniye sürer.
+956	Anahtarlar hazırlanamadı
+957	Tekrar dene
+958	Hesabınız hazır
+959	Şifreleme anahtarları bu cihazda oluşturuldu. Kurtarma kodu (24 kelime) burada, ${bio()} korumasıyla kaydedildi.
+960	İstediğiniz zaman profilinizden not alabilirsiniz (sağ üstteki baş harf düğmesi). Yalnızca bu cihazı kaybederseniz gerekir.
+961	Başla
+962	24 kelime, sırasıyla, boşlukla ayrılmış
+963	Anahtarları kurtar
+964	Hesabınızın başka bir cihazda oluşturulmuş anahtarları zaten var. Buraya da getirmek için kurtarma kodunun 24 kelimesini yazın.
+965	Kurtarma kodunu görmek için ${bio()} ile onaylayın
+966	Kod bu cihazda değil.
+967	Kurtarma kodu
+968	Bu 24 kelimeyi sırasıyla kâğıda yazın ve kâğıdı güvenli bir yerde saklayın. Bunlarla anahtarlarınızı başka bir cihazda kurtarırsınız.
+969	Fotoğrafını çekmeyin ve kimseye göndermeyin. ACM Docs'tan hiç kimse sizden bu kelimeleri istemez.
+970	Güvenli bir yere not aldım
+971	Hesabınız silinsin mi?
+972	Hesabınız, genel anahtar ve bu cihazdaki anahtarlar silinecek. Alınan .acm belgeleri artık açılamaz. Bu işlem geri alınamaz.
+973	Hesabın silinmesini ${bio()} ile onaylayın
+974	Silme iptal edildi.
+975	Parolayla onayla
+976	Hesabı sil
+977	Hesap siliniyor…
+978	Hesap silindi.
+979	Hesap
+980	Giriş yapın veya hesap oluşturun
+981	Şifreli belgeler ve bulut eşitleme için
+982	Onay olmadan belge alamazsınız
+983	Bulut eşitleme
+984	Cihazlar
+985	Bağlı cihazları görün ve yönetin
+986	Uygulama kilidi
+987	Not alındı ✓
+988	Henüz not alınmadı: not alın
+989	Casus yazılım koruması
+990	Uygulamanın yaptıkları ve sizin yapabilecekleriniz
+991	Güvenlik
+992	Şifreleme anahtarları yalnızca cihazlarınızda oluşturulur ve saklanır. Sunucu yalnızca şifreli verileri ve genel anahtarı tutar.
+993	Çıkış yap
+994	Anahtarlar bu cihazda kalır
+995	${bio()} ve parolayla
+996	Bu cihazdan çıkış yapılsın mı?
+997	Tekrar giriş yapana kadar burada şifreli belge gönderemez veya açamazsınız. Anahtarlar ve kişiler cihazda korunarak kalır.
+998	Evet, çıkış yap
+999	Oturumda kal
+1000	Çıkış yapılıyor…
+1001	Hesabım
+1002	Kodum
+1003	Sizi ekleyip doğrulayabilmesi için birine gösterin. Büyütmek için dokunun.
+1004	Kişiler
+1005	@ada göre ara, QR kodları tara
+1006	Kuantum sonrası şifreleme
+1007	Güvenlik, cihazlar ve bulut: Ayarlar'da
+1008	Kurtarma kodunu not alın
+1009	Bu cihazı kaybederseniz gerekir
+1010	Kullanıcı adı en az 3 karakterdir.
+1011	Kullanıcı adı en fazla 20 karakterdir.
+1012	Yalnızca aksansız küçük harf, rakam ve _ kullanın.
+1013	Bu ad ayrılmış. Başka bir tane seçin.
+1014	Bu e-postayla bir hesap zaten var. Giriş yapın veya parolayı sıfırlayın.
+1015	E-posta adresi geçerli değil.
+1016	E-posta veya parola yanlış.
+1017	Parola yanlış.
+1018	Bu e-postayla bir hesap yok.
+1019	Parola çok zayıf: en az 8 karakter kullanın.
+1020	Çok fazla deneme. Birkaç dakika sonra tekrar deneyin.
+1021	İnternet bağlantısı yok.
+1022	Güvenlik nedeniyle tekrar giriş yapıp yeniden deneyin.
+1023	Sunucu isteği reddetti. E-postanızı onaylayıp tekrar deneyin.
+1024	Sunucu yanıt vermiyor. İnternet bağlantınızı kontrol edin.
+1025	Adınızı yazın.
+1026	Parolalar aynı değil. Aynı parolayı iki kez yazın.
+1027	Profili güncellemek için onaylayın
+1028	Kelimeler doğru değil. Sırasını ve yazımını kontrol edin.
+1029	Bu kelimeler başka bir hesaba ait.
+1030	ACM Docs anahtarlarının kilidini aç
+1031	Hesap anahtarları bu cihazda değil.
+1032	Kurtarma kodunu gör
+1033	Hesabın silinmesini onayla
+1034	Şifresi çözülmüş kopya kaydet…
+1035	Şifreli dosyayı gönder
+1036	Alınan ve gönderilen .acm belgeleri. Cihazda şifreli kalırlar ve yalnızca görüntüleme için açılırlar.
+1037	Henüz şifreli belge yok
+1038	Alınan veya gönderilen .acm dosyaları burada görünür. Göndermek için bir dosyanın ⋯ menüsünden “Şifreli gönder”i seçin.
+1039	· düzenlemeler: orijinalin yanında
+1040	Kaydetme başarısız:
+1041	Önce kaydedin
+1042	Belgede kaydedilmemiş değişiklikler var. Kaydediyorum, ardından şifreleyebilirsiniz.
+1043	Bir hata oluştu:
+1044	parmak izi veya ekran kilidi
+1045	${bioName()} veya uygulama parolasıyla kilidi açın.
+1046	Uygulama parolasını yazın.
+1047	${bioName()} ile kilidi açın.
+1048	Uygulama parolası
+1049	Kilidi aç
+1050	Çok fazla deneme. ${Math.ceil((t0.until - Date.now()) / 1000)} saniye bekleyin.
+1051	${bioName()} ile kilidi aç
+1052	Uygulama parolasını unuttum
+1053	ACM Docs kilidini aç
+1054	Parola kurtarılamaz
+1055	${bioName()} ile kilidi açın, ardından parolayı Profil › Güvenlik'ten değiştirin.
+1056	Uygulama parolası yalnızca ACM Docs hesap parolasıyla sıfırlanabilir. Hesap yoksa uygulamayı yeniden yükleyin (yerel veriler kaybolur).
+1057	Uygulama parolasını sıfırla
+1058	${u.email} hesabının parolasıyla onaylayın. Uygulama parolası silinecek ve Profil'den yeniden belirleyebileceksiniz.
+1059	Onayla
+1060	Uygulama parolası silindi.
+1061	Hemen
+1062	1 dakika sonra
+1063	5 dakika sonra
+1064	15 dakika sonra
+1065	İsteğe bağlı. Açılışta ve uygulamaya döndüğünüzde ACM Docs onayınızı ister. Ayar her cihazda ayrıdır.
+1066	${bioName()} ile kilit açma
+1067	Bu cihazda kullanılamıyor
+1068	Açık · değiştirmek veya kapatmak için dokunun
+1069	Kapalı
+1070	Kilitle
+1071	ACM Docs kilit açmayı etkinleştir
+1072	Ne zaman kilitlenir
+1073	Uygulamadan çıkar çıkmaz
+1074	Parolayı değiştir
+1075	Parolayı kapat
+1076	Geçerli parola
+1077	Geçerli uygulama parolasıyla onaylayın.
+1078	Geçerli parola yanlış.
+1079	Uygulama parolası kapatıldı.
+1080	En az 6 karakter. Başka hiçbir yerde kullanmayın.
+1081	Uygulama parolası açık.
+1082	Yeni parola
+1083	Parola
+1084	Parola en az 6 karakterdir.
+1085	Parolalar aynı değil.
+1086	parola
+1087	Plaka
+1088	Kişi sayısı
+1089	Android telefon
+1090	Windows bilgisayar
+1091	Hesap anahtarlarının kilidini aç
+1092	Bu cihazı hesaba eklemek için onaylayın
+1093	Hesabın başka bir cihazı bu cihazı engelledi. Hesap anahtarları buradan silindi. Bir hataysa tekrar giriş yapın: kurtarma koduna veya başka bir cihazdan QR koduna ihtiyacınız olacak.
+1094	Cihaz
+1095	Hesabınızda yeni giriş
+1096	Siz değilseniz cihazı şimdi engelleyin: hesaba erişimini hemen kaybeder ve yeni verileri açamaz.
+1097	Siz değilseniz ana cihazdan engelleyin ve hesap parolasını değiştirin.
+1098	Ben değildim: engelle
+1099	Cihaz hesaba ve buluttaki verilere erişimini hemen kaybeder. Engelleme kalıcıdır: yeniden kullanmak için sıfırdan bağlanması gerekir.
+1100	“${name}” cihazının engellenmesini onaylayın
+1101	Engelleniyor…
+1102	Hesabın cihazlarını görmek için kilidi açın
+1103	Yükleniyor…
+1104	Ana
+1105	Bu
+1106	görüldü
+1107	Eklendi ${when(d.created)} · ${VIA[d.via] || ''}
+1108	Bu ana cihaz: hesabın diğer tüm cihazlarını engelleyebilir.
+1109	Bu cihaz yalnızca aynı düzeydeki cihazları engelleyebilir. Ana cihaz hepsini engelleyebilir.
+1110	Engellenenler
+1111	Yeni cihaz bağla
+1112	Yeni cihaz bağlamak için onaylayın
+1113	Yeni cihazda gösterilen QR kodunu tarayın
+1114	Bu bir giriş kodu değil
+1115	Yeni cihazda “QR koduyla giriş yap”ı seçin ve orada gösterilen kodu tarayın.
+1116	Kontrol ediliyor…
+1117	Kodun süresi doldu. Yeni cihazda yeni bir kod oluşturun.
+1118	Kod eşleşmiyor
+1119	Sunucudan alınan anahtar QR koddaki değil. Devam etmeyin: yeni bir kodla tekrar deneyin.
+1120	Cihaz hesaba tam erişim kazanacak: şifreli belgeler, kişiler ve bulut verileri. Yalnızca size ait cihazları bağlayın.
+1121	Bağla
+1122	Yeni cihazın bağlanmasını onaylayın
+1123	Kurtarma kodu bu cihazda değil.
+1124	Bağlanıyor…
+1125	Kod hazırlanıyor…
+1126	Onay bekleniyor…
+1127	ACM Docs'u hesaba zaten bağlı bir cihazda açın.
+1128	Profil › Cihazlar › Yeni cihaz bağla.
+1129	Face ID / parmak iziyle onaylayın ve bu kodu tarayın.
+1130	Kodun süresi doldu. Kapatıp tekrar deneyin.
+1131	Alınan anahtarlar bu hesaba ait değil.
+1132	@${profile.handle} hesabına giriş yapılsın mı?
+1133	Kod @${profile.handle}${profile.name ? ' (' + profile.name + ')' : ''} hesabı tarafından onaylandı. Yalnızca sizin hesabınızsa devam edin.
+1134	Giriş iptal edildi.
+1135	QR koduyla giriş başarısız oldu
+1136	Yetersiz bellek
+1137	Dosya okunamıyor.
+1138	Dosya geçerli bir PDF değil veya bozuk.
+1139	Yanlış parola.
+1140	Belge desteklenmeyen bir koruma kullanıyor.
+1141	Sayfa bulunamadı veya hata içeriyor.
+1142	PDF açılırken bilinmeyen hata (kod ${code}).
+1143	Belge parola korumalı.
+1144	Sayfa yok.
+1145	Sayfa yüklenemiyor.
+1146	Görüntüleme için yetersiz bellek.
+1147	Yazı tipi kullanılamıyor.
+1148	Görüntü için yetersiz bellek.
+1149	Görüntü eklenemedi.
+1150	Görüntü biçimi desteklenmiyor.
+1151	Belgenin en az bir sayfası olmalı.
+1152	Sayfa taşınamadı.
+1153	Sayfalar eklenemedi.
+1154	PDF kaydedilemedi.
+1155	Dosya yazılamıyor
+1156	Yüklenemedi
+1157	Ürün veya hizmet ekleyin
+1158	Ekle
+1159	Örnek Müşteri Ltd. Şti.
+1160	Yeni belge?
+1161	Sayı:
+1162	Toplam:
+1163	Sayfa${n}
+1164	Boş sayfa
+1165	SUM, AVERAGE, MIN, MAX, COUNT, COUNTA, COUNTIF, SUMIF, IF, IFERROR, AND, OR, NOT, ROUND, ROUNDUP, ROUNDDOWN, INT, ABS, SQRT, POWER, MOD, PRODUCT, CONCATENATE, LEN, UPPER, LOWER, TRIM, LEFT, RIGHT, MID, TODAY, NOW, DATE, YEAR, MONTH, DAY, VLOOKUP. Örnek: =SUM(B2:B10) veya =B2*C2.
+1166	İşlem başarısız:
+1167	Taramalar
+1168	Doğrulamayı kaydetmek için onaylayın
+1169	Hesap profili henüz tamamlanmadı.
+1170	Kişinin QR kodunu onun uygulamasından tarayın (Profil › Kodum)
+1171	Fotoğrafta QR kod bulunamadı. Daha yakından tekrar deneyin.
+1172	QR kodu tara
+1173	Kişinin kodunu kameraya tutun.
+1174	Taranan kod bir ACM Docs hesap kodu değil. Kişi kodunu Profil › Kodum'da bulur.
+1175	Bu sizin kodunuz.
+1176	Başka hesap
+1177	Taranan kod @${q.handle} hesabına ait, doğruladığınız kişiye değil.
+1178	Hesap yok
+1179	@${q.handle} hesabı artık yok.
+1180	Dikkat: kodlar eşleşmiyor
+1181	Sunucunun @${q.handle} için belirttiği genel anahtar, kişinin cihazındaki DEĞİL. Ya anahtarlarını az önce yeniden oluşturdu ya da biri ona gönderilen belgeleri ele geçirmeye çalışıyor.
+1182	ne olduğunu yüz yüze netleştirene kadar.
+1183	Doğrulandı
+1184	Doğrulanmadı
+1185	Ara
+1186	@${h} hesabı yok. Yazımı kontrol edin.
+1187	Bu sizin hesabınız.
+1188	Size şifreli belge göndermek isteyen kişi bu kodu kendi uygulamasından tarar (Kişiler › Tara). Böylece anahtarın size ait olduğundan emin olur.
+1189	Kodu yüz yüze veya görüntülü aramada tarayın. Başka birinden mesajla gelen bir kod hiçbir şey kanıtlamaz.
+1190	Başka bir kod tara
+1191	Henüz kişi yok. Birini @ada göre arayın veya QR kodunu tarayın.
+1192	Birinin QR kodunu tara
+1193	Bu hesap silindi. Artık ona belge gönderemezsiniz.
+1194	@${escHtml(c.handle)} kişisinin şifreleme anahtarı değişti.
+1195	Hesabını veya anahtarlarını kurtarma kodu olmadan başka bir cihazda yeniden oluşturduysa bu olur. Ancak bir ele geçirme girişimi de olabilir. Yeniden doğrulayana kadar ona belge gönderemezsiniz.
+1196	Kodunu tekrar tara
+1197	Yeni anahtarı doğrulamadan kabul et
+1198	${justAdded ? 'Contact adăugat. ' : ''}Anahtarın gerçekten @${escHtml(c.handle)} kişisine ait olduğunu henüz doğrulamadınız. Hassas belgeler için kodlarınızı yüz yüze karşılaştırın.
+1199	Kişi eklendi.
+1200	Güvenlik kodu
+1201	Aynı 60 rakam, sizin kişinizi açtığında onun telefonunda da görünür. Aynıysa arada kimse yoktur.
+1202	QR koduyla doğrula
+1203	Rakamlar aynı: doğrulandı olarak işaretle
+1204	Doğrulamayı kaldır
+1205	Kişiyi sil
+1206	Yalnızca 60 rakamın tamamını yüz yüze veya telefonda, kişinin sesini duyarak karşılaştırdıysanız doğrulandı olarak işaretleyin.
+1207	Yeni anahtar kabul edilsin mi?
+1208	Bundan sonra gönderilen belgeler yalnızca yeni anahtarla açılabilecek. @${c.handle} kişisinin anahtarlarını değiştirdiğinden emin değilseniz önce sorun.
+1209	Kabul et
+1210	Kişi silinsin mi?
+1211	Bir hesaba ihtiyacınız var
+1212	Şifreli .acm belgeleri yalnızca bir ACM Docs hesabıyla gönderilir ve açılır. Bir dakika sürer.
+1213	“${name}” belgesinin şifrelenmesini onaylayın
+1214	Kişi doğrulamaları sıfırlandı
+1215	Doğrulanmış kişiler listesi uygulamanın dışında değiştirildi, bu yüzden uygulama artık ona güvenmiyor. Önemli kişileri QR koduyla yeniden doğrulayın.
+1216	Alıcılar kontrol ediliyor…
+1217	Henüz gönderilemiyor
+1218	${changed.map((c) => '@' + c.handle).join(', ')}: ${changed.some((c) => c.gone) ? 'contul nu mai există sau ' : ''}şifreleme anahtarı değişti. Kişiyi Kişiler'de açın ve yeniden doğrulayın.
+1219	hesap artık yok veya
+1220	Doğrulanmamış alıcılar
+1221	${unverified.map((c) => '@' + c.handle).join(', ')} henüz doğrulanmadı. Belge, sunucunun belirttiği anahtarla şifrelenecek; sunucu ele geçirilirse biri anahtarı değiştirebilir. Hassas belgeler için önce QR kodlarını tarayın.
+1222	Şifreleniyor (parolayla)…
+1223	Şifreleniyor…
+1224	${who} için şifrelendi. Nasıl göndereceğinizi seçin.
+1225	ACM Docs ile şifrelenmiş belge. Yalnızca ACM Docs uygulamasında, alıcının hesabında açılır.
+1226	Şifrele ve gönder
+1227	Alıcının hesabının yanında parolaya da ihtiyacı var. Ona başka bir yolla söyleyin (telefonda, yüz yüze).
+1228	Bir alıcının şifreleme anahtarı değişti: göndermeden önce yeniden doğrulayın.
+1229	Doğrulanmamış alıcılarınız var. Hassas belgeler için önce QR kodlarınızı karşılıklı tarayın.
+1230	Tüm alıcılar doğrulandı.
+1231	Henüz kişi yok. Kişiyi @ada göre arayın.
+1232	Belge parolası en az 6 karakterdir.
+1233	.acm dosyasını yalnızca seçilen kişiler ACM Docs uygulamasında açabilir. Şifrelemeden sonra siz bile açamazsınız; gerekirse orijinali saklayın.
+1234	@${c.handle} eklendi.
+1235	Parola da ekle (isteğe bağlı)
+1236	Şifreli
+1237	Bu bir .acm dosyası değil.
+1238	“${name}” dosyasını açmak için onaylayın
+1239	Bu belge sizin hesabınız için değil, başka kişiler için şifrelendi. Açabilmeniz gerekiyorsa gönderenden tekrar göndermesini isteyin, şu adrese: @
+1240	adınız
+1241	Dosya yolda değiştirilmiş veya bozulmuş. Gönderenden tekrar göndermesini isteyin.
+1242	Gönderenin imzası geçersiz: dosya sahte. Kullanmayın.
+1243	Dosya uygulamanın daha yeni bir sürümüyle oluşturulmuş. ACM Docs'u güncelleyin.
+1244	Belge açılamıyor
+1245	Belge gönderildi
+1246	Gönderildiği kişi
+1247	Bu dosyayı yalnızca alıcıları açabilir. Gönderen olarak siz bile şifresini çözemezsiniz: burada yalnızca gönderim kaydı kalır.
+1248	Şifreli dosyayı tekrar gönder
+1249	Şifreli belge
+1250	Gönderen
+1251	Gönderenin imzası geçerli: belge yolda değiştirilmedi. Yalnızca görüntüleme için açılır; cihazda şifreli kalır.
+1252	Göndereni kişilere ekle
+1253	@${c.handle} kişilere eklendi (doğrulanmadı).
+1254	Gizli belge: şifresi çözülmüş kopya kapatıldığında silinir.
+1255	Şifresi çözülmüş bir kopya kaydedilsin mi?
+1256	Kaydedilen kopya artık korumalı değil: bu cihaza erişimi olan herkes okuyabilir. İletmeyin, buluta yüklemeyin ve paylaşmayın. Başka birine ulaşması gerekiyorsa şifreli gönderin.
+1257	Kopyayı kaydet
+1258	Şifresi çözülmüş
+1259	Kopya “Şifresi çözülmüş” klasörüne kaydedildi: ${Host.baseName(out)}
+1260	Siz
+1261	@${escHtml(known.handle)} kişilerinizde, ancak henüz QR koduyla doğrulamadınız.
+1262	Belge, @${escHtml(s.handle)} için sahip olduğunuzdan farklı bir anahtarla imzalanmış. Belki anahtarlarını yeniden oluşturdu ya da biri onun kılığına giriyor. Belgeye güvenmeden önce doğrudan sorun.
+1263	Kişilerinizde değil. Sunucu anahtarın @${escHtml(p.handle)} kişisine ait olduğunu onaylıyor, ancak onu yüz yüze doğrulamadınız.
+1264	Gönderen @${escHtml(s.handle)} olduğunu söylüyor, ancak anahtarı sunucudaki @${escHtml(s.handle)} hesabıyla eşleşmiyor.
+1265	Gönderen @${escHtml(s.handle)} olduğunu söylüyor, ancak bu hesap (artık) yok.
+1266	Belgeyi kimin gönderdiğini bilmiyoruz. İmza geçerli, ancak hiçbir kişiye ait değil.
+1267	Belgenin parolası var
+1268	Gönderen ayrıca bir parola koydu. Size söylediği parolayı yazın.
+1269	Şifreli ne gönderiyorsunuz?
+1270	PDF, Word, Excel, fotoğraflar… herhangi bir dosya
+1271	Başka dosya seç…
+1272	Korumalı bir belgenin ekran görüntüsünü aldınız. Gerekmiyorsa silin: fotoğraflar sıklıkla buluta gider.
+1273	Böyle bir telefonda diğer uygulamalar ACM Docs'un yaptıklarını okuyabilir. Üzerinde hassas belgeler açmayın.
+1274	ACM Docs'un casusluğa karşı yaptıkları:
+1275	Anahtarlar telefonda kilitli
+1276	Özel anahtarlar yalnızca ${ios ? 'Face ID' : Host.mobile ? 'amprenta sau PIN-ul' : 'confirmarea Windows'} ile açılır ve uygulamadan çıktığınızda veya 3 dakika işlem yapılmadığında kendiliğinden kilitlenir.
+1277	Ekran görüntüsü yok
+1278	Kurtarma kodu ve şifresi çözülmüş belgeler, ekran kaydedilirken veya paylaşılırken ve açık uygulamalar listesinde gizlenir.
+1279	Kurtarma kodu ve şifresi çözülmüş belgeler yakalanamaz veya kaydedilemez.
+1280	Açılan bir .acm belgesi, saklamayı seçmediğiniz sürece kapatıldığında telefondan silinir.
+1281	Biri .acm dosyalarını şimdi kopyalasa bile, gelecekteki bir kuantum bilgisayarla bile açamaz.
+1282	Telefon kontrolü: sorun
+1283	Jailbreak/root izleri bulduk.
+1284	Jailbreak veya root izi bulmadık.
+1285	Sizin yapabilecekleriniz
+1286	Telefonunuzu güncel tutun. Pegasus türü casus yazılımlar, güncellemelerin kapattığı açıkları kullanır.
+1287	Açın:
+1288	(Lockdown Mode): Ayarlar › Gizlilik ve Güvenlik › Kilitleme Modu. Apple'ın Pegasus'a karşı en güçlü korumasıdır.
+1289	Gelişmiş Koruma
+1290	(Android 16+): Ayarlar › Güvenlik ve gizlilik › Gelişmiş Koruma.
+1291	Telefonunuzu günde bir kez yeniden başlatın: birçok casus yazılım yeniden başlatmadan sağ çıkamaz.
+1292	Tanımadığınız kişilerden gelen bağlantıları veya dosyaları açmayın ve mağaza dışından uygulama yüklemeyin.
+1293	Açıkçası: hiçbir uygulama, tüm telefonu ele geçirmiş bir casus yazılıma karşı kendini tamamen koruyamaz. Yukarıdaki önlemler neyi ve ne zaman çalabileceğini büyük ölçüde azaltır.
+1294	Belge şifreli alındı. Kaydedilen kopya artık korumalı değil: bu cihaza erişimi olan herkes okuyabilir. İletmeyin, buluta yüklemeyin ve paylaşmayın. Başka birine ulaşması gerekiyorsa şifreli gönderin.
+1295	Şifreli eşitlemeyi başlatmak için onaylayın
+1296	Hesap gerektirir
+1297	Kapalı: veriler yalnızca bu cihazda kalır
+1298	Bulut depolama henüz etkin değil
+1299	Eşitlenmedi (internet yok mu?)
+1300	Başlatılıyor…
+1301	Eşitlendi
+1302	Şifreli bulut
+1303	Şirketleriniz, faturalarınız, müşterileriniz, imzalarınız, ayarlarınız, kişileriniz ve belgeleriniz hesabın tüm cihazlarında aynı görünür.
+1304	${(s.counts && s.counts.files) || 0} belge ve ${(s.counts && s.counts.data) || 0} veri kümesi eşitlendi.
+1305	Her şey, cihazdan çıkmadan önce hesap anahtarıyla ve kuantum bilgisayarlara da dayanan bir şifrelemeyle cihazda şifrelenir. Sunucu yalnızca adsız ve okunamaz içerikli şifreli blokları tutar. ACM Docs bile bunları okuyamaz.
+1306	Şimdi eşitle
+1307	Verilerimi buluttan sil
+1308	Eşitleme durdurulsun mu?
+1309	Bu cihazdaki yeni veriler artık diğer cihazlara ulaşmayacak. Bulutta zaten olanlar, siz silene kadar orada şifreli kalır.
+1310	Durdur
+1311	Eşitleniyor…
+1312	Veriler buluttan silinsin mi?
+1313	Hesabın tüm şifreli verileri buluttan silinir. Bu cihazdaki veriler kalır. Eşitlemesi açık diğer cihazlar kendi verilerini yeniden yükler.
+1314	Siliniyor…
+1315	Buluttaki veriler silindi.
+1316	ACM Docs hesabı
+1317	Parolanızı mı unuttunuz?
+1318	Hesabınız yok mu?
+1319	Zaten hesabınız var mı?
+1320	Bağlantıyı gönder
+1321	E-postayı tekrar gönder
+1322	E-posta tekrar gönderildi.
+1323	Kodu şimdi gör
+1324	Anahtarlar kurtarıldı.
+1325	Hesap parolası
+1326	Son adım: ${u.email} hesabının parolası.
+1327	Profil, QR kod, kişiler
+1328	Şifreli belge gönder
+1329	Hesap devre dışı bırakıldı.
+1330	@${h} ayrılamadı. Biri az önce almış olabilir: başka bir ad seçin.
+1331	Gönder (WhatsApp, e-posta…)
+1332	Şifreli gönder (.acm)…
+1333	Orijinalin üzerine yazılsın mı?
+1334	Görüntü okunamadı:
+1335	Her türlü faaliyet, çeşitli hizmetler
+1336	Projeler, saatler, abonelikler
+1337	Catering, etkinlikler, menüler
+1338	Bu cihaz engellendi
+1339	Bendim
+1340	“${name}” engellensin mi?
+1341	Ana cihazı yalnızca ana cihaz engelleyebilir.
+1342	Yeni cihaz bağlansın mı?
+1343	Yeni cihaz bağlandı.
+1344	Evet, benim hesabım
+1345	Benim değil
+1346	PDF belgesi oluşturulamadı.
+1347	Metin oluşturulamadı.
+1348	Metin yazılamadı.
+1349	Görüntü okunamıyor.
+1350	Görüntü güncellenemedi.
+1351	Sayfa eklenemedi.
+1352	${i + 1}. sayfa yazılamadı.
+1353	Sayfa ${pi + 1} / ${list.length} ·
+1354	Şirket adı *
+1355	KDV oranı (%)
+1356	Cadde, no.
+1357	Teklif / maliyet tahmini serisi
+1358	Boş = otomatik (şirket · telefon · e-posta)
+1359	İtalik (Ctrl+I)
+1360	Altı çizili (Ctrl+U)
+1361	Görüntü (desteklenmeyen biçim)
+1362	Geniş (16:9)
+1363	Standart (4:3)
+1364	Kenar boşlukları: normal (2,54 cm)
+1365	Kenar boşlukları: geniş (3,18 cm)
+1366	Tamam (Ctrl+Enter)
+1367	Bu bir ACM Docs kodu değil
+1368	Hassas hiçbir şey göndermeyin
+1369	Anahtar değişti
+1370	Rakamlar aynı mı?
+1371	Evet, aynı
+1372	Yine de gönder
+1373	Şifreli gönderilenler
+1374	Belge şifrelenemedi
+1375	${who} için şifrelendi: ${Host.baseName(out)}
+1376	Belge parolası
+1377	Şifreli gönder
+1378	Şifreli belge açılıyor…
+1379	Onaylanmamış gönderen
+1380	Bilinmeyen gönderen
+1381	Telefon değiştirilmiş görünüyor (${ios ? 'jailbreak' : 'root'}).
+1382	Geçici şifresi çözülmüş kopyalar
+1383	Telefon kontrol edildi
+1384	Kilitleme Modu
+1385	Eşitleme başladı.
+1386	Dilinizi seçin
+1387	Dili istediğiniz zaman Ayarlar'dan değiştirebilirsiniz.
+1388	Dil
+1389	Sürüm ${ver || '2.0.5'} · ${Host.mobile ? (Host.info.platform === 'ios' ? 'iOS' : 'Android') : 'Windows'} · 2026

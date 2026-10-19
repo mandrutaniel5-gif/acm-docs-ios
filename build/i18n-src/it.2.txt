@@ -1,0 +1,690 @@
+700	Elenco numerato
+701	Riduci rientro
+702	Aumenta rientro
+703	Interlinea
+704	Inserisci immagine
+705	Nuova pagina (interruzione di pagina)
+706	Cancella formattazione
+707	Trova e sostituisci (Ctrl+F)
+708	Piccola
+709	Media
+710	Grande
+711	Larghezza intera
+712	Al centro
+713	+ Riga sopra
+714	+ Riga sotto
+715	+ Colonna a sinistra
+716	+ Colonna a destra
+717	− Riga
+718	− Colonna
+719	Mostra / nascondi bordi
+720	Elimina tabella
+721	Non trovato
+722	${n} sostituiti
+723	Apertura del documento…
+724	Vecchio documento Word (.doc): il testo è stato mantenuto; la formattazione potrebbe mancare. Verrà salvato come .docx.
+725	File RTF: il testo è stato mantenuto. Verrà salvato come .docx.
+726	Impossibile aprire il documento
+727	Nuovo documento.docx
+728	Salva documento
+729	Impossibile preparare il documento
+730	Margini: stretti (1,27 cm)
+731	${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} · i clienti ti devono ${Invoice.money(s.unpaid)} ${s.currency}
+732	${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} questo mese · tutto pagato
+733	Fatturazione professionale per qualsiasi attività
+734	Fatturazione professionale per la tua azienda
+735	Lingua dell’app
+736	La lingua delle fatture si sceglie a parte per ogni documento (Lingua del documento) o come predefinita nei Dati aziendali.
+737	Scrivici
+738	Copia indirizzo
+739	Indirizzo copiato.
+740	PDF, documenti, fogli di calcolo, presentazioni e fatture in un’unica app. I tuoi dati restano su questo dispositivo.
+741	CEO · Amministratore delegato, ACM Code SRL
+742	Domande, problemi o suggerimenti: rispondiamo via email
+743	Versione ${ver || '2.0.1'} · ${Host.mobile ? 'Android' : 'Windows'} · 2026
+744	Scadenza (termine di pagamento)
+745	Entro il ${dateRo(inv.due)}
+746	Metodo di pagamento
+747	Lingua del documento
+748	Meno opzioni
+749	Sconto e note
+750	Il cliente ha pagato?
+751	Sì, pagato
+752	Soldi già ricevuti
+753	Paga più tardi
+754	Scegli la scadenza
+755	Lingua del documento
+756	Testo sul documento (inglese)
+757	Testo sul documento (rumeno)
+758	Ogni lingua del documento ha il proprio testo. Cambia la lingua nel modulo (Lingua del documento) per modificare l’altro.
+759	Fatturato
+760	Pagato
+761	Non pagato
+762	Non ancora pagato
+763	di cui scaduto
+764	Mese
+765	Mostra come tabella
+766	Mostra grafico
+767	Andamento mensile
+768	Quanto hai fatturato ogni mese e quanto hai già incassato.
+769	Clienti principali ${year}
+770	In base all’importo fatturato quest’anno.
+771	Fatturato a ${mName}
+772	${delta >= 0 ? '▲' : '▼'} ${Math.abs(delta)}% rispetto a ${pName}
+773	Incassato a ${mName}
+774	I clienti ti devono
+775	Tutte le fatture sono pagate
+776	${money(sumOf(late))} ${cs} scaduti
+777	${unpaid.length} ${unpaid.length === 1 ? 'factură neplătită' : 'facturi neplătite'}, non ancora scadute
+778	Non pagate
+779	Scadute
+780	${daysLate(d)} ${daysLate(d) === 1 ? 'zi' : 'zile'} di ritardo
+781	Non pagata
+782	scade il ${dateRo(d.due)}
+783	Pagata
+784	Il cliente ha pagato: segna come pagata
+785	Fattura segnata come pagata.
+786	Segna come non pagata
+787	Fatture per mese
+788	fattura
+789	fatture
+790	fattura pagata
+791	fatture pagate
+792	fattura non pagata
+793	fatture non pagate
+794	giorno
+795	giorni
+796	voce
+797	voci
+798	pagina
+799	pagine
+800	parola
+801	parole
+802	riga di testo è diventata modificabile
+803	righe di testo sono diventate modificabili
+804	non pagate
+805	RON
+806	Nessuna app di posta trovata su questo telefono.
+807	App fotocamera non trovata.
+808	Nessuna app trovata per questo.
+809	Nessuna app di questo telefono può aprire questo file.
+810	Il file non esiste più.
+811	Il telefono ha aperto la schermata di stampa: scegli «Salva come PDF».
+812	oggi, ${hm}
+813	ieri, ${hm}
+814	da
+815	Sviluppato da
+816	Ultima:
+817	mesi
+818	scadenza
+819	IVA incl.
+820	Fatture, proforma, offerte
+821	Fatture: Documenti\Facturi · modifiche: accanto all’originale
+822	P. IVA
+823	scadute
+824	Scegli tra i clienti salvati
+825	Clienti salvati
+826	Scegli un cliente e i suoi dati si compilano da soli, compreso il modo in cui paga di solito.
+827	Cerca per nome, P. IVA o telefono
+828	Nessun cliente trovato
+829	Ancora nessun cliente salvato
+830	I clienti vengono salvati automaticamente quando crei un documento.
+831	Elimina cliente
+832	Eliminare «${c.name}» dai clienti?
+833	I documenti emessi restano invariati.
+834	Cambio BNR di oggi
+835	Cambio BNR
+836	Tasso di cambio (1 ${inv.currency} = ? RON)
+837	Questa valuta non è nei cambi BNR.
+838	Impossibile ottenere il cambio BNR (controlla internet). Puoi inserirlo tu.
+839	La creazione del PDF sta richiedendo troppo tempo. Riprova.
+840	Ripristina predefiniti
+841	Visualizza
+842	Modelli
+843	Scegli un modello e rifiniscilo qui sotto (colori, carattere, struttura). I tuoi testi e l’ordine delle sezioni restano tuoi.
+844	Classico
+845	Equilibrato, adatto a tutti
+846	Intestazione colorata, decisa
+847	Sobrio, per aziende
+848	Solo l’essenziale, arioso
+849	Carattere classico, toni caldi
+850	Tecnico
+851	Griglia chiara, molte righe
+852	Economico
+853	Consuma meno inchiostro
+854	Per saloni e negozi
+855	Lingua della fattura
+856	Fattura in rumeno
+857	Fattura in inglese
+858	Ogni lingua ha i propri testi
+859	Prodotto o servizio
+860	Altro prodotto
+861	Impossibile mostrare l’elenco
+862	Foto → documento
+863	Scansiona
+864	Ruota pagina
+865	Ruota
+866	Regola gli angoli della pagina
+867	Trascina gli angoli blu sugli angoli del foglio.
+868	Foto intera
+869	Applica
+870	Testo ricercabile nel PDF
+871	Legge il testo della foto per poterlo cercare e copiare
+872	Salva PDF
+873	Grigio
+874	Bianco e nero
+875	Pagina
+876	Pagina
+877	Aggiungi una pagina
+878	Nuova pagina
+879	Scatta una foto
+880	Scegli una foto dal telefono
+881	Preparazione della pagina…
+882	Pulizia della pagina…
+883	Rotazione…
+884	Apertura della foto…
+885	Raddrizzamento della pagina…
+886	Lettura del testo…
+887	Impaginazione del documento…
+888	Bordi del foglio non trovati. Sposta gli angoli con il dito.
+889	Bordi del foglio non trovati. Tocca «Bordi» per impostarli.
+890	Impossibile usare la foto
+891	Impossibile elaborare la foto
+892	Impossibile ruotare la pagina
+893	Eliminare la pagina?
+894	L’area selezionata è troppo piccola.
+895	Impossibile leggere il testo; il PDF viene salvato solo con le immagini.
+896	PDF salvato in
+897	Nessun testo trovato nella foto. Prova con una foto più nitida, più vicina e con buona luce.
+898	Il documento è pronto. Controlla le parole evidenziate in giallo
+899	Il documento è pronto e può essere modificato.
+900	Impossibile leggere il testo
+901	Scartare la scansione?
+902	Le pagine scansionate non sono state salvate.
+903	Scarta
+904	Dati dell’app
+905	Svuota la memoria temporanea
+906	Anteprime e preferenze di stampa. Non viene eliminato niente di importante.
+907	Memoria temporanea svuotata.
+908	Elimina tutti i dati dell’app
+909	Aziende, clienti, elenco documenti, modelli e impostazioni. I file salvati restano.
+910	Usalo se avevi una versione precedente e qualcosa non va. L’app riparte come alla prima installazione.
+911	Eliminare tutti i dati dell’app?
+912	Vengono eliminati aziende, clienti, l’elenco dei documenti emessi, modelli e impostazioni. I PDF e le fatture salvati restano nella loro cartella. Operazione irreversibile.
+913	Elimina tutto
+914	Sei sicuro?
+915	L’app ripartirà come alla prima installazione.
+916	Sì, elimina
+917	Gomma
+918	Cancella disegni, evidenziazioni, coperture e spunte: passaci sopra (E)
+919	Qui non c’è niente da cancellare. La gomma rimuove disegni, evidenziazioni e spunte.
+920	Scegli dalla galleria (una o più)
+921	Il testo del PDF è pronto: puoi cercarlo e copiarlo.
+922	Preparazione delle pagine…
+923	App File › Sul mio iPhone › ACM Docs
+924	File › ACM Docs › Scanări
+925	Documenti, fatture e PDF, protetti
+926	Mostra password
+927	Più tardi
+928	Accedi
+929	Bentornato
+930	Accedi al tuo account ACM Docs per inviare e ricevere documenti cifrati.
+931	Accedi con codice QR
+932	Il dispositivo è stato collegato all’account.
+933	Creane uno
+934	Nome
+935	Password (almeno 8 caratteri)
+936	Conferma password
+937	Crea account
+938	Nuovo account
+939	Il tuo account riceve chiavi di cifratura post-quantistica, create su questo dispositivo. Nessun altro le ha.
+940	Ti abbiamo inviato un’email per impostare una nuova password.
+941	Nuova password
+942	Ti inviamo via email un link per scegliere una nuova password.
+943	Ho confermato
+944	Non vediamo ancora la conferma. Apri il link nell’email, poi tocca di nuovo.
+945	Conferma l’email
+946	Abbiamo inviato un link a
+947	Usa un altro account
+948	Nome utente
+949	3–20 caratteri: lettere minuscole, cifre e _
+950	Il tuo nome utente ora è @${v}.
+951	Cambia nome utente
+952	Scegli il tuo nome utente
+953	È così che ti trova chi ti invia documenti cifrati. La tua email resta privata: nessuno può cercarti con essa.
+954	Preparazione delle tue chiavi
+955	Le chiavi di cifratura post-quantistica dell’account vengono create su questo dispositivo. Ci vuole qualche secondo.
+956	Impossibile preparare le chiavi
+957	Riprova
+958	Il tuo account è pronto
+959	Le chiavi di cifratura sono state create su questo dispositivo. Il codice di recupero (24 parole) è salvato qui, protetto da ${bio()}.
+960	Puoi annotarlo quando vuoi dal profilo (il pulsante con l’iniziale, in alto a destra). Ti serve solo se perdi questo dispositivo.
+961	Inizia
+962	le 24 parole, in ordine, separate da spazi
+963	Recupera le chiavi
+964	Il tuo account ha già chiavi, create su un altro dispositivo. Scrivi le 24 parole del codice di recupero per averle anche qui.
+965	Conferma con ${bio()} per vedere il codice di recupero
+966	Il codice non è su questo dispositivo.
+967	Codice di recupero
+968	Scrivi queste 24 parole su carta, in ordine, e conserva il foglio in un luogo sicuro. Con esse recuperi le chiavi su un altro dispositivo.
+969	Non fotografarle e non inviarle a nessuno. Nessuno di ACM Docs ti chiederà mai queste parole.
+970	Le ho annotate in un luogo sicuro
+971	Eliminare il tuo account?
+972	Verranno eliminati l’account, la chiave pubblica e le chiavi su questo dispositivo. I documenti .acm ricevuti non si potranno più aprire. Operazione irreversibile.
+973	Conferma con ${bio()} l’eliminazione dell’account
+974	Eliminazione annullata.
+975	Conferma con la password
+976	Elimina account
+977	Eliminazione dell’account…
+978	L’account è stato eliminato.
+979	Account
+980	Accedi o crea un account
+981	Per documenti cifrati e sincronizzazione cloud
+982	Senza conferma non puoi ricevere documenti
+983	Sincronizzazione cloud
+984	Dispositivi
+985	Vedi e gestisci i dispositivi collegati
+986	Blocco dell’app
+987	Annotato ✓
+988	Non ancora annotato: annotalo
+989	Protezione anti-spyware
+990	Cosa fa l’app e cosa puoi fare tu
+991	Sicurezza
+992	Le chiavi di cifratura vengono create e conservate solo sui tuoi dispositivi. Il server conserva solo dati cifrati e la chiave pubblica.
+993	Esci
+994	Le chiavi restano su questo dispositivo
+995	Con ${bio()} e password
+996	Uscire da questo dispositivo?
+997	Non potrai inviare né aprire documenti cifrati qui finché non accedi di nuovo. Chiavi e contatti restano protetti sul dispositivo.
+998	Sì, esci
+999	Resta connesso
+1000	Uscita…
+1001	Il mio account
+1002	Il mio codice
+1003	Mostralo a qualcuno perché ti aggiunga e ti verifichi. Tocca per ingrandire.
+1004	Contatti
+1005	Cerca per @nome, scansiona codici QR
+1006	Cifratura post-quantistica
+1007	Sicurezza, dispositivi e cloud: in Impostazioni
+1008	Annota il codice di recupero
+1009	Ti serve se perdi questo dispositivo
+1010	Il nome utente ha almeno 3 caratteri.
+1011	Il nome utente ha al massimo 20 caratteri.
+1012	Usa solo lettere minuscole senza accenti, cifre e _.
+1013	Questo nome è riservato. Scegline un altro.
+1014	Esiste già un account con questa email. Accedi o reimposta la password.
+1015	L’indirizzo email non è valido.
+1016	L’email o la password non sono corrette.
+1017	La password non è corretta.
+1018	Non esiste alcun account con questa email.
+1019	La password è troppo debole: usa almeno 8 caratteri.
+1020	Troppi tentativi. Riprova tra qualche minuto.
+1021	Nessuna connessione a internet.
+1022	Per sicurezza, accedi di nuovo e riprova.
+1023	Il server ha rifiutato la richiesta. Conferma l’email e riprova.
+1024	Il server non risponde. Controlla la connessione a internet.
+1025	Scrivi il tuo nome.
+1026	Le password non coincidono. Scrivi la stessa password due volte.
+1027	Conferma per aggiornare il profilo
+1028	Le parole non sono corrette. Controlla ordine e ortografia.
+1029	Queste parole appartengono a un altro account.
+1030	Sblocca le chiavi di ACM Docs
+1031	Le chiavi dell’account non sono su questo dispositivo.
+1032	Vedi codice di recupero
+1033	Conferma l’eliminazione dell’account
+1034	Salva una copia decifrata…
+1035	Invia il file cifrato
+1036	Documenti .acm ricevuti e inviati. Restano cifrati sul dispositivo e si aprono solo in visualizzazione.
+1037	Ancora nessun documento cifrato
+1038	I file .acm ricevuti o inviati compaiono qui. Per inviarne uno, scegli «Invia cifrato» dal menu ⋯ di un file.
+1039	· modifiche: accanto all’originale
+1040	Salvataggio non riuscito:
+1041	Salva prima
+1042	Il documento ha modifiche non salvate. Lo salvo, poi potrai cifrarlo.
+1043	Si è verificato un errore:
+1044	impronta o blocco schermo
+1045	Sblocca con ${bioName()} o con la password dell’app.
+1046	Scrivi la password dell’app.
+1047	Sblocca con ${bioName()}.
+1048	Password dell’app
+1049	Sblocca
+1050	Troppi tentativi. Attendi ${Math.ceil((t0.until - Date.now()) / 1000)} secondi.
+1051	Sblocca con ${bioName()}
+1052	Ho dimenticato la password dell’app
+1053	Sblocca ACM Docs
+1054	La password non può essere recuperata
+1055	Sblocca con ${bioName()}, poi cambia la password in Profilo › Sicurezza.
+1056	La password dell’app si può reimpostare solo con la password dell’account ACM Docs. Senza account, reinstalla l’app (i dati locali andranno persi).
+1057	Reimposta la password dell’app
+1058	Conferma con la password dell’account ${u.email}. La password dell’app verrà rimossa e potrai impostarla di nuovo dal Profilo.
+1059	Conferma
+1060	La password dell’app è stata rimossa.
+1061	Subito
+1062	Dopo 1 minuto
+1063	Dopo 5 minuti
+1064	Dopo 15 minuti
+1065	Facoltativo. All’avvio e quando torni nell’app, ACM Docs chiede la tua conferma. L’impostazione è separata per ogni dispositivo.
+1066	Sblocco con ${bioName()}
+1067	Non disponibile su questo dispositivo
+1068	Attiva · tocca per cambiarla o disattivarla
+1069	Disattivata
+1070	Blocca
+1071	Attiva lo sblocco di ACM Docs
+1072	Quando si blocca
+1073	Appena esci dall’app
+1074	Cambia password
+1075	Disattiva password
+1076	Password attuale
+1077	Conferma con la password attuale dell’app.
+1078	La password attuale non è corretta.
+1079	La password dell’app è stata disattivata.
+1080	Almeno 6 caratteri. Non usarla altrove.
+1081	La password dell’app è attiva.
+1082	Nuova password
+1083	Password
+1084	La password ha almeno 6 caratteri.
+1085	Le password non coincidono.
+1086	password
+1087	Targa
+1088	N. persone
+1089	Telefono Android
+1090	Computer Windows
+1091	Sblocca le chiavi dell’account
+1092	Conferma per aggiungere questo dispositivo all’account
+1093	Un altro dispositivo dell’account ha bloccato questo dispositivo. Le chiavi dell’account sono state cancellate da qui. Se è stato un errore, accedi di nuovo: ti servirà il codice di recupero o un codice QR da un altro dispositivo.
+1094	Dispositivo
+1095	Nuovo accesso al tuo account
+1096	Se non sei stato tu, blocca subito il dispositivo: perde immediatamente l’accesso all’account e non può aprire i nuovi dati.
+1097	Se non sei stato tu, bloccalo dal dispositivo principale e cambia la password dell’account.
+1098	Non sono stato io: blocca
+1099	Il dispositivo perde subito l’accesso all’account e ai dati nel cloud. Il blocco è definitivo: per usarlo di nuovo dovrà essere collegato da zero.
+1100	Conferma il blocco del dispositivo «${name}»
+1101	Blocco in corso…
+1102	Sblocca per vedere i dispositivi dell’account
+1103	Caricamento…
+1104	Principale
+1105	Questo
+1106	visto
+1107	Aggiunto ${when(d.created)} · ${VIA[d.via] || ''}
+1108	Questo è il dispositivo principale: può bloccare qualsiasi altro dispositivo dell’account.
+1109	Questo dispositivo può bloccare solo dispositivi dello stesso livello. Il principale può bloccarli tutti.
+1110	Bloccati
+1111	Collega un nuovo dispositivo
+1112	Conferma per collegare un nuovo dispositivo
+1113	Scansiona il codice QR mostrato sul nuovo dispositivo
+1114	Non è un codice di accesso
+1115	Sul nuovo dispositivo scegli «Accedi con codice QR» e scansiona il codice mostrato lì.
+1116	Verifica…
+1117	Il codice è scaduto. Generane uno nuovo sul nuovo dispositivo.
+1118	Il codice non corrisponde
+1119	La chiave ricevuta dal server non è quella del codice QR. Non continuare: riprova con un nuovo codice.
+1120	Il dispositivo avrà accesso completo all’account: documenti cifrati, contatti e dati nel cloud. Collega solo dispositivi che ti appartengono.
+1121	Collega
+1122	Conferma il collegamento del nuovo dispositivo
+1123	Il codice di recupero non è su questo dispositivo.
+1124	Collegamento…
+1125	Preparazione del codice…
+1126	In attesa di conferma…
+1127	Apri ACM Docs su un dispositivo già collegato all’account.
+1128	Profilo › Dispositivi › Collega un nuovo dispositivo.
+1129	Conferma con Face ID / impronta e scansiona questo codice.
+1130	Il codice è scaduto. Chiudi e riprova.
+1131	Le chiavi ricevute non appartengono a questo account.
+1132	Accedere all’account @${profile.handle}?
+1133	Il codice è stato approvato dall’account @${profile.handle}${profile.name ? ' (' + profile.name + ')' : ''}. Continua solo se è il tuo account.
+1134	Accesso annullato.
+1135	Accesso con codice QR non riuscito
+1136	Memoria insufficiente
+1137	Il file non può essere letto.
+1138	Il file non è un PDF valido o è danneggiato.
+1139	Password errata.
+1140	Il documento usa una protezione non supportata.
+1141	La pagina non è stata trovata o contiene errori.
+1142	Errore sconosciuto nell’apertura del PDF (codice ${code}).
+1143	Il documento è protetto da password.
+1144	La pagina non esiste.
+1145	La pagina non può essere caricata.
+1146	Memoria insufficiente per la visualizzazione.
+1147	Il carattere non può essere usato.
+1148	Memoria insufficiente per l’immagine.
+1149	Impossibile aggiungere l’immagine.
+1150	Il formato dell’immagine non è supportato.
+1151	Il documento deve avere almeno una pagina.
+1152	Spostamento della pagina non riuscito.
+1153	Impossibile aggiungere le pagine.
+1154	Salvataggio del PDF non riuscito.
+1155	Impossibile scrivere il file
+1156	Impossibile caricare
+1157	Aggiungi prodotti o servizi
+1158	Aggiungi
+1159	Cliente Esempio Srl
+1160	Nuovo documento?
+1161	Conteggio:
+1162	Somma:
+1163	Foglio${n}
+1164	Foglio vuoto
+1165	SUM, AVERAGE, MIN, MAX, COUNT, COUNTA, COUNTIF, SUMIF, IF, IFERROR, AND, OR, NOT, ROUND, ROUNDUP, ROUNDDOWN, INT, ABS, SQRT, POWER, MOD, PRODUCT, CONCATENATE, LEN, UPPER, LOWER, TRIM, LEFT, RIGHT, MID, TODAY, NOW, DATE, YEAR, MONTH, DAY, VLOOKUP. Esempio: =SUM(B2:B10) o =B2*C2.
+1166	L’operazione non è riuscita:
+1167	Scansioni
+1168	Conferma per salvare la verifica
+1169	Il profilo dell’account non è ancora completo.
+1170	Scansiona il codice QR della persona dalla sua app (Profilo › Il mio codice)
+1171	Nessun codice QR trovato nella foto. Riprova, più da vicino.
+1172	Scansiona codice QR
+1173	Tieni il codice della persona davanti alla fotocamera.
+1174	Il codice scansionato non è un codice di account ACM Docs. La persona trova il suo codice in Profilo › Il mio codice.
+1175	Questo è il tuo codice.
+1176	Altro account
+1177	Il codice scansionato è di @${q.handle}, non della persona che stai verificando.
+1178	Account inesistente
+1179	L’account @${q.handle} non esiste più.
+1180	Attenzione: i codici non corrispondono
+1181	La chiave pubblica indicata dal server per @${q.handle} NON è quella sul dispositivo della persona. O ha appena rifatto le chiavi, o qualcuno sta cercando di intercettare i documenti inviati a lei.
+1182	finché non chiarite di persona cosa è successo.
+1183	Verificato
+1184	Non verificato
+1185	Cerca
+1186	Non esiste alcun account @${h}. Controlla come è scritto.
+1187	Questo è il tuo account.
+1188	Chi vuole inviarti documenti cifrati scansiona questo codice dalla sua app (Contatti › Scansiona). Così ha la certezza che la chiave è tua.
+1189	Scansionate il codice di persona o in videochiamata. Un codice ricevuto per messaggio da qualcun altro non prova nulla.
+1190	Scansiona un altro codice
+1191	Ancora nessun contatto. Cerca qualcuno per @nome o scansiona il suo codice QR.
+1192	Scansiona il codice QR di qualcuno
+1193	Questo account è stato eliminato. Non puoi più inviargli documenti.
+1194	La chiave di cifratura di @${escHtml(c.handle)} è cambiata.
+1195	Succede se ha rifatto l’account o le chiavi su un altro dispositivo senza codice di recupero. Ma potrebbe anche essere un tentativo di intercettazione. Finché non verificate di nuovo, non puoi inviargli documenti.
+1196	Scansiona di nuovo il suo codice
+1197	Accetta la nuova chiave senza verifica
+1198	${justAdded ? 'Contact adăugat. ' : ''}Non hai ancora verificato che la chiave appartenga davvero a @${escHtml(c.handle)}. Per documenti sensibili, confrontate i codici di persona.
+1199	Contatto aggiunto.
+1200	Codice di sicurezza
+1201	Le stesse 60 cifre compaiono sul suo telefono quando apre il tuo contatto. Se sono identiche, nessuno è nel mezzo.
+1202	Verifica con codice QR
+1203	Le cifre sono identiche: segna come verificato
+1204	Annulla la verifica
+1205	Elimina contatto
+1206	Segna come verificato solo se avete confrontato tutte le 60 cifre di persona o al telefono, sentendo la voce della persona.
+1207	Accettare la nuova chiave?
+1208	I documenti inviati da ora in poi si potranno aprire solo con la nuova chiave. Se non sei sicuro che @${c.handle} abbia cambiato le chiavi, chiediglielo prima.
+1209	Accetta
+1210	Eliminare il contatto?
+1211	Ti serve un account
+1212	I documenti cifrati .acm si inviano e si aprono solo con un account ACM Docs. Ci vuole un minuto.
+1213	Conferma la cifratura del documento «${name}»
+1214	Le verifiche dei contatti sono state reimpostate
+1215	L’elenco dei contatti verificati è stato modificato fuori dall’app, quindi l’app non si fida più. Verifica di nuovo con codice QR le persone importanti.
+1216	Verifica dei destinatari…
+1217	Non è ancora possibile inviare
+1218	${changed.map((c) => '@' + c.handle).join(', ')}: ${changed.some((c) => c.gone) ? 'contul nu mai există sau ' : ''}la chiave di cifratura è cambiata. Apri il contatto in Contatti e verificalo di nuovo.
+1219	l’account non esiste più oppure
+1220	Destinatari non verificati
+1221	Non hai ancora verificato ${unverified.map((c) => '@' + c.handle).join(', ')}. Il documento sarà cifrato con la chiave indicata dal server; se il server fosse compromesso, qualcuno potrebbe sostituire la chiave. Per documenti sensibili, scansionate prima i codici QR.
+1222	Cifratura (con password)…
+1223	Cifratura…
+1224	Cifrato per ${who}. Scegli come inviarlo.
+1225	Documento cifrato con ACM Docs. Si apre solo nell’app ACM Docs, nell’account del destinatario.
+1226	Cifra e invia
+1227	Il destinatario ha bisogno anche della password, oltre al suo account. Comunicagliela in un altro modo (al telefono, di persona).
+1228	La chiave di un destinatario è cambiata: verificalo di nuovo prima di inviare.
+1229	Hai destinatari non verificati. Per documenti sensibili, scansionate prima i vostri codici QR.
+1230	Tutti i destinatari sono verificati.
+1231	Ancora nessun contatto. Cerca la persona per @nome.
+1232	La password del documento ha almeno 6 caratteri.
+1233	Solo le persone scelte potranno aprire il file .acm, nell’app ACM Docs. Dopo la cifratura nemmeno tu potrai aprirlo, quindi conserva l’originale se ti serve.
+1234	@${c.handle} è stato aggiunto.
+1235	Aggiungi anche una password (facoltativa)
+1236	Cifrati
+1237	Non è un file .acm.
+1238	Conferma per aprire «${name}»
+1239	Questo documento è stato cifrato per altre persone, non per il tuo account. Se dovresti poterlo aprire, chiedi al mittente di inviartelo di nuovo, a @
+1240	il tuo nome
+1241	Il file è stato modificato o danneggiato durante il percorso. Chiedi al mittente di inviarlo di nuovo.
+1242	La firma del mittente non è valida: il file è stato falsificato. Non usarlo.
+1243	Il file è stato creato con una versione più recente dell’app. Aggiorna ACM Docs.
+1244	Il documento non può essere aperto
+1245	Documento inviato
+1246	Inviato a
+1247	Questo file può essere aperto solo dai destinatari. Nemmeno tu, come mittente, puoi decifrarlo: qui resta solo la traccia dell’invio.
+1248	Invia di nuovo il file cifrato
+1249	Documento cifrato
+1250	Inviato da
+1251	La firma del mittente è valida: il documento non è stato modificato durante il percorso. Si apre solo in visualizzazione; sul dispositivo resta cifrato.
+1252	Aggiungi il mittente ai contatti
+1253	@${c.handle} è stato aggiunto ai contatti (non verificato).
+1254	Documento riservato: la copia decifrata viene eliminata alla chiusura.
+1255	Salvare una copia decifrata?
+1256	La copia salvata non è più protetta: chiunque abbia accesso a questo dispositivo può leggerla. Non inoltrarla, non caricarla nel cloud e non pubblicarla. Se deve arrivare a qualcun altro, inviala cifrata.
+1257	Salva copia
+1258	Decifrati
+1259	La copia è stata salvata in «Decifrati»: ${Host.baseName(out)}
+1260	Tu
+1261	@${escHtml(known.handle)} è nei tuoi contatti, ma non l’hai ancora verificato con codice QR.
+1262	Il documento è firmato con una chiave diversa da quella che hai per @${escHtml(s.handle)}. Forse ha rifatto le chiavi, oppure qualcuno si spaccia per lui. Chiediglielo direttamente prima di fidarti del documento.
+1263	Non è nei tuoi contatti. Il server conferma che la chiave è di @${escHtml(p.handle)}, ma non l’hai verificato di persona.
+1264	Il mittente dice di essere @${escHtml(s.handle)}, ma la sua chiave non corrisponde all’account @${escHtml(s.handle)} sul server.
+1265	Il mittente dice di essere @${escHtml(s.handle)}, ma questo account non esiste (più).
+1266	Non sappiamo chi ha inviato il documento. La firma è valida, ma non appartiene a nessun contatto.
+1267	Il documento ha una password
+1268	Il mittente ha impostato anche una password. Scrivi la password che ti ha detto.
+1269	Cosa invii cifrato?
+1270	PDF, Word, Excel, foto… qualsiasi file
+1271	Scegli un altro file…
+1272	Hai fatto uno screenshot di un documento protetto. Eliminalo se non ti serve: le foto finiscono spesso nel cloud.
+1273	Su un telefono così, altre app possono leggere ciò che fa ACM Docs. Non aprirci documenti sensibili.
+1274	Cosa fa ACM Docs per non essere spiato:
+1275	Chiavi chiuse nel telefono
+1276	Le chiavi private si aprono solo con ${ios ? 'Face ID' : Host.mobile ? 'amprenta sau PIN-ul' : 'confirmarea Windows'} e si richiudono da sole quando esci dall’app o dopo 3 minuti di inattività.
+1277	Niente screenshot
+1278	Il codice di recupero e i documenti decifrati vengono nascosti quando lo schermo è registrato o condiviso, e nell’elenco delle app aperte.
+1279	Il codice di recupero e i documenti decifrati non possono essere catturati o registrati.
+1280	Un documento .acm aperto viene eliminato dal telefono alla chiusura, a meno che tu non scelga di tenerlo.
+1281	Anche se qualcuno copia ora i file .acm, non potrà aprirli, nemmeno con un futuro computer quantistico.
+1282	Verifica del telefono: problema
+1283	Abbiamo trovato segni di jailbreak/root.
+1284	Nessun segno di jailbreak o root.
+1285	Cosa puoi fare tu
+1286	Tieni il telefono aggiornato. Gli spyware come Pegasus sfruttano falle che gli aggiornamenti chiudono.
+1287	Attiva
+1288	(Lockdown Mode): Impostazioni › Privacy e sicurezza › Modalità isolamento. È la protezione più forte di Apple contro Pegasus.
+1289	Protezione avanzata
+1290	(Android 16+): Impostazioni › Sicurezza e privacy › Protezione avanzata.
+1291	Riavvia il telefono una volta al giorno: molti programmi spia non sopravvivono a un riavvio.
+1292	Non aprire link o file di sconosciuti e non installare app fuori dallo store.
+1293	Sinceramente: nessuna app può difendersi del tutto da uno spyware che ha preso il controllo dell’intero telefono. Le misure qui sopra riducono molto ciò che potrebbe rubare, e quando.
+1294	Il documento è stato ricevuto cifrato. La copia salvata non è più protetta: chiunque abbia accesso a questo dispositivo può leggerla. Non inoltrarla, non caricarla nel cloud e non pubblicarla. Se deve arrivare a qualcun altro, inviala cifrata.
+1295	Conferma per avviare la sincronizzazione cifrata
+1296	Richiede un account
+1297	Disattivata: i dati restano solo su questo dispositivo
+1298	L’archiviazione cloud non è ancora attiva
+1299	Non sincronizzato (niente internet?)
+1300	Avvio…
+1301	Sincronizzato
+1302	Cloud cifrato
+1303	Le tue aziende, fatture, clienti, firme, impostazioni, contatti e documenti sono uguali su tutti i dispositivi dell’account.
+1304	${(s.counts && s.counts.files) || 0} documenti e ${(s.counts && s.counts.data) || 0} insiemi di dati sincronizzati.
+1305	Tutto viene cifrato sul dispositivo prima di partire, con la chiave dell’account e una cifratura che resiste anche ai computer quantistici. Il server conserva solo blocchi cifrati, senza nomi né contenuto leggibile. Nemmeno ACM Docs può leggerli.
+1306	Sincronizza ora
+1307	Elimina i miei dati dal cloud
+1308	Interrompere la sincronizzazione?
+1309	I nuovi dati di questo dispositivo non arriveranno più agli altri. Ciò che è già nel cloud resta lì, cifrato, finché non lo elimini.
+1310	Interrompi
+1311	Sincronizzazione…
+1312	Eliminare i dati dal cloud?
+1313	Tutti i dati cifrati dell’account vengono eliminati dal cloud. I dati su questo dispositivo restano. Gli altri dispositivi con la sincronizzazione attiva ricaricheranno i loro.
+1314	Eliminazione…
+1315	I dati nel cloud sono stati eliminati.
+1316	Account ACM Docs
+1317	Password dimenticata?
+1318	Non hai un account?
+1319	Hai già un account?
+1320	Invia il link
+1321	Invia di nuovo l’email
+1322	Email inviata di nuovo.
+1323	Vedi il codice ora
+1324	Le chiavi sono state recuperate.
+1325	Password dell’account
+1326	Ultimo passo: la password dell’account ${u.email}.
+1327	Profilo, codice QR, contatti
+1328	Invia un documento cifrato
+1329	L’account è stato disattivato.
+1330	Impossibile riservare @${h}. Forse qualcuno l’ha appena preso: scegli un altro nome.
+1331	Invia (WhatsApp, email…)
+1332	Invia cifrato (.acm)…
+1333	Sovrascrivere l’originale?
+1334	Impossibile leggere l’immagine:
+1335	Qualsiasi attività, servizi vari
+1336	Progetti, ore, abbonamenti
+1337	Catering, eventi, menu
+1338	Questo dispositivo è stato bloccato
+1339	Sono stato io
+1340	Bloccare «${name}»?
+1341	Solo il dispositivo principale può bloccare il dispositivo principale.
+1342	Collegare il nuovo dispositivo?
+1343	Il nuovo dispositivo è stato collegato.
+1344	Sì, è il mio account
+1345	Non è mio
+1346	Impossibile creare il documento PDF.
+1347	Impossibile creare il testo.
+1348	Impossibile scrivere il testo.
+1349	Impossibile leggere l’immagine.
+1350	Impossibile aggiornare l’immagine.
+1351	Impossibile inserire la pagina.
+1352	Impossibile scrivere la pagina ${i + 1}.
+1353	Pagina ${pi + 1} di ${list.length} ·
+1354	Ragione sociale *
+1355	Aliquota IVA (%)
+1356	Via, n.
+1357	Serie offerte / preventivi
+1358	Vuoto = automatico (azienda · telefono · email)
+1359	Corsivo (Ctrl+I)
+1360	Sottolineato (Ctrl+U)
+1361	Immagine (formato non supportato)
+1362	Panoramico (16:9)
+1363	Standard (4:3)
+1364	Margini: normali (2,54 cm)
+1365	Margini: larghi (3,18 cm)
+1366	Fatto (Ctrl+Invio)
+1367	Non è un codice ACM Docs
+1368	Non inviare nulla di sensibile
+1369	La chiave è cambiata
+1370	Le cifre sono identiche?
+1371	Sì, sono identiche
+1372	Invia comunque
+1373	Inviati cifrati
+1374	Impossibile cifrare il documento
+1375	Cifrato per ${who}: ${Host.baseName(out)}
+1376	Password del documento
+1377	Invia cifrato
+1378	Apertura del documento cifrato…
+1379	Mittente non confermato
+1380	Mittente sconosciuto
+1381	Il telefono sembra modificato (${ios ? 'jailbreak' : 'root'}).
+1382	Copie decifrate temporanee
+1383	Telefono verificato
+1384	Modalità isolamento
+1385	La sincronizzazione è iniziata.
+1386	Scegli la tua lingua
+1387	Puoi cambiare la lingua quando vuoi in Impostazioni.
+1388	Lingua
+1389	Versione ${ver || '2.0.5'} · ${Host.mobile ? (Host.info.platform === 'ios' ? 'iOS' : 'Android') : 'Windows'} · 2026

@@ -12,9 +12,7 @@ const I18n = (() => {
     ['es', 'Español', 'es-ES'], ['it', 'Italiano', 'it-IT'], ['pt', 'Português', 'pt-PT'], ['hu', 'Magyar', 'hu-HU'],
     ['pl', 'Polski', 'pl-PL'], ['uk', 'Українська', 'uk-UA'], ['ru', 'Русский', 'ru-RU'], ['tr', 'Türkçe', 'tr-TR'],
     ['ar', 'العربية', 'ar', true], ['hi', 'हिन्दी', 'hi-IN'], ['zh', '中文（简体）', 'zh-CN'], ['ja', '日本語', 'ja-JP'], ['ko', '한국어', 'ko-KR'],
-  ].map(([code, name, locale, rtl]) => ({ code, name, locale, rtl: !!rtl }))
-    // languages whose dictionary is finished (the others are added as they are translated)
-    .filter((x) => ['ro', 'en'].includes(x.code));
+  ].map(([code, name, locale, rtl]) => ({ code, name, locale, rtl: !!rtl }));
   const known = (l) => LANGS.some((x) => x.code === l);
   let saved = null;
   try { saved = localStorage.getItem(KEY); } catch (e) {}
@@ -60,7 +58,9 @@ const I18n = (() => {
   function word(s) {
     const t = s.trim();
     if (!t) return s;
-    const e = exact.get(t) || lower.get(t.toLowerCase());
+    const ex = exact.get(t);
+    if (ex) return ex; // exact match: the dictionary already has the right case (German nouns stay capitalised)
+    const e = lower.get(t.toLowerCase());
     if (!e) return s;
     if (t === t.toLowerCase() && t !== t.toUpperCase()) return e.toLocaleLowerCase(locale());
     return e;

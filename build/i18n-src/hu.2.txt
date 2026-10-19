@@ -1,0 +1,690 @@
+700	Számozott lista
+701	Behúzás csökkentése
+702	Behúzás növelése
+703	Sorköz
+704	Kép beszúrása
+705	Új oldal (oldaltörés)
+706	Formázás törlése
+707	Keresés és csere (Ctrl+F)
+708	Kicsi
+709	Közepes
+710	Nagy
+711	Teljes szélesség
+712	Középre
+713	+ Sor fölé
+714	+ Sor alá
+715	+ Oszlop balra
+716	+ Oszlop jobbra
+717	− Sor
+718	− Oszlop
+719	Szegélyek megjelenítése / elrejtése
+720	Táblázat törlése
+721	Nem található
+722	${n} csere
+723	Dokumentum megnyitása…
+724	Régi Word-dokumentum (.doc): a szöveg megmaradt, a formázás hiányozhat. .docx formátumban mentődik.
+725	RTF-fájl: a szöveg megmaradt. .docx formátumban mentődik.
+726	A dokumentum nem nyitható meg
+727	Új dokumentum.docx
+728	Dokumentum mentése
+729	A dokumentum nem készíthető elő
+730	Margók: keskeny (1,27 cm)
+731	${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} · az ügyfelek tartoznak neked ${Invoice.money(s.unpaid)} ${s.currency}
+732	${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} ebben a hónapban · minden kifizetve
+733	Professzionális számlázás bármilyen vállalkozásnak
+734	Professzionális számlázás a cégednek
+735	Az alkalmazás nyelve
+736	A számlák nyelvét minden dokumentumnál külön választod (Dokumentum nyelve), vagy alapértelmezésként a Cégadatokban.
+737	Írj nekünk
+738	Cím másolása
+739	Cím másolva.
+740	PDF-ek, dokumentumok, táblázatok, bemutatók és számlák egy alkalmazásban. Az adataid ezen az eszközön maradnak.
+741	CEO · Ügyvezető igazgató, ACM Code SRL
+742	Kérdések, problémák vagy javaslatok – e-mailben válaszolunk
+743	Verzió ${ver || '2.0.1'} · ${Host.mobile ? 'Android' : 'Windows'} · 2026
+744	Határidő (fizetési határidő)
+745	Eddig: ${dateRo(inv.due)}
+746	Fizetési mód
+747	Dokumentum nyelve
+748	Kevesebb beállítás
+749	Kedvezmény és megjegyzések
+750	Fizetett az ügyfél?
+751	Igen, fizetett
+752	A pénz már megérkezett
+753	Később fizet
+754	Határidő kiválasztása
+755	Dokumentum nyelve
+756	Szöveg a dokumentumon (angol)
+757	Szöveg a dokumentumon (román)
+758	Minden dokumentumnyelvnek saját szövege van. Változtasd meg a nyelvet az űrlapon (Dokumentum nyelve) a másik szerkesztéséhez.
+759	Kiszámlázva
+760	Fizetve
+761	Kifizetetlen
+762	Még nincs kifizetve
+763	ebből lejárt
+764	Hónap
+765	Megjelenítés táblázatként
+766	Diagram megjelenítése
+767	Havi alakulás
+768	Mennyit számláztál havonta, és abból mennyi folyt már be.
+769	Legnagyobb ügyfelek ${year}
+770	Az idei kiszámlázott összeg alapján.
+771	Kiszámlázva: ${mName}
+772	${delta >= 0 ? '▲' : '▼'} ${Math.abs(delta)}% a(z) ${pName} hónaphoz képest
+773	Befolyt: ${mName}
+774	Az ügyfelek tartoznak neked
+775	Minden számla ki van fizetve
+776	${money(sumOf(late))} ${cs} lejárt
+777	${unpaid.length} ${unpaid.length === 1 ? 'factură neplătită' : 'facturi neplătite'}, még nem járt le
+778	Kifizetetlen
+779	Lejárt
+780	${daysLate(d)} ${daysLate(d) === 1 ? 'zi' : 'zile'} késés
+781	Kifizetetlen
+782	esedékes: ${dateRo(d.due)}
+783	Fizetve
+784	Az ügyfél fizetett – megjelölés fizetettként
+785	A számla fizetettként megjelölve.
+786	Megjelölés kifizetetlenként
+787	Számlák havonta
+788	számla
+789	számla
+790	fizetett számla
+791	fizetett számla
+792	kifizetetlen számla
+793	kifizetetlen számla
+794	nap
+795	nap
+796	tétel
+797	tétel
+798	oldal
+799	oldal
+800	szó
+801	szó
+802	szövegsor vált szerkeszthetővé
+803	szövegsor vált szerkeszthetővé
+804	kifizetetlen
+805	RON
+806	Ezen a telefonon nincs levelezőalkalmazás.
+807	A kamera alkalmazás nem található.
+808	Nincs ehhez alkalmazás.
+809	A telefonon egyetlen alkalmazás sem tudja megnyitni ezt a fájlt.
+810	A fájl már nem létezik.
+811	A telefon megnyitotta a nyomtatási képernyőt: válaszd a „Mentés PDF-ként” lehetőséget.
+812	ma, ${hm}
+813	tegnap, ${hm}
+814	tőle:
+815	Fejlesztette:
+816	Utolsó:
+817	hónap
+818	esedékes
+819	áfával
+820	Számlák, díjbekérők, árajánlatok
+821	Számlák: Dokumentumok\Facturi · szerkesztések: az eredeti mellett
+822	Adószám
+823	lejárt
+824	Választás a mentett ügyfelek közül
+825	Mentett ügyfelek
+826	Válassz ügyfelet, és az adatai automatikusan kitöltődnek, a szokásos fizetési módjával együtt.
+827	Keresés név, adószám vagy telefon szerint
+828	Nincs ilyen ügyfél
+829	Még nincsenek mentett ügyfelek
+830	Az ügyfelek automatikusan mentődnek, amikor dokumentumot hozol létre.
+831	Ügyfél törlése
+832	Törlöd „${c.name}” ügyfelet?
+833	A kiállított dokumentumok nem változnak.
+834	Mai BNR-árfolyam
+835	BNR-árfolyam
+836	Árfolyam (1 ${inv.currency} = ? RON)
+837	Ez a pénznem nem szerepel a BNR-árfolyamok között.
+838	Nem sikerült lekérni a BNR-árfolyamot (ellenőrizd az internetet). Beírhatod kézzel.
+839	A PDF elkészítése túl sokáig tart. Próbáld újra.
+840	Alapértékek visszaállítása
+841	Nézet
+842	Sablonok
+843	Válassz sablont, majd finomhangold lent (színek, betűtípus, szerkezet). A szövegeid és a szakaszok sorrendje megmarad.
+844	Klasszikus
+845	Kiegyensúlyozott, mindenkinek
+846	Színes fejléc, hangsúlyos
+847	Visszafogott, cégeknek
+848	Csak a lényeg, levegős
+849	Klasszikus betűtípus, meleg tónusok
+850	Technikai
+851	Áttekinthető rács, sok sor
+852	Takarékos
+853	A legkevesebb tintát fogyasztja
+854	Szalonoknak és üzleteknek
+855	A számla nyelve
+856	Számla románul
+857	Számla angolul
+858	Minden nyelvnek saját szövegei vannak
+859	Termék vagy szolgáltatás
+860	Másik termék
+861	A lista nem jeleníthető meg
+862	Fotó → dokumentum
+863	Beolvasás
+864	Oldal forgatása
+865	Forgatás
+866	Az oldal sarkainak igazítása
+867	Húzd a kék sarkokat a lap sarkaira.
+868	Teljes fotó
+869	Alkalmaz
+870	Kereshető szöveg a PDF-ben
+871	Beolvassa a fotó szövegét, hogy kereshesd és másolhasd
+872	PDF mentése
+873	Szürke
+874	Fekete-fehér
+875	Oldal
+876	Oldal
+877	Oldal hozzáadása
+878	Új oldal
+879	Fotó készítése
+880	Fotó választása a telefonról
+881	Az oldal előkészítése…
+882	Az oldal tisztítása…
+883	Forgatás…
+884	A fotó megnyitása…
+885	Az oldal kiegyenesítése…
+886	A szöveg olvasása…
+887	A dokumentum tördelése…
+888	Nem találhatók a lap szélei. Mozgasd a sarkokat az ujjaddal.
+889	Nem találhatók a lap szélei. Koppints a „Szélek” gombra a beállításhoz.
+890	A fotó nem használható
+891	A fotó nem dolgozható fel
+892	Az oldal nem forgatható el
+893	Törlöd az oldalt?
+894	A kijelölt terület túl kicsi.
+895	A szöveg nem olvasható; a PDF csak a képekkel mentődik.
+896	PDF mentve ide:
+897	A fotón nem található szöveg. Próbálj élesebb fotót, közelebbről és jó fényben.
+898	A dokumentum kész. Ellenőrizd a sárgával jelölt szavakat
+899	A dokumentum kész és szerkeszthető.
+900	A szöveg nem olvasható
+901	Elveted a beolvasást?
+902	A beolvasott oldalak nincsenek mentve.
+903	Elvetés
+904	Alkalmazásadatok
+905	Ideiglenes memória ürítése
+906	Előnézetek és nyomtatási beállítások. Semmi fontos nem törlődik.
+907	Ideiglenes memória kiürítve.
+908	Az összes alkalmazásadat törlése
+909	Cégek, ügyfelek, dokumentumlista, sablonok és beállítások. A mentett fájlok megmaradnak.
+910	Akkor használd, ha régebbi verziód volt, és valami hibásnak tűnik. Az alkalmazás úgy indul, mint az első telepítéskor.
+911	Törlöd az összes alkalmazásadatot?
+912	Törlődnek a cégek, az ügyfelek, a kiállított dokumentumok listája, a sablonok és a beállítások. A mentett PDF-ek és számlák a mappájukban maradnak. Nem vonható vissza.
+913	Minden törlése
+914	Biztos vagy benne?
+915	Az alkalmazás úgy indul, mint az első telepítéskor.
+916	Igen, törlés
+917	Radír
+918	Rajzokat, kiemeléseket, letakarásokat és pipákat töröl: húzd át rajtuk (E)
+919	Itt nincs mit radírozni. A radír a rajzokat, kiemeléseket és pipákat távolítja el.
+920	Választás a galériából (egy vagy több)
+921	A PDF szövege kész: kereshetsz benne és másolhatod.
+922	Az oldalak előkészítése…
+923	Fájlok app › Saját iPhone-on › ACM Docs
+924	Fájlok › ACM Docs › Scanări
+925	Dokumentumok, számlák és PDF-ek, védve
+926	Jelszó megjelenítése
+927	Később
+928	Bejelentkezés
+929	Üdv újra
+930	Jelentkezz be az ACM Docs-fiókodba titkosított dokumentumok küldéséhez és fogadásához.
+931	Bejelentkezés QR-kóddal
+932	Az eszköz csatlakozott a fiókhoz.
+933	Hozz létre egyet
+934	Név
+935	Jelszó (legalább 8 karakter)
+936	Jelszó megerősítése
+937	Fiók létrehozása
+938	Új fiók
+939	A fiókod kvantumbiztos titkosítási kulcsokat kap, amelyek ezen az eszközön jönnek létre. Senki másnak nincsenek meg.
+940	E-mailt küldtünk az új jelszó beállításához.
+941	Új jelszó
+942	E-mailben küldünk egy linket, amellyel új jelszót választhatsz.
+943	Megerősítettem
+944	Még nem látjuk a megerősítést. Nyisd meg az e-mailben kapott linket, majd koppints újra.
+945	Erősítsd meg az e-mail-címed
+946	Linket küldtünk ide:
+947	Másik fiók használata
+948	Felhasználónév
+949	3–20 karakter: kisbetűk, számjegyek és _
+950	A felhasználóneved mostantól @${v}.
+951	Felhasználónév módosítása
+952	Válassz felhasználónevet
+953	Így találnak meg azok, akik titkosított dokumentumokat küldenek neked. Az e-mail-címed privát marad: senki sem kereshet rád vele.
+954	A kulcsaid előkészítése
+955	A fiók kvantumbiztos titkosítási kulcsai most jönnek létre ezen az eszközön. Néhány másodperc.
+956	Nem sikerült előkészíteni a kulcsokat
+957	Újrapróbálás
+958	A fiókod kész
+959	A titkosítási kulcsok létrejöttek ezen az eszközön. A helyreállítási kód (24 szó) itt van mentve, ${bio()} védelmével.
+960	Bármikor felírhatod a profilodból (a kezdőbetűs gomb jobb felül). Csak akkor kell, ha elveszíted ezt az eszközt.
+961	Kezdés
+962	a 24 szó, sorrendben, szóközzel elválasztva
+963	Kulcsok helyreállítása
+964	A fiókodnak már vannak kulcsai, egy másik eszközön létrehozva. Írd be a helyreállítási kód 24 szavát, hogy ide is áthozd őket.
+965	Erősítsd meg ezzel: ${bio()}, hogy lásd a helyreállítási kódot
+966	A kód nincs ezen az eszközön.
+967	Helyreállítási kód
+968	Írd fel ezt a 24 szót papírra, sorrendben, és tartsd biztonságos helyen. Ezekkel állíthatod helyre a kulcsaidat egy másik eszközön.
+969	Ne fényképezd le és ne küldd el senkinek. Az ACM Docs részéről soha senki nem fogja kérni tőled ezeket a szavakat.
+970	Biztonságos helyre felírtam
+971	Törlöd a fiókodat?
+972	Törlődik a fiók, a nyilvános kulcs és az eszközön lévő kulcsok. A kapott .acm dokumentumok többé nem nyithatók meg. Nem vonható vissza.
+973	Erősítsd meg a fiók törlését ezzel: ${bio()}
+974	Törlés megszakítva.
+975	Megerősítés jelszóval
+976	Fiók törlése
+977	A fiók törlése…
+978	A fiók törölve.
+979	Fiók
+980	Jelentkezz be, vagy hozz létre fiókot
+981	Titkosított dokumentumokhoz és felhőszinkronizáláshoz
+982	Megerősítés nélkül nem fogadhatsz dokumentumokat
+983	Felhőszinkronizálás
+984	Eszközök
+985	A csatlakoztatott eszközök megtekintése és kezelése
+986	Alkalmazászár
+987	Felírva ✓
+988	Még nincs felírva: írd fel
+989	Kémprogramok elleni védelem
+990	Mit tesz az alkalmazás, és mit tehetsz te
+991	Biztonság
+992	A titkosítási kulcsok csak a te eszközeiden jönnek létre és tárolódnak. A szerver csak titkosított adatokat és a nyilvános kulcsot tárolja.
+993	Kijelentkezés
+994	A kulcsok ezen az eszközön maradnak
+995	${bio()} és jelszó segítségével
+996	Kijelentkezel erről az eszközről?
+997	Amíg újra be nem jelentkezel, itt nem küldhetsz és nem nyithatsz meg titkosított dokumentumokat. A kulcsok és a névjegyek védve maradnak az eszközön.
+998	Igen, kijelentkezem
+999	Bejelentkezve maradok
+1000	Kijelentkezés…
+1001	Fiókom
+1002	Kódom
+1003	Mutasd meg valakinek, hogy hozzáadjon és ellenőrizzen. Koppints a nagyításhoz.
+1004	Névjegyek
+1005	Keresés @név alapján, QR-kódok beolvasása
+1006	Kvantumbiztos titkosítás
+1007	Biztonság, eszközök és felhő: a Beállításokban
+1008	Írd fel a helyreállítási kódot
+1009	Akkor kell, ha elveszíted ezt az eszközt
+1010	A felhasználónév legalább 3 karakter.
+1011	A felhasználónév legfeljebb 20 karakter.
+1012	Csak ékezet nélküli kisbetűket, számjegyeket és _ jelet használj.
+1013	Ez a név foglalt. Válassz másikat.
+1014	Már létezik fiók ezzel az e-mail-címmel. Jelentkezz be, vagy állítsd vissza a jelszót.
+1015	Az e-mail-cím érvénytelen.
+1016	Az e-mail-cím vagy a jelszó hibás.
+1017	A jelszó hibás.
+1018	Nincs fiók ezzel az e-mail-címmel.
+1019	A jelszó túl gyenge: használj legalább 8 karaktert.
+1020	Túl sok próbálkozás. Próbáld újra néhány perc múlva.
+1021	Nincs internetkapcsolat.
+1022	Biztonsági okokból jelentkezz be újra, és próbáld meg ismét.
+1023	A szerver elutasította a kérést. Erősítsd meg az e-mail-címed, és próbáld újra.
+1024	A szerver nem válaszol. Ellenőrizd az internetkapcsolatot.
+1025	Írd be a neved.
+1026	A jelszavak nem egyeznek. Írd be kétszer ugyanazt a jelszót.
+1027	Erősítsd meg a profil frissítéséhez
+1028	A szavak hibásak. Ellenőrizd a sorrendet és a helyesírást.
+1029	Ezek a szavak egy másik fiókhoz tartoznak.
+1030	ACM Docs-kulcsok feloldása
+1031	A fiók kulcsai nincsenek ezen az eszközön.
+1032	Helyreállítási kód megtekintése
+1033	A fiók törlésének megerősítése
+1034	Visszafejtett másolat mentése…
+1035	A titkosított fájl küldése
+1036	Kapott és küldött .acm dokumentumok. Titkosítva maradnak az eszközön, és csak megtekintésre nyílnak meg.
+1037	Még nincs titkosított dokumentum
+1038	A kapott vagy küldött .acm fájlok itt jelennek meg. Egy fájl küldéséhez válaszd a „Küldés titkosítva” lehetőséget a fájl ⋯ menüjéből.
+1039	· szerkesztések: az eredeti mellett
+1040	A mentés nem sikerült:
+1041	Először mentsd
+1042	A dokumentumnak nem mentett módosításai vannak. Elmentem, utána titkosíthatod.
+1043	Hiba történt:
+1044	ujjlenyomat vagy képernyőzár
+1045	Oldd fel ezzel: ${bioName()}, vagy az alkalmazás jelszavával.
+1046	Írd be az alkalmazás jelszavát.
+1047	Oldd fel ezzel: ${bioName()}.
+1048	Alkalmazásjelszó
+1049	Feloldás
+1050	Túl sok próbálkozás. Várj ${Math.ceil((t0.until - Date.now()) / 1000)} másodpercet.
+1051	Feloldás ezzel: ${bioName()}
+1052	Elfelejtettem az alkalmazásjelszót
+1053	ACM Docs feloldása
+1054	A jelszó nem állítható helyre
+1055	Oldd fel ezzel: ${bioName()}, majd módosítsd a jelszót itt: Profil › Biztonság.
+1056	Az alkalmazásjelszó csak az ACM Docs-fiók jelszavával állítható vissza. Fiók nélkül telepítsd újra az alkalmazást (a helyi adatok elvesznek).
+1057	Alkalmazásjelszó visszaállítása
+1058	Erősítsd meg a(z) ${u.email} fiók jelszavával. Az alkalmazásjelszó törlődik, és a Profilban újra beállíthatod.
+1059	Megerősítés
+1060	Az alkalmazásjelszó törölve.
+1061	Azonnal
+1062	1 perc után
+1063	5 perc után
+1064	15 perc után
+1065	Nem kötelező. Indításkor és amikor visszatérsz az alkalmazásba, az ACM Docs megerősítést kér. A beállítás eszközönként külön érvényes.
+1066	Feloldás ezzel: ${bioName()}
+1067	Ezen az eszközön nem érhető el
+1068	Bekapcsolva · koppints a módosításhoz vagy kikapcsoláshoz
+1069	Kikapcsolva
+1070	Zárolás
+1071	Az ACM Docs feloldásának bekapcsolása
+1072	Mikor zárol
+1073	Amint kilépsz az alkalmazásból
+1074	Jelszó módosítása
+1075	Jelszó kikapcsolása
+1076	Jelenlegi jelszó
+1077	Erősítsd meg a jelenlegi alkalmazásjelszóval.
+1078	A jelenlegi jelszó hibás.
+1079	Az alkalmazásjelszó kikapcsolva.
+1080	Legalább 6 karakter. Máshol ne használd.
+1081	Az alkalmazásjelszó be van kapcsolva.
+1082	Új jelszó
+1083	Jelszó
+1084	A jelszó legalább 6 karakter.
+1085	A jelszavak nem egyeznek.
+1086	jelszó
+1087	Rendszám
+1088	Létszám
+1089	Android telefon
+1090	Windows számítógép
+1091	A fiók kulcsainak feloldása
+1092	Erősítsd meg az eszköz fiókhoz adásához
+1093	A fiók egy másik eszköze letiltotta ezt az eszközt. A fiók kulcsai törlődtek innen. Ha tévedés volt, jelentkezz be újra: szükséged lesz a helyreállítási kódra vagy egy másik eszköz QR-kódjára.
+1094	Eszköz
+1095	Új bejelentkezés a fiókodba
+1096	Ha nem te voltál, tiltsd le most az eszközt: azonnal elveszíti a hozzáférést a fiókhoz, és nem nyithat meg új adatokat.
+1097	Ha nem te voltál, tiltsd le a fő eszközről, és változtasd meg a fiók jelszavát.
+1098	Nem én voltam: letiltás
+1099	Az eszköz azonnal elveszíti a hozzáférést a fiókhoz és a felhőben lévő adatokhoz. A letiltás végleges: újbóli használatához elölről kell csatlakoztatni.
+1100	Erősítsd meg a(z) „${name}” eszköz letiltását
+1101	Letiltás…
+1102	Oldd fel a fiók eszközeinek megtekintéséhez
+1103	Betöltés…
+1104	Fő eszköz
+1105	Ez az eszköz
+1106	látva
+1107	Hozzáadva: ${when(d.created)} · ${VIA[d.via] || ''}
+1108	Ez a fő eszköz: a fiók bármely más eszközét letilthatja.
+1109	Ez az eszköz csak az azonos szintű eszközöket tilthatja le. A fő eszköz mindet letilthatja.
+1110	Letiltva
+1111	Új eszköz csatlakoztatása
+1112	Erősítsd meg új eszköz csatlakoztatásához
+1113	Olvasd be az új eszközön megjelenő QR-kódot
+1114	Ez nem bejelentkezési kód
+1115	Az új eszközön válaszd a „Bejelentkezés QR-kóddal” lehetőséget, és olvasd be az ott megjelenő kódot.
+1116	Ellenőrzés…
+1117	A kód lejárt. Generálj újat az új eszközön.
+1118	A kód nem egyezik
+1119	A szervertől kapott kulcs nem azonos a QR-kódban lévővel. Ne folytasd: próbáld újra egy új kóddal.
+1120	Az eszköz teljes hozzáférést kap a fiókhoz: titkosított dokumentumok, névjegyek és felhőadatok. Csak a saját eszközeidet csatlakoztasd.
+1121	Csatlakoztatás
+1122	Erősítsd meg az új eszköz csatlakoztatását
+1123	A helyreállítási kód nincs ezen az eszközön.
+1124	Csatlakozás…
+1125	A kód előkészítése…
+1126	Várakozás a megerősítésre…
+1127	Nyisd meg az ACM Docs-ot egy, a fiókhoz már csatlakoztatott eszközön.
+1128	Profil › Eszközök › Új eszköz csatlakoztatása.
+1129	Erősítsd meg Face ID-vel / ujjlenyomattal, és olvasd be ezt a kódot.
+1130	A kód lejárt. Zárd be, és próbáld újra.
+1131	A kapott kulcsok nem ehhez a fiókhoz tartoznak.
+1132	Bejelentkezel a(z) @${profile.handle} fiókba?
+1133	A kódot a(z) @${profile.handle}${profile.name ? ' (' + profile.name + ')' : ''} fiók hagyta jóvá. Csak akkor folytasd, ha ez a te fiókod.
+1134	Bejelentkezés megszakítva.
+1135	A QR-kódos bejelentkezés nem sikerült
+1136	Nincs elég memória
+1137	A fájl nem olvasható.
+1138	A fájl nem érvényes PDF, vagy sérült.
+1139	Hibás jelszó.
+1140	A dokumentum nem támogatott védelmet használ.
+1141	Az oldal nem található, vagy hibákat tartalmaz.
+1142	Ismeretlen hiba a PDF megnyitásakor (kód: ${code}).
+1143	A dokumentum jelszóval védett.
+1144	Az oldal nem létezik.
+1145	Az oldal nem tölthető be.
+1146	Nincs elég memória a megjelenítéshez.
+1147	A betűtípus nem használható.
+1148	Nincs elég memória a képhez.
+1149	A kép nem adható hozzá.
+1150	A képformátum nem támogatott.
+1151	A dokumentumnak legalább egy oldalt kell tartalmaznia.
+1152	Az oldal áthelyezése nem sikerült.
+1153	Az oldalak nem adhatók hozzá.
+1154	A PDF mentése nem sikerült.
+1155	A fájl nem írható
+1156	Nem sikerült betölteni
+1157	Adj hozzá termékeket vagy szolgáltatásokat
+1158	Hozzáadás
+1159	Minta Ügyfél Kft.
+1160	Új dokumentum?
+1161	Darab:
+1162	Összeg:
+1163	Munkalap${n}
+1164	Üres munkalap
+1165	SUM, AVERAGE, MIN, MAX, COUNT, COUNTA, COUNTIF, SUMIF, IF, IFERROR, AND, OR, NOT, ROUND, ROUNDUP, ROUNDDOWN, INT, ABS, SQRT, POWER, MOD, PRODUCT, CONCATENATE, LEN, UPPER, LOWER, TRIM, LEFT, RIGHT, MID, TODAY, NOW, DATE, YEAR, MONTH, DAY, VLOOKUP. Példa: =SUM(B2:B10) vagy =B2*C2.
+1166	A művelet nem sikerült:
+1167	Beolvasások
+1168	Erősítsd meg az ellenőrzés mentéséhez
+1169	A fiók profilja még nincs kész.
+1170	Olvasd be a személy QR-kódját az ő alkalmazásából (Profil › Kódom)
+1171	A fotón nem található QR-kód. Próbáld újra közelebbről.
+1172	QR-kód beolvasása
+1173	Tartsd a személy kódját a kamera elé.
+1174	A beolvasott kód nem ACM Docs-fiókkód. A személy a kódját itt találja: Profil › Kódom.
+1175	Ez a te kódod.
+1176	Másik fiók
+1177	A beolvasott kód @${q.handle} fiókjáé, nem annak, akit ellenőrzöl.
+1178	Nem létező fiók
+1179	A(z) @${q.handle} fiók már nem létezik.
+1180	Figyelem: a kódok nem egyeznek
+1181	A szerver által @${q.handle} számára megadott nyilvános kulcs NEM azonos a személy eszközén lévővel. Vagy épp most hozta létre újra a kulcsait, vagy valaki megpróbálja elfogni a neki küldött dokumentumokat.
+1182	amíg személyesen nem tisztázzátok, mi történt.
+1183	Ellenőrzött
+1184	Nem ellenőrzött
+1185	Keresés
+1186	Nincs @${h} fiók. Ellenőrizd a helyesírást.
+1187	Ez a te fiókod.
+1188	Aki titkosított dokumentumot szeretne küldeni neked, beolvassa ezt a kódot a saját alkalmazásában (Névjegyek › Beolvasás). Így biztos lehet benne, hogy a kulcs a tiéd.
+1189	Személyesen vagy videohívásban olvassátok be a kódot. Egy másvalakitől üzenetben kapott kód semmit sem bizonyít.
+1190	Másik kód beolvasása
+1191	Még nincsenek névjegyeid. Keress valakit @név alapján, vagy olvasd be a QR-kódját.
+1192	Valaki QR-kódjának beolvasása
+1193	Ezt a fiókot törölték. Többé nem küldhetsz neki dokumentumot.
+1194	@${escHtml(c.handle)} titkosítási kulcsa megváltozott.
+1195	Ez akkor fordul elő, ha a fiókját vagy a kulcsait egy másik eszközön helyreállítási kód nélkül hozta létre újra. De lehet lehallgatási kísérlet is. Amíg újra nem ellenőrzitek, nem küldhetsz neki dokumentumot.
+1196	A kódja újbóli beolvasása
+1197	Az új kulcs elfogadása ellenőrzés nélkül
+1198	${justAdded ? 'Contact adăugat. ' : ''}Még nem ellenőrizted, hogy a kulcs valóban @${escHtml(c.handle)} tulajdona. Érzékeny dokumentumoknál hasonlítsátok össze a kódokat személyesen.
+1199	Névjegy hozzáadva.
+1200	Biztonsági kód
+1201	Ugyanez a 60 számjegy jelenik meg az ő telefonján, amikor megnyitja a névjegyedet. Ha egyeznek, senki sincs közöttetek.
+1202	Ellenőrzés QR-kóddal
+1203	A számjegyek egyeznek: megjelölés ellenőrzöttként
+1204	Ellenőrzés visszavonása
+1205	Névjegy törlése
+1206	Csak akkor jelöld ellenőrzöttnek, ha mind a 60 számjegyet személyesen vagy telefonon, a személy hangját hallva hasonlítottátok össze.
+1207	Elfogadod az új kulcsot?
+1208	A mostantól küldött dokumentumok csak az új kulccsal nyithatók meg. Ha nem vagy biztos benne, hogy @${c.handle} lecserélte a kulcsait, előbb kérdezd meg.
+1209	Elfogadás
+1210	Törlöd a névjegyet?
+1211	Fiókra van szükséged
+1212	A titkosított .acm dokumentumok csak ACM Docs-fiókkal küldhetők és nyithatók meg. Egy perc az egész.
+1213	Erősítsd meg a(z) „${name}” dokumentum titkosítását
+1214	A névjegyek ellenőrzései visszaálltak
+1215	Az ellenőrzött névjegyek listáját az alkalmazáson kívül módosították, ezért az alkalmazás már nem bízik benne. Ellenőrizd újra QR-kóddal a fontos személyeket.
+1216	Címzettek ellenőrzése…
+1217	Még nem küldhető
+1218	${changed.map((c) => '@' + c.handle).join(', ')}: ${changed.some((c) => c.gone) ? 'contul nu mai există sau ' : ''}a titkosítási kulcs megváltozott. Nyisd meg a névjegyet a Névjegyekben, és ellenőrizd újra.
+1219	a fiók már nem létezik, vagy
+1220	Nem ellenőrzött címzettek
+1221	Még nem ellenőrizted: ${unverified.map((c) => '@' + c.handle).join(', ')}. A dokumentum a szerver által megadott kulccsal lesz titkosítva; ha a szervert feltörnék, valaki kicserélhetné a kulcsot. Érzékeny dokumentumoknál előbb olvassátok be a QR-kódokat.
+1222	Titkosítás (jelszóval)…
+1223	Titkosítás…
+1224	Titkosítva neki: ${who}. Válaszd ki, hogyan küldöd.
+1225	ACM Docs-szal titkosított dokumentum. Csak az ACM Docs alkalmazásban, a címzett fiókjában nyitható meg.
+1226	Titkosítás és küldés
+1227	A címzettnek a fiókja mellett a jelszóra is szüksége van. Mondd meg neki más úton (telefonon, személyesen).
+1228	Egy címzett titkosítási kulcsa megváltozott: küldés előtt ellenőrizd újra.
+1229	Vannak nem ellenőrzött címzettjeid. Érzékeny dokumentumoknál előbb olvassátok be egymás QR-kódját.
+1230	Minden címzett ellenőrzött.
+1231	Még nincsenek névjegyeid. Keresd meg a személyt @név alapján.
+1232	A dokumentum jelszava legalább 6 karakter.
+1233	Csak a kiválasztott személyek nyithatják meg az .acm fájlt, az ACM Docs alkalmazásban. Titkosítás után még te sem nyithatod meg, ezért őrizd meg az eredetit, ha szükséged van rá.
+1234	@${c.handle} hozzáadva.
+1235	Jelszó hozzáadása is (nem kötelező)
+1236	Titkosított
+1237	Ez nem .acm fájl.
+1238	Erősítsd meg a(z) „${name}” megnyitásához
+1239	Ezt a dokumentumot más személyeknek titkosították, nem a te fiókodnak. Ha meg kellene tudnod nyitni, kérd meg a küldőt, hogy küldje el újra ide: @
+1240	a neved
+1241	A fájl útközben megváltozott vagy megsérült. Kérd meg a küldőt, hogy küldje el újra.
+1242	A küldő aláírása érvénytelen: a fájlt meghamisították. Ne használd.
+1243	A fájl az alkalmazás újabb verziójával készült. Frissítsd az ACM Docs-ot.
+1244	A dokumentum nem nyitható meg
+1245	Dokumentum elküldve
+1246	Címzett
+1247	Ezt a fájlt csak a címzettjei nyithatják meg. Még te, a küldő sem fejtheted vissza: itt csak a küldés nyoma marad.
+1248	A titkosított fájl újraküldése
+1249	Titkosított dokumentum
+1250	Küldő
+1251	A küldő aláírása érvényes: a dokumentum útközben nem változott. Csak megtekintésre nyílik meg; az eszközön titkosítva marad.
+1252	A küldő hozzáadása a névjegyekhez
+1253	@${c.handle} hozzáadva a névjegyekhez (nem ellenőrzött).
+1254	Bizalmas dokumentum: a visszafejtett másolat bezáráskor törlődik.
+1255	Mentesz egy visszafejtett másolatot?
+1256	A mentett másolat már nem védett: bárki elolvashatja, aki hozzáfér ehhez az eszközhöz. Ne továbbítsd, ne töltsd fel a felhőbe, és ne tedd közzé. Ha valaki másnak is meg kell kapnia, küldd titkosítva.
+1257	Másolat mentése
+1258	Visszafejtett
+1259	A másolat a „Visszafejtett” mappába került: ${Host.baseName(out)}
+1260	Te
+1261	@${escHtml(known.handle)} szerepel a névjegyeid között, de még nem ellenőrizted QR-kóddal.
+1262	A dokumentumot más kulccsal írták alá, mint ami neked @${escHtml(s.handle)} számára megvan. Lehet, hogy újra létrehozta a kulcsait, vagy valaki kiadja magát érte. Kérdezd meg közvetlenül, mielőtt megbízol a dokumentumban.
+1263	Nincs a névjegyeid között. A szerver megerősíti, hogy a kulcs @${escHtml(p.handle)} tulajdona, de személyesen nem ellenőrizted.
+1264	A küldő azt állítja, hogy ő @${escHtml(s.handle)}, de a kulcsa nem egyezik a szerveren lévő @${escHtml(s.handle)} fiókéval.
+1265	A küldő azt állítja, hogy ő @${escHtml(s.handle)}, de ez a fiók nem létezik (már).
+1266	Nem tudjuk, ki küldte a dokumentumot. Az aláírás érvényes, de egyik névjegyhez sem tartozik.
+1267	A dokumentumnak jelszava van
+1268	A küldő jelszót is beállított. Írd be a jelszót, amit megmondott neked.
+1269	Mit küldesz titkosítva?
+1270	PDF, Word, Excel, fotók… bármilyen fájl
+1271	Másik fájl kiválasztása…
+1272	Képernyőképet készítettél egy védett dokumentumról. Töröld, ha nincs rá szükséged: a fotók gyakran a felhőbe kerülnek.
+1273	Egy ilyen telefonon más alkalmazások is olvashatják, mit csinál az ACM Docs. Ne nyiss meg rajta érzékeny dokumentumokat.
+1274	Mit tesz az ACM Docs, hogy ne lehessen kémkedni utána:
+1275	Kulcsok a telefonba zárva
+1276	A privát kulcsok csak ezzel nyílnak meg: ${ios ? 'Face ID' : Host.mobile ? 'amprenta sau PIN-ul' : 'confirmarea Windows'}, és maguktól bezárulnak, ha kilépsz az alkalmazásból vagy 3 perc tétlenség után.
+1277	Nincs képernyőkép
+1278	A helyreállítási kód és a visszafejtett dokumentumok elrejtődnek, amikor a képernyőt rögzítik vagy megosztják, valamint a megnyitott alkalmazások listájában.
+1279	A helyreállítási kód és a visszafejtett dokumentumok nem rögzíthetők és nem menthetők képként.
+1280	A megnyitott .acm dokumentum bezáráskor törlődik a telefonról, hacsak nem döntesz úgy, hogy megtartod.
+1281	Még ha valaki most le is másolja az .acm fájlokat, nem tudja megnyitni őket, egy jövőbeli kvantumszámítógéppel sem.
+1282	Telefonellenőrzés: probléma
+1283	Jailbreak/root jeleit találtuk.
+1284	Nem találtuk jailbreak vagy root jeleit.
+1285	Mit tehetsz te
+1286	Tartsd naprakészen a telefonodat. A Pegasus-típusú kémprogramok olyan hibákat használnak ki, amelyeket a frissítések bezárnak.
+1287	Kapcsold be:
+1288	(Lockdown Mode): Beállítások › Adatvédelem és biztonság › Zárolt mód. Ez az Apple legerősebb védelme a Pegasus ellen.
+1289	Speciális védelem
+1290	(Android 16+): Beállítások › Biztonság és adatvédelem › Speciális védelem.
+1291	Indítsd újra a telefonodat naponta egyszer: sok kémprogram nem éli túl az újraindítást.
+1292	Ne nyiss meg ismeretlenektől kapott linkeket vagy fájlokat, és ne telepíts alkalmazást az áruházon kívülről.
+1293	Őszintén: egyetlen alkalmazás sem védheti meg magát teljesen egy olyan kémprogramtól, amely az egész telefont átvette. A fenti intézkedések azonban jelentősen csökkentik, mit és mikor lophatna el.
+1294	A dokumentum titkosítva érkezett. A mentett másolat már nem védett: bárki elolvashatja, aki hozzáfér ehhez az eszközhöz. Ne továbbítsd, ne töltsd fel a felhőbe, és ne tedd közzé. Ha valaki másnak is meg kell kapnia, küldd titkosítva.
+1295	Erősítsd meg a titkosított szinkronizálás elindításához
+1296	Fiók szükséges
+1297	Kikapcsolva: az adatok csak ezen az eszközön maradnak
+1298	A felhőtárhely még nincs bekapcsolva
+1299	Nincs szinkronizálva (nincs internet?)
+1300	Indítás…
+1301	Szinkronizálva
+1302	Titkosított felhő
+1303	A cégeid, számláid, ügyfeleid, aláírásaid, beállításaid, névjegyeid és dokumentumaid a fiók minden eszközén ugyanúgy jelennek meg.
+1304	${(s.counts && s.counts.files) || 0} dokumentum és ${(s.counts && s.counts.data) || 0} adatkészlet szinkronizálva.
+1305	Minden az eszközön titkosítódik, mielőtt elhagyná, a fiók kulcsával és olyan titkosítással, amely a kvantumszámítógépeknek is ellenáll. A szerver csak titkosított blokkokat tárol, nevek és olvasható tartalom nélkül. Még az ACM Docs sem tudja elolvasni őket.
+1306	Szinkronizálás most
+1307	Adataim törlése a felhőből
+1308	Leállítod a szinkronizálást?
+1309	Az eszköz új adatai nem jutnak el a többi eszközre. Ami már a felhőben van, ott marad titkosítva, amíg nem törlöd.
+1310	Leállítás
+1311	Szinkronizálás…
+1312	Törlöd az adatokat a felhőből?
+1313	A fiók összes titkosított adata törlődik a felhőből. Az eszközön lévő adatok megmaradnak. A többi, szinkronizálást használó eszköz újra feltölti a sajátjait.
+1314	Törlés…
+1315	A felhőben lévő adatok törölve.
+1316	ACM Docs-fiók
+1317	Elfelejtetted a jelszót?
+1318	Nincs még fiókod?
+1319	Már van fiókod?
+1320	Link küldése
+1321	E-mail újraküldése
+1322	E-mail újraküldve.
+1323	Kód megtekintése most
+1324	A kulcsok helyreállítva.
+1325	Fiókjelszó
+1326	Utolsó lépés: a(z) ${u.email} fiók jelszava.
+1327	Profil, QR-kód, névjegyek
+1328	Titkosított dokumentum küldése
+1329	A fiókot letiltották.
+1330	Nem sikerült lefoglalni ezt: @${h}. Lehet, hogy valaki épp most vette el: válassz másik nevet.
+1331	Küldés (WhatsApp, e-mail…)
+1332	Küldés titkosítva (.acm)…
+1333	Felülírod az eredetit?
+1334	A kép nem olvasható:
+1335	Bármilyen tevékenység, vegyes szolgáltatások
+1336	Projektek, órák, előfizetések
+1337	Catering, rendezvények, menük
+1338	Ezt az eszközt letiltották
+1339	Én voltam
+1340	Letiltod: „${name}”?
+1341	Csak a fő eszköz tilthatja le a fő eszközt.
+1342	Csatlakoztatod az új eszközt?
+1343	Az új eszköz csatlakozott.
+1344	Igen, ez az én fiókom
+1345	Nem az enyém
+1346	A PDF-dokumentum nem hozható létre.
+1347	A szöveg nem hozható létre.
+1348	A szöveg nem írható.
+1349	A kép nem olvasható.
+1350	A kép nem frissíthető.
+1351	Az oldal nem szúrható be.
+1352	A(z) ${i + 1}. oldal nem írható.
+1353	${pi + 1}. oldal / ${list.length} ·
+1354	Cégnév *
+1355	Áfakulcs (%)
+1356	Utca, házszám
+1357	Árajánlat- / költségbecslés-sorozat
+1358	Üres = automatikus (cég · telefon · e-mail)
+1359	Dőlt (Ctrl+I)
+1360	Aláhúzott (Ctrl+U)
+1361	Kép (nem támogatott formátum)
+1362	Széles (16:9)
+1363	Normál (4:3)
+1364	Margók: normál (2,54 cm)
+1365	Margók: széles (3,18 cm)
+1366	Kész (Ctrl+Enter)
+1367	Ez nem ACM Docs-kód
+1368	Ne küldj semmi érzékenyet
+1369	A kulcs megváltozott
+1370	A számjegyek egyeznek?
+1371	Igen, egyeznek
+1372	Küldés mégis
+1373	Titkosítva küldött
+1374	A dokumentum nem titkosítható
+1375	Titkosítva neki: ${who}: ${Host.baseName(out)}
+1376	A dokumentum jelszava
+1377	Küldés titkosítva
+1378	A titkosított dokumentum megnyitása…
+1379	Nem megerősített küldő
+1380	Ismeretlen küldő
+1381	A telefon módosítottnak tűnik (${ios ? 'jailbreak' : 'root'}).
+1382	Ideiglenes visszafejtett másolatok
+1383	Telefon ellenőrizve
+1384	Zárolt mód
+1385	A szinkronizálás elindult.
+1386	Válaszd ki a nyelvet
+1387	A nyelvet bármikor módosíthatod a Beállításokban.
+1388	Nyelv
+1389	Verzió ${ver || '2.0.5'} · ${Host.mobile ? (Host.info.platform === 'ios' ? 'iOS' : 'Android') : 'Windows'} · 2026

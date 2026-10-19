@@ -1,0 +1,700 @@
+0	de ACM Code SRL
+1	Crear
+2	Inicio
+3	Archivos
+4	Facturas
+5	Ajustes
+6	ACM Docs · gratis
+7	Buenas tardes
+8	¿Qué hacemos hoy?
+9	Escanear
+10	Foto → PDF
+11	Factura
+12	Nueva
+13	Abrir
+14	Cualquier archivo
+15	Hoja de cálculo
+16	Presentación
+17	Facturado este mes
+18	Aún no hay facturas
+19	Recientes
+20	Ver todo
+21	Todos
+22	Originales
+23	Editados
+24	Suelta el archivo aquí para abrirlo
+25	Vista previa
+26	Nuevo
+27	Apariencia
+28	Empresa
+29	Total a pagar
+30	Crear PDF
+31	Cerrar
+32	Guardar
+33	Exportar a PDF
+34	Reemplazar
+35	Reemplazar todo
+36	Presentar
+37	Doble clic en un texto para editarlo · arrastra para mover · F5 para presentar
+38	Trabajando…
+39	Buscar por nombre
+40	Atrás
+41	Ver cómo queda
+42	Empezar un documento nuevo
+43	Cambiar el diseño, los colores y los textos
+44	Datos de la empresa
+45	Factura
+46	Volver al inicio
+47	Cambios sin guardar
+48	Deshacer (Ctrl+Z)
+49	Rehacer (Ctrl+Y)
+50	Página anterior
+51	Página siguiente
+52	Buscar en el documento (Ctrl+F)
+53	Más
+54	Buscar texto en el documento…
+55	Anterior
+56	Siguiente
+57	Cerrar (Esc)
+58	Alejar (Ctrl + rueda)
+59	Ajustar al ancho
+60	Acercar (Ctrl + rueda)
+61	Buscar…
+62	Reemplazar por…
+63	Alejar
+64	Ajustar
+65	Acercar
+66	Celda seleccionada (escribe una dirección y pulsa Intro)
+67	Escribe un valor o una fórmula, p. ej. =SUM(B2:B10)
+68	Presentar (F5)
+69	Mostrar en la carpeta
+70	Guardar una copia en el teléfono…
+71	Quitar de la lista
+72	Empresa emisora
+73	Buenas noches
+74	Buenos días
+75	Buenas noches
+76	Configura tu empresa y emite tu primera factura
+77	${s.monthCount} ${s.monthCount === 1 ? 'invoice' : 'invoices'} · ${Invoice.money(s.unpaid)} ${s.currency} por cobrar
+78	${s.monthCount} ${s.monthCount === 1 ? 'invoice' : 'invoices'} este mes
+79	Nueva factura
+80	Proforma
+81	Presupuesto
+82	Oferta
+83	Tu empresa
+84	Facturas gratis para cualquier negocio
+85	Introduce los datos de tu empresa una vez y emite facturas, proformas y ofertas en segundos.
+86	Configurar empresa
+87	Aún no hay archivos
+88	Escanea una página o abre un PDF desde tu teléfono.
+89	Abre un PDF o una foto, o arrastra un archivo a la ventana.
+90	Todo lo que has abierto, editado o creado en la aplicación.
+91	Tus archivos, intactos. Las ediciones se guardan aparte.
+92	Copias guardadas tras editar (name_editat_1, _2…).
+93	Facturas, proformas y ofertas emitidas.
+94	No se encontró nada
+95	Ningún archivo contiene «${q}».
+96	Toca + para escanear una página o abrir un archivo.
+97	Haz clic en «Abrir» o arrastra un archivo a la ventana.
+98	Aún no has abierto documentos
+99	Los archivos que abras aparecerán aquí.
+100	Aún no hay copias editadas
+101	Cuando guardes un documento, aparecerá aquí como «name_editat_1». El original queda intacto.
+102	Aún no hay documentos emitidos
+103	Las facturas, proformas y ofertas que crees aparecerán aquí.
+104	Automático
+105	Igual que el teléfono
+106	Igual que Windows
+107	Claro
+108	Oscuro
+109	Usar esta empresa
+110	Aspecto de los documentos
+111	Eliminar empresa
+112	¿Eliminar «${p.name}»?
+113	Solo se eliminan de la aplicación los datos de la empresa. Los PDF emitidos permanecen en tu dispositivo.
+114	Eliminar
+115	Añadir otra empresa
+116	Configura tu empresa
+117	Facturas para cualquier negocio
+118	Empresas
+119	Los documentos se emiten a nombre de la empresa marcada. Puedes tener varias empresas.
+120	Documentos
+121	Lista de documentos emitidos
+122	Dónde se guardan los archivos
+123	 · ediciones: junto al original
+124	Acerca de
+125	PDF, documentos, hojas de cálculo, presentaciones y facturas: gratis y sin cuenta. Tus datos se quedan solo en este dispositivo.
+126	Escanear con la cámara
+127	PDF a partir de una foto o un escaneo
+128	Oferta de precio
+129	Hoja de cálculo (Excel)
+130	Presentación (PowerPoint)
+131	Abrir un archivo…
+132	La imagen está vacía.
+133	Formato de presentación antiguo
+134	«${name}» es una presentación antigua de PowerPoint (.ppt). Ábrela en PowerPoint y elige Archivo → Guardar como → Presentación de PowerPoint (.pptx); luego ábrela aquí.
+135	Entendido
+136	Formato OpenDocument
+137	«${name}» es un documento de LibreOffice (.odt/.odp). Guárdalo desde LibreOffice como .docx o .pptx y luego ábrelo aquí. Las hojas .ods se abren directamente.
+138	Este documento no es un PDF
+139	«${name}» parece un documento de Word/Excel. Ábrelo en Word y elige Archivo → Guardar como → PDF; luego abre el PDF aquí.
+140	«${name}» está vacío (0 bytes).
+141	Archivo desconocido
+142	«${name}» no es un PDF ni una imagen. Solo se pueden abrir archivos PDF y fotos (JPG, PNG, BMP, GIF, WEBP).
+143	No se puede leer «${name}». Puede que se haya movido, eliminado o esté abierto en otro programa.
+144	Detalles
+145	No se puede leer el archivo
+146	Abriendo…
+147	No se pudo abrir «${name}»
+148	La foto ya es un PDF. ¿Hacer editable su texto?
+149	El documento parece escaneado (solo imágenes). ¿Hacer editable el texto?
+150	Hacer editable el texto
+151	La foto se colocó en un PDF nuevo. Guarda para conservarla.
+152	Documento nuevo.pdf
+153	Documento nuevo
+154	Se añadieron ${Editor.sizes.length - before} páginas al final.
+155	No se pudo añadir «${name}»
+156	Elegiste el propio archivo original. Si continúas, el original se perderá.
+157	Sobrescribir
+158	Guardando…
+159	Guardado aparte: ${Host.baseName(p)}; el original está intacto.
+160	Enviar
+161	No se puede escribir en esa carpeta (está protegida o el archivo está abierto en otro programa). Elige otro lugar.
+162	Error al guardar:
+163	Guardar como
+164	Haz clic en cualquier elemento de la página para seleccionarlo · arrastra para mover · las esquinas cambian el tamaño · doble clic en un texto para editarlo
+165	Haz clic en un texto para editarlo, o en cualquier lugar de la página para añadir texto (la fuente y el tamaño se ajustan solos)
+166	Dibuja manteniendo pulsado el botón del ratón
+167	Arrastra sobre el texto para resaltarlo
+168	Dibuja un rectángulo sobre lo que quieras tapar con blanco
+169	Haz clic donde quieras la marca de verificación
+170	Haz clic donde quieras la X
+171	Haz clic en la página para colocar la imagen (o dibuja un rectángulo para su tamaño) · Esc para cancelar
+172	El archivo elegido no es una imagen.
+173	No se pudo leer la imagen:
+174	Guardar como…
+175	Hacer editable el texto de las imágenes (esta página)
+176	Añadir páginas de otro PDF…
+177	Página en blanco tras la actual
+178	Girar página a la izquierda
+179	Girar página a la derecha
+180	Eliminar la página actual
+181	Cerrar documento
+182	¿Eliminar la página?
+183	La página ${i + 1} se quitará del documento. Puedes deshacerlo con Ctrl+Z.
+184	Guardar en ${Host.baseName(copyPath)} (Ctrl+S)
+185	Guardar como archivo aparte «…_editat_N.pdf»; el original queda intacto (Ctrl+S)
+186	${a4}${mm(s.w)} × ${mm(s.h)} mm · ${n} ${n === 1 ? 'page' : 'pages'}
+187	Se produjo un error:
+188	Error
+189	El motor PDF no pudo iniciarse
+190	El almacenamiento de la aplicación está lleno: no se pudo guardar.
+191	Servicios
+192	Servicio
+193	Producto
+194	Productos
+195	Otros
+196	Qué vendiste o qué servicio prestaste…
+197	Comercio
+198	Venta de productos, tienda, online
+199	Envío
+200	Nombre del producto…
+201	Taller mecánico
+202	Reparaciones, piezas, mano de obra
+203	Mano de obra
+204	Pieza
+205	Piezas
+206	Vehículo
+207	Marca y modelo
+208	Matrícula
+209	Kilometraje (km)
+210	N.º de bastidor (VIN)
+211	Qué reparaste o qué pieza montaste…
+212	Cliente: vehículo y documento recibidos
+213	Garantía de 3 meses en la mano de obra.
+214	Construcción
+215	Reformas, instalaciones, acabados
+216	Materiales
+217	Equipos
+218	Obras
+219	Dirección de la obra
+220	Descripción de los trabajos
+221	Periodo
+222	N.º de contrato
+223	Trabajo o material…
+224	Informática y consultoría
+225	Horas
+226	Horas trabajadas
+227	Proyecto
+228	Proyectos
+229	Suscripción
+230	Suscripciones
+231	mes
+232	Qué entregaste…
+233	Viajes, carga, pasajeros
+234	Viaje
+235	Viajes
+236	viaje
+237	Kilómetros
+238	Extras
+239	Servicios adicionales
+240	Ruta
+241	Viaje o servicio…
+242	Belleza
+243	Salón, cosmética, bienestar
+244	Servicio o producto…
+245	Comida
+246	ración
+247	Bebidas
+248	Evento
+249	Fecha del evento
+250	Producto o servicio…
+251	FACTURA
+252	Proformas
+253	FACTURA PROFORMA
+254	Ofertas
+255	OFERTA DE PRECIO
+256	Rumanía
+257	Proveedor no sujeto al IVA (régimen especial de exención, art. 310 del Código Fiscal rumano).
+258	No se encontró ninguna fuente en este ordenador para escribir el texto.
+259	No se puede escribir el archivo
+260	La creación de PDF no está disponible.
+261	Copia guardada.
+262	No se pudo cargar
+263	» no está cargado.
+264	No se pudo preparar la imagen.
+265	La foto está girada; solo puedo leer texto derecho.
+266	Página ${pi + 1} de ${list.length} ·
+267	Leyendo el texto de la foto…
+268	Iniciando el lector de texto…
+269	Escribiendo el texto…
+270	Listo: ${total} ${total === 1 ? 'rând de text a devenit editabil' : 'rânduri de text au devenit editabile'}. Haz doble clic en el texto para editarlo.
+271	No se encontró texto claro en la foto.
+272	No se pudo leer el texto de la foto
+273	Efectivo
+274	Serie
+275	Fecha de emisión
+276	Fecha de vencimiento
+277	Válida hasta
+278	N.º
+279	Cant.
+280	Precio unitario
+281	Importe
+282	Total sin IVA
+283	TOTAL A PAGAR
+284	Forma de pago
+285	Observaciones
+286	Proveedor: firma
+287	<tr><td colspan="${ncols + 1}" class="empty">Añade productos o servicios</td></tr>
+288	Nombre de la empresa
+289	Cliente: firma de recepción
+290	<br>(sin IVA)
+291	Introduce los datos de tu empresa
+292	NIF, dirección, IBAN: aparecen en cada documento. Solo los introduces una vez.
+293	Completar
+294	Serie
+295	Número
+296	Fecha
+297	Vencimiento (opcional)
+298	Pago
+299	Transferencia bancaria (orden de pago)
+300	Transferencia bancaria
+301	Contra reembolso
+302	Moneda
+303	Nombre de la empresa *
+304	Nombre completo *
+305	Teléfono
+306	N.º de identidad (opcional)
+307	Dirección
+308	Correo (opcional)
+309	Cliente
+310	Particular
+311	Empresa
+312	Cantidad
+313	Precio
+314	<span>Añadir</span>
+315	Productos y servicios
+316	Pagada
+317	p. ej. garantía de 12 meses. ¡Gracias!
+318	Escribe qué vendiste o en qué trabajaste, pon el precio y pulsa Añadir. El total se calcula solo.
+319	Cambiar categoría
+320	Eliminar fila
+321	de los cuales IVA ${money(t.tva)}
+322	Aún no hay conceptos
+323	¿A qué se dedica tu empresa?
+324	Adaptamos tus documentos a tu sector: categorías, campos y textos adecuados. Puedes cambiarlo cuando quieras.
+325	Cancelar
+326	Continuar
+327	¿Cómo se llama tu empresa?
+328	Puedes añadir el resto (dirección, IBAN, logotipo) ahora o más tarde.
+329	La empresa está sujeta al IVA
+330	Listo
+331	Los precios que introduzco incluyen IVA
+332	Nota para proveedores no sujetos al IVA
+333	Cambiar logotipo
+334	Añadir logotipo
+335	Sin logotipo
+336	Escribe el nombre de la empresa.
+337	Empresa nueva
+338	Solo los introduces una vez. Aparecen en cada factura, proforma u oferta.
+339	Aparece en la parte superior de tus documentos. Opcional.
+340	Nombre visible *
+341	Razón social
+342	Sector de actividad
+343	Datos fiscales
+344	RO12345678 o 12345678
+345	Capital social
+346	Dirección y contacto
+347	Ciudad
+348	Provincia / región
+349	Sitio web
+350	opcional
+351	Banco
+352	Banco
+353	Series y numeración
+354	Serie de facturas
+355	Número siguiente
+356	Serie de proformas
+357	Valores predeterminados de los documentos
+358	Moneda
+359	Plazo de pago (días)
+360	0 = sin vencimiento
+361	Observaciones predeterminadas
+362	Escribe el nombre del cliente.
+363	Añade al menos un producto o servicio.
+364	Otra ubicación…
+365	Crear PDF: ${label.toLowerCase()}
+366	Nombre del archivo (puedes cambiarlo):
+367	Se guarda en:
+368	El archivo ya existe
+369	«${Host.baseName(target)}» ya existe. ¿Reemplazarlo?
+370	Creando: ${label.toLowerCase()}…
+371	Otra
+372	Abrir PDF
+373	No se pudo crear el documento
+374	Verde azulado
+375	Azul
+376	Grafito
+377	Verde
+378	Rojo
+379	Naranja
+380	Morado
+381	Negro
+382	Proveedor y cliente
+383	Detalles (según el sector)
+384	Tabla de productos / servicios
+385	Totales
+386	Pago, notas, observaciones
+387	Firmas
+388	Pie de página
+389	Título de la factura (vacío = FACTURA)
+390	Título de la proforma
+391	Título de la oferta
+392	Proveedor
+393	Columna N.º
+394	Columna Descripción
+395	Columna Unidad
+396	Columna Cantidad
+397	Columna Precio unitario
+398	Columna Importe
+399	Firma del proveedor
+400	Firma del cliente (vacío = automático)
+401	¿Guardar los cambios?
+402	Cambiaste el diseño del documento y no lo guardaste.
+403	No guardar
+404	El diseño se ha guardado. Se usará en todos los documentos nuevos.
+405	¿Restablecer los valores predeterminados?
+406	Colores, estructura y textos vuelven a como estaban al principio. Luego pulsa Guardar para conservarlos.
+407	Restablecer
+408	Otro color
+409	Elige cualquier color
+410	Otro…
+411	<span>Predeterminado</span>
+412	Volver al aspecto original
+413	<span>Guardar</span>
+414	Estructura, colores y textos de tus documentos
+415	Colores y diseño
+416	Color principal
+417	Color del texto
+418	Casi negro
+419	Gris oscuro
+420	Azul marino
+421	Tamaño del texto
+422	Márgenes
+423	Encabezado
+424	Blanco (ahorra tinta)
+425	Tono
+426	Banda sólida
+427	Una banda sólida gasta mucha tinta
+428	Bordes
+429	Contorno
+430	Ninguno
+431	Encabezado de tabla
+432	Línea (ahorra tinta)
+433	Sólido
+434	Filas de la tabla
+435	Líneas
+436	Rayas
+437	Cuadrícula
+438	Simple
+439	Contorno (ahorra tinta)
+440	Mostrar logotipo
+441	Tamaño
+442	Más pequeño = menos tinta
+443	Forma
+444	Cuadrado
+445	Redondeado
+446	Círculo
+447	Posición
+448	Izquierda
+449	Derecha
+450	Imagen
+451	Cambiar logotipo…
+452	Añadir logotipo…
+453	Subir
+454	Bajar
+455	Estructura: orden de las secciones
+456	Usa las flechas para subir o bajar una sección y el botón de la derecha para mostrarla u ocultarla. El encabezado siempre queda arriba.
+457	Agrupar por categoría
+458	Mostrar subtotales
+459	Texto del pie de página
+460	Texto en el documento
+461	Nombre del archivo PDF
+462	Patrón de nombre
+463	Se borrará lo que has introducido hasta ahora.
+464	Empezar de nuevo
+465	Datos de la empresa…
+466	Añadir otra empresa…
+467	Empresa emisora
+468	Facturas gratis para tu empresa
+469	Configuras tu empresa una vez (un minuto) y luego emites facturas, proformas y ofertas desde el teléfono o el ordenador.
+470	Por cobrar
+471	${unpaid.length} sin pagar
+472	Todo está pagado
+473	Presupuestos
+474	Sin pagar
+475	No hay nada aquí
+476	Cambia el filtro de arriba.
+477	Haz clic en «Documento nuevo», introduce el cliente y lo que vendiste y luego pulsa «Crear PDF».
+478	Emite tu primera factura
+479	sin fecha
+480	Vencida
+481	Sin pagar
+482	Marcar como pagada
+483	Marcar como no pagada
+484	Convertir en factura
+485	Duplicar (documento nuevo idéntico)
+486	¿Quitar el documento de la lista?
+487	El archivo PDF sigue donde está; simplemente ya no aparecerá aquí.
+488	Quitar
+489	Factura proforma
+490	¿Qué quieres emitir?
+491	Editar texto
+492	Copiar texto
+493	Este texto no se puede editar (está girado o no tiene una fuente legible). Puedes moverlo o eliminarlo.
+494	Este texto solo se puede mover o eliminar.
+495	Texto copiado.
+496	La operación falló:
+497	Más pequeño
+498	Más grande
+499	Negrita
+500	Editar
+501	Editar texto (Intro)
+502	Copiar texto (Ctrl+C)
+503	Texto editable
+504	Lee el texto de la imagen y lo hace editable
+505	Eliminar (Supr)
+506	Seleccionar
+507	Haz clic en cualquier elemento de la página (texto, imágenes, firmas): arrastra para mover, vuelve a hacer clic en un texto para editarlo (V)
+508	Haz clic en un texto para cambiarlo, o en cualquier lugar para escribir texto nuevo (T)
+509	Firma
+510	Dibujar o elegir una firma (S)
+511	Imagen
+512	Añadir una imagen: sello, logotipo, foto
+513	Dibujar
+514	Dibujo a mano alzada con el ratón (P)
+515	Resaltar
+516	Marcar con rotulador (H)
+517	Tapar
+518	Tapar con blanco (W)
+519	Marca de verificación
+520	Añadir una marca de verificación (C)
+521	Añadir una X (X)
+522	Tamaño del texto nuevo (pt)
+523	Automático: el texto nuevo usa la fuente, el tamaño y el color del texto cercano (haz clic para desactivar)
+524	Automático desactivado: el texto nuevo usa los ajustes de aquí
+525	Grosor de línea (pt)
+526	Tamaño de la marca
+527	Acciones de página
+528	Girar a la izquierda
+529	Girar a la derecha
+530	Insertar página en blanco después
+531	Eliminar página
+532	¿Eliminar la página ${i + 1}?
+533	Puedes deshacerlo con Ctrl+Z.
+534	${index + 1} de ${results.length}
+535	Sin resultados
+536	 Eliminar
+537	Usar firma
+538	Desde una imagen…
+539	Usar
+540	Firma con el ratón en el recuadro de abajo.
+541	Guardar para la próxima vez
+542	Firmas guardadas
+543	Contraseña
+544	La contraseña es incorrecta. Inténtalo de nuevo.
+545	Introduce la contraseña del documento.
+546	¿Quieres guardar los cambios de «${name}»?
+547	Copiar error
+548	Nombre del archivo:
+549	Guardado aparte: ${Host.baseName(path)}; el original no se ha tocado.
+550	el archivo está abierto en otro programa o la carpeta está protegida.
+551	Exportar a PDF
+552	Creando PDF…
+553	No se pudo crear el PDF
+554	Sin color
+555	Otro color…
+556	VERDADERO
+557	Promedio: <b>${n ? ro(sum / n, 2) : '—'}</b> &nbsp; Recuento: <b>${cnt}</b> &nbsp; Suma: <b>${ro(sum, 2)}</b>
+558	¿Combinar celdas?
+559	Solo se conserva el valor de la primera celda (arriba a la izquierda); las demás se borran.
+560	Combinar
+561	Cortar
+562	Copiar
+563	Pegar
+564	Insertar ${nr} filas arriba
+565	Insertar fila arriba
+566	Insertar ${nr} filas abajo
+567	Insertar fila abajo
+568	Insertar ${nc} columnas a la izquierda
+569	Insertar columna a la izquierda
+570	Insertar ${nc} columnas a la derecha
+571	Insertar columna a la derecha
+572	Eliminar ${nr} filas
+573	Eliminar ${nc} columnas
+574	Eliminar columna
+575	Borrar celdas
+576	Ordenar A → Z
+577	Ordenar Z → A
+578	Negrita (Ctrl+B)
+579	Color de celda
+580	Alinear a la izquierda
+581	Centrar
+582	Alinear a la derecha
+583	Ajustar texto
+584	Combinar / Separar celdas
+585	Porcentaje
+586	Fecha
+587	Formato de número
+588	Menos decimales
+589	Más decimales
+590	Todos los bordes
+591	Borde exterior
+592	Borde inferior
+593	Sin bordes
+594	Autosuma (Σ)
+595	Suma
+596	Filas y columnas
+597	Eliminar filas seleccionadas
+598	Eliminar columnas seleccionadas
+599	Filas
+600	Cambiar nombre
+601	Duplicar hoja
+602	Mover a la izquierda
+603	Mover a la derecha
+604	Eliminar hoja
+605	Hoja nueva
+606	Cambiar nombre de la hoja
+607	Ya existe una hoja con ese nombre.
+608	¿Eliminar la hoja?
+609	Se eliminará la hoja «${wb.sheets[i].name}» y todo su contenido. Puedes deshacerlo con Ctrl+Z.
+610	No se pudo iniciar el editor
+611	Abriendo hoja de cálculo…
+612	No se pudo abrir la hoja de cálculo
+613	Hoja nueva.xlsx
+614	Se guardará como .xlsx (formato moderno de Excel); el original queda intacto.
+615	Hoja de cálculo nueva
+616	Guardar hoja de cálculo
+617	No se pudo preparar el archivo
+618	Funciones disponibles
+619	Funciones
+620	Blanco
+621	Taller
+622	Papel
+623	Naturaleza
+624	Atardecer
+625	Haz clic para añadir un título
+626	Haz clic para añadir texto
+627	Haz clic para añadir un subtítulo
+628	Haz clic para añadir un título de sección
+629	Diapositiva ${cur + 1} de ${deck.slides.length}
+630	Escribe texto
+631	Título
+632	Título y texto
+633	Dos columnas
+634	Encabezado de sección
+635	Solo título
+636	En blanco
+637	Diapositiva nueva después
+638	Duplicar diapositiva
+639	Fondo…
+640	Eliminar diapositiva
+641	Color de fondo…
+642	Según el tema
+643	Imagen de fondo…
+644	Fondo del tema
+645	Aplicar el fondo a todas
+646	Diapositiva nueva
+647	Diapositiva
+648	Cuadro de texto
+649	Formas
+650	Rectángulo
+651	Rectángulo redondeado
+652	Círculo / elipse
+653	Triángulo
+654	Flecha
+655	Línea
+656	Viñetas
+657	Texto arriba / en medio / abajo
+658	Arriba
+659	En medio
+660	Abajo
+661	Color de relleno
+662	Color del contorno
+663	Organizar
+664	Traer al frente
+665	Traer adelante
+666	Enviar atrás
+667	Enviar al fondo
+668	Centrar horizontalmente
+669	Alinear arriba
+670	Centrar verticalmente
+671	Alinear abajo
+672	Duplicar (Ctrl+D)
+673	Fondo
+674	Temas
+675	Tema
+676	Fin de la presentación. Haz clic o pulsa Esc para salir.
+677	El archivo no parece una presentación de PowerPoint.
+678	Abriendo presentación…
+679	No se pudo abrir la presentación
+680	Presentación nueva.pptx
+681	Presentación nueva
+682	Guardar presentación
+683	Preparando la presentación…
+684	No se pudo preparar la presentación
+685	Duplicar
+686	Cambiar imagen…
+687	Imagen…
+688	Página 1 de ${pages} · ${words} ${words === 1 ? 'word' : 'words'} · ${t.replace(/\s/g, '').length} caracteres
+689	Insertar tabla
+690	Título 1
+691	Título 2
+692	Título 3
+693	Título 4
+694	Cita
+695	Estilo de párrafo
+696	Tachado
+697	Resaltar
+698	Justificar
+699	Lista con viñetas

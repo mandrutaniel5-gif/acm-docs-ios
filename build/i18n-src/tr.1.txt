@@ -1,0 +1,700 @@
+0	ACM Code SRL tarafından
+1	Oluştur
+2	Ana sayfa
+3	Dosyalar
+4	Faturalar
+5	Ayarlar
+6	ACM Docs · ücretsiz
+7	İyi günler
+8	Bugün ne yapıyoruz?
+9	Tara
+10	Fotoğraf → PDF
+11	Fatura
+12	Yeni
+13	Aç
+14	Herhangi bir dosya
+15	Tablo
+16	Sunu
+17	Bu ay faturalanan
+18	Henüz fatura yok
+19	Son kullanılanlar
+20	Tümünü gör
+21	Tümü
+22	Orijinaller
+23	Düzenlenenler
+24	Açmak için dosyayı buraya bırakın
+25	Önizleme
+26	Yeni
+27	Görünüm
+28	Şirket
+29	Ödenecek toplam
+30	PDF oluştur
+31	Kapat
+32	Kaydet
+33	PDF olarak dışa aktar
+34	Değiştir
+35	Tümünü değiştir
+36	Sun
+37	Düzenlemek için metne çift tıklayın · taşımak için sürükleyin · sunmak için F5
+38	İşleniyor…
+39	Ada göre ara
+40	Geri
+41	Nasıl göründüğüne bakın
+42	Yeni bir belge başlat
+43	Düzeni, renkleri ve metinleri değiştir
+44	Şirket bilgileri
+45	Fatura
+46	Başa dön
+47	Kaydedilmemiş değişiklikler
+48	Geri al (Ctrl+Z)
+49	Yinele (Ctrl+Y)
+50	Önceki sayfa
+51	Sonraki sayfa
+52	Belgede ara (Ctrl+F)
+53	Daha fazla
+54	Belgede metin ara…
+55	Önceki
+56	Sonraki
+57	Kapat (Esc)
+58	Uzaklaştır (Ctrl + fare tekerleği)
+59	Genişliğe sığdır
+60	Yakınlaştır (Ctrl + fare tekerleği)
+61	Bul…
+62	Şununla değiştir…
+63	Uzaklaştır
+64	Sığdır
+65	Yakınlaştır
+66	Seçili hücre (bir adres yazıp Enter'a basın)
+67	Bir değer veya formül girin, örn. =SUM(B2:B10)
+68	Sun (F5)
+69	Klasörde göster
+70	Telefona bir kopya kaydet…
+71	Listeden kaldır
+72	Düzenleyen şirket
+73	İyi geceler
+74	Günaydın
+75	İyi akşamlar
+76	Şirketinizi kurun ve ilk faturanızı kesin
+77	${s.monthCount} ${s.monthCount === 1 ? 'invoice' : 'invoices'} · ${Invoice.money(s.unpaid)} ${s.currency} tahsil edilecek
+78	Bu ay ${s.monthCount} ${s.monthCount === 1 ? 'invoice' : 'invoices'}
+79	Yeni fatura
+80	Proforma
+81	Maliyet tahmini
+82	Teklif
+83	Şirketiniz
+84	Her işletme için ücretsiz fatura
+85	Şirket bilgilerinizi bir kez girin; faturaları, proformaları ve teklifleri saniyeler içinde düzenleyin.
+86	Şirketi kur
+87	Henüz dosya yok
+88	Bir sayfa tarayın veya telefonunuzdan bir PDF açın.
+89	Bir PDF ya da fotoğraf açın veya bir dosyayı pencereye sürükleyin.
+90	Uygulamada açtığınız, düzenlediğiniz veya oluşturduğunuz her şey.
+91	Dosyalarınız, dokunulmadan. Düzenlemeler ayrı kaydedilir.
+92	Düzenlemeden sonra kaydedilen kopyalar (name_editat_1, _2…).
+93	Düzenlenen faturalar, proformalar ve teklifler.
+94	Hiçbir şey bulunamadı
+95	Hiçbir dosya “${q}” içermiyor.
+96	Bir sayfa taramak veya dosya açmak için + simgesine dokunun.
+97	“Aç”a tıklayın veya bir dosyayı pencereye sürükleyin.
+98	Henüz belge açılmadı
+99	Açtığınız dosyalar burada görünür.
+100	Henüz düzenlenmiş kopya yok
+101	Bir belgeyi kaydettiğinizde burada “name_editat_1” olarak görünür. Orijinal dokunulmadan kalır.
+102	Henüz düzenlenmiş belge yok
+103	Oluşturduğunuz faturalar, proformalar ve teklifler burada görünür.
+104	Otomatik
+105	Telefonla aynı
+106	Windows ile aynı
+107	Açık
+108	Koyu
+109	Bu şirketi kullan
+110	Belgelerin görünümü
+111	Şirketi sil
+112	“${p.name}” silinsin mi?
+113	Uygulamadan yalnızca şirket bilgileri kaldırılır. Düzenlenen PDF'ler cihazınızda kalır.
+114	Sil
+115	Başka bir şirket ekle
+116	Şirketinizi kurun
+117	Her işletme için faturalar
+118	Şirketler
+119	Belgeler işaretli şirket adına düzenlenir. Birden fazla şirket tutabilirsiniz.
+120	Belgeler
+121	Düzenlenen belgelerin listesi
+122	Dosyaların kaydedildiği yer
+123	 · düzenlemeler: orijinalin yanında
+124	Hakkında
+125	PDF'ler, belgeler, tablolar, sunular ve faturalar — ücretsiz, hesap gerekmez. Verileriniz yalnızca bu cihazda kalır.
+126	Kamerayla tara
+127	Fotoğraf veya taramadan PDF
+128	Fiyat teklifi
+129	Tablo (Excel)
+130	Sunu (PowerPoint)
+131	Dosya aç…
+132	Görüntü boş.
+133	Eski sunu biçimi
+134	“${name}” eski bir PowerPoint sunusu (.ppt). PowerPoint'te açın ve Dosya → Farklı Kaydet → PowerPoint Sunusu (.pptx) seçin, ardından burada açın.
+135	Anladım
+136	OpenDocument biçimi
+137	“${name}” bir LibreOffice belgesi (.odt/.odp). LibreOffice'te .docx veya .pptx olarak kaydedin, ardından burada açın. .ods tablolar doğrudan açılır.
+138	Bu belge PDF değil
+139	“${name}” bir Word/Excel belgesine benziyor. Word'de açın ve Dosya → Farklı Kaydet → PDF seçin, ardından PDF'i burada açın.
+140	“${name}” boş (0 bayt).
+141	Bilinmeyen dosya
+142	“${name}” ne PDF ne de görüntü. Yalnızca PDF dosyaları ve fotoğraflar (JPG, PNG, BMP, GIF, WEBP) açılabilir.
+143	“${name}” okunamıyor. Taşınmış, silinmiş veya başka bir programda açık olabilir.
+144	Ayrıntılar
+145	Dosya okunamıyor
+146	Açılıyor…
+147	“${name}” açılamadı
+148	Fotoğraf artık bir PDF. İçindeki metin düzenlenebilir yapılsın mı?
+149	Belge taranmış görünüyor (yalnızca görüntüler). Metin düzenlenebilir yapılsın mı?
+150	Metni düzenlenebilir yap
+151	Fotoğraf yeni bir PDF'e yerleştirildi. Saklamak için kaydedin.
+152	Yeni belge.pdf
+153	Yeni belge
+154	Sona ${Editor.sizes.length - before} sayfa eklendi.
+155	“${name}” eklenemedi
+156	Orijinal dosyanın kendisini seçtiniz. Devam ederseniz orijinal kaybolur.
+157	Üzerine yaz
+158	Kaydediliyor…
+159	Ayrı kaydedildi: ${Host.baseName(p)} — orijinal dokunulmadı.
+160	Gönder
+161	Bu klasöre yazılamıyor (korumalı veya dosya başka bir programda açık). Başka bir konum seçin.
+162	Kaydetme başarısız:
+163	Farklı kaydet
+164	Seçmek için sayfadaki herhangi bir öğeye tıklayın · taşımak için sürükleyin · köşeler boyutlandırır · düzenlemek için metne çift tıklayın
+165	Düzenlemek için bir metne veya yeni metin eklemek için sayfada herhangi bir yere tıklayın (yazı tipi ve boyut otomatik uyar)
+166	Fare düğmesini basılı tutarak çizin
+167	Vurgulamak için metnin üzerinden sürükleyin
+168	Beyazla kapatmak istediğiniz yerin üzerine bir dikdörtgen çizin
+169	Onay işaretinin olacağı yere tıklayın
+170	X'in olacağı yere tıklayın
+171	Görüntüyü yerleştirmek için sayfaya tıklayın (veya boyut için bir dikdörtgen çizin) · iptal için Esc
+172	Seçilen dosya bir görüntü değil.
+173	Görüntü okunamadı:
+174	Farklı kaydet…
+175	Görüntülerdeki metni düzenlenebilir yap (bu sayfa)
+176	Başka bir PDF'ten sayfa ekle…
+177	Geçerli sayfadan sonra boş sayfa
+178	Sayfayı sola döndür
+179	Sayfayı sağa döndür
+180	Geçerli sayfayı sil
+181	Belgeyi kapat
+182	Sayfa silinsin mi?
+183	${i + 1}. sayfa belgeden kaldırılacak. Ctrl+Z ile geri alabilirsiniz.
+184	${Host.baseName(copyPath)} dosyasına kaydet (Ctrl+S)
+185	Ayrı dosya olarak kaydet “…_editat_N.pdf”; orijinal dokunulmadan kalır (Ctrl+S)
+186	${a4}${mm(s.w)} × ${mm(s.h)} mm · ${n} ${n === 1 ? 'page' : 'pages'}
+187	Bir hata oluştu:
+188	Hata
+189	PDF motoru başlatılamadı
+190	Uygulamanın depolama alanı dolu: kaydedilemedi.
+191	Hizmetler
+192	Hizmet
+193	Ürün
+194	Ürünler
+195	Diğer
+196	Ne sattınız veya hangi hizmeti verdiniz…
+197	Ticaret
+198	Ürün satışı, mağaza, çevrimiçi
+199	Teslimat
+200	Ürün adı…
+201	Oto servis
+202	Onarım, parça, işçilik
+203	İşçilik
+204	Parça
+205	Parçalar
+206	Araç
+207	Marka ve model
+208	Plaka
+209	Kilometre (km)
+210	Şasi no. (VIN)
+211	Neyi onardınız veya hangi parçayı taktınız…
+212	Müşteri — aracı ve belgeyi teslim aldı
+213	İşçilikte 3 ay garanti.
+214	İnşaat
+215	Tadilat, tesisat, iç yapı
+216	Malzemeler
+217	Ekipman
+218	İşler
+219	Şantiye adresi
+220	İşlerin açıklaması
+221	Dönem
+222	Sözleşme no.
+223	İş veya malzeme…
+224	BT ve danışmanlık
+225	Saatler
+226	Çalışılan saatler
+227	Proje
+228	Projeler
+229	Abonelik
+230	Abonelikler
+231	ay
+232	Ne teslim ettiniz…
+233	Seferler, yük, yolcu
+234	Sefer
+235	Seferler
+236	sefer
+237	Kilometre
+238	Ekstralar
+239	Ek hizmetler
+240	Güzergâh
+241	Sefer veya hizmet…
+242	Güzellik
+243	Salon, kozmetik, sağlıklı yaşam
+244	Hizmet veya ürün…
+245	Yemek
+246	porsiyon
+247	İçecekler
+248	Etkinlik
+249	Etkinlik tarihi
+250	Ürün veya hizmet…
+251	FATURA
+252	Proformalar
+253	PROFORMA FATURA
+254	Teklifler
+255	FİYAT TEKLİFİ
+256	Romanya
+257	KDV mükellefi olmayan tedarikçi (özel muafiyet rejimi, Romanya Vergi Kanunu md. 310).
+258	Bu bilgisayarda metni yazmak için yazı tipi bulunamadı.
+259	Dosya yazılamıyor
+260	PDF oluşturma kullanılamıyor.
+261	Kopya kaydedildi.
+262	Yüklenemedi
+263	” yüklenmedi.
+264	Görüntü hazırlanamadı.
+265	Fotoğraf döndürülmüş; yalnızca düz metni okuyabilirim.
+266	Sayfa ${pi + 1} / ${list.length} ·
+267	Fotoğraftaki metin okunuyor…
+268	Metin okuyucu başlatılıyor…
+269	Metin yazılıyor…
+270	Tamam: ${total} ${total === 1 ? 'rând de text a devenit editabil' : 'rânduri de text au devenit editabile'}. Düzenlemek için metne çift tıklayın.
+271	Fotoğrafta net metin bulunamadı.
+272	Fotoğraftaki metin okunamadı
+273	Nakit
+274	Seri
+275	Düzenleme tarihi
+276	Son ödeme tarihi
+277	Geçerlilik tarihi
+278	No.
+279	Miktar
+280	Birim fiyat
+281	Tutar
+282	KDV hariç toplam
+283	ÖDENECEK TOPLAM
+284	Ödeme şekli
+285	Notlar
+286	Tedarikçi — imza
+287	<tr><td colspan="${ncols + 1}" class="empty">Ürün veya hizmet ekleyin</td></tr>
+288	Şirket adı
+289	Müşteri — teslim alındı imzası
+290	<br>(KDV hariç)
+291	Şirket bilgilerinizi girin
+292	Vergi no, adres, IBAN — her belgede görünür. Yalnızca bir kez girersiniz.
+293	Doldur
+294	Seri
+295	Numara
+296	Tarih
+297	Son ödeme tarihi (isteğe bağlı)
+298	Ödeme
+299	Banka havalesi (ödeme talimatı)
+300	Banka havalesi
+301	Kapıda ödeme
+302	Para birimi
+303	Şirket adı *
+304	Ad soyad *
+305	Telefon
+306	Kimlik no. (isteğe bağlı)
+307	Adres
+308	E-posta (isteğe bağlı)
+309	Müşteri
+310	Bireysel
+311	Şirket
+312	Miktar
+313	Fiyat
+314	<span>Ekle</span>
+315	Ürünler ve hizmetler
+316	Ödendi
+317	örn. 12 ay garanti. Teşekkürler!
+318	Ne sattığınızı veya üzerinde çalıştığınızı yazın, fiyatı belirleyin ve Ekle'ye basın. Toplam otomatik hesaplanır.
+319	Kategoriyi değiştir
+320	Satırı sil
+321	KDV dahil ${money(t.tva)}
+322	Henüz kalem yok
+323	Şirketiniz ne iş yapıyor?
+324	Belgelerinizi sektörünüze göre ayarlarız: uygun kategoriler, alanlar ve ifadeler. Bunu istediğiniz zaman değiştirebilirsiniz.
+325	İptal
+326	Devam
+327	Şirketinizin adı ne?
+328	Gerisini (adres, IBAN, logo) şimdi veya daha sonra ekleyebilirsiniz.
+329	Şirket KDV mükellefi
+330	Tamam
+331	Girdiğim fiyatlara KDV dahil
+332	KDV mükellefi olmayan tedarikçiler için not
+333	Logoyu değiştir
+334	Logo ekle
+335	Logo yok
+336	Şirket adını girin.
+337	Yeni şirket
+338	Yalnızca bir kez girersiniz. Her fatura, proforma ve teklifte görünür.
+339	Belgelerinizin üstünde görünür. İsteğe bağlı.
+340	Görünen ad *
+341	Resmî unvan
+342	Faaliyet alanı
+343	Vergi bilgileri
+344	RO12345678 veya 12345678
+345	Sermaye
+346	Adres ve iletişim
+347	Şehir
+348	İl / bölge
+349	Web sitesi
+350	isteğe bağlı
+351	Banka
+352	Banka
+353	Seriler ve numaralandırma
+354	Fatura serisi
+355	Sonraki numara
+356	Proforma serisi
+357	Belge varsayılanları
+358	Para birimi
+359	Ödeme vadesi (gün)
+360	0 = vade yok
+361	Varsayılan notlar
+362	Müşterinin adını girin.
+363	En az bir ürün veya hizmet ekleyin.
+364	Başka konum…
+365	PDF oluştur: ${label.toLowerCase()}
+366	Dosya adı (değiştirebilirsiniz):
+367	Kaydedileceği yer:
+368	Dosya zaten var
+369	“${Host.baseName(target)}” zaten var. Değiştirilsin mi?
+370	Oluşturuluyor: ${label.toLowerCase()}…
+371	Bir tane daha
+372	PDF'i aç
+373	Belge oluşturulamadı
+374	Petrol mavisi
+375	Mavi
+376	Grafit
+377	Yeşil
+378	Kırmızı
+379	Turuncu
+380	Mor
+381	Siyah
+382	Tedarikçi ve müşteri
+383	Ayrıntılar (sektöre göre)
+384	Ürün / hizmet tablosu
+385	Toplamlar
+386	Ödeme, notlar, açıklamalar
+387	İmzalar
+388	Alt bilgi
+389	Fatura başlığı (boş = FATURA)
+390	Proforma başlığı
+391	Teklif başlığı
+392	Tedarikçi
+393	No. sütunu
+394	Açıklama sütunu
+395	Birim sütunu
+396	Miktar sütunu
+397	Birim fiyat sütunu
+398	Tutar sütunu
+399	Tedarikçi imzası
+400	Müşteri imzası (boş = otomatik)
+401	Değişiklikler kaydedilsin mi?
+402	Belgenin düzenini değiştirdiniz ve kaydetmediniz.
+403	Kaydetme
+404	Düzen kaydedildi. Tüm yeni belgelerde kullanılacak.
+405	Varsayılanlara dönülsün mü?
+406	Renkler, yapı ve metinler başlangıçtaki hâline döner. Sonra saklamak için Kaydet'e tıklayın.
+407	Sıfırla
+408	Başka renk
+409	Herhangi bir renk seç
+410	Diğer…
+411	<span>Varsayılanlar</span>
+412	Orijinal görünüme dön
+413	<span>Kaydet</span>
+414	Belgelerinizin yapısı, renkleri ve metinleri
+415	Renkler ve düzen
+416	Ana renk
+417	Metin rengi
+418	Neredeyse siyah
+419	Koyu gri
+420	Lacivert
+421	Metin boyutu
+422	Kenar boşlukları
+423	Üst bilgi
+424	Beyaz (mürekkep tasarrufu)
+425	Tonlu
+426	Dolu şerit
+427	Dolu şerit çok mürekkep harcar
+428	Kenarlıklar
+429	Çerçeve
+430	Yok
+431	Tablo başlığı
+432	Çizgi (mürekkep tasarrufu)
+433	Dolu
+434	Tablo satırları
+435	Çizgiler
+436	Şeritler
+437	Izgara
+438	Sade
+439	Çerçeve (mürekkep tasarrufu)
+440	Logoyu göster
+441	Boyut
+442	Daha küçük = daha az mürekkep
+443	Şekil
+444	Kare
+445	Yuvarlatılmış
+446	Daire
+447	Konum
+448	Sol
+449	Sağ
+450	Görüntü
+451	Logoyu değiştir…
+452	Logo ekle…
+453	Yukarı taşı
+454	Aşağı taşı
+455	Yapı — bölümlerin sırası
+456	Bir bölümü yukarı veya aşağı taşımak için okları, göstermek veya gizlemek için sağdaki düğmeyi kullanın. Üst bilgi her zaman en üstte kalır.
+457	Kategoriye göre grupla
+458	Ara toplamları göster
+459	Alt bilgi metni
+460	Belgedeki metin
+461	PDF dosya adı
+462	Ad şablonu
+463	Şimdiye kadar girdikleriniz silinecek.
+464	Yeniden başla
+465	Şirket bilgileri…
+466	Başka bir şirket ekle…
+467	Düzenleyen şirket
+468	İşletmeniz için ücretsiz faturalar
+469	Şirketinizi bir kez kurarsınız (bir dakika), ardından faturaları, proformaları ve teklifleri doğrudan telefonunuzdan veya bilgisayarınızdan düzenlersiniz.
+470	Tahsil edilecek
+471	${unpaid.length} ödenmemiş
+472	Her şey ödendi
+473	Maliyet tahminleri
+474	Ödenmemiş
+475	Burada hiçbir şey yok
+476	Yukarıdaki filtreyi değiştirin.
+477	“Yeni belge”ye tıklayın, müşteriyi ve sattığınızı girin, ardından “PDF oluştur”a tıklayın.
+478	İlk faturanızı kesin
+479	tarihsiz
+480	Vadesi geçmiş
+481	Ödenmemiş
+482	Ödendi olarak işaretle
+483	Ödenmedi olarak işaretle
+484	Faturaya dönüştür
+485	Çoğalt (yeni aynı belge)
+486	Belge listeden kaldırılsın mı?
+487	PDF dosyası yerinde kalır; yalnızca burada artık görünmez.
+488	Kaldır
+489	Proforma fatura
+490	Ne düzenlemek istiyorsunuz?
+491	Metni düzenle
+492	Metni kopyala
+493	Bu metin düzenlenemez (döndürülmüş veya okunabilir yazı tipi yok). Taşıyabilir veya silebilirsiniz.
+494	Bu metin yalnızca taşınabilir veya silinebilir.
+495	Metin kopyalandı.
+496	İşlem başarısız:
+497	Daha küçük
+498	Daha büyük
+499	Kalın
+500	Düzenle
+501	Metni düzenle (Enter)
+502	Metni kopyala (Ctrl+C)
+503	Düzenlenebilir metin
+504	Görüntüdeki metni okur ve düzenlenebilir yapar
+505	Sil (Delete)
+506	Seç
+507	Sayfadaki herhangi bir öğeye tıklayın (metin, görüntü, imza): taşımak için sürükleyin, düzenlemek için metne yeniden tıklayın (V)
+508	Değiştirmek için bir metne veya yeni metin yazmak için herhangi bir yere tıklayın (T)
+509	İmza
+510	İmza çiz veya seç (S)
+511	Görüntü
+512	Görüntü ekle: kaşe, logo, fotoğraf
+513	Çiz
+514	Fareyle serbest çizim (P)
+515	Vurgula
+516	Fosforlu kalemle işaretle (H)
+517	Kapat
+518	Beyazla kapat (W)
+519	Onay işareti
+520	Onay işareti ekle (C)
+521	X ekle (X)
+522	Yeni metin boyutu (pt)
+523	Otomatik: yeni metin, çevredeki metnin yazı tipini, boyutunu ve rengini kullanır (kapatmak için tıklayın)
+524	Otomatik kapalı: yeni metin buradaki ayarları kullanır
+525	Çizgi kalınlığı (pt)
+526	İşaret boyutu
+527	Sayfa işlemleri
+528	Sola döndür
+529	Sağa döndür
+530	Sonrasına boş sayfa ekle
+531	Sayfayı sil
+532	${i + 1}. sayfa silinsin mi?
+533	Ctrl+Z ile geri alabilirsiniz.
+534	${index + 1} / ${results.length}
+535	Sonuç yok
+536	 Sil
+537	İmzayı kullan
+538	Görüntüden…
+539	Kullan
+540	Aşağıdaki kutuda fareyle imzalayın.
+541	Sonraki sefer için sakla
+542	Kayıtlı imzalar
+543	Parola
+544	Parola yanlış. Tekrar deneyin.
+545	Belgenin parolasını girin.
+546	“${name}” üzerindeki değişiklikler kaydedilsin mi?
+547	Hatayı kopyala
+548	Dosya adı:
+549	Ayrı kaydedildi: ${Host.baseName(path)} — orijinal değiştirilmedi.
+550	dosya başka bir programda açık veya klasör korumalı.
+551	PDF olarak dışa aktar
+552	PDF oluşturuluyor…
+553	PDF oluşturulamadı
+554	Renk yok
+555	Başka renk…
+556	DOĞRU
+557	Ortalama: <b>${n ? ro(sum / n, 2) : '—'}</b> &nbsp; Sayı: <b>${cnt}</b> &nbsp; Toplam: <b>${ro(sum, 2)}</b>
+558	Hücreler birleştirilsin mi?
+559	Yalnızca ilk (sol üst) hücrenin değeri kalır; diğerleri silinir.
+560	Birleştir
+561	Kes
+562	Kopyala
+563	Yapıştır
+564	Üste ${nr} satır ekle
+565	Üste satır ekle
+566	Alta ${nr} satır ekle
+567	Alta satır ekle
+568	Sola ${nc} sütun ekle
+569	Sola sütun ekle
+570	Sağa ${nc} sütun ekle
+571	Sağa sütun ekle
+572	${nr} satırı sil
+573	${nc} sütunu sil
+574	Sütunu sil
+575	Hücreleri temizle
+576	A → Z sırala
+577	Z → A sırala
+578	Kalın (Ctrl+B)
+579	Hücre rengi
+580	Sola hizala
+581	Ortala
+582	Sağa hizala
+583	Metni kaydır
+584	Hücreleri birleştir / ayır
+585	Yüzde
+586	Tarih
+587	Sayı biçimi
+588	Daha az ondalık
+589	Daha fazla ondalık
+590	Tüm kenarlıklar
+591	Dış kenarlık
+592	Alt kenarlık
+593	Kenarlık yok
+594	Otomatik Toplam (Σ)
+595	Toplam
+596	Satırlar ve sütunlar
+597	Seçili satırları sil
+598	Seçili sütunları sil
+599	Satırlar
+600	Yeniden adlandır
+601	Sayfayı çoğalt
+602	Sola taşı
+603	Sağa taşı
+604	Sayfayı sil
+605	Yeni sayfa
+606	Sayfayı yeniden adlandır
+607	Bu adda bir sayfa zaten var.
+608	Sayfa silinsin mi?
+609	“${wb.sheets[i].name}” sayfası ve üzerindeki her şey silinecek. Ctrl+Z ile geri alabilirsiniz.
+610	Düzenleyici başlatılamadı
+611	Tablo açılıyor…
+612	Tablo açılamadı
+613	Yeni tablo.xlsx
+614	.xlsx (modern Excel biçimi) olarak kaydedilecek; orijinal dokunulmadan kalır.
+615	Yeni tablo
+616	Tabloyu kaydet
+617	Dosya hazırlanamadı
+618	Kullanılabilir işlevler
+619	İşlevler
+620	Beyaz
+621	Atölye
+622	Kâğıt
+623	Doğa
+624	Gün batımı
+625	Başlık eklemek için tıklayın
+626	Metin eklemek için tıklayın
+627	Alt başlık eklemek için tıklayın
+628	Bölüm başlığı eklemek için tıklayın
+629	Slayt ${cur + 1} / ${deck.slides.length}
+630	Metin yazın
+631	Başlık
+632	Başlık ve metin
+633	İki sütun
+634	Bölüm başlığı
+635	Yalnızca başlık
+636	Boş
+637	Sonrasına yeni slayt
+638	Slaytı çoğalt
+639	Arka plan…
+640	Slaytı sil
+641	Arka plan rengi…
+642	Temaya uygun
+643	Arka plan görüntüsü…
+644	Tema arka planı
+645	Arka planı tümüne uygula
+646	Yeni slayt
+647	Slayt
+648	Metin kutusu
+649	Şekiller
+650	Dikdörtgen
+651	Yuvarlatılmış dikdörtgen
+652	Daire / elips
+653	Üçgen
+654	Ok
+655	Çizgi
+656	Madde işaretleri
+657	Metin üstte / ortada / altta
+658	Üst
+659	Orta
+660	Alt
+661	Dolgu rengi
+662	Çerçeve rengi
+663	Düzenle
+664	En öne getir
+665	Öne getir
+666	Geriye gönder
+667	En arkaya gönder
+668	Yatay ortala
+669	Üste hizala
+670	Dikey ortala
+671	Alta hizala
+672	Çoğalt (Ctrl+D)
+673	Arka plan
+674	Temalar
+675	Tema
+676	Sununun sonu. Çıkmak için tıklayın veya Esc'ye basın.
+677	Dosya bir PowerPoint sunusuna benzemiyor.
+678	Sunu açılıyor…
+679	Sunu açılamadı
+680	Yeni sunu.pptx
+681	Yeni sunu
+682	Sunuyu kaydet
+683	Sunu hazırlanıyor…
+684	Sunu hazırlanamadı
+685	Çoğalt
+686	Görüntüyü değiştir…
+687	Görüntü…
+688	Sayfa 1 / ${pages} · ${words} ${words === 1 ? 'word' : 'words'} · ${t.replace(/\s/g, '').length} karakter
+689	Tablo ekle
+690	Başlık 1
+691	Başlık 2
+692	Başlık 3
+693	Başlık 4
+694	Alıntı
+695	Paragraf stili
+696	Üstü çizili
+697	Vurgula
+698	İki yana yasla
+699	Madde işaretli liste

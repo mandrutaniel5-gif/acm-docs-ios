@@ -1461,4 +1461,8 @@ window.I18N_EN = {"ACM Docs":"ACM Docs",
 "Alege limba":"Choose your language",
 "Poți schimba limba oricând din Setări.":"You can change the language any time in Settings.",
 "Limba":"Language",
-"Versiunea ${ver || '2.0.5'} · ${Host.mobile ? (Host.info.platform === 'ios' ? 'iOS' : 'Android') : 'Windows'} · 2026":"Version ${ver || '2.0.5'} · ${Host.mobile ? (Host.info.platform === 'ios' ? 'iOS' : 'Android') : 'Windows'} · 2026"};
+"Versiunea ${ver || '2.0.5'} · ${Host.mobile ? (Host.info.platform === 'ios' ? 'iOS' : 'Android') : 'Windows'} · 2026":"Version ${ver || '2.0.5'} · ${Host.mobile ? (Host.info.platform === 'ios' ? 'iOS' : 'Android') : 'Windows'} · 2026",
+"sau":"or",
+"editat":"edited",
+"document emis":"issued",
+"criptat":"encrypted"};

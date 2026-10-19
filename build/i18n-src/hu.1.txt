@@ -1,0 +1,700 @@
+0	az ACM Code SRL-től
+1	Létrehozás
+2	Kezdőlap
+3	Fájlok
+4	Számlák
+5	Beállítások
+6	ACM Docs · ingyenes
+7	Jó napot
+8	Mit csinálunk ma?
+9	Beolvasás
+10	Fotó → PDF
+11	Számla
+12	Új
+13	Megnyitás
+14	Bármilyen fájl
+15	Táblázat
+16	Bemutató
+17	E havi számlázás
+18	Még nincs számla
+19	Legutóbbiak
+20	Összes
+21	Mind
+22	Eredetiek
+23	Szerkesztettek
+24	Ejtsd ide a fájlt a megnyitáshoz
+25	Előnézet
+26	Új
+27	Megjelenés
+28	Cég
+29	Fizetendő összesen
+30	PDF létrehozása
+31	Bezárás
+32	Mentés
+33	Exportálás PDF-be
+34	Csere
+35	Összes cseréje
+36	Vetítés
+37	Dupla kattintás a szövegen a szerkesztéshez · húzással mozgatás · F5 a vetítéshez
+38	Folyamatban…
+39	Keresés név szerint
+40	Vissza
+41	Nézd meg, hogyan néz ki
+42	Új dokumentum indítása
+43	Elrendezés, színek és szövegek módosítása
+44	Cégadatok
+45	Számla
+46	Vissza az elejére
+47	Nem mentett változások
+48	Visszavonás (Ctrl+Z)
+49	Újra (Ctrl+Y)
+50	Előző oldal
+51	Következő oldal
+52	Keresés a dokumentumban (Ctrl+F)
+53	Továbbiak
+54	Szöveg keresése a dokumentumban…
+55	Előző
+56	Következő
+57	Bezárás (Esc)
+58	Kicsinyítés (Ctrl + görgő)
+59	Szélességhez igazítás
+60	Nagyítás (Ctrl + görgő)
+61	Keresés…
+62	Csere erre…
+63	Kicsinyítés
+64	Igazítás
+65	Nagyítás
+66	Kijelölt cella (írj be egy címet és nyomj Entert)
+67	Írj be egy értéket vagy képletet, pl. =SUM(B2:B10)
+68	Vetítés (F5)
+69	Megjelenítés a mappában
+70	Másolat mentése a telefonra…
+71	Eltávolítás a listából
+72	Kiállító cég
+73	Jó éjszakát
+74	Jó reggelt
+75	Jó estét
+76	Állítsd be a cégedet, és állítsd ki az első számládat
+77	${s.monthCount} ${s.monthCount === 1 ? 'invoice' : 'invoices'} · ${Invoice.money(s.unpaid)} ${s.currency} beszedendő
+78	${s.monthCount} ${s.monthCount === 1 ? 'invoice' : 'invoices'} ebben a hónapban
+79	Új számla
+80	Díjbekérő
+81	Költségbecslés
+82	Árajánlat
+83	A céged
+84	Ingyenes számlák bármilyen vállalkozásnak
+85	Add meg egyszer a cégadatokat, és pillanatok alatt állíts ki számlákat, díjbekérőket és árajánlatokat.
+86	Cég beállítása
+87	Még nincsenek fájlok
+88	Olvass be egy oldalt, vagy nyiss meg egy PDF-et a telefonodról.
+89	Nyiss meg egy PDF-et vagy fotót, vagy húzz egy fájlt az ablakba.
+90	Minden, amit az alkalmazásban megnyitottál, szerkesztettél vagy létrehoztál.
+91	A fájljaid érintetlenül. A szerkesztések külön mentődnek.
+92	Szerkesztés után mentett másolatok (name_editat_1, _2…).
+93	Kiállított számlák, díjbekérők és árajánlatok.
+94	Nincs találat
+95	Egyik fájl sem tartalmazza ezt: „${q}”.
+96	Koppints a + gombra egy oldal beolvasásához vagy egy fájl megnyitásához.
+97	Kattints a „Megnyitás” gombra, vagy húzz egy fájlt az ablakba.
+98	Még nem nyitottál meg dokumentumot
+99	A megnyitott fájlok itt jelennek meg.
+100	Még nincs szerkesztett másolat
+101	Ha mentesz egy dokumentumot, itt jelenik meg „name_editat_1” néven. Az eredeti érintetlen marad.
+102	Még nincs kiállított dokumentum
+103	Az általad létrehozott számlák, díjbekérők és árajánlatok itt jelennek meg.
+104	Automatikus
+105	Mint a telefon
+106	Mint a Windows
+107	Világos
+108	Sötét
+109	Ennek a cégnek a használata
+110	A dokumentumok megjelenése
+111	Cég törlése
+112	Törlöd ezt: „${p.name}”?
+113	Csak a cégadatok törlődnek az alkalmazásból. A kiállított PDF-ek az eszközödön maradnak.
+114	Törlés
+115	Másik cég hozzáadása
+116	Állítsd be a cégedet
+117	Számlák bármilyen vállalkozásnak
+118	Cégek
+119	A dokumentumok a bejelölt cég nevében készülnek. Több céget is kezelhetsz.
+120	Dokumentumok
+121	A kiállított dokumentumok listája
+122	Hová mentődnek a fájlok
+123	 · szerkesztések: az eredeti mellett
+124	Névjegy
+125	PDF-ek, dokumentumok, táblázatok, bemutatók és számlák – ingyen, fiók nélkül. Az adataid csak ezen az eszközön maradnak.
+126	Beolvasás kamerával
+127	PDF fotóból vagy beolvasásból
+128	Árajánlat
+129	Táblázat (Excel)
+130	Bemutató (PowerPoint)
+131	Fájl megnyitása…
+132	A kép üres.
+133	Régi bemutatóformátum
+134	„${name}” egy régi PowerPoint-bemutató (.ppt). Nyisd meg PowerPointban, válaszd a Fájl → Mentés másként → PowerPoint-bemutató (.pptx) lehetőséget, majd nyisd meg itt.
+135	Értem
+136	OpenDocument formátum
+137	„${name}” egy LibreOffice-dokumentum (.odt/.odp). Mentsd el LibreOffice-ban .docx vagy .pptx formátumban, majd nyisd meg itt. Az .ods táblázatok közvetlenül megnyílnak.
+138	Ez a dokumentum nem PDF
+139	„${name}” Word/Excel dokumentumnak tűnik. Nyisd meg Wordben, válaszd a Fájl → Mentés másként → PDF lehetőséget, majd nyisd meg itt a PDF-et.
+140	„${name}” üres (0 bájt).
+141	Ismeretlen fájl
+142	„${name}” se nem PDF, se nem kép. Csak PDF-fájlok és fotók (JPG, PNG, BMP, GIF, WEBP) nyithatók meg.
+143	„${name}” nem olvasható. Lehet, hogy áthelyezték, törölték, vagy egy másik program használja.
+144	Részletek
+145	A fájl nem olvasható
+146	Megnyitás…
+147	„${name}” nem nyitható meg
+148	A fotó most már PDF. Szerkeszthetővé teszed a szövegét?
+149	A dokumentum beolvasottnak tűnik (csak képek). Szerkeszthetővé teszed a szöveget?
+150	Szöveg szerkeszthetővé tétele
+151	A fotó egy új PDF-be került. Mentsd el, hogy megmaradjon.
+152	Új dokumentum.pdf
+153	Új dokumentum
+154	${Editor.sizes.length - before} oldal hozzáadva a végére.
+155	„${name}” nem adható hozzá
+156	Magát az eredeti fájlt választottad. Ha folytatod, az eredeti elvész.
+157	Felülírás
+158	Mentés…
+159	Külön mentve: ${Host.baseName(p)} – az eredeti érintetlen.
+160	Küldés
+161	Ebbe a mappába nem lehet írni (védett, vagy a fájl egy másik programban van megnyitva). Válassz másik helyet.
+162	A mentés nem sikerült:
+163	Mentés másként
+164	Kattints bármire az oldalon a kijelöléshez · húzással mozgatás · a sarkokkal átméretezés · dupla kattintás a szövegen a szerkesztéshez
+165	Kattints egy szövegre a szerkesztéshez, vagy bárhová az oldalon új szöveg hozzáadásához (a betűtípus és a méret automatikusan igazodik)
+166	Rajzolj lenyomott egérgombbal
+167	Húzd végig a szövegen a kiemeléshez
+168	Húzz egy téglalapot arra, amit fehérrel akarsz letakarni
+169	Kattints oda, ahová a pipát szeretnéd
+170	Kattints oda, ahová az X-et szeretnéd
+171	Kattints az oldalra a kép elhelyezéséhez (vagy húzz téglalapot a mérethez) · Esc a megszakításhoz
+172	A kiválasztott fájl nem kép.
+173	A kép nem olvasható:
+174	Mentés másként…
+175	Képek szövegének szerkeszthetővé tétele (ez az oldal)
+176	Oldalak hozzáadása másik PDF-ből…
+177	Üres oldal az aktuális után
+178	Oldal forgatása balra
+179	Oldal forgatása jobbra
+180	Aktuális oldal törlése
+181	Dokumentum bezárása
+182	Törlöd az oldalt?
+183	A(z) ${i + 1}. oldal eltávolításra kerül. Ctrl+Z-vel visszavonhatod.
+184	Mentés ide: ${Host.baseName(copyPath)} (Ctrl+S)
+185	Mentés külön fájlba „…_editat_N.pdf” néven; az eredeti érintetlen marad (Ctrl+S)
+186	${a4}${mm(s.w)} × ${mm(s.h)} mm · ${n} ${n === 1 ? 'page' : 'pages'}
+187	Hiba történt:
+188	Hiba
+189	A PDF-motor nem indult el
+190	Az alkalmazás tárhelye megtelt: a mentés nem sikerült.
+191	Szolgáltatások
+192	Szolgáltatás
+193	Termék
+194	Termékek
+195	Egyéb
+196	Mit adtál el, vagy milyen szolgáltatást nyújtottál…
+197	Kereskedelem
+198	Termékértékesítés, üzlet, online
+199	Szállítás
+200	Termék neve…
+201	Autószerviz
+202	Javítások, alkatrészek, munkadíj
+203	Munkadíj
+204	Alkatrész
+205	Alkatrészek
+206	Jármű
+207	Márka és típus
+208	Rendszám
+209	Kilométeróra-állás (km)
+210	Alvázszám (VIN)
+211	Mit javítottál, vagy milyen alkatrészt szereltél be…
+212	Ügyfél – a járművet és a dokumentumot átvette
+213	3 hónap garancia a munkára.
+214	Építőipar
+215	Felújítás, szerelés, kivitelezés
+216	Anyagok
+217	Eszközök
+218	Munkák
+219	A munkavégzés címe
+220	A munkák leírása
+221	Időszak
+222	Szerződésszám
+223	Munka vagy anyag…
+224	IT és tanácsadás
+225	Órák
+226	Ledolgozott órák
+227	Projekt
+228	Projektek
+229	Előfizetés
+230	Előfizetések
+231	hónap
+232	Mit szállítottál le…
+233	Utak, fuvar, személyszállítás
+234	Út
+235	Utak
+236	út
+237	Kilométer
+238	Extrák
+239	Kiegészítő szolgáltatások
+240	Útvonal
+241	Út vagy szolgáltatás…
+242	Szépségápolás
+243	Szalon, kozmetika, wellness
+244	Szolgáltatás vagy termék…
+245	Étel
+246	adag
+247	Italok
+248	Rendezvény
+249	A rendezvény dátuma
+250	Termék vagy szolgáltatás…
+251	SZÁMLA
+252	Díjbekérők
+253	DÍJBEKÉRŐ
+254	Árajánlatok
+255	ÁRAJÁNLAT
+256	Románia
+257	Áfakörön kívüli szállító (különleges mentességi szabály, a román adótörvénykönyv 310. cikke).
+258	Ezen a számítógépen nem található betűtípus a szöveg írásához.
+259	A fájl nem írható
+260	A PDF-készítés nem érhető el.
+261	Másolat mentve.
+262	Nem sikerült betölteni
+263	” nincs betöltve.
+264	A kép nem készíthető elő.
+265	A fotó el van forgatva; csak egyenes szöveget tudok olvasni.
+266	${pi + 1}. oldal / ${list.length} ·
+267	Szöveg olvasása a fotóról…
+268	A szövegolvasó indítása…
+269	Szöveg írása…
+270	Kész: ${total} ${total === 1 ? 'rând de text a devenit editabil' : 'rânduri de text au devenit editabile'}. Kattints duplán a szövegre a szerkesztéshez.
+271	A fotón nem található jól olvasható szöveg.
+272	A fotóról nem sikerült szöveget olvasni
+273	Készpénz
+274	Sorozat
+275	Kiállítás dátuma
+276	Fizetési határidő
+277	Érvényes eddig
+278	Sz.
+279	Menny.
+280	Egységár
+281	Összeg
+282	Összesen áfa nélkül
+283	FIZETENDŐ ÖSSZESEN
+284	Fizetési mód
+285	Megjegyzések
+286	Szállító – aláírás
+287	<tr><td colspan="${ncols + 1}" class="empty">Adj hozzá termékeket vagy szolgáltatásokat</td></tr>
+288	Cégnév
+289	Ügyfél – átvételi aláírás
+290	<br>(áfa nélkül)
+291	Add meg a cégadataidat
+292	Adószám, cím, IBAN – minden dokumentumon megjelennek. Csak egyszer kell megadnod.
+293	Kitöltés
+294	Sorozat
+295	Szám
+296	Dátum
+297	Határidő (nem kötelező)
+298	Fizetés
+299	Banki átutalás (fizetési megbízás)
+300	Banki átutalás
+301	Utánvét
+302	Pénznem
+303	Cégnév *
+304	Teljes név *
+305	Telefon
+306	Személyi azonosító (nem kötelező)
+307	Cím
+308	E-mail (nem kötelező)
+309	Ügyfél
+310	Magánszemély
+311	Cég
+312	Mennyiség
+313	Ár
+314	<span>Hozzáadás</span>
+315	Termékek és szolgáltatások
+316	Fizetve
+317	pl. 12 hónap garancia. Köszönjük!
+318	Írd be, mit adtál el vagy min dolgoztál, add meg az árat, és nyomd meg a Hozzáadás gombot. Az összeg automatikusan számolódik.
+319	Kategória módosítása
+320	Sor törlése
+321	ebből áfa ${money(t.tva)}
+322	Még nincsenek tételek
+323	Mivel foglalkozik a céged?
+324	A dokumentumaidat a tevékenységedhez igazítjuk: megfelelő kategóriák, mezők és megfogalmazások. Ezt bármikor módosíthatod.
+325	Mégse
+326	Tovább
+327	Mi a céged neve?
+328	A többit (cím, IBAN, logó) most vagy később is megadhatod.
+329	A cég áfakörös
+330	Kész
+331	Az általam megadott árak tartalmazzák az áfát
+332	Megjegyzés áfakörön kívüli szállítóknak
+333	Logó módosítása
+334	Logó hozzáadása
+335	Nincs logó
+336	Add meg a cég nevét.
+337	Új cég
+338	Csak egyszer kell megadnod. Minden számlán, díjbekérőn és árajánlaton megjelennek.
+339	A dokumentumaid tetején jelenik meg. Nem kötelező.
+340	Megjelenített név *
+341	Hivatalos név
+342	Tevékenységi kör
+343	Adóadatok
+344	RO12345678 vagy 12345678
+345	Jegyzett tőke
+346	Cím és elérhetőség
+347	Város
+348	Megye / régió
+349	Weboldal
+350	nem kötelező
+351	Bank
+352	Bank
+353	Sorozatok és számozás
+354	Számlasorozat
+355	Következő szám
+356	Díjbekérő-sorozat
+357	A dokumentumok alapértékei
+358	Pénznem
+359	Fizetési határidő (nap)
+360	0 = nincs határidő
+361	Alapértelmezett megjegyzések
+362	Add meg az ügyfél nevét.
+363	Adj hozzá legalább egy terméket vagy szolgáltatást.
+364	Más hely…
+365	PDF létrehozása: ${label.toLowerCase()}
+366	Fájlnév (módosítható):
+367	Mentés helye:
+368	A fájl már létezik
+369	„${Host.baseName(target)}” már létezik. Lecseréled?
+370	Készül: ${label.toLowerCase()}…
+371	Még egy
+372	PDF megnyitása
+373	A dokumentum nem hozható létre
+374	Kékeszöld
+375	Kék
+376	Grafit
+377	Zöld
+378	Piros
+379	Narancs
+380	Lila
+381	Fekete
+382	Szállító és ügyfél
+383	Részletek (tevékenység szerint)
+384	Termékek / szolgáltatások táblázata
+385	Végösszegek
+386	Fizetés, megjegyzések, közlemények
+387	Aláírások
+388	Lábléc
+389	Számla címe (üres = SZÁMLA)
+390	Díjbekérő címe
+391	Árajánlat címe
+392	Szállító
+393	Sorszám oszlop
+394	Leírás oszlop
+395	Mértékegység oszlop
+396	Mennyiség oszlop
+397	Egységár oszlop
+398	Összeg oszlop
+399	A szállító aláírása
+400	Az ügyfél aláírása (üres = automatikus)
+401	Mented a módosításokat?
+402	Módosítottad a dokumentum elrendezését, de nem mentetted.
+403	Nem mentem
+404	Az elrendezés mentve. Minden új dokumentumhoz ezt használjuk.
+405	Visszaállítod az alapértékeket?
+406	A színek, a szerkezet és a szövegek visszaállnak a kezdeti állapotra. Utána kattints a Mentés gombra, hogy megmaradjanak.
+407	Visszaállítás
+408	Más szín
+409	Bármilyen szín választása
+410	Más…
+411	<span>Alapértékek</span>
+412	Vissza az eredeti megjelenéshez
+413	<span>Mentés</span>
+414	A dokumentumaid szerkezete, színei és szövegei
+415	Színek és elrendezés
+416	Fő szín
+417	Szövegszín
+418	Majdnem fekete
+419	Sötétszürke
+420	Tengerészkék
+421	Betűméret
+422	Margók
+423	Fejléc
+424	Fehér (tintát takarít meg)
+425	Árnyalat
+426	Teli sáv
+427	A teli sáv sok tintát fogyaszt
+428	Szegélyek
+429	Körvonal
+430	Nincs
+431	Táblázat fejléce
+432	Vonal (tintát takarít meg)
+433	Teli
+434	Táblázat sorai
+435	Vonalak
+436	Csíkok
+437	Rács
+438	Egyszerű
+439	Körvonal (tintát takarít meg)
+440	Logó megjelenítése
+441	Méret
+442	Kisebb = kevesebb tinta
+443	Forma
+444	Négyzet
+445	Lekerekített
+446	Kör
+447	Helyzet
+448	Balra
+449	Jobbra
+450	Kép
+451	Logó módosítása…
+452	Logó hozzáadása…
+453	Fel
+454	Le
+455	Szerkezet – a szakaszok sorrendje
+456	A nyilakkal fel- vagy lefelé mozgathatsz egy szakaszt, a jobb oldali gombbal pedig megjelenítheted vagy elrejtheted. A fejléc mindig felül marad.
+457	Csoportosítás kategória szerint
+458	Részösszegek megjelenítése
+459	Lábléc szövege
+460	Szöveg a dokumentumon
+461	PDF fájlneve
+462	Névminta
+463	Az eddig beírtak törlődnek.
+464	Újrakezdés
+465	Cégadatok…
+466	Másik cég hozzáadása…
+467	Kiállító cég
+468	Ingyenes számlák a cégednek
+469	Egyszer beállítod a cégedet (egy perc), utána közvetlenül a telefonodról vagy számítógépedről állíthatsz ki számlákat, díjbekérőket és árajánlatokat.
+470	Beszedendő
+471	${unpaid.length} kifizetetlen
+472	Minden ki van fizetve
+473	Költségbecslések
+474	Kifizetetlen
+475	Itt nincs semmi
+476	Módosítsd a fenti szűrőt.
+477	Kattints az „Új dokumentum” gombra, add meg az ügyfelet és amit eladtál, majd kattints a „PDF létrehozása” gombra.
+478	Állítsd ki az első számládat
+479	dátum nélkül
+480	Lejárt
+481	Kifizetetlen
+482	Megjelölés fizetettként
+483	Megjelölés kifizetetlenként
+484	Átalakítás számlává
+485	Másolat (új, azonos dokumentum)
+486	Eltávolítod a dokumentumot a listából?
+487	A PDF-fájl a helyén marad, csak itt nem jelenik meg többé.
+488	Eltávolítás
+489	Díjbekérő
+490	Mit szeretnél kiállítani?
+491	Szöveg szerkesztése
+492	Szöveg másolása
+493	Ez a szöveg nem szerkeszthető (el van forgatva, vagy nincs olvasható betűtípusa). Mozgathatod vagy törölheted.
+494	Ez a szöveg csak mozgatható vagy törölhető.
+495	Szöveg másolva.
+496	A művelet nem sikerült:
+497	Kisebb
+498	Nagyobb
+499	Félkövér
+500	Szerkesztés
+501	Szöveg szerkesztése (Enter)
+502	Szöveg másolása (Ctrl+C)
+503	Szerkeszthető szöveg
+504	Beolvassa a kép szövegét, és szerkeszthetővé teszi
+505	Törlés (Delete)
+506	Kijelölés
+507	Kattints bármire az oldalon (szöveg, képek, aláírások): húzással mozgatás, újabb kattintás a szövegen a szerkesztéshez (V)
+508	Kattints egy szövegre a módosításához, vagy bárhová új szöveg írásához (T)
+509	Aláírás
+510	Aláírás rajzolása vagy kiválasztása (S)
+511	Kép
+512	Kép hozzáadása: bélyegző, logó, fotó
+513	Rajzolás
+514	Szabadkézi rajz egérrel (P)
+515	Kiemelés
+516	Kiemelés szövegkiemelővel (H)
+517	Letakarás
+518	Letakarás fehérrel (W)
+519	Pipa
+520	Pipa hozzáadása (C)
+521	X hozzáadása (X)
+522	Az új szöveg mérete (pt)
+523	Automatikus: az új szöveg a környező szöveg betűtípusát, méretét és színét használja (kattints a kikapcsoláshoz)
+524	Automatikus kikapcsolva: az új szöveg az itteni beállításokat használja
+525	Vonalvastagság (pt)
+526	A jel mérete
+527	Oldalműveletek
+528	Forgatás balra
+529	Forgatás jobbra
+530	Üres oldal beszúrása utána
+531	Oldal törlése
+532	Törlöd a(z) ${i + 1}. oldalt?
+533	Ctrl+Z-vel visszavonhatod.
+534	${index + 1} / ${results.length}
+535	Nincs találat
+536	 Törlés
+537	Aláírás használata
+538	Képből…
+539	Használat
+540	Írd alá egérrel az alábbi mezőben.
+541	Megőrzés legközelebbre
+542	Mentett aláírások
+543	Jelszó
+544	A jelszó hibás. Próbáld újra.
+545	Add meg a dokumentum jelszavát.
+546	Mented a(z) „${name}” módosításait?
+547	Hiba másolása
+548	Fájlnév:
+549	Külön mentve: ${Host.baseName(path)} – az eredeti nem változott.
+550	a fájl egy másik programban van megnyitva, vagy a mappa védett.
+551	Exportálás PDF-be
+552	PDF készül…
+553	A PDF nem hozható létre
+554	Nincs szín
+555	Más szín…
+556	IGAZ
+557	Átlag: <b>${n ? ro(sum / n, 2) : '—'}</b> &nbsp; Darab: <b>${cnt}</b> &nbsp; Összeg: <b>${ro(sum, 2)}</b>
+558	Egyesíted a cellákat?
+559	Csak az első (bal felső) cella értéke marad meg; a többi törlődik.
+560	Egyesítés
+561	Kivágás
+562	Másolás
+563	Beillesztés
+564	${nr} sor beszúrása fölé
+565	Sor beszúrása fölé
+566	${nr} sor beszúrása alá
+567	Sor beszúrása alá
+568	${nc} oszlop beszúrása balra
+569	Oszlop beszúrása balra
+570	${nc} oszlop beszúrása jobbra
+571	Oszlop beszúrása jobbra
+572	${nr} sor törlése
+573	${nc} oszlop törlése
+574	Oszlop törlése
+575	Cellák törlése
+576	Rendezés A → Z
+577	Rendezés Z → A
+578	Félkövér (Ctrl+B)
+579	Cellaszín
+580	Balra igazítás
+581	Középre
+582	Jobbra igazítás
+583	Sortörés
+584	Cellák egyesítése / szétválasztása
+585	Százalék
+586	Dátum
+587	Számformátum
+588	Kevesebb tizedesjegy
+589	Több tizedesjegy
+590	Minden szegély
+591	Külső szegély
+592	Alsó szegély
+593	Nincs szegély
+594	AutoSzum (Σ)
+595	Összeg
+596	Sorok és oszlopok
+597	Kijelölt sorok törlése
+598	Kijelölt oszlopok törlése
+599	Sorok
+600	Átnevezés
+601	Munkalap másolása
+602	Mozgatás balra
+603	Mozgatás jobbra
+604	Munkalap törlése
+605	Új munkalap
+606	Munkalap átnevezése
+607	Már létezik ilyen nevű munkalap.
+608	Törlöd a munkalapot?
+609	A(z) „${wb.sheets[i].name}” munkalap és minden tartalma törlődik. Ctrl+Z-vel visszavonhatod.
+610	A szerkesztő nem indult el
+611	Táblázat megnyitása…
+612	A táblázat nem nyitható meg
+613	Új táblázat.xlsx
+614	.xlsx formátumban mentődik (modern Excel-formátum); az eredeti érintetlen marad.
+615	Új táblázat
+616	Táblázat mentése
+617	A fájl nem készíthető elő
+618	Elérhető függvények
+619	Függvények
+620	Fehér
+621	Műhely
+622	Papír
+623	Természet
+624	Naplemente
+625	Kattints cím hozzáadásához
+626	Kattints szöveg hozzáadásához
+627	Kattints alcím hozzáadásához
+628	Kattints szakaszcím hozzáadásához
+629	${cur + 1}. dia / ${deck.slides.length}
+630	Írj szöveget
+631	Cím
+632	Cím és szöveg
+633	Két hasáb
+634	Szakaszfejléc
+635	Csak cím
+636	Üres
+637	Új dia utána
+638	Dia másolása
+639	Háttér…
+640	Dia törlése
+641	Háttérszín…
+642	A téma szerint
+643	Háttérkép…
+644	A téma háttere
+645	Háttér alkalmazása mindegyikre
+646	Új dia
+647	Dia
+648	Szövegdoboz
+649	Alakzatok
+650	Téglalap
+651	Lekerekített téglalap
+652	Kör / ellipszis
+653	Háromszög
+654	Nyíl
+655	Vonal
+656	Felsorolás
+657	Szöveg fent / középen / lent
+658	Fent
+659	Középen
+660	Lent
+661	Kitöltőszín
+662	Körvonalszín
+663	Elrendezés
+664	Előterbe hozás
+665	Előrébb hozás
+666	Hátrébb küldés
+667	Háttérbe küldés
+668	Vízszintes középre igazítás
+669	Felülre igazítás
+670	Függőleges középre igazítás
+671	Alulra igazítás
+672	Másolat (Ctrl+D)
+673	Háttér
+674	Témák
+675	Téma
+676	A bemutató vége. Kattints vagy nyomd meg az Esc-et a kilépéshez.
+677	A fájl nem tűnik PowerPoint-bemutatónak.
+678	Bemutató megnyitása…
+679	A bemutató nem nyitható meg
+680	Új bemutató.pptx
+681	Új bemutató
+682	Bemutató mentése
+683	A bemutató előkészítése…
+684	A bemutató nem készíthető elő
+685	Másolat
+686	Kép cseréje…
+687	Kép…
+688	1. oldal / ${pages} · ${words} ${words === 1 ? 'word' : 'words'} · ${t.replace(/\s/g, '').length} karakter
+689	Táblázat beszúrása
+690	Címsor 1
+691	Címsor 2
+692	Címsor 3
+693	Címsor 4
+694	Idézet
+695	Bekezdésstílus
+696	Áthúzott
+697	Kiemelés
+698	Sorkizárt
+699	Felsorolásos lista

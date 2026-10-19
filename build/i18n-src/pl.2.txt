@@ -1,0 +1,690 @@
+700	Lista numerowana
+701	Zmniejsz wcięcie
+702	Zwiększ wcięcie
+703	Interlinia
+704	Wstaw obraz
+705	Nowa strona (podział strony)
+706	Wyczyść formatowanie
+707	Znajdź i zamień (Ctrl+F)
+708	Mały
+709	Średni
+710	Duży
+711	Pełna szerokość
+712	Wyśrodkowany
+713	+ Wiersz powyżej
+714	+ Wiersz poniżej
+715	+ Kolumna z lewej
+716	+ Kolumna z prawej
+717	− Wiersz
+718	− Kolumna
+719	Pokaż / ukryj krawędzie
+720	Usuń tabelę
+721	Nie znaleziono
+722	Zamieniono ${n}
+723	Otwieranie dokumentu…
+724	Stary dokument Word (.doc): tekst został zachowany; może brakować formatowania. Zostanie zapisany jako .docx.
+725	Plik RTF: tekst został zachowany. Zostanie zapisany jako .docx.
+726	Nie udało się otworzyć dokumentu
+727	Nowy dokument.docx
+728	Zapisz dokument
+729	Nie udało się przygotować dokumentu
+730	Marginesy: wąskie (1,27 cm)
+731	${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} · klienci są ci winni ${Invoice.money(s.unpaid)} ${s.currency}
+732	${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} w tym miesiącu · wszystko zapłacone
+733	Profesjonalne fakturowanie dla każdej działalności
+734	Profesjonalne fakturowanie dla twojej firmy
+735	Język aplikacji
+736	Język faktur wybierasz osobno dla każdego dokumentu (Język dokumentu) lub domyślnie w Danych firmy.
+737	Napisz do nas
+738	Kopiuj adres
+739	Adres skopiowany.
+740	PDF-y, dokumenty, arkusze, prezentacje i faktury w jednej aplikacji. Twoje dane zostają na tym urządzeniu.
+741	CEO · Prezes zarządu, ACM Code SRL
+742	Pytania, problemy lub sugestie — odpowiadamy e-mailem
+743	Wersja ${ver || '2.0.1'} · ${Host.mobile ? 'Android' : 'Windows'} · 2026
+744	Termin (termin płatności)
+745	Do ${dateRo(inv.due)}
+746	Sposób płatności
+747	Język dokumentu
+748	Mniej opcji
+749	Rabat i uwagi
+750	Czy klient zapłacił?
+751	Tak, zapłacone
+752	Pieniądze już otrzymane
+753	Zapłaci później
+754	Wybierz termin płatności
+755	Język dokumentu
+756	Tekst na dokumencie (angielski)
+757	Tekst na dokumencie (rumuński)
+758	Każdy język dokumentu ma własny tekst. Zmień język w formularzu (Język dokumentu), aby edytować drugi.
+759	Zafakturowano
+760	Zapłacono
+761	Niezapłacone
+762	Jeszcze niezapłacone
+763	w tym po terminie
+764	Miesiąc
+765	Pokaż jako tabelę
+766	Pokaż wykres
+767	Przegląd miesięczny
+768	Ile zafakturowałeś w każdym miesiącu i ile z tego już otrzymałeś.
+769	Najwięksi klienci ${year}
+770	Wg kwoty zafakturowanej w tym roku.
+771	Zafakturowano: ${mName}
+772	${delta >= 0 ? '▲' : '▼'} ${Math.abs(delta)}% wobec: ${pName}
+773	Otrzymano: ${mName}
+774	Klienci są ci winni
+775	Wszystkie faktury są zapłacone
+776	${money(sumOf(late))} ${cs} po terminie
+777	${unpaid.length} ${unpaid.length === 1 ? 'factură neplătită' : 'facturi neplătite'}, jeszcze w terminie
+778	Niezapłacone
+779	Po terminie
+780	${daysLate(d)} ${daysLate(d) === 1 ? 'zi' : 'zile'} po terminie
+781	Niezapłacona
+782	termin ${dateRo(d.due)}
+783	Zapłacona
+784	Klient zapłacił — oznacz jako zapłaconą
+785	Faktura oznaczona jako zapłacona.
+786	Oznacz jako niezapłaconą
+787	Faktury wg miesięcy
+788	faktura
+789	faktury
+790	zapłacona faktura
+791	zapłacone faktury
+792	niezapłacona faktura
+793	niezapłacone faktury
+794	dzień
+795	dni
+796	pozycja
+797	pozycje
+798	strona
+799	strony
+800	słowo
+801	słowa
+802	wiersz tekstu stał się edytowalny
+803	wiersze tekstu stały się edytowalne
+804	niezapłacone
+805	RON
+806	Nie znaleziono aplikacji pocztowej na tym telefonie.
+807	Nie znaleziono aplikacji aparatu.
+808	Nie znaleziono aplikacji do tego.
+809	Żadna aplikacja na tym telefonie nie może otworzyć tego pliku.
+810	Plik już nie istnieje.
+811	Telefon otworzył ekran drukowania: wybierz „Zapisz jako PDF”.
+812	dziś, ${hm}
+813	wczoraj, ${hm}
+814	od
+815	Opracowane przez
+816	Ostatnia:
+817	miesięcy
+818	termin
+819	z VAT
+820	Faktury, proformy, oferty
+821	Faktury: Dokumenty\Facturi · zmiany: obok oryginału
+822	NIP
+823	po terminie
+824	Wybierz z zapisanych klientów
+825	Zapisani klienci
+826	Wybierz klienta, a jego dane uzupełnią się same, łącznie z tym, jak zwykle płaci.
+827	Szukaj po nazwie, NIP lub telefonie
+828	Nie znaleziono klienta
+829	Brak zapisanych klientów
+830	Klienci zapisują się automatycznie, gdy tworzysz dokument.
+831	Usuń klienta
+832	Usunąć „${c.name}” z klientów?
+833	Wystawione dokumenty pozostają bez zmian.
+834	Dzisiejszy kurs BNR
+835	Kurs BNR
+836	Kurs wymiany (1 ${inv.currency} = ? RON)
+837	Tej waluty nie ma w kursach BNR.
+838	Nie udało się pobrać kursu BNR (sprawdź internet). Możesz go wpisać.
+839	Tworzenie PDF trwa zbyt długo. Spróbuj ponownie.
+840	Przywróć domyślne
+841	Widok
+842	Szablony
+843	Wybierz szablon, a potem dopracuj go poniżej (kolory, czcionka, struktura). Twoje teksty i kolejność sekcji zostają.
+844	Klasyczny
+845	Wyważony, pasuje każdemu
+846	Kolorowy nagłówek, wyrazisty
+847	Stonowany, dla firm
+848	Tylko to, co ważne, przestronny
+849	Klasyczna czcionka, ciepłe barwy
+850	Techniczny
+851	Wyraźna siatka, wiele wierszy
+852	Oszczędny
+853	Zużywa najmniej tuszu
+854	Dla salonów i sklepów
+855	Język faktury
+856	Faktura po rumuńsku
+857	Faktura po angielsku
+858	Każdy język ma własne teksty
+859	Produkt lub usługa
+860	Inny produkt
+861	Nie udało się wyświetlić listy
+862	Zdjęcie → dokument
+863	Skanuj
+864	Obróć stronę
+865	Obróć
+866	Dopasuj narożniki strony
+867	Przeciągnij niebieskie narożniki na narożniki kartki.
+868	Całe zdjęcie
+869	Zastosuj
+870	Tekst z wyszukiwaniem w PDF
+871	Odczytuje tekst ze zdjęcia, żebyś mógł go wyszukiwać i kopiować
+872	Zapisz PDF
+873	Szary
+874	Czarno-biały
+875	Strona
+876	Strona
+877	Dodaj stronę
+878	Nowa strona
+879	Zrób zdjęcie
+880	Wybierz zdjęcie z telefonu
+881	Przygotowywanie strony…
+882	Czyszczenie strony…
+883	Obracanie…
+884	Otwieranie zdjęcia…
+885	Prostowanie strony…
+886	Odczytywanie tekstu…
+887	Składanie dokumentu…
+888	Nie znaleziono krawędzi kartki. Przesuń narożniki palcem.
+889	Nie znaleziono krawędzi kartki. Dotknij „Krawędzie”, aby je ustawić.
+890	Nie można użyć zdjęcia
+891	Nie można przetworzyć zdjęcia
+892	Nie można obrócić strony
+893	Usunąć stronę?
+894	Zaznaczony obszar jest za mały.
+895	Nie udało się odczytać tekstu; PDF zostanie zapisany tylko z obrazami.
+896	PDF zapisany w
+897	Na zdjęciu nie znaleziono tekstu. Spróbuj ostrzejszego zdjęcia, z bliska i przy dobrym świetle.
+898	Dokument jest gotowy. Sprawdź słowa zaznaczone na żółto
+899	Dokument jest gotowy i można go edytować.
+900	Nie udało się odczytać tekstu
+901	Odrzucić skan?
+902	Zeskanowane strony nie zostały zapisane.
+903	Odrzuć
+904	Dane aplikacji
+905	Wyczyść pamięć tymczasową
+906	Podglądy i preferencje drukowania. Nic ważnego nie zostanie usunięte.
+907	Pamięć tymczasowa wyczyszczona.
+908	Usuń wszystkie dane aplikacji
+909	Firmy, klienci, lista dokumentów, szablony i ustawienia. Zapisane pliki zostają.
+910	Użyj tego, jeśli miałeś starszą wersję i coś wygląda źle. Aplikacja uruchomi się jak po pierwszej instalacji.
+911	Usunąć wszystkie dane aplikacji?
+912	Usunięte zostaną firmy, klienci, lista wystawionych dokumentów, szablony i ustawienia. Zapisane pliki PDF i faktury zostają w swoim folderze. Tego nie można cofnąć.
+913	Usuń wszystko
+914	Na pewno?
+915	Aplikacja uruchomi się jak po pierwszej instalacji.
+916	Tak, usuń
+917	Gumka
+918	Usuwa rysunki, wyróżnienia, zakrycia i znaczniki: przeciągnij po nich (E)
+919	Nie ma tu nic do wymazania. Gumka usuwa rysunki, wyróżnienia i znaczniki.
+920	Wybierz z galerii (jedno lub więcej)
+921	Tekst PDF jest gotowy: możesz go wyszukiwać i kopiować.
+922	Przygotowywanie stron…
+923	Aplikacja Pliki › Na moim iPhonie › ACM Docs
+924	Pliki › ACM Docs › Scanări
+925	Dokumenty, faktury i PDF-y, chronione
+926	Pokaż hasło
+927	Później
+928	Zaloguj się
+929	Witaj ponownie
+930	Zaloguj się do konta ACM Docs, aby wysyłać i odbierać zaszyfrowane dokumenty.
+931	Zaloguj się kodem QR
+932	Urządzenie zostało połączone z kontem.
+933	Utwórz je
+934	Imię i nazwisko
+935	Hasło (co najmniej 8 znaków)
+936	Potwierdź hasło
+937	Utwórz konto
+938	Nowe konto
+939	Twoje konto otrzymuje klucze szyfrowania postkwantowego, utworzone na tym urządzeniu. Nikt inny ich nie ma.
+940	Wysłaliśmy e-mail, aby ustawić nowe hasło.
+941	Nowe hasło
+942	Wyślemy ci e-mailem link do wybrania nowego hasła.
+943	Potwierdziłem
+944	Nie widzimy jeszcze potwierdzenia. Otwórz link z e-maila, a potem dotknij ponownie.
+945	Potwierdź e-mail
+946	Wysłaliśmy link na
+947	Użyj innego konta
+948	Nazwa użytkownika
+949	3–20 znaków: małe litery, cyfry i _
+950	Twoja nazwa użytkownika to teraz @${v}.
+951	Zmień nazwę użytkownika
+952	Wybierz nazwę użytkownika
+953	Po niej znajdą cię osoby wysyłające ci zaszyfrowane dokumenty. Twój e-mail pozostaje prywatny: nikt nie może cię po nim wyszukać.
+954	Przygotowujemy twoje klucze
+955	Na tym urządzeniu tworzone są klucze szyfrowania postkwantowego konta. To potrwa kilka sekund.
+956	Nie udało się przygotować kluczy
+957	Spróbuj ponownie
+958	Twoje konto jest gotowe
+959	Klucze szyfrowania zostały utworzone na tym urządzeniu. Kod odzyskiwania (24 słowa) jest zapisany tutaj, chroniony przez ${bio()}.
+960	Możesz go zanotować w dowolnej chwili w profilu (przycisk z inicjałem, w prawym górnym rogu). Potrzebujesz go tylko, jeśli zgubisz to urządzenie.
+961	Zaczynamy
+962	24 słowa, po kolei, oddzielone spacjami
+963	Odzyskaj klucze
+964	Twoje konto ma już klucze utworzone na innym urządzeniu. Wpisz 24 słowa kodu odzyskiwania, aby przenieść je także tutaj.
+965	Potwierdź przez ${bio()}, aby zobaczyć kod odzyskiwania
+966	Kodu nie ma na tym urządzeniu.
+967	Kod odzyskiwania
+968	Zapisz te 24 słowa na kartce, po kolei, i przechowuj ją w bezpiecznym miejscu. Dzięki nim odzyskasz klucze na innym urządzeniu.
+969	Nie fotografuj ich i nikomu nie wysyłaj. Nikt z ACM Docs nigdy nie poprosi cię o te słowa.
+970	Zapisałem je w bezpiecznym miejscu
+971	Usunąć konto?
+972	Twoje konto, klucz publiczny i klucze z tego urządzenia zostaną usunięte. Otrzymanych dokumentów .acm nie będzie można już otworzyć. Tego nie można cofnąć.
+973	Potwierdź usunięcie konta przez ${bio()}
+974	Usuwanie anulowane.
+975	Potwierdź hasłem
+976	Usuń konto
+977	Usuwanie konta…
+978	Konto zostało usunięte.
+979	Konto
+980	Zaloguj się lub utwórz konto
+981	Do zaszyfrowanych dokumentów i synchronizacji w chmurze
+982	Bez potwierdzenia nie możesz odbierać dokumentów
+983	Synchronizacja w chmurze
+984	Urządzenia
+985	Zobacz połączone urządzenia i zarządzaj nimi
+986	Blokada aplikacji
+987	Zanotowany ✓
+988	Jeszcze niezanotowany: zanotuj go
+989	Ochrona przed oprogramowaniem szpiegującym
+990	Co robi aplikacja i co możesz zrobić ty
+991	Bezpieczeństwo
+992	Klucze szyfrowania są tworzone i przechowywane tylko na twoich urządzeniach. Serwer przechowuje wyłącznie zaszyfrowane dane i klucz publiczny.
+993	Wyloguj się
+994	Klucze zostają na tym urządzeniu
+995	Przez ${bio()} i hasło
+996	Wylogować się z tego urządzenia?
+997	Nie będziesz mógł tu wysyłać ani otwierać zaszyfrowanych dokumentów, dopóki nie zalogujesz się ponownie. Klucze i kontakty zostają na urządzeniu, chronione.
+998	Tak, wyloguj mnie
+999	Zostań zalogowany
+1000	Wylogowywanie…
+1001	Moje konto
+1002	Mój kod
+1003	Pokaż go komuś, aby cię dodał i zweryfikował. Dotknij, aby powiększyć.
+1004	Kontakty
+1005	Szukaj po @nazwie, skanuj kody QR
+1006	Szyfrowanie postkwantowe
+1007	Bezpieczeństwo, urządzenia i chmura: w Ustawieniach
+1008	Zanotuj kod odzyskiwania
+1009	Potrzebujesz go, jeśli zgubisz to urządzenie
+1010	Nazwa użytkownika ma co najmniej 3 znaki.
+1011	Nazwa użytkownika ma co najwyżej 20 znaków.
+1012	Używaj tylko małych liter bez polskich znaków, cyfr i _.
+1013	Ta nazwa jest zarezerwowana. Wybierz inną.
+1014	Konto z tym e-mailem już istnieje. Zaloguj się lub zresetuj hasło.
+1015	Adres e-mail jest nieprawidłowy.
+1016	E-mail lub hasło jest nieprawidłowe.
+1017	Hasło jest nieprawidłowe.
+1018	Nie ma konta z tym e-mailem.
+1019	Hasło jest za słabe: użyj co najmniej 8 znaków.
+1020	Zbyt wiele prób. Spróbuj ponownie za kilka minut.
+1021	Brak połączenia z internetem.
+1022	Ze względów bezpieczeństwa zaloguj się ponownie i spróbuj jeszcze raz.
+1023	Serwer odrzucił żądanie. Potwierdź e-mail i spróbuj ponownie.
+1024	Serwer nie odpowiada. Sprawdź połączenie z internetem.
+1025	Wpisz swoje imię i nazwisko.
+1026	Hasła nie są takie same. Wpisz to samo hasło dwa razy.
+1027	Potwierdź, aby zaktualizować profil
+1028	Słowa są nieprawidłowe. Sprawdź ich kolejność i pisownię.
+1029	Te słowa należą do innego konta.
+1030	Odblokuj klucze ACM Docs
+1031	Kluczy konta nie ma na tym urządzeniu.
+1032	Zobacz kod odzyskiwania
+1033	Potwierdź usunięcie konta
+1034	Zapisz odszyfrowaną kopię…
+1035	Wyślij zaszyfrowany plik
+1036	Odebrane i wysłane dokumenty .acm. Pozostają zaszyfrowane na urządzeniu i otwierają się tylko do podglądu.
+1037	Brak zaszyfrowanych dokumentów
+1038	Odebrane lub wysłane pliki .acm pojawiają się tutaj. Aby wysłać plik, wybierz „Wyślij zaszyfrowane” z menu ⋯ pliku.
+1039	· zmiany: obok oryginału
+1040	Zapis nie powiódł się:
+1041	Najpierw zapisz
+1042	Dokument ma niezapisane zmiany. Zapiszę go, a potem będziesz mógł go zaszyfrować.
+1043	Wystąpił błąd:
+1044	odcisk palca lub blokada ekranu
+1045	Odblokuj przez ${bioName()} lub hasłem aplikacji.
+1046	Wpisz hasło aplikacji.
+1047	Odblokuj przez ${bioName()}.
+1048	Hasło aplikacji
+1049	Odblokuj
+1050	Zbyt wiele prób. Odczekaj ${Math.ceil((t0.until - Date.now()) / 1000)} s.
+1051	Odblokuj przez ${bioName()}
+1052	Nie pamiętam hasła aplikacji
+1053	Odblokuj ACM Docs
+1054	Hasła nie da się odzyskać
+1055	Odblokuj przez ${bioName()}, a potem zmień hasło w Profil › Bezpieczeństwo.
+1056	Hasło aplikacji można zresetować tylko hasłem konta ACM Docs. Bez konta zainstaluj aplikację ponownie (dane lokalne zostaną utracone).
+1057	Zresetuj hasło aplikacji
+1058	Potwierdź hasłem konta ${u.email}. Hasło aplikacji zostanie usunięte i możesz je ustawić ponownie w Profilu.
+1059	Potwierdź
+1060	Hasło aplikacji zostało usunięte.
+1061	Natychmiast
+1062	Po 1 minucie
+1063	Po 5 minutach
+1064	Po 15 minutach
+1065	Opcjonalnie. Przy uruchomieniu i po powrocie do aplikacji ACM Docs poprosi o potwierdzenie. Ustawienie jest osobne dla każdego urządzenia.
+1066	Odblokowanie przez ${bioName()}
+1067	Niedostępne na tym urządzeniu
+1068	Włączona · dotknij, aby zmienić lub wyłączyć
+1069	Wyłączona
+1070	Zablokuj
+1071	Włącz odblokowywanie ACM Docs
+1072	Kiedy blokować
+1073	Gdy tylko wyjdziesz z aplikacji
+1074	Zmień hasło
+1075	Wyłącz hasło
+1076	Obecne hasło
+1077	Potwierdź obecnym hasłem aplikacji.
+1078	Obecne hasło jest nieprawidłowe.
+1079	Hasło aplikacji zostało wyłączone.
+1080	Co najmniej 6 znaków. Nie używaj go nigdzie indziej.
+1081	Hasło aplikacji jest włączone.
+1082	Nowe hasło
+1083	Hasło
+1084	Hasło ma co najmniej 6 znaków.
+1085	Hasła nie są takie same.
+1086	hasło
+1087	Nr rejestracyjny
+1088	Liczba osób
+1089	Telefon z Androidem
+1090	Komputer z Windows
+1091	Odblokuj klucze konta
+1092	Potwierdź, aby dodać to urządzenie do konta
+1093	Inne urządzenie konta zablokowało to urządzenie. Klucze konta zostały stąd usunięte. Jeśli to pomyłka, zaloguj się ponownie: będziesz potrzebować kodu odzyskiwania lub kodu QR z innego urządzenia.
+1094	Urządzenie
+1095	Nowe logowanie do twojego konta
+1096	Jeśli to nie ty, zablokuj urządzenie teraz: natychmiast traci dostęp do konta i nie otworzy nowych danych.
+1097	Jeśli to nie ty, zablokuj je z urządzenia głównego i zmień hasło konta.
+1098	To nie ja: zablokuj
+1099	Urządzenie natychmiast traci dostęp do konta i danych w chmurze. Blokada jest trwała: aby znów go używać, trzeba je połączyć od nowa.
+1100	Potwierdź zablokowanie urządzenia „${name}”
+1101	Blokowanie…
+1102	Odblokuj, aby zobaczyć urządzenia konta
+1103	Wczytywanie…
+1104	Główne
+1105	To urządzenie
+1106	widziane
+1107	Dodano ${when(d.created)} · ${VIA[d.via] || ''}
+1108	To jest urządzenie główne: może zablokować każde inne urządzenie konta.
+1109	To urządzenie może blokować tylko urządzenia tego samego poziomu. Urządzenie główne może zablokować wszystkie.
+1110	Zablokowane
+1111	Połącz nowe urządzenie
+1112	Potwierdź, aby połączyć nowe urządzenie
+1113	Zeskanuj kod QR wyświetlony na nowym urządzeniu
+1114	To nie jest kod logowania
+1115	Na nowym urządzeniu wybierz „Zaloguj się kodem QR” i zeskanuj wyświetlony tam kod.
+1116	Sprawdzanie…
+1117	Kod wygasł. Wygeneruj nowy na nowym urządzeniu.
+1118	Kod się nie zgadza
+1119	Klucz otrzymany z serwera nie jest tym z kodu QR. Nie kontynuuj: spróbuj ponownie z nowym kodem.
+1120	Urządzenie uzyska pełny dostęp do konta: zaszyfrowanych dokumentów, kontaktów i danych w chmurze. Łącz tylko urządzenia, które należą do ciebie.
+1121	Połącz
+1122	Potwierdź połączenie nowego urządzenia
+1123	Kodu odzyskiwania nie ma na tym urządzeniu.
+1124	Łączenie…
+1125	Przygotowywanie kodu…
+1126	Czekamy na potwierdzenie…
+1127	Otwórz ACM Docs na urządzeniu już połączonym z kontem.
+1128	Profil › Urządzenia › Połącz nowe urządzenie.
+1129	Potwierdź przez Face ID / odcisk palca i zeskanuj ten kod.
+1130	Kod wygasł. Zamknij i spróbuj ponownie.
+1131	Otrzymane klucze nie należą do tego konta.
+1132	Zalogować się na konto @${profile.handle}?
+1133	Kod zatwierdziło konto @${profile.handle}${profile.name ? ' (' + profile.name + ')' : ''}. Kontynuuj tylko, jeśli to twoje konto.
+1134	Logowanie anulowane.
+1135	Logowanie kodem QR nie powiodło się
+1136	Za mało pamięci
+1137	Nie można odczytać pliku.
+1138	Plik nie jest prawidłowym PDF lub jest uszkodzony.
+1139	Nieprawidłowe hasło.
+1140	Dokument używa nieobsługiwanego zabezpieczenia.
+1141	Nie znaleziono strony lub zawiera błędy.
+1142	Nieznany błąd podczas otwierania PDF (kod ${code}).
+1143	Dokument jest chroniony hasłem.
+1144	Strona nie istnieje.
+1145	Nie można wczytać strony.
+1146	Za mało pamięci do wyświetlenia.
+1147	Nie można użyć czcionki.
+1148	Za mało pamięci na obraz.
+1149	Nie udało się dodać obrazu.
+1150	Format obrazu nie jest obsługiwany.
+1151	Dokument musi mieć co najmniej jedną stronę.
+1152	Przeniesienie strony nie powiodło się.
+1153	Nie udało się dodać stron.
+1154	Zapis PDF nie powiódł się.
+1155	Nie można zapisać pliku
+1156	Nie udało się wczytać
+1157	Dodaj produkty lub usługi
+1158	Dodaj
+1159	Przykładowy Klient Sp. z o.o.
+1160	Nowy dokument?
+1161	Liczba:
+1162	Suma:
+1163	Arkusz${n}
+1164	Pusty arkusz
+1165	SUM, AVERAGE, MIN, MAX, COUNT, COUNTA, COUNTIF, SUMIF, IF, IFERROR, AND, OR, NOT, ROUND, ROUNDUP, ROUNDDOWN, INT, ABS, SQRT, POWER, MOD, PRODUCT, CONCATENATE, LEN, UPPER, LOWER, TRIM, LEFT, RIGHT, MID, TODAY, NOW, DATE, YEAR, MONTH, DAY, VLOOKUP. Przykład: =SUM(B2:B10) lub =B2*C2.
+1166	Operacja nie powiodła się:
+1167	Skany
+1168	Potwierdź, aby zapisać weryfikację
+1169	Profil konta nie jest jeszcze gotowy.
+1170	Zeskanuj kod QR osoby z jej aplikacji (Profil › Mój kod)
+1171	Na zdjęciu nie znaleziono kodu QR. Spróbuj ponownie, z bliższa.
+1172	Skanuj kod QR
+1173	Trzymaj kod osoby przed aparatem.
+1174	Zeskanowany kod nie jest kodem konta ACM Docs. Osoba znajdzie swój kod w Profil › Mój kod.
+1175	To twój kod.
+1176	Inne konto
+1177	Zeskanowany kod należy do @${q.handle}, a nie do osoby, którą weryfikujesz.
+1178	Konto nie istnieje
+1179	Konto @${q.handle} już nie istnieje.
+1180	Uwaga: kody się nie zgadzają
+1181	Klucz publiczny podany przez serwer dla @${q.handle} NIE jest tym z urządzenia tej osoby. Albo właśnie odtworzyła swoje klucze, albo ktoś próbuje przechwycić wysyłane do niej dokumenty.
+1182	dopóki nie wyjaśnicie osobiście, co się stało.
+1183	Zweryfikowany
+1184	Niezweryfikowany
+1185	Szukaj
+1186	Nie ma konta @${h}. Sprawdź pisownię.
+1187	To twoje konto.
+1188	Kto chce wysłać ci zaszyfrowane dokumenty, skanuje ten kod w swojej aplikacji (Kontakty › Skanuj). Dzięki temu ma pewność, że klucz należy do ciebie.
+1189	Skanujcie kod osobiście lub podczas rozmowy wideo. Kod otrzymany w wiadomości od kogoś innego niczego nie dowodzi.
+1190	Skanuj inny kod
+1191	Nie masz jeszcze kontaktów. Wyszukaj kogoś po @nazwie lub zeskanuj jego kod QR.
+1192	Zeskanuj czyjś kod QR
+1193	To konto zostało usunięte. Nie możesz już wysyłać do niego dokumentów.
+1194	Klucz szyfrowania @${escHtml(c.handle)} się zmienił.
+1195	Dzieje się tak, gdy ktoś odtworzył konto lub klucze na innym urządzeniu bez kodu odzyskiwania. Może to być jednak także próba przechwycenia. Dopóki nie zweryfikujecie się ponownie, nie możesz wysyłać mu dokumentów.
+1196	Zeskanuj jego kod ponownie
+1197	Akceptuj nowy klucz bez weryfikacji
+1198	${justAdded ? 'Contact adăugat. ' : ''}Nie zweryfikowałeś jeszcze, że klucz naprawdę należy do @${escHtml(c.handle)}. W przypadku poufnych dokumentów porównajcie kody osobiście.
+1199	Kontakt dodany.
+1200	Kod bezpieczeństwa
+1201	Te same 60 cyfr pojawia się na jego telefonie, gdy otwiera twój kontakt. Jeśli są identyczne, nikt nie stoi pośrodku.
+1202	Zweryfikuj kodem QR
+1203	Cyfry są identyczne: oznacz jako zweryfikowany
+1204	Cofnij weryfikację
+1205	Usuń kontakt
+1206	Oznacz jako zweryfikowany tylko wtedy, gdy porównaliście wszystkie 60 cyfr osobiście lub przez telefon, słysząc głos tej osoby.
+1207	Zaakceptować nowy klucz?
+1208	Dokumenty wysłane od teraz będzie można otworzyć tylko nowym kluczem. Jeśli nie masz pewności, że @${c.handle} zmienił klucze, najpierw zapytaj.
+1209	Akceptuj
+1210	Usunąć kontakt?
+1211	Potrzebujesz konta
+1212	Zaszyfrowane dokumenty .acm wysyła się i otwiera tylko z kontem ACM Docs. To zajmie minutę.
+1213	Potwierdź zaszyfrowanie dokumentu „${name}”
+1214	Weryfikacje kontaktów zostały zresetowane
+1215	Lista zweryfikowanych kontaktów została zmieniona poza aplikacją, więc aplikacja już jej nie ufa. Zweryfikuj ponownie kodem QR ważne osoby.
+1216	Sprawdzanie odbiorców…
+1217	Nie można jeszcze wysłać
+1218	${changed.map((c) => '@' + c.handle).join(', ')}: ${changed.some((c) => c.gone) ? 'contul nu mai există sau ' : ''}klucz szyfrowania się zmienił. Otwórz kontakt w Kontaktach i zweryfikuj go ponownie.
+1219	konto już nie istnieje lub
+1220	Niezweryfikowani odbiorcy
+1221	Nie zweryfikowałeś jeszcze: ${unverified.map((c) => '@' + c.handle).join(', ')}. Dokument zostanie zaszyfrowany kluczem podanym przez serwer; gdyby serwer został przejęty, ktoś mógłby podmienić klucz. W przypadku poufnych dokumentów najpierw zeskanujcie kody QR.
+1222	Szyfrowanie (z hasłem)…
+1223	Szyfrowanie…
+1224	Zaszyfrowano dla: ${who}. Wybierz, jak wysłać.
+1225	Dokument zaszyfrowany w ACM Docs. Otwiera się tylko w aplikacji ACM Docs, na koncie odbiorcy.
+1226	Zaszyfruj i wyślij
+1227	Odbiorca potrzebuje oprócz konta także hasła. Przekaż mu je inną drogą (telefonicznie, osobiście).
+1228	Klucz szyfrowania jednego z odbiorców się zmienił: zweryfikuj go ponownie przed wysłaniem.
+1229	Masz niezweryfikowanych odbiorców. W przypadku poufnych dokumentów najpierw zeskanujcie wzajemnie kody QR.
+1230	Wszyscy odbiorcy są zweryfikowani.
+1231	Nie masz jeszcze kontaktów. Wyszukaj osobę po @nazwie.
+1232	Hasło dokumentu ma co najmniej 6 znaków.
+1233	Tylko wybrane osoby będą mogły otworzyć plik .acm w aplikacji ACM Docs. Po zaszyfrowaniu nawet ty go nie otworzysz, więc zachowaj oryginał, jeśli go potrzebujesz.
+1234	Dodano @${c.handle}.
+1235	Dodaj też hasło (opcjonalnie)
+1236	Zaszyfrowane
+1237	To nie jest plik .acm.
+1238	Potwierdź, aby otworzyć „${name}”
+1239	Ten dokument został zaszyfrowany dla innych osób, nie dla twojego konta. Jeśli powinieneś móc go otworzyć, poproś nadawcę o ponowne wysłanie na @
+1240	twoja nazwa
+1241	Plik został zmieniony lub uszkodzony po drodze. Poproś nadawcę o ponowne wysłanie.
+1242	Podpis nadawcy jest nieprawidłowy: plik został sfałszowany. Nie używaj go.
+1243	Plik został utworzony w nowszej wersji aplikacji. Zaktualizuj ACM Docs.
+1244	Nie można otworzyć dokumentu
+1245	Dokument wysłany
+1246	Wysłano do
+1247	Ten plik mogą otworzyć tylko jego odbiorcy. Nawet ty jako nadawca nie możesz go odszyfrować: zostaje tu tylko zapis wysyłki.
+1248	Wyślij ponownie zaszyfrowany plik
+1249	Zaszyfrowany dokument
+1250	Wysłane przez
+1251	Podpis nadawcy jest prawidłowy: dokument nie został zmieniony po drodze. Otwiera się tylko do podglądu; na urządzeniu pozostaje zaszyfrowany.
+1252	Dodaj nadawcę do kontaktów
+1253	Dodano @${c.handle} do kontaktów (niezweryfikowany).
+1254	Dokument poufny: odszyfrowana kopia zostanie usunięta po zamknięciu.
+1255	Zapisać odszyfrowaną kopię?
+1256	Zapisana kopia nie jest już chroniona: każdy z dostępem do tego urządzenia może ją przeczytać. Nie przesyłaj jej dalej, nie wysyłaj do chmury i nie publikuj. Jeśli ma trafić do kogoś innego, wyślij ją zaszyfrowaną.
+1257	Zapisz kopię
+1258	Odszyfrowane
+1259	Kopię zapisano w „Odszyfrowane”: ${Host.baseName(out)}
+1260	Ty
+1261	@${escHtml(known.handle)} jest w twoich kontaktach, ale nie został jeszcze zweryfikowany kodem QR.
+1262	Dokument jest podpisany innym kluczem niż ten, który masz dla @${escHtml(s.handle)}. Może odtworzył klucze, a może ktoś się pod niego podszywa. Zapytaj go bezpośrednio, zanim zaufasz dokumentowi.
+1263	Nie ma go w twoich kontaktach. Serwer potwierdza, że klucz należy do @${escHtml(p.handle)}, ale nie zweryfikowałeś go osobiście.
+1264	Nadawca podaje się za @${escHtml(s.handle)}, ale jego klucz nie pasuje do konta @${escHtml(s.handle)} na serwerze.
+1265	Nadawca podaje się za @${escHtml(s.handle)}, ale to konto nie istnieje (już).
+1266	Nie wiemy, kto wysłał dokument. Podpis jest prawidłowy, ale nie należy do żadnego kontaktu.
+1267	Dokument ma hasło
+1268	Nadawca ustawił też hasło. Wpisz hasło, które ci przekazał.
+1269	Co wysyłasz zaszyfrowane?
+1270	PDF, Word, Excel, zdjęcia… dowolny plik
+1271	Wybierz inny plik…
+1272	Zrobiłeś zrzut ekranu chronionego dokumentu. Usuń go, jeśli go nie potrzebujesz: zdjęcia często trafiają do chmury.
+1273	Na takim telefonie inne aplikacje mogą odczytywać, co robi ACM Docs. Nie otwieraj na nim poufnych dokumentów.
+1274	Co robi ACM Docs, aby nie dało się go szpiegować:
+1275	Klucze zamknięte w telefonie
+1276	Klucze prywatne otwierają się tylko przez ${ios ? 'Face ID' : Host.mobile ? 'amprenta sau PIN-ul' : 'confirmarea Windows'} i zamykają się same, gdy wyjdziesz z aplikacji lub po 3 minutach bezczynności.
+1277	Bez zrzutów ekranu
+1278	Kod odzyskiwania i odszyfrowane dokumenty są ukrywane podczas nagrywania lub udostępniania ekranu oraz na liście otwartych aplikacji.
+1279	Kodu odzyskiwania i odszyfrowanych dokumentów nie da się przechwycić ani nagrać.
+1280	Otwarty dokument .acm jest usuwany z telefonu po zamknięciu, chyba że zdecydujesz się go zachować.
+1281	Nawet jeśli ktoś skopiuje teraz pliki .acm, nie otworzy ich, nawet przyszłym komputerem kwantowym.
+1282	Sprawdzenie telefonu: problem
+1283	Znaleźliśmy oznaki jailbreaka/roota.
+1284	Nie znaleźliśmy oznak jailbreaka ani roota.
+1285	Co możesz zrobić ty
+1286	Aktualizuj telefon. Oprogramowanie szpiegujące typu Pegasus wykorzystuje luki, które zamykają aktualizacje.
+1287	Włącz
+1288	(Lockdown Mode): Ustawienia › Prywatność i ochrona › Tryb blokady. To najsilniejsza ochrona Apple przed Pegasusem.
+1289	Zaawansowana ochrona
+1290	(Android 16+): Ustawienia › Bezpieczeństwo i prywatność › Zaawansowana ochrona.
+1291	Uruchamiaj telefon ponownie raz dziennie: wiele programów szpiegujących nie przetrwa restartu.
+1292	Nie otwieraj linków ani plików od nieznajomych i nie instaluj aplikacji spoza sklepu.
+1293	Szczerze: żadna aplikacja nie obroni się całkowicie przed oprogramowaniem szpiegującym, które przejęło cały telefon. Powyższe środki znacznie ograniczają, co i kiedy mogłoby ukraść.
+1294	Dokument został odebrany zaszyfrowany. Zapisana kopia nie jest już chroniona: każdy z dostępem do tego urządzenia może ją przeczytać. Nie przesyłaj jej dalej, nie wysyłaj do chmury i nie publikuj. Jeśli ma trafić do kogoś innego, wyślij ją zaszyfrowaną.
+1295	Potwierdź, aby uruchomić szyfrowaną synchronizację
+1296	Wymaga konta
+1297	Wyłączona: dane zostają tylko na tym urządzeniu
+1298	Przechowywanie w chmurze nie jest jeszcze włączone
+1299	Niezsynchronizowano (brak internetu?)
+1300	Uruchamianie…
+1301	Zsynchronizowano
+1302	Zaszyfrowana chmura
+1303	Twoje firmy, faktury, klienci, podpisy, ustawienia, kontakty i dokumenty wyglądają tak samo na wszystkich urządzeniach konta.
+1304	Zsynchronizowano dokumenty: ${(s.counts && s.counts.files) || 0}, zestawy danych: ${(s.counts && s.counts.data) || 0}.
+1305	Wszystko jest szyfrowane na urządzeniu, zanim je opuści, kluczem konta i szyfrowaniem odpornym także na komputery kwantowe. Serwer przechowuje tylko zaszyfrowane bloki, bez nazw i czytelnej treści. Nawet ACM Docs nie może ich odczytać.
+1306	Synchronizuj teraz
+1307	Usuń moje dane z chmury
+1308	Zatrzymać synchronizację?
+1309	Nowe dane z tego urządzenia nie będą już trafiać na inne urządzenia. To, co już jest w chmurze, zostaje tam zaszyfrowane, dopóki tego nie usuniesz.
+1310	Zatrzymaj
+1311	Synchronizowanie…
+1312	Usunąć dane z chmury?
+1313	Wszystkie zaszyfrowane dane konta zostaną usunięte z chmury. Dane na tym urządzeniu zostają. Inne urządzenia z włączoną synchronizacją ponownie prześlą swoje.
+1314	Usuwanie…
+1315	Dane z chmury zostały usunięte.
+1316	Konto ACM Docs
+1317	Nie pamiętasz hasła?
+1318	Nie masz konta?
+1319	Masz już konto?
+1320	Wyślij link
+1321	Wyślij e-mail ponownie
+1322	E-mail wysłany ponownie.
+1323	Zobacz kod teraz
+1324	Klucze zostały odzyskane.
+1325	Hasło konta
+1326	Ostatni krok: hasło konta ${u.email}.
+1327	Profil, kod QR, kontakty
+1328	Wyślij zaszyfrowany dokument
+1329	Konto zostało wyłączone.
+1330	Nie udało się zarezerwować @${h}. Może ktoś właśnie ją zajął: wybierz inną nazwę.
+1331	Wyślij (WhatsApp, e-mail…)
+1332	Wyślij zaszyfrowane (.acm)…
+1333	Nadpisać oryginał?
+1334	Nie można odczytać obrazu:
+1335	Dowolna działalność, różne usługi
+1336	Projekty, godziny, abonamenty
+1337	Catering, wydarzenia, menu
+1338	To urządzenie zostało zablokowane
+1339	To ja
+1340	Zablokować „${name}”?
+1341	Tylko urządzenie główne może zablokować urządzenie główne.
+1342	Połączyć nowe urządzenie?
+1343	Nowe urządzenie zostało połączone.
+1344	Tak, to moje konto
+1345	To nie moje
+1346	Nie udało się utworzyć dokumentu PDF.
+1347	Nie udało się utworzyć tekstu.
+1348	Nie udało się zapisać tekstu.
+1349	Nie można odczytać obrazu.
+1350	Nie udało się zaktualizować obrazu.
+1351	Nie udało się wstawić strony.
+1352	Nie udało się zapisać strony ${i + 1}.
+1353	Strona ${pi + 1} z ${list.length} ·
+1354	Nazwa firmy *
+1355	Stawka VAT (%)
+1356	Ulica, nr
+1357	Seria ofert / kosztorysów
+1358	Puste = automatycznie (firma · telefon · e-mail)
+1359	Kursywa (Ctrl+I)
+1360	Podkreślenie (Ctrl+U)
+1361	Obraz (nieobsługiwany format)
+1362	Panoramiczny (16:9)
+1363	Standardowy (4:3)
+1364	Marginesy: normalne (2,54 cm)
+1365	Marginesy: szerokie (3,18 cm)
+1366	Gotowe (Ctrl+Enter)
+1367	To nie jest kod ACM Docs
+1368	Nie wysyłaj niczego poufnego
+1369	Klucz się zmienił
+1370	Czy cyfry są identyczne?
+1371	Tak, są identyczne
+1372	Wyślij mimo to
+1373	Wysłane zaszyfrowane
+1374	Nie udało się zaszyfrować dokumentu
+1375	Zaszyfrowano dla: ${who}: ${Host.baseName(out)}
+1376	Hasło dokumentu
+1377	Wyślij zaszyfrowane
+1378	Otwieranie zaszyfrowanego dokumentu…
+1379	Niepotwierdzony nadawca
+1380	Nieznany nadawca
+1381	Telefon wygląda na zmodyfikowany (${ios ? 'jailbreak' : 'root'}).
+1382	Tymczasowe odszyfrowane kopie
+1383	Telefon sprawdzony
+1384	Tryb blokady
+1385	Synchronizacja została uruchomiona.
+1386	Wybierz język
+1387	Język możesz zmienić w każdej chwili w Ustawieniach.
+1388	Język
+1389	Wersja ${ver || '2.0.5'} · ${Host.mobile ? (Host.info.platform === 'ios' ? 'iOS' : 'Android') : 'Windows'} · 2026
