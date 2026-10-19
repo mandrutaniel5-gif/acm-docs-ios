@@ -16,6 +16,7 @@ import { setGlobalOptions } from 'firebase-functions/v2';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage';
 import { ed25519 } from '@noble/curves/ed25519.js';
 import { sha256 } from '@noble/hashes/sha2.js';
 import { randomBytes } from 'node:crypto';
@@ -268,6 +269,9 @@ export const wipeAccount = onCall(async (req) => {
   batch.delete(pref);
   await batch.commit();
   await db.recursiveDelete(db.collection('accounts').doc(uid));
+  // the encrypted blocks of the cloud sync
+  try { await getStorage().bucket('acm-docs-52280.firebasestorage.app').deleteFiles({ prefix: `accounts/${uid}/` }); }
+  catch (e) { console.warn('storage cleanup', e.message); }
   await getAuth().deleteUser(uid);
   return { ok: true };
 });

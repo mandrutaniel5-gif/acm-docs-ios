@@ -273,6 +273,7 @@ const Account = (() => {
     try { await F().auth.signOut(auth); } catch (e) {}
     await Host.secureDelete(SEC.words(uid));
     await Host.secureDelete(SEC.secrets(uid));
+    if (typeof Sync !== 'undefined') await Sync.forgetAccount(uid);
     [LS.saved(uid), LS.fp(uid), LS.handle(uid), 'acm.contacts.' + uid].forEach(store.del);
     profile = null;
     identity = null;

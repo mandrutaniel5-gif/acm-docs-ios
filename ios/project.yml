@@ -20,8 +20,8 @@ targets:
       base:
         PRODUCT_NAME: ACMDocs
         PRODUCT_BUNDLE_IDENTIFIER: ro.acmcode.docs
-        MARKETING_VERSION: "2.2.3"
-        CURRENT_PROJECT_VERSION: "20203"
+        MARKETING_VERSION: "2.2.4"
+        CURRENT_PROJECT_VERSION: "20204"
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_STYLE: Automatic

@@ -1,0 +1,24 @@
+rules_version = '2';
+// ACM Docs: encrypted blocks of the cloud sync. Each account can reach only its own folder, and only
+// from an active, recent device session. The blocks are encrypted on the device: the server and
+// ACM Docs see only random names and unreadable bytes.
+service firebase.storage {
+  match /b/{bucket}/o {
+    function devId() { return request.auth.token.get('dev', null); }
+    function freshSession() { return request.auth.token.auth_time * 1000 > request.time.toMillis() - 26 * 3600 * 1000; }
+    function activeDevice(uid) {
+      return request.auth != null && request.auth.uid == uid && devId() is string && freshSession()
+        && request.auth.token.email_verified == true
+        && firestore.get(/databases/(default)/documents/accounts/$(uid)/devices/$(devId())).data.status == 'active';
+    }
+    match /accounts/{uid}/blobs/{id} {
+      allow get, delete: if id.matches('^[0-9a-f]{32}$') && activeDevice(uid);
+      // new blocks only (a block is never rewritten), up to 110 MB
+      allow create: if id.matches('^[0-9a-f]{32}$') && activeDevice(uid)
+        && request.resource.size <= 110 * 1024 * 1024
+        && request.resource.contentType == 'application/octet-stream';
+      allow list, update: if false;
+    }
+    match /{all=**} { allow read, write: if false; }
+  }
+}

@@ -97,6 +97,7 @@ const Devices = (() => {
   async function wipeBlocked() {
     const u = uid();
     forget(u);
+    if (typeof Sync !== 'undefined') await Sync.forgetAccount(u);
     try { await Host.secureDelete('words.' + u); await Host.secureDelete('keys.' + u); } catch (e) {}
     try { await Account.signOut(); } catch (e) {}
     await UI.confirm('Acest dispozitiv a fost blocat', 'Un alt dispozitiv al contului a blocat acest dispozitiv. Cheile contului au fost șterse de aici. Dacă a fost o greșeală, conectează-te din nou: vei avea nevoie de codul de recuperare sau de un cod QR de pe alt dispozitiv.', 'Am înțeles', 'Închide');
