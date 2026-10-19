@@ -12,7 +12,7 @@ const Devices = (() => {
   const A = () => window.__lib.acmcrypto;
   const F = () => window.__lib.firebase;
   const uid = () => (Account.current() ? Account.current().uid : null);
-  const LS = { dev: (u) => 'acm.dev.' + u, key: (u) => 'acm.devkey.' + u, seen: (u) => 'acm.events.seen.' + u };
+  const LS = { dev: (u) => 'acm.dev.' + u, key: (u) => 'acm.devkey.' + u, seen: (u) => 'acm.events.seen.' + u, last: 'acm.dev.last' };
   const ls = {
     get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } },
     set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} },
@@ -36,8 +36,44 @@ const Devices = (() => {
     return devKey;
   }
   function newKey() { devKey = A().deriveIdentity(A().generateMnemonic()); return devKey; }
-  async function keep(u, dev, key) { await Host.secureSet(SECRET(u), A().exportSecrets(key), { quiet: true }); ls.set(LS.dev(u), dev); devKey = key; }
-  function forget(u) { [LS.dev(u), LS.key(u), LS.seen(u)].forEach(ls.del); Host.secureDelete(SECRET(u), { quiet: true }).catch(() => {}); devKey = null; vkey = null; }
+  async function keep(u, dev, key) { await Host.secureSet(SECRET(u), A().exportSecrets(key), { quiet: true }); ls.set(LS.dev(u), dev); ls.set(LS.last, u); devKey = key; }
+  function forget(u) {
+    [LS.dev(u), LS.key(u), LS.seen(u)].forEach(ls.del);
+    if (ls.get(LS.last) === u) ls.del(LS.last);
+    Host.secureDelete(SECRET(u), { quiet: true }).catch(() => {});
+    devKey = null; vkey = null;
+  }
+
+  /**
+   * The session was closed from outside (password changed or reset, sessions revoked): a registered
+   * device signs itself back in with its own device key. The password is not needed and does not
+   * help: the device key is what proves this is one of the account's devices.
+   */
+  let resuming = null;
+  function resume() {
+    if (resuming) return resuming;
+    resuming = (async () => {
+      if (uid()) return true;
+      const u = ls.get(LS.last);
+      const dev = u && ls.get(LS.dev(u));
+      if (!dev) return false;
+      let key = null;
+      try { const b = await Host.secureGet(SECRET(u), '', { quiet: true }); if (b) key = A().importSecrets(b); } catch (e) {}
+      if (!key) return false;
+      const ts = Date.now();
+      try {
+        const r = await Account.call('deviceSession', { uid: u, dev, ts, sig: Host.toB64(A().signEd(key, `acm-session\n${u}\n${dev}\n${ts}`)) });
+        await Account.signInWithToken(r.token);
+        devKey = key;
+        return true;
+      } catch (e) {
+        // blocked or removed: this device is out of the account for good
+        if (/blocked|unknown device/.test(e.server || '')) forget(u);
+        return false;
+      }
+    })().finally(() => { resuming = null; });
+    return resuming;
+  }
   const SESSION_MAX_S = 20 * 3600; // renewed with the device key well before the server's 26 h limit
 
   function describe() {
@@ -64,6 +100,7 @@ const Devices = (() => {
     const dev = myDevice();
     if (dev && (await loadKey())) {
       const c = await Account.claims();
+      ls.set(LS.last, u);
       if (c.dev === dev && Date.now() / 1000 - (c.auth_time || 0) < SESSION_MAX_S) return 'ok';
       try {
         const ts = Date.now();
@@ -131,12 +168,13 @@ const Devices = (() => {
     let evs;
     try { evs = await events(); } catch (e) { if (/permission/i.test(String(e && (e.code || e.message)))) { const st = await ensure().catch(() => null); if (st === 'blocked') stop(); } return; }
     const seen = +(ls.get(LS.seen(u)) || 0);
-    const fresh = evs.filter((e) => e.type === 'signin' && e.dev !== myDevice() && ms(e.at) > seen).reverse();
+    const fresh = evs.filter((e) => (e.type === 'signin' && e.dev !== myDevice() || e.type === 'password') && ms(e.at) > seen).reverse();
     if (!evs.length) return;
     ls.set(LS.seen(u), String(Math.max(seen, ...evs.map((e) => ms(e.at)))));
     if (!fresh.length) return;
     const devs = await list().catch(() => []);
     for (const e of fresh) {
+      if (e.type === 'password') { await alertPassword(e); continue; }
       const d = devs.find((x) => x.id === e.dev) || { id: e.dev };
       if (d.status && d.status !== 'active') continue;
       await alertSignIn(e, d, devs);
@@ -161,6 +199,29 @@ const Devices = (() => {
       );
     });
     if (act === 'block') await block(d, true);
+  }
+
+  /** Someone typed the account's email + password somewhere (seen by the server at sign-in). */
+  async function alertPassword(e) {
+    const act = await UI.modal((box, close) => {
+      box.append(
+        el('div', { class: 'acm-alert', html: svg('shield') }),
+        el('h2', { text: 'Cineva a intrat cu parola contului' }),
+        el('div', { class: 'recv-from' }, [
+          el('b', { class: 'no-tr', text: e.agent || 'Browser sau aplicație necunoscută' }),
+          el('small', { class: 'muted', text: when(e.at) }),
+        ]),
+        el('p', { class: 'muted small', text: 'Doar cu parola nu se pot deschide documentele și datele tale: pentru asta trebuie cheile contului. Dacă nu ai fost tu, schimbă parola: dispozitivele tale rămân conectate.' }),
+        el('div', { class: 'actions col' }, [
+          el('button', { class: 'btn danger', type: 'button', text: 'Nu am fost eu: schimbă parola', onclick: () => close('reset') }),
+          el('button', { class: 'btn primary', type: 'button', text: 'Am fost eu', onclick: () => close(null) }),
+        ]),
+      );
+    });
+    if (act === 'reset') {
+      try { await Account.resetPassword(Account.current().email); UI.toast('Ți-am trimis pe email linkul pentru parola nouă.'); }
+      catch (x) { UI.toast(Account.say(x), { error: true }); }
+    }
   }
 
   function start() {
@@ -351,5 +412,5 @@ const Devices = (() => {
     stop();
   }
 
-  return { ensure, start, stop, show, pairThisDevice, leave, myDevice, block };
+  return { ensure, start, stop, show, pairThisDevice, leave, myDevice, block, resume };
 })();

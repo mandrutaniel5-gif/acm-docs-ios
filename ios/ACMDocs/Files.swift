@@ -11,6 +11,21 @@ enum Files {
         return url
     }()
 
+    /// Paths the page may use: anything except the app's own Library (preferences, web storage,
+    /// cookies), where only the private documents folder and the caches count.
+    static func allowed(_ p: String) -> Bool {
+        if p.isEmpty { return false }
+        let real = { (u: URL) -> String in u.standardizedFileURL.resolvingSymlinksInPath().path }
+        let path = real(URL(fileURLWithPath: p))
+        let lib = real(FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0])
+        guard path == lib || path.hasPrefix(lib + "/") else { return true }
+        for ok in [privateRoot, FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]] {
+            let o = real(ok)
+            if path == o || path.hasPrefix(o + "/") { return true }
+        }
+        return false
+    }
+
     /// The web app inside the app package.
     static let www: URL = Bundle.main.resourceURL!.appendingPathComponent("www", isDirectory: true)
 
@@ -121,7 +136,7 @@ final class SchemeHandler: NSObject, WKURLSchemeHandler {
     func serve(path: String) -> (Data, String)? {
         if path.hasPrefix("/~file/") {
             let filePath = String(path.dropFirst(6))
-            guard let data = FileManager.default.contents(atPath: filePath) else { return nil }
+            guard Files.allowed(filePath), let data = FileManager.default.contents(atPath: filePath) else { return nil }
             return (data, Files.mime(filePath))
         }
         var rel = path

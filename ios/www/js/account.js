@@ -97,6 +97,9 @@ const Account = (() => {
       'auth/network-request-failed': 'Nu există conexiune la internet.',
       'auth/requires-recent-login': 'Din motive de siguranță, intră din nou în cont și reîncearcă.',
       'auth/user-disabled': 'Contul a fost dezactivat.',
+      'auth/invalid-verification-code': 'Codul nu este corect. Folosește codul afișat acum în aplicația de autentificare.',
+      'auth/unverified-email': 'Confirmă mai întâi emailul contului.',
+      'auth/missing-multi-factor-session': 'Din motive de siguranță, intră din nou în cont și reîncearcă.',
       'permission-denied': 'Serverul a refuzat cererea. Confirmă emailul și reîncearcă.',
       'unavailable': 'Serverul nu răspunde. Verifică internetul.',
     }[c];
@@ -119,12 +122,63 @@ const Account = (() => {
   }
   async function signIn(email, password) {
     await ready();
-    return (await F().auth.signInWithEmailAndPassword(auth, email.trim(), password)).user;
+    try { return (await F().auth.signInWithEmailAndPassword(auth, email.trim(), password)).user; }
+    catch (e) { return (await secondFactor(e)).user; }
+  }
+
+  // ---------------------------------------------------------------- two-step verification (authenticator app codes)
+  // With it on, the email + password are not enough to sign in anywhere: a 6-digit code from the
+  // person's authenticator app is asked too. The account's own devices are not affected: they sign
+  // in with their device keys.
+  let askCode = null; // set by the screens: async (again) => '123456' | null
+  const setCodePrompt = (f) => { askCode = f; };
+  const factors = () => { try { return user ? F().auth.multiFactor(user).enrolledFactors || [] : []; } catch (e) { return []; } };
+  const twoStep = () => factors().some((f) => f.factorId === 'totp');
+  async function secondFactor(e) {
+    const Au = F().auth;
+    if (!e || e.code !== 'auth/multi-factor-auth-required') throw e;
+    const resolver = Au.getMultiFactorResolver(auth, e);
+    const hint = resolver.hints.find((h) => h.factorId === 'totp');
+    if (!hint) throw e;
+    for (let again = false; ; again = true) {
+      const code = askCode ? await askCode(again) : null;
+      if (!code) throw new Error('cancel');
+      try { return await resolver.resolveSignIn(Au.TotpMultiFactorGenerator.assertionForSignIn(hint.uid, String(code).replace(/\D/g, ''))); }
+      catch (x) { if (x && x.code === 'auth/invalid-verification-code') continue; throw x; }
+    }
+  }
+  /** The password again (plus the code, when two-step verification is on), for sensitive changes. */
+  async function reauth(password) {
+    const Au = F().auth;
+    try { await Au.reauthenticateWithCredential(user, Au.EmailAuthProvider.credential(user.email, password)); }
+    catch (e) { await secondFactor(e); }
+    user = auth.currentUser;
+  }
+  /** Step 1: a new secret for the authenticator app (shown as a QR code and as text). */
+  async function twoStepStart(password) {
+    const Au = F().auth;
+    await reauth(password);
+    const session = await Au.multiFactor(user).getSession();
+    const secret = await Au.TotpMultiFactorGenerator.generateSecret(session);
+    return { secret, key: secret.secretKey, uri: secret.generateQrCodeUrl(user.email, 'ACM Docs') };
+  }
+  /** Step 2: the first code from the app proves it was set up right. */
+  async function twoStepFinish(secret, code) {
+    const Au = F().auth;
+    await Au.multiFactor(user).enroll(Au.TotpMultiFactorGenerator.assertionForEnrollment(secret, String(code).replace(/\D/g, '')), 'Authenticator');
+  }
+  async function twoStepOff(password) {
+    const Au = F().auth;
+    await reauth(password);
+    for (const f of factors()) if (f.factorId === 'totp') await Au.multiFactor(user).unenroll(f);
   }
   async function resetPassword(email) { await ready(); await F().auth.sendPasswordResetEmail(auth, email.trim()); }
   async function resendVerification() { if (user) await F().auth.sendEmailVerification(user); }
   async function refresh() { if (user) { await F().auth.reload(user); user = auth.currentUser; await user.getIdToken(true); } return user; }
-  async function signOut() { identity = null; profile = null; await F().auth.signOut(auth); }
+  // set while this device signs out on purpose (otherwise a closed session is resumed with the device key)
+  let leaving = false;
+  async function signOut() { identity = null; profile = null; leaving = true; try { await F().auth.signOut(auth); } finally { setTimeout(() => { leaving = false; }, 3000); } }
+  const signingOut = () => leaving;
 
   // ---------------------------------------------------------------- keys
   const Fs = () => F().firestore;
@@ -243,8 +297,7 @@ const Account = (() => {
   }
   /** The account password is right (asked by the server). */
   async function checkPassword(password) {
-    const { auth: Au } = F();
-    await Au.reauthenticateWithCredential(user, Au.EmailAuthProvider.credential(user.email, password));
+    await reauth(password);
     return true;
   }
   /** Forgets the unlocked keys (the next use asks for Face ID again). */
@@ -259,9 +312,8 @@ const Account = (() => {
   // ---------------------------------------------------------------- delete account
   async function deleteAccount(password) {
     const { auth: Au, firestore: Fs } = F();
-    if (isPasswordUser()) {
-      await Au.reauthenticateWithCredential(user, Au.EmailAuthProvider.credential(user.email, password));
-    }
+    if (isPasswordUser()) await reauth(password);
+    void Au;
     const uid = user.uid;
     // the server removes profile, @name, devices, cloud data and the sign-in, but only with a
     // signature made by the account keys (a stolen password or session alone cannot do it)
@@ -271,7 +323,7 @@ const Account = (() => {
     const ts = Date.now();
     await call('wipeAccount', { ts, sig: Host.toB64(A().signEd(id, `acm-wipe\n${uid}\n${Devices.myDevice() || dev}\n${ts}`)) });
     void Fs;
-    try { await F().auth.signOut(auth); } catch (e) {}
+    try { await signOut(); } catch (e) {}
     await Host.secureDelete(SEC.words(uid));
     await Host.secureDelete(SEC.secrets(uid));
     if (typeof Sync !== 'undefined') await Sync.forgetAccount(uid);
@@ -297,7 +349,8 @@ const Account = (() => {
   const internals = () => ({ F: F(), db, auth });
 
   return {
-    call, signInWithToken, claims, internals,
+    call, signInWithToken, claims, internals, signingOut,
+    setCodePrompt, twoStep, twoStepStart, twoStepFinish, twoStepOff,
     init, ready, onChange, current, needsVerification, isPasswordUser, say,
     signUp, signIn, resetPassword, resendVerification, refresh, signOut,
     keyState, createKeys, restoreKeys, setHandle, handle, fingerprint, lookup, profileOf, handleProblem, suggestHandle, cleanHandle, unlock, lock, checkPassword, words, wordsSaved, markWordsSaved, deleteAccount,

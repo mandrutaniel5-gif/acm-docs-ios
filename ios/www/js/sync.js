@@ -32,6 +32,21 @@ const Sync = (() => {
   }
   const sharedKeys = () => { const u = uid(); return u ? SHARED.concat(PER_ACCOUNT.map((p) => p + u)) : []; };
 
+  // Documents coming from the cloud: only the kinds of documents the app works with, and only
+  // inside this device's documents folder (no "..", no absolute paths, no program files).
+  const DOC_EXT = /\.(pdf|png|jpe?g|webp|gif|bmp|tiff?|heic|docx|doc|xlsx|xls|csv|tsv|pptx|ppt|odt|ods|odp|txt|md|rtf)$/i;
+  const HEX32 = /^[0-9a-f]{32}$/;
+  const RESERVED = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\.|$)/i;
+  function safeParts(rel, name) {
+    const parts = String(rel || name || '').split(/[\\/]+/)
+      .map((x) => x.replace(/[\u0000-\u001f<>:"|?*]/g, '').replace(/[. ]+$/, '').trim())
+      .filter((x) => x && x !== '.' && x !== '..' && !/^\.+$/.test(x))
+      .map((x) => (RESERVED.test(x) ? '_' + x : x).slice(0, 120));
+    if (!parts.length || !DOC_EXT.test(parts[parts.length - 1])) return null;
+    return parts.slice(-6);
+  }
+  const inside = (root, p) => { const r = String(root).replace(/[\\/]+$/, ''); return p.startsWith(r + '/') || p.startsWith(r + '\\'); };
+
   // ---------------------------------------------------------------- local state of this device
   const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const put = (k, v) => { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} };
@@ -187,6 +202,9 @@ const Sync = (() => {
     let changedKV = [];
     for (const p of recs.filter((x) => x.kind === 'file')) await applyFile(s, p);
     for (const p of recs.filter((x) => x.kind === 'kv')) {
+      // only the data that is meant to travel between devices: never device settings, keys or state
+      if (typeof p.k !== 'string' || !sharedKeys().includes(p.k)) continue;
+      if (p.v != null && typeof p.v !== 'string') continue;
       const localT = s.dirty[p.k] || s.kvT[p.k] || 0;
       // first sync of a device: what the account already has wins over this device's defaults
       if (s.inited && localT >= p.t) continue;
@@ -201,15 +219,23 @@ const Sync = (() => {
     return changedKV;
   }
   async function applyFile(s, p) {
+    if (!HEX32.test(String(p.fk))) return;
     const local = Object.entries(s.files).find(([, r]) => r.fk === p.fk);
     if (p.del) {
       if (local) { delete s.files[local[0]]; try { App.forgetPath && App.forgetPath(local[0]); } catch (e) {} }
       return;
     }
     if (local && local[1].sha === p.sha && Host.exists(local[0])) return;
-    const bytes = await downloadBlob(p.blob);
+    if (!HEX32.test(String(p.blob))) return;
     const root = await docsRoot();
-    let path = local ? local[0] : Host.join(root, p.rel || p.name);
+    let path = local ? local[0] : null;
+    if (!path) {
+      const parts = safeParts(p.rel, p.name);
+      if (!parts || !root) return;
+      path = Host.join(root, ...parts);
+      if (!inside(root, path)) return;
+    }
+    const bytes = await downloadBlob(p.blob);
     Host.mkdirp(Host.dirName(path));
     if (!local && Host.exists(path)) {
       const m = /^(.*?)(\.[^.]*)?$/.exec(Host.baseName(path));

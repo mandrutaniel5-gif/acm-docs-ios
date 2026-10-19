@@ -76,6 +76,10 @@ final class Bridge: NSObject, WKScriptMessageHandler {
         let a = obj["a"] as? [Any] ?? []
         let s0 = a.first as? String ?? ""
         let fm = FileManager.default
+        // the app's own internals (preferences, web storage) are never handed to the page
+        if ["readB64", "writeB64", "isFile", "listDir", "mkdirs", "mtime", "remove"].contains(m) && !Files.allowed(s0) {
+            return failure("blocked path")
+        }
         switch m {
         case "info":
             let info: [String: Any] = [
@@ -154,6 +158,8 @@ final class Bridge: NSObject, WKScriptMessageHandler {
     }
 
     func userContentController(_ c: WKUserContentController, didReceive message: WKScriptMessage) {
+        // only the app's own page (acm://app, main frame) may talk to the phone
+        guard message.frameInfo.isMainFrame, message.frameInfo.securityOrigin.protocol == "acm" else { return }
         // iOS 26+: the page reports its bottom bar (visible? which tab?) for the native glass bar
         if let body = message.body as? [String: Any], body["op"] as? String == "tabbar" {
             let visible = body["visible"] as? Bool ?? false
@@ -223,6 +229,7 @@ final class Bridge: NSObject, WKScriptMessageHandler {
             vc.top.present(picker, animated: true)
 
         case "export":
+            guard Files.allowed(a["path"] as? String ?? "") else { return reply(id, "blocked path", nil) }
             let url = URL(fileURLWithPath: a["path"] as? String ?? "")
             let picker = UIDocumentPickerViewController(forExporting: [url], asCopy: true)
             let helper = PickerHelper { [weak self] urls in
@@ -235,6 +242,7 @@ final class Bridge: NSObject, WKScriptMessageHandler {
 
         case "share", "view":
             let path = a["path"] as? String ?? ""
+            guard Files.allowed(path) else { return reply(id, "blocked path", nil) }
             guard FileManager.default.fileExists(atPath: path) else { return reply(id, t("Fișierul nu mai există.", "The file no longer exists."), nil) }
             var items: [Any] = [URL(fileURLWithPath: path)]
             if let text = a["text"] as? String, !text.isEmpty { items.append(text) }

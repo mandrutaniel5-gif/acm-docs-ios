@@ -319,7 +319,7 @@ public class MainActivity extends Activity {
     /** Copies a picked/shared file into "ACM Docs/Importate" (same name; same file is reused). */
     File importUri(Uri uri) throws IOException {
         if ("file".equals(uri.getScheme()) && uri.getPath() != null) {
-            File f = new File(uri.getPath());
+            File f = checked(new File(uri.getPath())); // another app cannot make us open our own internals
             if (f.isFile() && f.canRead()) return f;
         }
         File dir = new File(docsRoot, "Importate");
@@ -526,14 +526,14 @@ public class MainActivity extends Activity {
             i.setClipData(android.content.ClipData.newRawUri("", out));
             startFor(id, REQ_CAMERA, f, i);
         } else if ("export".equals(op)) {
-            File f = new File(a.getString("path"));
+            File f = checked(new File(a.getString("path")));
             Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             i.addCategory(Intent.CATEGORY_OPENABLE);
             i.setType(mimeOf(f.getName()));
             i.putExtra(Intent.EXTRA_TITLE, f.getName());
             startFor(id, REQ_EXPORT, f, i);
         } else if ("share".equals(op)) {
-            File f = new File(a.getString("path"));
+            File f = checked(new File(a.getString("path")));
             if (!f.isFile()) throw new Exception("Fișierul nu mai există.");
             Intent i = new Intent(Intent.ACTION_SEND);
             Uri u = uriFor(f);
@@ -568,10 +568,10 @@ public class MainActivity extends Activity {
                 startActivity(i);
                 reply(id, null, "true");
             } catch (ActivityNotFoundException e) {
-                reply(id, "Nu am găsit o aplicație de e-mail pe telefon.", null);
+                reply(id, t("Nu am găsit o aplicație care să deschidă asta.", "No app on this phone can open this."), null);
             }
         } else if ("view".equals(op)) {
-            File f = new File(a.getString("path"));
+            File f = checked(new File(a.getString("path")));
             Intent i = new Intent(Intent.ACTION_VIEW);
             Uri u = uriFor(f);
             i.setDataAndType(u, mimeOf(f.getName()));
@@ -652,10 +652,25 @@ public class MainActivity extends Activity {
 
     // ------------------------------------------------------------------ the page's window.AndroidBridge
 
+    /**
+     * The app's own internals (settings, web storage, keys) are never handed to the page or to
+     * other apps: inside the app's private folder only its document, private and cache folders count.
+     */
+    File checked(File f) throws IOException {
+        String c = f.getCanonicalPath();
+        String data = new File(getApplicationInfo().dataDir).getCanonicalPath();
+        if (c.equals(data) || c.startsWith(data + File.separator)) {
+            String[] ok = { new File(getFilesDir(), "ACM Docs").getCanonicalPath(), new File(getNoBackupFilesDir(), "private").getCanonicalPath(), getCacheDir().getCanonicalPath() };
+            for (String o : ok) if (c.equals(o) || c.startsWith(o + File.separator)) return f;
+            throw new IOException("blocked path");
+        }
+        return f;
+    }
+
     class Bridge {
         File file(String p) throws IOException {
             if (p == null || p.isEmpty()) throw new IOException("cale goală");
-            return new File(p);
+            return checked(new File(p));
         }
 
         @JavascriptInterface
@@ -825,7 +840,7 @@ public class MainActivity extends Activity {
             if (path.startsWith("/~file/")) {
                 // a file of the phone, streamed to the app (much faster than copying it as text)
                 try {
-                    File f = new File(Uri.decode(path.substring(6)));
+                    File f = checked(new File(Uri.decode(path.substring(6))));
                     Map<String, String> headers = new HashMap<String, String>();
                     headers.put("Cache-Control", "no-store");
                     return new WebResourceResponse(mimeOf(f.getName()), null, 200, "OK", headers, new FileInputStream(f));

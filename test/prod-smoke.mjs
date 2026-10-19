@@ -3,7 +3,8 @@
 // rules let that device in. Needs GOOGLE_APPLICATION_CREDENTIALS (the deploy key).
 import { createRequire } from 'node:module';
 import { initializeApp as clientApp } from 'firebase/app';
-import { getAuth as clientAuth, signInWithCustomToken, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getAuth as clientAuth, signInWithCustomToken, signInWithEmailAndPassword, signOut, multiFactor, getMultiFactorResolver, TotpMultiFactorGenerator } from 'firebase/auth';
+import { createHmac } from 'node:crypto';
 import { getFirestore, doc, getDoc, setDoc, writeBatch, getDocs, collection, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import * as A from '../build/vendor/acmcrypto.mjs';
@@ -99,6 +100,38 @@ try {
   }
   if (!seen) throw new Error('no "password" sign-in event for the devices');
   console.log('LIVE OK: a sign-in with the password is reported to the devices');
+
+  // two-step verification: with it on, the password alone does not sign in anywhere
+  const totp = (b32) => {
+    const alph = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'; let bits = '';
+    for (const ch of b32.replace(/=+$/, '').toUpperCase()) bits += alph.indexOf(ch).toString(2).padStart(5, '0');
+    const key = Buffer.from(bits.match(/.{8}/g).map((x) => parseInt(x, 2)));
+    const ctr = Buffer.alloc(8); ctr.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30000)));
+    const h = createHmac('sha1', key).update(ctr).digest(); const o = h[h.length - 1] & 15;
+    return String(((h.readUInt32BE(o) & 0x7fffffff) % 1000000)).padStart(6, '0');
+  };
+  const app3 = clientApp({ apiKey: 'AIzaSyDsXxKCjxhOeGTZYyYIsm_S6SO6zADe25w', authDomain: `${PROJECT}.firebaseapp.com`, projectId: PROJECT }, 'mfa');
+  const auth3 = clientAuth(app3);
+  await signInWithEmailAndPassword(auth3, `${handle}@example.invalid`, password);
+  const secret = await TotpMultiFactorGenerator.generateSecret(await multiFactor(auth3.currentUser).getSession());
+  await multiFactor(auth3.currentUser).enroll(TotpMultiFactorGenerator.assertionForEnrollment(secret, totp(secret.secretKey)), 'CI');
+  await signOut(auth3);
+  let needs = false, resolver = null;
+  try { await signInWithEmailAndPassword(auth3, `${handle}@example.invalid`, password); } catch (e) { needs = e.code === 'auth/multi-factor-auth-required'; if (needs) resolver = getMultiFactorResolver(auth3, e); }
+  if (!needs) throw new Error('two-step: the password alone still signed in');
+  const hint = resolver.hints.find((x) => x.factorId === 'totp');
+  let wrong = true;
+  try { await resolver.resolveSignIn(TotpMultiFactorGenerator.assertionForSignIn(hint.uid, '000000')); } catch (e) { wrong = false; }
+  if (wrong && totp(secret.secretKey) !== '000000') throw new Error('two-step: a wrong code was accepted');
+  const done = await resolver.resolveSignIn(TotpMultiFactorGenerator.assertionForSignIn(hint.uid, totp(secret.secretKey)));
+  if (!done.user) throw new Error('two-step: the right code did not sign in');
+  await signOut(auth3);
+  // the account's device is not affected: its device session still works
+  const ts3 = Date.now();
+  const s3 = await call('deviceSession', { uid: user.uid, dev: r.dev, ts: ts3, sig: A.toB64(A.signEd(dev, `acm-session\n${user.uid}\n${r.dev}\n${ts3}`)) });
+  await signInWithCustomToken(auth, s3.token);
+  if (!(await getDocs(collection(db, 'accounts', user.uid, 'devices'))).size) throw new Error('device session after two-step');
+  console.log('LIVE OK: two-step verification — password alone refused, wrong code refused, right code accepted, devices unaffected');
 
   // pairing limit: made-up addresses in X-Forwarded-For do not get around it
   const pk = A.deriveIdentity(A.generateMnemonic());

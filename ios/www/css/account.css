@@ -285,3 +285,8 @@ html.i18n-wait body { visibility: hidden; }
 .lang-chip { display: inline-flex; align-items: center; gap: 6px; float: inline-end; margin: -6px -6px 6px 8px; padding: 6px 11px; border-radius: 999px; background: var(--surface-2, rgba(127,127,127,.1)); color: var(--muted); font-size: 13px; font-weight: 600; }
 .lang-chip svg { width: 16px; height: 16px; fill: currentColor; }
 .lang-sheet .lang-list { max-height: 56vh; }
+
+/* two-step verification */
+.acm-ui .code-in { font-size: 26px; letter-spacing: .3em; text-align: center; font-variant-numeric: tabular-nums; margin: 6px 0 4px; }
+.mfa-set .qr-img { width: min(200px, 56vw); }
+.mfa-key { font: 600 15px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .04em; text-align: center; background: var(--fill); border-radius: 12px; padding: 10px 12px; margin: 4px 0 8px; word-break: break-all; user-select: all; -webkit-user-select: all; }

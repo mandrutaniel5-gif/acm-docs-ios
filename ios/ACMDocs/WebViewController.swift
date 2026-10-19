@@ -269,8 +269,15 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url else { return decisionHandler(.cancel) }
-        if url.scheme == "acm" || url.scheme == "about" || url.scheme == "blob" || url.scheme == "data" {
+        if url.scheme == "acm" || url.scheme == "about" {
             return decisionHandler(.allow)
+        }
+        // blob: only inside frames (previews); data: pages never (they would run outside the app's rules)
+        if url.scheme == "blob", navigationAction.targetFrame != nil, navigationAction.targetFrame?.isMainFrame == false {
+            return decisionHandler(.allow)
+        }
+        if url.scheme == "blob" || url.scheme == "data" || url.scheme == "javascript" || url.scheme == "file" {
+            return decisionHandler(.cancel)
         }
         // links to the web, e-mail, phone: in their own apps
         UIApplication.shared.open(url)
@@ -296,6 +303,8 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
     func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?,
                  initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
         if prompt == "acm-sync" {
+            // only the app's own page (acm://app, main frame) may talk to the phone
+            guard frame.isMainFrame, frame.securityOrigin.protocol == "acm" else { completionHandler(nil); return }
             completionHandler(bridge.sync(defaultText ?? "{}"))
             return
         }
