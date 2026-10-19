@@ -1,0 +1,303 @@
+[
+  {
+    "code": "S01",
+    "severity": "CRITIC",
+    "title": "Cu parola furată: înlocuiește cheia publică a victimei (atac man-in-the-middle pentru contactele noi)",
+    "result": "VULNERABIL",
+    "detail": ""
+  },
+  {
+    "code": "S02",
+    "severity": "CRITIC",
+    "title": "Cu parola furată: șterge profilul și îl recreează cu cheia atacatorului",
+    "result": "VULNERABIL",
+    "detail": "profil șters și recreat cu altă cheie"
+  },
+  {
+    "code": "S03",
+    "severity": "CRITIC",
+    "title": "Cu parola furată: înregistrează un dispozitiv al atacatorului în contul victimei (după S01)",
+    "result": "VULNERABIL",
+    "detail": "dispozitiv înregistrat: vede lista de dispozitive și poate bloca dispozitivele membre"
+  },
+  {
+    "code": "S04",
+    "severity": "MARE",
+    "title": "Cu parola furată, fără dispozitiv: citește dispozitivele / evenimentele / seiful victimei",
+    "result": "BLOCAT",
+    "detail": "devices:false events:false vault:false"
+  },
+  {
+    "code": "S05",
+    "severity": "MARE",
+    "title": "Cu parola furată: înregistrare dispozitiv cu o semnătură falsă (fără cheile contului)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S10",
+    "severity": "CRITIC",
+    "title": "Alt utilizator citește dispozitivele / evenimentele / seiful victimei",
+    "result": "BLOCAT",
+    "detail": "devices:false events:false vault:false"
+  },
+  {
+    "code": "S11",
+    "severity": "CRITIC",
+    "title": "Alt utilizator scrie în seiful victimei",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S12",
+    "severity": "CRITIC",
+    "title": "Alt utilizator modifică profilul / cheia victimei",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S13",
+    "severity": "MARE",
+    "title": "Alt utilizator fură @numele victimei (suprascrie usernames/{handle})",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S14",
+    "severity": "MARE",
+    "title": "Alt utilizator șterge @numele victimei",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S15",
+    "severity": "MEDIU",
+    "title": "Enumerare: listează toți utilizatorii (colecția users)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S16",
+    "severity": "MEDIU",
+    "title": "Enumerare: listează toate @numele (colecția usernames)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S17",
+    "severity": "MEDIU",
+    "title": "Căutare după email (users where emailLower == ...)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S18",
+    "severity": "MARE",
+    "title": "Alt utilizator blochează un dispozitiv al victimei",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S19",
+    "severity": "MARE",
+    "title": "Alt utilizator cere o sesiune pentru dispozitivul victimei (fără cheia dispozitivului)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S20",
+    "severity": "MARE",
+    "title": "Alt utilizator scrie evenimente false („conectare nouă”) în contul victimei",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S21",
+    "severity": "MEDIU",
+    "title": "Clientul scrie direct un eveniment fals în propriul cont",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S22",
+    "severity": "MARE",
+    "title": "Dispozitivul își ridică singur rolul la „primary”",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S23",
+    "severity": "MARE",
+    "title": "Dispozitivul își adaugă singur un dispozitiv nou (scriere directă în devices)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S24",
+    "severity": "MEDIU",
+    "title": "Pairing: citește direct colecția pairings",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S30",
+    "severity": "MARE",
+    "title": "Rezervă un @nume interzis (admin)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S31",
+    "severity": "MEDIU",
+    "title": "Rezervă mai multe @nume deodată (squatting)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S32",
+    "severity": "MEDIU",
+    "title": "Pune HTML/script în numele afișat (stored XSS)",
+    "result": "VULNERABIL",
+    "detail": "serverul acceptă; clientul trebuie să-l afișeze doar ca text"
+  },
+  {
+    "code": "S33",
+    "severity": "MEDIU",
+    "title": "Profil cu cheie publică invalidă / amprentă care nu corespunde",
+    "result": "VULNERABIL",
+    "detail": "acceptat de server; clientul verifică amprenta la citire"
+  },
+  {
+    "code": "S34",
+    "severity": "MEDIU",
+    "title": "Cont cu email neconfirmat își creează profil",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S35",
+    "severity": "MIC",
+    "title": "Neautentificat: citește un profil",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S40",
+    "severity": "MARE",
+    "title": "Pairing: alt cont aprobă codul QR al victimei (victima ar intra în contul atacatorului)",
+    "result": "VULNERABIL",
+    "detail": "pid-ul (128 biți) trebuie văzut fizic pe ecranul victimei; riscul e de phishing"
+  },
+  {
+    "code": "S41",
+    "severity": "MARE",
+    "title": "Pairing: preia cheile cu altă cheie decât cea din QR (poll cu semnătură falsă)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S42",
+    "severity": "MEDIU",
+    "title": "Pairing: flood de coduri QR fără cont (200 cereri)",
+    "result": "VULNERABIL",
+    "detail": "200/200 create; documentele nu au TTL (rămân în baza de date)"
+  },
+  {
+    "code": "S43",
+    "severity": "MIC",
+    "title": "Replay: aceeași semnătură de sesiune folosită de două ori în 5 minute",
+    "result": "VULNERABIL",
+    "detail": "o semnătură interceptată (în afara TLS) ar fi refolosibilă 5 minute"
+  },
+  {
+    "code": "S44",
+    "severity": "MIC",
+    "title": "Replay: semnătură de sesiune veche (10 minute)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S50",
+    "severity": "MARE",
+    "title": "Dispozitiv membru blochează dispozitivul principal",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S51",
+    "severity": "MARE",
+    "title": "Dispozitiv membru își dă singur rolul de principal (claimPrimary fără cheile contului)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S52",
+    "severity": "MARE",
+    "title": "Dispozitiv membru șterge toate datele contului (wipeAccount), inclusiv lista de dispozitive blocate",
+    "result": "VULNERABIL",
+    "detail": ""
+  },
+  {
+    "code": "S53",
+    "severity": "MEDIU",
+    "title": "Seif: un dispozitiv scrie 900 KB într-un singur document (abuz de spațiu / cost)",
+    "result": "VULNERABIL",
+    "detail": ""
+  },
+  {
+    "code": "S60",
+    "severity": "CRITIC",
+    "title": "Dispozitiv blocat: citește în continuare datele contului cu sesiunea pe care o avea",
+    "result": "BLOCAT",
+    "detail": "devices:false vault:false"
+  },
+  {
+    "code": "S61",
+    "severity": "CRITIC",
+    "title": "Dispozitiv blocat: cere o sesiune nouă",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S62",
+    "severity": "MARE",
+    "title": "Dispozitiv blocat: se reînregistrează cu parola (fără cheile contului)",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S63",
+    "severity": "MARE",
+    "title": "Dispozitiv blocat: își schimbă singur statusul înapoi în „active”",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S64",
+    "severity": "MEDIU",
+    "title": "Dispozitiv blocat: citește în continuare profilurile publice și @numele (sesiunea Firebase rămâne validă)",
+    "result": "VULNERABIL",
+    "detail": ""
+  },
+  {
+    "code": "S70",
+    "severity": "MEDIU",
+    "title": "Funcții: cheie publică uriașă / malformată în registerDevice",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S71",
+    "severity": "MEDIU",
+    "title": "Funcții: info de dispozitiv de 4 MB",
+    "result": "BLOCAT",
+    "detail": ""
+  },
+  {
+    "code": "S72",
+    "severity": "MIC",
+    "title": "Funcții: pairApprove cu „sealed” de 10 MB",
+    "result": "BLOCAT",
+    "detail": ""
+  }
+]
