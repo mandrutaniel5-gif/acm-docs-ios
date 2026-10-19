@@ -3,7 +3,7 @@
 // rules let that device in. Needs GOOGLE_APPLICATION_CREDENTIALS (the deploy key).
 import { createRequire } from 'node:module';
 import { initializeApp as clientApp } from 'firebase/app';
-import { getAuth as clientAuth, signInWithCustomToken, signOut } from 'firebase/auth';
+import { getAuth as clientAuth, signInWithCustomToken, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { getFirestore, doc, writeBatch, getDocs, collection, serverTimestamp } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import * as A from '../build/vendor/acmcrypto.mjs';
@@ -22,10 +22,11 @@ const auth = clientAuth(app), db = getFirestore(app), fn = getFunctions(app, 'eu
 const call = async (n, d) => (await httpsCallable(fn, n)(d)).data;
 
 const handle = 'ci_' + Date.now().toString(36);
-const user = await admin.createUser({ email: `${handle}@example.invalid`, emailVerified: true, password: 'Ci-' + Math.random().toString(36).slice(2) + 'X9!' });
+const password = 'Ci-' + Math.random().toString(36).slice(2) + 'X9!';
+const user = await admin.createUser({ email: `${handle}@example.invalid`, emailVerified: true, password });
 let ok = false;
 try {
-  await signInWithCustomToken(auth, await admin.createCustomToken(user.uid));
+  await signInWithEmailAndPassword(auth, `${handle}@example.invalid`, password);
   const acct = A.deriveIdentity(A.generateMnemonic());
   const b = writeBatch(db);
   b.set(doc(db, 'usernames', handle), { uid: user.uid });
