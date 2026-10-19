@@ -30,7 +30,7 @@ const Contacts = (() => {
   const get = (uid) => all()[uid] || null;
   function put(c) { const m = all(); m[c.uid] = c; saveAll(m); return c; }
   function remove(uid) { const m = all(); delete m[uid]; saveAll(m); }
-  const list = () => Object.values(all()).sort((a, b) => (a.name || a.handle).localeCompare(b.name || b.handle, 'ro'));
+  const list = () => Object.values(all()).filter((c) => !me() || c.uid !== me().uid).sort((a, b) => (a.name || a.handle).localeCompare(b.name || b.handle, 'ro'));
 
   /** 'verified' | 'unverified' | 'changed' */
   const status = (c) => (c.pending ? 'changed' : c.verified ? 'verified' : 'unverified');
@@ -39,6 +39,7 @@ const Contacts = (() => {
 
   /** Adds someone found on the server (not verified yet). */
   function addFromProfile(p) {
+    if (me() && p.uid === me().uid) return null; // yourself
     const old = get(p.uid);
     if (old && old.fp === p.fp) return put(Object.assign(old, { handle: p.handle, name: p.name || old.name }));
     if (old && old.fp !== p.fp) return put(Object.assign(old, { pending: { fp: p.fp, key: Host.toB64(p.key), handle: p.handle, name: p.name } }));
@@ -397,10 +398,11 @@ const AcmShare = (() => {
     try {
       const bytes = await Host.readFileAsync(path);
       const sealed = A().seal({ bytes, name, mime: MIME[Host.ext(name)] || 'application/octet-stream' }, id,
-        [...people.map((c) => Host.fromB64(c.key)), id.bundle], { password: password || undefined, handle: Account.handle() });
+        people.map((c) => Host.fromB64(c.key)), { password: password || undefined, handle: Account.handle() });
       out = await freePath(await docsDir('Trimise criptat'), safeName(name.replace(/\.[^.]+$/, '')) + '.acm');
       Host.writeFile(out, sealed);
       try { App.rememberFile(out, 'secure'); } catch (e) {}
+      Sent.add(out, { name, to: people.map((c) => c.handle), at: Date.now(), size: sealed.length });
     } catch (e) {
       UI.busy();
       console.error(e);
@@ -472,7 +474,7 @@ const AcmShare = (() => {
 
       box.append(
         el('div', { class: 'send-head' }, [el('span', { class: 'send-i', html: svg('lockfile') }), el('div', {}, [el('h2', { text: 'Trimite criptat' }), el('small', { class: 'muted no-tr', text: name })])]),
-        el('p', { class: 'muted small', text: 'Doar persoanele alese (și tu) vor putea deschide fișierul .acm, în aplicația ACM Docs.' }),
+        el('p', { class: 'muted small', text: 'Doar persoanele alese vor putea deschide fișierul .acm, în aplicația ACM Docs. După criptare nici tu nu îl mai poți deschide, așa că păstrează originalul dacă ai nevoie de el.' }),
         Contacts.searchBox((p, out) => {
           const c = Contacts.addFromProfile(p);
           chosen.set(c.uid, c);
@@ -533,12 +535,41 @@ const AcmShare = (() => {
     }
   }
 
+  /** What this account sent (on this device): which file went to whom. The sender cannot open it. */
+  const Sent = {
+    key: () => 'acm.sent.' + (Account.current() ? Account.current().uid : '-'),
+    all() { try { return JSON.parse(localStorage.getItem(this.key()) || '{}') || {}; } catch (e) { return {}; } },
+    get(p) { return this.all()[p] || null; },
+    add(p, rec) { const m = this.all(); m[p] = rec; try { localStorage.setItem(this.key(), JSON.stringify(m)); } catch (e) {} },
+  };
+  const isSentPath = (p) => /[\\/]Trimise criptat$/.test(Host.dirName(p));
+
+  async function showSent(path) {
+    const rec = Sent.get(path);
+    const when = rec ? new Date(rec.at).toLocaleString(I18n.locale(), { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : null;
+    const act = await UI.modal((box, close) => {
+      box.classList.add('acm-recv');
+      box.append(
+        el('div', { class: 'send-head' }, [el('span', { class: 'send-i', html: svg('lockfile') }), el('div', {}, [el('h2', { text: 'Document trimis' }), el('small', { class: 'muted no-tr', text: rec ? rec.name : Host.baseName(path) })])]),
+        rec ? el('div', { class: 'recv-from' }, [el('small', { class: 'muted', text: 'Trimis către' }), el('b', { class: 'no-tr', text: rec.to.map((h) => '@' + h).join(', ') }), el('small', { class: 'muted', text: when })]) : null,
+        el('p', { class: 'muted small', text: 'Acest fișier poate fi deschis doar de destinatarii lui. Nici tu, ca expeditor, nu îl mai poți decripta: aici rămâne doar evidența trimiterii.' }),
+        el('div', { class: 'actions col' }, [
+          el('button', { class: 'btn primary', type: 'button', html: svg('share') + '<span>' + (Host.mobile ? 'Trimite din nou fișierul criptat' : 'Arată în folder') + '</span>', onclick: () => close('share') }),
+          el('button', { class: 'btn', type: 'button', text: 'Închide', onclick: () => close(null) }),
+        ]),
+      );
+    });
+    if (act === 'share') { if (Host.mobile) await Host.share(path); else Host.showInFolder(path); }
+  }
+
   async function openFile(path, bytes) {
+    if (isSentPath(path) || Sent.get(path)) { try { App.rememberFile(path, 'secure'); } catch (e) {} return showSent(path); }
     try { A().inspect(bytes); } catch (e) { return UI.toast(e.message || 'Nu este un fișier .acm.', { error: true }); }
     if (!(await ensureAccount())) return;
-    try { await keepEncrypted(path, bytes); } catch (e) { console.warn('keep .acm', e); }
     const res = await decryptBytes(Host.baseName(path), bytes);
     if (!res) return;
+    // only documents meant for this account are kept (still encrypted) under Files › Criptate
+    try { await keepEncrypted(path, bytes); } catch (e) { console.warn('keep .acm', e); }
     const sender = await describeSender(res.sender);
     const go = await UI.modal((box, close) => {
       box.classList.add('acm-recv');
@@ -557,7 +588,7 @@ const AcmShare = (() => {
     });
     if (go === 'add' && sender.add) {
       const c = Contacts.addFromProfile(sender.add);
-      UI.toast(`@${c.handle} a fost adăugat la contacte (neverificat).`);
+      if (c) UI.toast(`@${c.handle} a fost adăugat la contacte (neverificat).`);
       return;
     }
     if (go === 'save') return saveDecrypted(res);
@@ -592,6 +623,9 @@ const AcmShare = (() => {
   }
 
   async function describeSender(s) {
+    if (Account.fingerprint() && s.fingerprint === Account.fingerprint()) {
+      return { row: Contacts.contactRow({ handle: Account.handle() || '', name: 'Tu', verified: true }, null, el('span')), note: null };
+    }
     const known = Contacts.list().find((c) => c.fp === s.fingerprint);
     if (known) {
       return {
