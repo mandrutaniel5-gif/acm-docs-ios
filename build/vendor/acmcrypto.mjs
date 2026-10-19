@@ -4,8 +4,8 @@
 // Building blocks (audited libraries, nothing home-made):
 //   - 24 recovery words: BIP-39 (256 bits)          @scure/bip39
 //   - key derivation: HKDF-SHA256                    @noble/hashes
-//   - key agreement: X25519 + ML-KEM-768 (hybrid, post-quantum)   @noble/curves, @noble/post-quantum
-//   - signatures: Ed25519                            @noble/curves
+//   - key agreement: X25519 + ML-KEM-768 (hybrid, post-quantum, NIST FIPS 203)   @noble/curves, @noble/post-quantum
+//   - signatures: Ed25519 + ML-DSA-65 (hybrid, post-quantum, NIST FIPS 204)   @noble/curves, @noble/post-quantum
 //   - encryption: XChaCha20-Poly1305                 @noble/ciphers
 //   - document password: Argon2id                    @noble/hashes
 //
@@ -19,6 +19,7 @@ import { argon2id } from '@noble/hashes/argon2.js';
 import { randomBytes, concatBytes, utf8ToBytes } from '@noble/hashes/utils.js';
 import { xchacha20poly1305 } from '@noble/ciphers/chacha.js';
 import { ml_kem768 } from '@noble/post-quantum/ml-kem.js';
+import { ml_dsa65 } from '@noble/post-quantum/ml-dsa.js';
 import { generateMnemonic as bipGenerate, validateMnemonic as bipValidate, mnemonicToSeedSync } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english.js';
 
@@ -72,35 +73,36 @@ export function deriveIdentity(mnemonic) {
   const edSk = kdf(master, undefined, 'acm/ed25519', 32);
   const kemSeed = kdf(master, undefined, 'acm/mlkem768', 64);
   const kem = ml_kem768.keygen(kemSeed);
-  return identityFromSecrets({ xSk, edSk, kemSk: kem.secretKey, kemPk: kem.publicKey });
+  const dsa = ml_dsa65.keygen(kdf(master, undefined, 'acm/mldsa65', 32));
+  return identityFromSecrets({ xSk, edSk, kemSk: kem.secretKey, kemPk: kem.publicKey, dsaSk: dsa.secretKey, dsaPk: dsa.publicKey });
 }
 
-function identityFromSecrets({ xSk, edSk, kemSk, kemPk }) {
-  const pub = { x: x25519.getPublicKey(xSk), ed: ed25519.getPublicKey(edSk), kem: kemPk };
+function identityFromSecrets({ xSk, edSk, kemSk, kemPk, dsaSk, dsaPk }) {
+  const pub = { x: x25519.getPublicKey(xSk), ed: ed25519.getPublicKey(edSk), kem: kemPk, dsa: dsaPk };
   const bundle = encodePublicKey(pub);
-  return { secret: { xSk, edSk, kemSk }, public: pub, bundle, fingerprint: fingerprint(bundle) };
+  return { secret: { xSk, edSk, kemSk, dsaSk }, public: pub, bundle, fingerprint: fingerprint(bundle) };
 }
 
 /** Private keys as one blob (what the device keeps, wrapped by the Secure Enclave / Keystore). */
 export function exportSecrets(id) {
-  return concatBytes(utf8ToBytes('ACMS'), new Uint8Array([VERSION]), id.secret.xSk, id.secret.edSk, id.public.kem, id.secret.kemSk);
+  return concatBytes(utf8ToBytes('ACMS'), new Uint8Array([VERSION]), id.secret.xSk, id.secret.edSk, id.public.kem, id.secret.kemSk, id.public.dsa, id.secret.dsaSk);
 }
 export function importSecrets(blob) {
   const b = toBytes(blob);
   if (td.decode(b.subarray(0, 4)) !== 'ACMS' || b[4] !== VERSION) throw new AcmError('BAD_SECRETS');
   let o = 5;
   const take = (n) => { const r = b.slice(o, o + n); o += n; return r; };
-  const xSk = take(32), edSk = take(32), kemPk = take(1184), kemSk = take(2400);
-  return identityFromSecrets({ xSk, edSk, kemSk, kemPk });
+  const xSk = take(32), edSk = take(32), kemPk = take(1184), kemSk = take(2400), dsaPk = take(1952), dsaSk = take(4032);
+  return identityFromSecrets({ xSk, edSk, kemSk, kemPk, dsaSk, dsaPk });
 }
 
 export function encodePublicKey(pub) {
-  return concatBytes(KEY_MAGIC, new Uint8Array([VERSION]), pub.x, pub.ed, pub.kem);
+  return concatBytes(KEY_MAGIC, new Uint8Array([VERSION]), pub.x, pub.ed, pub.kem, pub.dsa);
 }
 export function decodePublicKey(bundle) {
   const b = toBytes(bundle);
-  if (b.length !== 5 + 32 + 32 + 1184 || !equal(b.subarray(0, 4), KEY_MAGIC) || b[4] !== VERSION) throw new AcmError('BAD_PUBLIC_KEY');
-  return { x: b.slice(5, 37), ed: b.slice(37, 69), kem: b.slice(69) };
+  if (b.length !== 5 + 32 + 32 + 1184 + 1952 || !equal(b.subarray(0, 4), KEY_MAGIC) || b[4] !== VERSION) throw new AcmError('BAD_PUBLIC_KEY');
+  return { x: b.slice(5, 37), ed: b.slice(37, 69), kem: b.slice(69, 69 + 1184), dsa: b.slice(69 + 1184) };
 }
 export function fingerprint(bundle) { return hex(sha256(toBytes(bundle))); }
 
@@ -141,6 +143,11 @@ function wrapKey(recipientPub, dek, pwKey) {
 }
 
 function unwrapKey(entry, id, pwKey) {
+  // any damaged envelope (bad base64, wrong lengths) simply does not open: never an internal error
+  try { return unwrapKeyInner(entry, id, pwKey); } catch (e) { return null; }
+}
+
+function unwrapKeyInner(entry, id, pwKey) {
   const ephPub = unb64(entry.e), ct = unb64(entry.k);
   const ss1 = x25519.getSharedSecret(id.secret.xSk, ephPub);
   const ss2 = ml_kem768.decapsulate(ct, id.secret.kemSk);
@@ -172,14 +179,15 @@ export function seal(doc, sender, recipients, opts = {}) {
   // envelopes, in random order (the order says nothing about who is who)
   const r = recipients.map((bundle) => wrapKey(decodePublicKey(bundle), dek, pwKey));
   for (let i = r.length - 1; i > 0; i--) { const j = randomBytes(1)[0] % (i + 1); [r[i], r[j]] = [r[j], r[i]]; }
-  const header = te.encode(JSON.stringify({ v: VERSION, alg: 'x25519+mlkem768/xchacha20poly1305/ed25519', n: b64(nonce), pw, r }));
+  const header = te.encode(JSON.stringify({ v: VERSION, alg: 'x25519+mlkem768/xchacha20poly1305/ed25519+mldsa65', n: b64(nonce), pw, r }));
   const prefix = concatBytes(MAGIC, new Uint8Array([VERSION]), u32(header.length), header);
 
   // inside the box: who sent it (signed), the name and type, the document, padding
   const bytes = toBytes(doc.bytes);
   const meta = te.encode(JSON.stringify({ name: String(doc.name || 'document'), mime: String(doc.mime || 'application/octet-stream'), size: bytes.length, created: Date.now(), from: { b: b64(sender.bundle) } }));
   const toSign = concatBytes(utf8ToBytes('ACM1 sig'), sha256(prefix), sha256(meta), sha256(bytes));
-  const sig = ed25519.sign(toSign, sender.secret.edSk);
+  // two signatures: both must hold (a quantum computer would have to break both)
+  const sig = concatBytes(ed25519.sign(toSign, sender.secret.edSk), ml_dsa65.sign(toSign, sender.secret.dsaSk));
   const body = concatBytes(u32(meta.length), meta, sig, bytes);
   const padded = new Uint8Array(Math.max(body.length, padme(body.length)));
   padded.set(body);
@@ -214,7 +222,7 @@ export function open(file, id, opts = {}) {
   let pwKey = null;
   if (header.pw) {
     if (!opts.password) throw new AcmError('PASSWORD_REQUIRED', 'Documentul cere o parolă.');
-    pwKey = passwordKey(opts.password, unb64(header.pw.s), header.pw);
+    try { pwKey = passwordKey(opts.password, unb64(header.pw.s), header.pw); } catch (e) { throw new AcmError('TAMPERED', 'Fișierul este deteriorat.'); }
   }
   let dek = null;
   for (const entry of header.r) { dek = unwrapKey(entry, id, pwKey); if (dek) break; }
@@ -224,11 +232,15 @@ export function open(file, id, opts = {}) {
   const ml = readU32(body, 0);
   const metaBytes = body.subarray(4, 4 + ml);
   const meta = JSON.parse(td.decode(metaBytes));
-  const sig = body.subarray(4 + ml, 4 + ml + 64);
-  const bytes = body.slice(4 + ml + 64, 4 + ml + 64 + meta.size);
+  const SIG = 64 + 3309;
+  const sig = body.subarray(4 + ml, 4 + ml + SIG);
+  const bytes = body.slice(4 + ml + SIG, 4 + ml + SIG + meta.size);
   const senderBundle = unb64(meta.from.b);
   const senderPub = decodePublicKey(senderBundle);
   const toSign = concatBytes(utf8ToBytes('ACM1 sig'), sha256(prefix), sha256(metaBytes), sha256(bytes));
-  if (!ed25519.verify(sig, toSign, senderPub.ed)) throw new AcmError('BAD_SIGNATURE', 'Semnătura expeditorului nu este validă.');
+  const okEd = ed25519.verify(sig.subarray(0, 64), toSign, senderPub.ed);
+  let okDsa = false;
+  try { okDsa = ml_dsa65.verify(sig.subarray(64), toSign, senderPub.dsa); } catch (e) { okDsa = false; }
+  if (!okEd || !okDsa) throw new AcmError('BAD_SIGNATURE', 'Semnătura expeditorului nu este validă.');
   return { bytes, name: meta.name, mime: meta.mime, created: meta.created, sender: { bundle: senderBundle, fingerprint: fingerprint(senderBundle) } };
 }

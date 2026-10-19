@@ -134,3 +134,32 @@ test('real Argon2 parameters (32 MiB) work and take a sensible time', () => {
   console.log(`  seal + open with real Argon2id: ${Math.round(ms)} ms`);
   assert.ok(ms < 15000);
 });
+
+test('post-quantum: public key carries ML-KEM-768 and ML-DSA-65; both signatures are required', () => {
+  const pub = A.decodePublicKey(ana.bundle);
+  assert.equal(pub.kem.length, 1184);
+  assert.equal(pub.dsa.length, 1952);
+  const file = A.seal(doc(), ana, [mihai.bundle]);
+  assert.ok(new TextDecoder().decode(file.subarray(9, 200)).includes('mlkem768'));
+  // a sender whose ML-DSA key does not match its bundle is refused even if Ed25519 matches
+  const mixed = { ...ana, secret: { ...ana.secret, dsaSk: eve.secret.dsaSk } };
+  assert.throws(() => A.open(A.seal(doc(), mixed, [mihai.bundle]), mihai), { code: 'BAD_SIGNATURE' });
+  const mixed2 = { ...ana, secret: { ...ana.secret, edSk: eve.secret.edSk } };
+  assert.throws(() => A.open(A.seal(doc(), mixed2, [mihai.bundle]), mihai), { code: 'BAD_SIGNATURE' });
+});
+
+test('changing ANY single byte gives a clear error (whole header + 300 random spots)', () => {
+  const file = A.seal(doc('y'.repeat(3000)), ana, [mihai.bundle], { password: 'parola-test-1', argon: FAST });
+  const hl = new DataView(file.buffer, file.byteOffset + 5, 4).getUint32(0, true);
+  const spots = [];
+  for (let i = 0; i < 9 + hl; i += 7) spots.push(i);
+  for (let i = 0; i < 300; i++) spots.push(Math.floor(Math.random() * file.length));
+  const ok = new Set(['TAMPERED', 'NOT_FOR_YOU', 'BAD_PASSWORD_OR_NOT_FOR_YOU', 'BAD_SIGNATURE', 'NOT_ACM', 'NEWER_VERSION', 'PASSWORD_REQUIRED']);
+  for (const p of spots) {
+    const bad = file.slice();
+    bad[p] ^= 1 << (p % 8);
+    let code = null;
+    try { A.open(bad, mihai, { password: 'parola-test-1' }); code = 'OPENED'; } catch (e) { code = e.code || ('INTERNAL ' + e.message); }
+    assert.ok(ok.has(code), `byte ${p}: ${code}`);
+  }
+});
