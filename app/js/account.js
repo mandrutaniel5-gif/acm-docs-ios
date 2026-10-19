@@ -1,7 +1,7 @@
 'use strict';
 // ACM Docs accounts (Firebase) and the account keys for .acm documents.
 //
-// - Sign in: email + password (with email confirmation) or Google.
+// - Sign in: email + password (with email confirmation), or a QR code from a signed-in device.
 // - Keys: made automatically from 24 recovery words when the account is created. The words and
 //   the private keys stay on this device, behind Face ID / the phone's lock (Host.secure*);
 //   only the public key (the "open padlock") goes to Firestore, so others can lock documents for you.
@@ -22,12 +22,6 @@ const Account = (() => {
     storageBucket: 'acm-docs-52280.firebasestorage.app',
     messagingSenderId: '1013772730312',
     appId: '1:1013772730312:web:81f63346bf055dc2d58afd',
-  };
-  // Google sign-in: OAuth clients (filled in once created in Google Cloud / Firebase)
-  const GOOGLE = {
-    ios: '',        // iOS client ID ("….apps.googleusercontent.com")
-    desktop: '',    // Windows: "Desktop app" client ID
-    desktopSecret: '', // Google gives desktop apps a non-secret "secret"; it is not a password
   };
 
   const LS = {
@@ -130,32 +124,6 @@ const Account = (() => {
   async function resendVerification() { if (user) await F().auth.sendEmailVerification(user); }
   async function refresh() { if (user) { await F().auth.reload(user); user = auth.currentUser; await user.getIdToken(true); } return user; }
   async function signOut() { identity = null; profile = null; await F().auth.signOut(auth); }
-
-  // ---------------------------------------------------------------- Google (system browser, PKCE)
-  const b64url = (u8) => Host.toB64(u8).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  async function google() {
-    await ready();
-    const ios = Host.info && Host.info.platform === 'ios';
-    const clientId = ios ? GOOGLE.ios : GOOGLE.desktop;
-    if (!clientId || (!ios && Host.mobile)) throw new Error('Conectarea cu Google va fi disponibilă în curând. Până atunci, folosește emailul.');
-    const verifier = b64url(crypto.getRandomValues(new Uint8Array(32)));
-    const challenge = b64url(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))));
-    const state = b64url(crypto.getRandomValues(new Uint8Array(16)));
-    const scheme = 'com.googleusercontent.apps.' + clientId.split('.apps.googleusercontent.com')[0];
-    const redirect = ios ? scheme + ':/oauth2redirect' : '{REDIRECT}';
-    const q = (o) => Object.entries(o).map(([k, v]) => k + '=' + (v === '{REDIRECT}' ? v : encodeURIComponent(v))).join('&');
-    const url = 'https://accounts.google.com/o/oauth2/v2/auth?' + q({ client_id: clientId, redirect_uri: redirect, response_type: 'code', scope: 'openid email profile', code_challenge: challenge, code_challenge_method: 'S256', state, prompt: 'select_account' });
-    const back = new URL(await Host.oauth(url, ios ? scheme : 'loopback'));
-    if (back.searchParams.get('state') !== state) throw new Error('Răspuns Google nevalid.');
-    const code = back.searchParams.get('code');
-    if (!code) throw new Error('cancel');
-    const usedRedirect = ios ? redirect : back.origin;
-    const body = q({ client_id: clientId, code, code_verifier: verifier, grant_type: 'authorization_code', redirect_uri: usedRedirect, ...(ios ? {} : { client_secret: GOOGLE.desktopSecret }) });
-    const tok = JSON.parse(await Host.googleToken(body));
-    if (!tok.id_token) throw new Error(tok.error_description || 'Google nu a răspuns.');
-    const { auth: Au } = F();
-    return (await Au.signInWithCredential(auth, Au.GoogleAuthProvider.credential(tok.id_token))).user;
-  }
 
   // ---------------------------------------------------------------- keys
   const Fs = () => F().firestore;
@@ -329,9 +297,8 @@ const Account = (() => {
   return {
     call, signInWithToken, claims, internals,
     init, ready, onChange, current, needsVerification, isPasswordUser, say,
-    signUp, signIn, resetPassword, resendVerification, refresh, signOut, google,
+    signUp, signIn, resetPassword, resendVerification, refresh, signOut,
     keyState, createKeys, restoreKeys, setHandle, handle, fingerprint, lookup, profileOf, handleProblem, suggestHandle, cleanHandle, unlock, lock, checkPassword, words, wordsSaved, markWordsSaved, deleteAccount,
     skipped, setSkipped,
-    get googleReady() { return !!(Host.info && Host.info.platform === 'ios' ? GOOGLE.ios : (!Host.mobile && GOOGLE.desktop)); },
   };
 })();

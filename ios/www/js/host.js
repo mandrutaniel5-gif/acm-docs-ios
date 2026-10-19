@@ -495,18 +495,6 @@ const Host = (() => {
     if (ipc) { try { return !!(await ipc.invoke('secure', 'hello', {})); } catch (e) { return false; } }
     return false;
   }
-  /** Google sign-in: exchanges the one-time code for the ID token (only oauth2.googleapis.com). */
-  async function googleToken(body) {
-    if (AB) return call('googleToken', { body });
-    if (ipc) return ipc.invoke('google-token', body);
-    throw new Error('Conectarea cu Google merge doar în aplicație.');
-  }
-  /** Sign-in in the system browser (Google): returns the URL the browser came back with. */
-  async function oauth(url, callback) {
-    if (AB) return call('oauth', { url, callback });
-    if (ipc) return ipc.invoke('oauth', { url, callback });
-    throw new Error('Conectarea cu Google merge doar în aplicație.');
-  }
 
   /** Live QR scanner of the phone (iOS); null = cancelled, undefined = not available here */
   async function scanQR(title) {
@@ -533,7 +521,7 @@ const Host = (() => {
   return {
     platform, mobile, available, info, readFile, readFileAsync, writeFile, exists, baseName, dirName, openDialog, pickImages, camera, saveDialog, startupFile, onOpenFile, setTitle, wasmBytes, listFonts,
     ocr, ocrWarm, htmlToPdf, capture, ext, showInFolder, openPath, openExternal, fetchText, share, exportCopy, specialDir, listDir, mkdirp, join, mtime, remove, setTheme, exitApp, appVersion, toB64, fromB64,
-    secureSet, secureGet, secureHas, secureDelete, confirmOwner, oauth, googleToken, scanQR, privacy, integrity, biometricsAvailable,
+    secureSet, secureGet, secureHas, secureDelete, confirmOwner, scanQR, privacy, integrity, biometricsAvailable,
   };
 })();
 

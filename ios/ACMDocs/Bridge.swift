@@ -330,27 +330,6 @@ final class Bridge: NSObject, WKScriptMessageHandler {
             let reason = (a["reason"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? t("Confirmă că ești tu", "Confirm it's you")
             Secure.confirmOwner(reason: reason) { ok in self.reply(id, ok ? nil : "cancel", ok ? "true" : nil) }
 
-        case "oauth":
-            guard let url = URL(string: a["url"] as? String ?? ""), url.scheme == "https",
-                  let scheme = a["callback"] as? String, !scheme.isEmpty else { return reply(id, "oauth", nil) }
-            let runner = OAuthRunner(anchor: vc.view.window)
-            pending[id] = runner
-            runner.start(url: url, callbackScheme: scheme) { [weak self] back, error in
-                self?.pending[id] = nil
-                self?.reply(id, error, back?.absoluteString)
-            }
-
-        case "googleToken":
-            // Google sign-in, step 2: the one-time code for the ID token. Only Google's token address.
-            var req = URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
-            req.httpMethod = "POST"
-            req.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            req.httpBody = (a["body"] as? String ?? "").data(using: .utf8)
-            URLSession.shared.dataTask(with: req) { data, _, error in
-                if let data = data, let s = String(data: data, encoding: .utf8) { self.reply(id, nil, s) }
-                else { self.reply(id, error?.localizedDescription ?? "google", nil) }
-            }.resume()
-
         default:
             reply(id, "op " + op, nil)
         }

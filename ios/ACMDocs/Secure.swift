@@ -1,6 +1,5 @@
 import Foundation
 import LocalAuthentication
-import AuthenticationServices
 import Security
 import UIKit
 
@@ -99,31 +98,5 @@ enum Secure {
         ctx.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { ok, _ in
             DispatchQueue.main.async { done(ok) }
         }
-    }
-}
-
-/// Sign-in pages (Google) open in Safari's secure sheet, never inside the app's own page.
-final class OAuthRunner: NSObject, ASWebAuthenticationPresentationContextProviding {
-    private var session: ASWebAuthenticationSession?
-    private weak var anchor: UIWindow?
-
-    init(anchor: UIWindow?) { self.anchor = anchor }
-
-    func start(url: URL, callbackScheme: String, done: @escaping (URL?, String?) -> Void) {
-        let s = ASWebAuthenticationSession(url: url, callbackURLScheme: callbackScheme) { result, error in
-            DispatchQueue.main.async {
-                if let result = result { done(result, nil) }
-                else if let e = error as? ASWebAuthenticationSessionError, e.code == .canceledLogin { done(nil, "cancel") }
-                else { done(nil, error?.localizedDescription ?? "oauth") }
-            }
-        }
-        s.presentationContextProvider = self
-        s.prefersEphemeralWebBrowserSession = true
-        session = s
-        if !s.start() { done(nil, "oauth") }
-    }
-
-    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        anchor ?? ASPresentationAnchor()
     }
 }

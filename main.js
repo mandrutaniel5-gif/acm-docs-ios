@@ -250,32 +250,3 @@ ipcMain.handle('secure', async (e, op, args) => {
   throw new Error('secure ' + op);
 });
 
-// Google sign-in in the system browser, back through a one-time local address (127.0.0.1).
-// The page builds the sign-in URL with "{REDIRECT}" where the local address goes.
-ipcMain.handle('oauth', (_e, args) => new Promise((resolve, reject) => {
-  const http = require('http');
-  const server = http.createServer((req, res) => {
-    const port = server.address().port;
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end('<!doctype html><meta charset="utf-8"><body style="font:16px system-ui;padding:40px">Gata. Te poți întoarce în ACM Docs.</body>');
-    server.close();
-    clearTimeout(timer);
-    resolve(`http://127.0.0.1:${port}${req.url}`);
-  });
-  const timer = setTimeout(() => { server.close(); reject(new Error('cancel')); }, 5 * 60 * 1000);
-  server.listen(0, '127.0.0.1', () => {
-    const redirect = `http://127.0.0.1:${server.address().port}`;
-    shell.openExternal(String(args && args.url || '').replace(/\{REDIRECT\}/g, encodeURIComponent(redirect)));
-  });
-}));
-
-// Google sign-in, step 2 (Windows): the one-time code for the ID token. Only Google's token address.
-ipcMain.handle('google-token', (_e, body) => new Promise((resolve, reject) => {
-  const data = Buffer.from(String(body || ''));
-  const req = require('https').request({ host: 'oauth2.googleapis.com', path: '/token', method: 'POST', timeout: 15000,
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': data.length } }, (res) => {
-    let out = ''; res.setEncoding('utf8'); res.on('data', (c) => { out += c; }); res.on('end', () => resolve(out));
-  });
-  req.on('error', reject); req.on('timeout', () => req.destroy(new Error('timeout')));
-  req.end(data);
-}));

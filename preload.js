@@ -8,7 +8,7 @@ const path = require('path');
 
 const APP_DIR = path.join(__dirname, 'app');
 const INVOKE = new Set(['startup-file', 'dialog-open', 'dialog-save', 'ocr-warm', 'ocr', 'show-in-folder', 'fetch-text', 'open-external',
-  'open-path', 'special-dir', 'set-theme', 'html-to-pdf', 'capture', 'privacy', 'secure', 'oauth', 'google-token']);
+  'open-path', 'special-dir', 'set-theme', 'html-to-pdf', 'capture', 'privacy', 'secure']);
 const EVENTS = new Set(['open-file', 'ocr-progress']);
 const str = (p) => { if (typeof p !== 'string' || !p) throw new Error('bad path'); return p; };
 const u8 = (b) => (b instanceof Uint8Array ? b : new Uint8Array(b));
