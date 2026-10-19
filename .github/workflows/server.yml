@@ -47,11 +47,12 @@ jobs:
           printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
           set -o pipefail
-          firebase deploy --project acm-docs-52280 --only firestore:rules,firestore:indexes,functions --force --non-interactive 2>&1 | tee deploy.txt
+          # Auth first (Identity Platform, second factor, no client-side deletion): the sign-in
+          # function below needs Identity Platform switched on
+          node test/auth-config.mjs 2>&1 | tee deploy.txt || true
+          firebase deploy --project acm-docs-52280 --only firestore:rules,firestore:indexes,functions --force --non-interactive 2>&1 | tee -a deploy.txt
           # Storage rules (only once Storage is activated in the console)
           firebase deploy --project acm-docs-52280 --only storage --non-interactive 2>&1 | tee -a deploy.txt || echo "STORAGE NOT ACTIVE" | tee -a deploy.txt
-          # Auth settings: no client-side deletion, email enumeration protection
-          node test/auth-config.mjs 2>&1 | tee -a deploy.txt || true
           # one real round trip with a throwaway account (created and deleted by the test)
           node test/prod-smoke.mjs 2>&1 | tee -a deploy.txt
           rm -f "$RUNNER_TEMP/sa.json"

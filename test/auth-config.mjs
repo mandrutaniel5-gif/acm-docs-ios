@@ -13,8 +13,20 @@ const client = await auth.getClient();
 const url = `https://identitytoolkit.googleapis.com/admin/v2/projects/${PROJECT}/config`;
 const show = (c) => JSON.stringify({ disabledUserDeletion: !!(c.client && c.client.permissions && c.client.permissions.disabledUserDeletion), improvedEmailPrivacy: !!(c.emailPrivacyConfig && c.emailPrivacyConfig.enableImprovedEmailPrivacy) });
 try {
-  const before = (await client.request({ url })).data;
+  let before = (await client.request({ url })).data;
+  // Identity Platform (the owner agreed): needed for the sign-in alerts and the second factor
+  if (before.subtype !== 'IDENTITY_PLATFORM') {
+    await client.request({ url: `https://identitytoolkit.googleapis.com/v2/projects/${PROJECT}/identityPlatform:initializeAuth`, method: 'POST', data: {} });
+    before = (await client.request({ url })).data;
+    console.log('IDENTITY PLATFORM: enabled now →', before.subtype);
+  } else console.log('IDENTITY PLATFORM: already on');
   console.log('auth config before:', show(before));
+  // second factor: codes from an authenticator app (TOTP), chosen by each person in Settings
+  const mfa = (await client.request({
+    url: url + '?updateMask=mfa.providerConfigs', method: 'PATCH',
+    data: { mfa: { providerConfigs: [{ state: 'ENABLED', totpProviderConfig: { adjacentIntervals: 1 } }] } },
+  })).data;
+  console.log('MFA OK:', JSON.stringify((mfa.mfa && mfa.mfa.providerConfigs) || []));
   const after = (await client.request({
     url: url + '?updateMask=client.permissions.disabledUserDeletion,emailPrivacyConfig.enableImprovedEmailPrivacy',
     method: 'PATCH',

@@ -13,6 +13,7 @@
 //  - every sign-in is written as an event, so all devices can show "new sign-in" alerts
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { setGlobalOptions } from 'firebase-functions/v2';
+import { beforeUserSignedIn } from 'firebase-functions/v2/identity';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore';
@@ -286,4 +287,30 @@ export const wipeAccount = onCall(async (req) => {
   catch (e) { console.warn('storage cleanup', e.message); }
   await getAuth().deleteUser(uid);
   return { ok: true };
+});
+
+// ------------------------------------------------------------------ sign-ins with the password
+/** "Chrome · Windows": a rough description of where a sign-in came from (no address is stored). */
+function agentOf(ua) {
+  ua = String(ua || '');
+  const os = /iPhone|iPad|iOS/.test(ua) ? 'iOS' : /Android/.test(ua) ? 'Android' : /Windows/.test(ua) ? 'Windows' : /Mac OS X|Macintosh/.test(ua) ? 'macOS' : /Linux/.test(ua) ? 'Linux' : '';
+  const app = /Electron|ACMDocs|; wv\)/.test(ua) ? 'ACM Docs' : /Edg\//.test(ua) ? 'Edge' : /Firefox\//.test(ua) ? 'Firefox' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : /node|curl|python|okhttp|Go-http/i.test(ua) ? 'program / script' : '';
+  return [app, os].filter(Boolean).join(' · ').slice(0, 60) || null;
+}
+
+/**
+ * Every sign-in with the account's email + password is written as an event, so all the account's
+ * devices show "someone signed in with your password" (the password alone opens nothing, but the
+ * owner should know it is out). Device sessions (custom tokens) are not password sign-ins.
+ */
+export const beforeSignIn = beforeUserSignedIn(async (ev) => {
+  const info = ev.additionalUserInfo || {};
+  const provider = info.providerId || (ev.credential && ev.credential.providerId) || '';
+  if (provider !== 'password' || info.isNewUser || !ev.data) return;
+  const uid = ev.data.uid;
+  try {
+    const active = await devicesOf(uid).where('status', '==', 'active').limit(1).get();
+    if (active.empty) return; // no device yet: nobody to warn
+    await event(uid, { type: 'password', agent: agentOf(ev.userAgent) });
+  } catch (e) { console.warn('sign-in event', e.message); }
 });

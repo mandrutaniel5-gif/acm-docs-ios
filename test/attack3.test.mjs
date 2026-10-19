@@ -185,8 +185,8 @@ await attack('P08', 'MARE', 'Doar cu parola: scrie / șterge înregistrări din 
 
 await attack('P09', 'MEDIU', 'Doar cu parola: proprietarul nu află că cineva a intrat cu parola lui (nicio alertă)', async () => {
   const ev = await getDocs(collection(victim.c.db, 'accounts', victim.uid, 'events'));
-  const signins = ev.docs.filter((d) => d.data().type === 'signin').length;
-  return { ok: signins <= 1, detail: `evenimente „conectare” vizibile proprietarului: ${signins} (doar crearea contului)` };
+  const pw = ev.docs.filter((d) => d.data().type === 'password').length;
+  return { ok: pw === 0, detail: `alerte „cineva a intrat cu parola”: ${pw}` };
 });
 
 await attack('P10', 'MIC', 'Doar cu parola: citește profilurile publice și caută @nume', async () => {
