@@ -28,6 +28,7 @@ targets:
         ENABLE_BITCODE: NO
         INFOPLIST_FILE: ACMDocs/Info.plist
         GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_ENTITLEMENTS: ACMDocs/ACMDocs.entitlements
     info:
       path: ACMDocs/Info.plist
       properties:

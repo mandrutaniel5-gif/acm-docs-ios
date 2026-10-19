@@ -36,7 +36,7 @@ jobs:
           cd ios
           xcodebuild -project ACMDocs.xcodeproj -scheme ACMDocs -configuration Debug \
             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build CODE_SIGNING_ALLOWED=NO build 2>&1 | tee build-sim.log | grep -E "error:|warning: unre|BUILD (SUCCEEDED|FAILED)" || true
+            -derivedDataPath build CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO build 2>&1 | tee build-sim.log | grep -E "error:|warning: unre|BUILD (SUCCEEDED|FAILED)" || true
           grep -q "BUILD SUCCEEDED" build-sim.log
 
       - name: Run in the simulator (self-test + screenshots)
@@ -76,7 +76,7 @@ jobs:
           defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false
           cd ios
           xcodebuild build-for-testing -project ACMDocs.xcodeproj -scheme ACMDocs -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' -derivedDataPath build-ui CODE_SIGNING_ALLOWED=NO \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath build-ui CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO \
             2>&1 | tee ../uitest-build.log | grep -E "error:|\*\* TEST BUILD" 
           cd ..
           mkdir -p uishots
