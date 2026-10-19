@@ -75,7 +75,7 @@ const AccountUI = (() => {
         form,
         el('button', { class: 'auth-link', type: 'button', text: 'Ai uitat parola?', onclick: () => render('reset', { email: email.input.value }) }),
         el('div', { class: 'auth-or' }, [el('span', { text: 'sau' })]),
-        typeof Devices !== 'undefined' ? el('button', { class: 'auth-alt', type: 'button', id: 'auth-qr', html: svg('qr') + '<span>Conectează-te cu cod QR</span>', onclick: async () => { if (await Devices.pairThisDevice()) { close(); Devices.start(); UI.toast('Dispozitivul a fost conectat la cont.'); } } }) : null,
+        typeof Devices !== 'undefined' ? el('button', { class: 'auth-alt', type: 'button', id: 'auth-qr', html: svg('qr') + '<span>Conectează-te cu cod QR</span>', onclick: async () => { if (await Devices.pairThisDevice()) { close(); Devices.start(); if (typeof Sync !== 'undefined') Sync.start(); UI.toast('Dispozitivul a fost conectat la cont.'); } } }) : null,
         el('p', { class: 'auth-switch' }, [document.createTextNode('Nu ai cont? '), el('button', { type: 'button', class: 'auth-link inline', text: 'Creează unul', onclick: () => render('signup') })]),
       );
       later(card);
@@ -256,7 +256,7 @@ const AccountUI = (() => {
   /** Keys are here: this device registers / renews its device session, then watches for new sign-ins. */
   async function afterKeys() {
     if (typeof Devices === 'undefined') return;
-    try { const st = await Devices.ensure(); if (st === 'ok') Devices.start(); }
+    try { const st = await Devices.ensure(); if (st === 'ok') { Devices.start(); if (typeof Sync !== 'undefined') Sync.start(); } }
     catch (e) { console.warn('devices', e); }
   }
 

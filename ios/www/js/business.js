@@ -304,10 +304,12 @@ const Biz = (() => {
   let emitTimer = 0;
   function emit() { clearTimeout(emitTimer); emitTimer = setTimeout(() => listeners.forEach((f) => { try { f(); } catch (e) { console.error(e); } }), 0); }
   function onChange(f) { listeners.push(f); }
+  /** Data changed underneath (cloud sync): read it again. */
+  function reload() { cache = null; emit(); }
 
   return {
     INDUSTRIES, DOC_TYPES, CURRENCIES, industry, preset, docLabel, docTitle, curSymbol,
     list, get, active, setActive, save, remove, blankProfile, normalize, bumpNumber,
-    docs, addDoc, updateDoc, removeDoc, migrate, colorFor, initials, badge, onChange, uid, load, store,
+    docs, addDoc, updateDoc, removeDoc, migrate, colorFor, initials, badge, onChange, reload, uid, load, store,
   };
 })();

@@ -73,9 +73,13 @@ const App = (() => {
     }
   }
 
-  function forget(path) {
+  function forgetPath(path) {
     saveJSON(FILES_KEY, files().filter((f) => f.path !== path));
     renderView();
+  }
+  function forget(path) {
+    if (typeof Sync !== 'undefined') Sync.forget(path);
+    forgetPath(path);
   }
 
   const when = (t) => {
@@ -1115,7 +1119,7 @@ const App = (() => {
   document.addEventListener('DOMContentLoaded', boot);
 
   return {
-    chooseTool, pickImage, openPath, recentFiles: () => files().filter((f) => Host.exists(f.path)), renderView, ensureClosed: async () => (await ensureSaved()) && (await Office.ensureSaved()), quietScanHint, save, saveAs, closeDoc, addPdf, showScreen, showHome, showView, rememberFile, scan, back,
+    chooseTool, pickImage, openPath, recentFiles: () => files().filter((f) => Host.exists(f.path)), renderView, ensureClosed: async () => (await ensureSaved()) && (await Office.ensureSaved()), quietScanHint, save, saveAs, closeDoc, addPdf, showScreen, showHome, showView, rememberFile, forgetPath, scan, back,
     get copyPath() { return copyPath; },
   };
 })();
