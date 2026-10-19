@@ -184,8 +184,8 @@ export const blockDevice = onCall(async (req) => {
   if (snap.data().status === 'blocked') return { ok: true };
   await ref.update({ status: 'blocked', blockedBy: dev, blockedAt: FieldValue.serverTimestamp() });
   await event(uid, { type: 'blocked', dev: target, by: dev });
-  // every session must re-prove its device key: the blocked one cannot
-  await getAuth().revokeRefreshTokens(uid);
+  // no refresh-token revocation: that would sign out every device of the account. The rules and the
+  // functions check the device status on every request, so the blocked device is out at once.
   return { ok: true };
 });
 

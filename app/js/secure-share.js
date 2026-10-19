@@ -79,8 +79,8 @@ const Contacts = (() => {
   }
 
   /** Reads a QR code: live camera (iPhone native or webcam), else a photo of it. */
-  async function scan() {
-    const native = await Host.scanQR('Scanează codul QR al persoanei din aplicația ei (Profil › Codul meu)');
+  async function scan(title) {
+    const native = await Host.scanQR(title || 'Scanează codul QR al persoanei din aplicația ei (Profil › Codul meu)');
     if (native !== undefined) return native;
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try { return await webcamScan(); } catch (e) { console.warn('webcam', e); }
@@ -329,7 +329,7 @@ const Contacts = (() => {
     }
   }
 
-  return { list, get, put, remove, status, refresh, addFromProfile, acceptNewKey, badge, avatar, contactRow, searchBox, scanAndVerify, showMyCode, showList, showContact, parseQr };
+  return { scanCode: scan, list, get, put, remove, status, refresh, addFromProfile, acceptNewKey, badge, avatar, contactRow, searchBox, scanAndVerify, showMyCode, showList, showContact, parseQr };
 })();
 
 const AcmShare = (() => {

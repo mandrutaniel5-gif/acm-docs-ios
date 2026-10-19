@@ -4,7 +4,7 @@
 import { createRequire } from 'node:module';
 import { initializeApp as clientApp } from 'firebase/app';
 import { getAuth as clientAuth, signInWithCustomToken, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { getFirestore, doc, writeBatch, getDocs, collection, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, writeBatch, getDocs, collection, serverTimestamp } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import * as A from '../build/vendor/acmcrypto.mjs';
 
@@ -39,6 +39,9 @@ try {
   await signInWithCustomToken(auth, r.token);
   const list = await getDocs(collection(db, 'accounts', user.uid, 'devices'));
   if (list.size !== 1) throw new Error('devices: ' + list.size);
+  // a device session (custom token) still counts as a confirmed email for profiles / @names
+  if (!(await getDoc(doc(db, 'users', user.uid))).exists()) throw new Error('profile not readable with a device session');
+  if (!(await getDoc(doc(db, 'usernames', handle))).exists()) throw new Error('@name not readable with a device session');
   const ts2 = Date.now();
   const s = await call('deviceSession', { uid: user.uid, dev: r.dev, ts: ts2, sig: A.toB64(A.signEd(dev, `acm-session\n${user.uid}\n${r.dev}\n${ts2}`)) });
   if (!s.token) throw new Error('deviceSession');

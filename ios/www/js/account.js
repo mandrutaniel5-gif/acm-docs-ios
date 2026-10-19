@@ -54,7 +54,7 @@ const Account = (() => {
   }
   const SEC = { words: (uid) => 'words.' + uid, secrets: (uid) => 'keys.' + uid };
 
-  let fb = null, auth = null, db = null, user = null, firstState = null, identity = null;
+  let fb = null, auth = null, db = null, fns = null, user = null, firstState = null, identity = null;
   const listeners = [];
   const A = () => window.__lib.acmcrypto;
   const F = () => window.__lib.firebase;
@@ -72,6 +72,7 @@ const Account = (() => {
     auth = Au.initializeAuth(fb, { persistence: [Au.indexedDBLocalPersistence, Au.browserLocalPersistence, Au.inMemoryPersistence] });
     try { auth.languageCode = I18n.lang === 'en' ? 'en' : 'ro'; } catch (e) {}
     db = Fs.getFirestore(fb);
+    fns = F().functions.getFunctions(fb, 'europe-west1');
     firstState = new Promise((resolve) => {
       Au.onAuthStateChanged(auth, (u) => {
         if (!u || !user || u.uid !== user.uid) identity = null;
@@ -293,6 +294,7 @@ const Account = (() => {
       await Au.reauthenticateWithCredential(user, Au.EmailAuthProvider.credential(user.email, password));
     }
     const uid = user.uid;
+    try { if (typeof Devices !== 'undefined' && Devices.myDevice()) await call('wipeAccount', {}); } catch (e) { console.warn('wipe', e); }
     try {
       const snap = await Fs.getDoc(userDoc());
       const b = Fs.writeBatch(db);
@@ -312,7 +314,20 @@ const Account = (() => {
   const skipped = () => store.get(LS.later) === '1';
   const setSkipped = (v) => (v ? store.set(LS.later, '1') : store.del(LS.later));
 
+  /** Server function (europe-west1) → its data; errors carry the server's message. */
+  async function call(name, data) {
+    await ready();
+    try { return (await F().functions.httpsCallable(fns, name)(data || {})).data; } catch (e) {
+      const m = String((e && e.message) || e);
+      throw Object.assign(new Error(m), { code: (e && e.code) || 'functions/error', server: m });
+    }
+  }
+  async function signInWithToken(token) { await ready(); user = (await F().auth.signInWithCustomToken(auth, token)).user; return user; }
+  async function claims() { if (!user) return {}; try { return (await F().auth.getIdTokenResult(user)).claims || {}; } catch (e) { return {}; } }
+  const internals = () => ({ F: F(), db, auth });
+
   return {
+    call, signInWithToken, claims, internals,
     init, ready, onChange, current, needsVerification, isPasswordUser, say,
     signUp, signIn, resetPassword, resendVerification, refresh, signOut, google,
     keyState, createKeys, restoreKeys, setHandle, handle, fingerprint, lookup, profileOf, handleProblem, suggestHandle, cleanHandle, unlock, lock, checkPassword, words, wordsSaved, markWordsSaved, deleteAccount,

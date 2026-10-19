@@ -80,6 +80,7 @@ const AccountUI = (() => {
         form,
         el('button', { class: 'auth-link', type: 'button', text: 'Ai uitat parola?', onclick: () => render('reset', { email: email.input.value }) }),
         el('div', { class: 'auth-or' }, [el('span', { text: 'sau' })]),
+        typeof Devices !== 'undefined' ? el('button', { class: 'auth-google', type: 'button', id: 'auth-qr', html: svg('qr') + '<span>Conectează-te cu cod QR</span>', onclick: async () => { if (await Devices.pairThisDevice()) { close(); Devices.start(); UI.toast('Dispozitivul a fost conectat la cont.'); } } }) : null,
         googleBtn(box),
         el('p', { class: 'auth-switch' }, [document.createTextNode('Nu ai cont? '), el('button', { type: 'button', class: 'auth-link inline', text: 'Creează unul', onclick: () => render('signup') })]),
       );
@@ -254,8 +255,16 @@ const AccountUI = (() => {
       if (st === 'restore') return render('restore');
       if (st === 'handle') return render('handle', {});
       void t0;
+      await afterKeys();
       close();
     } catch (e) { console.error(e); render('keyError', { error: e }); }
+  }
+
+  /** Keys are here: this device registers / renews its device session, then watches for new sign-ins. */
+  async function afterKeys() {
+    if (typeof Devices === 'undefined') return;
+    try { const st = await Devices.ensure(); if (st === 'ok') Devices.start(); }
+    catch (e) { console.warn('devices', e); }
   }
 
   // ---------------------------------------------------------------- recovery words
@@ -340,6 +349,8 @@ const AccountUI = (() => {
       );
     });
     if (!ok) return false;
+    UI.busy('Se deconectează…');
+    try { if (typeof Devices !== 'undefined') await Devices.leave(); } finally { UI.busy(); }
     await Account.signOut();
     return true;
   }
@@ -375,6 +386,7 @@ const AccountUI = (() => {
         el('div', { class: 'list-card' }, [
           row('people', 'green', 'Contacte', 'Caută după @nume, scanează coduri QR', 'contacts'),
           row('lockfile', 'blue', 'Trimite un document criptat', 'Criptare post-cuantică', 'send'),
+          typeof Devices !== 'undefined' ? row('lock', 'indigo', 'Dispozitive', 'Vezi și administrează dispozitivele conectate', 'devices') : null,
         ]),
         el('h3', { class: 'csub', text: 'Securitate' }),
         el('div', { class: 'list-card' }, [
@@ -396,6 +408,7 @@ const AccountUI = (() => {
     if (act === 'words') { await showWords(); return showProfile(); }
     if (act === 'shield') { await Shield.showInfo(); return showProfile(); }
     if (act === 'handle') return render('handle', { change: true });
+    if (act === 'devices') return Devices.show();
     if (act === 'applock') { await AppLock.settings(); return showProfile(); }
     if (act === 'logout') { if (await confirmSignOut()) refreshAround(); return; }
     if (act === 'delete') { await deleteFlow(); refreshAround(); }
@@ -429,7 +442,7 @@ const AccountUI = (() => {
     const u = Account.current();
     if (!u) { if (!Account.skipped()) render('signin'); return; }
     if (Account.needsVerification()) return; // reminded in Settings
-    try { const st = await Account.keyState(); if (st !== 'ok') await route(); } catch (e) { console.warn('keys', e); }
+    try { const st = await Account.keyState(); if (st !== 'ok') await route(); else await afterKeys(); } catch (e) { console.warn('keys', e); }
     banner();
   }
 
