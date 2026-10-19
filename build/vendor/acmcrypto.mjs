@@ -163,7 +163,7 @@ function unwrapKeyInner(entry, id, pwKey) {
  * @param {{bytes:Uint8Array, name:string, mime?:string}} doc
  * @param sender identity (from deriveIdentity / importSecrets) — signs the document
  * @param {Uint8Array[]} recipients public key bundles (add the sender's own to keep access)
- * @param {{password?:string, argon?:{t,m,p}}} opts
+ * @param {{password?:string, argon?:{t,m,p}, handle?:string}} opts (handle: the sender's @name, signed with the document)
  */
 export function seal(doc, sender, recipients, opts = {}) {
   if (!recipients || !recipients.length) throw new AcmError('NO_RECIPIENTS', 'Alege cel puțin o persoană.');
@@ -184,7 +184,7 @@ export function seal(doc, sender, recipients, opts = {}) {
 
   // inside the box: who sent it (signed), the name and type, the document, padding
   const bytes = toBytes(doc.bytes);
-  const meta = te.encode(JSON.stringify({ name: String(doc.name || 'document'), mime: String(doc.mime || 'application/octet-stream'), size: bytes.length, created: Date.now(), from: { b: b64(sender.bundle) } }));
+  const meta = te.encode(JSON.stringify({ name: String(doc.name || 'document'), mime: String(doc.mime || 'application/octet-stream'), size: bytes.length, created: Date.now(), from: opts.handle ? { b: b64(sender.bundle), h: String(opts.handle) } : { b: b64(sender.bundle) } }));
   const toSign = concatBytes(utf8ToBytes('ACM1 sig'), sha256(prefix), sha256(meta), sha256(bytes));
   // two signatures: both must hold (a quantum computer would have to break both)
   const sig = concatBytes(ed25519.sign(toSign, sender.secret.edSk), ml_dsa65.sign(toSign, sender.secret.dsaSk));
@@ -242,5 +242,5 @@ export function open(file, id, opts = {}) {
   let okDsa = false;
   try { okDsa = ml_dsa65.verify(sig.subarray(64), toSign, senderPub.dsa); } catch (e) { okDsa = false; }
   if (!okEd || !okDsa) throw new AcmError('BAD_SIGNATURE', 'Semnătura expeditorului nu este validă.');
-  return { bytes, name: meta.name, mime: meta.mime, created: meta.created, sender: { bundle: senderBundle, fingerprint: fingerprint(senderBundle) } };
+  return { bytes, name: meta.name, mime: meta.mime, created: meta.created, sender: { bundle: senderBundle, fingerprint: fingerprint(senderBundle), handle: meta.from.h || null } };
 }

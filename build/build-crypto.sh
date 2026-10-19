@@ -10,3 +10,7 @@ ls -la "$ROOT/app/vendor/acmcrypto.js"
   --target=chrome69,safari15 --legal-comments=eof --outfile="$ROOT/app/vendor/firebase.js"
 [ -d "$ROOT/ios/www/vendor" ] && cp "$ROOT/app/vendor/firebase.js" "$ROOT/ios/www/vendor/firebase.js"
 ls -la "$ROOT/app/vendor/firebase.js"
+"$ROOT/node_modules/.bin/esbuild" "$ROOT/build/vendor/qr.js" --bundle --minify --format=iife \
+  --target=chrome69,safari15 --legal-comments=eof --outfile="$ROOT/app/vendor/qr.js"
+[ -d "$ROOT/ios/www/vendor" ] && cp "$ROOT/app/vendor/qr.js" "$ROOT/ios/www/vendor/qr.js"
+ls -la "$ROOT/app/vendor/qr.js"

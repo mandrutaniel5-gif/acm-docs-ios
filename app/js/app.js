@@ -99,6 +99,7 @@ const App = (() => {
       { label: 'Deschide', icon: 'folder', run: () => openPath(path) },
       Host.mobile ? { label: 'Trimite (WhatsApp, email…)', icon: 'share', run: () => Host.share(path) } : { label: 'Arată în folder', icon: 'folder', run: () => Host.showInFolder(path) },
       Host.mobile ? { label: 'Salvează o copie în telefon…', icon: 'download', run: () => Host.exportCopy(path) } : null,
+      typeof AcmShare !== 'undefined' && Host.ext(path) !== 'acm' ? { label: 'Trimite criptat (.acm)…', icon: 'lockfile', run: () => AcmShare.send(path) } : null,
       '-',
       { label: 'Scoate din listă', icon: 'close', run: () => forget(path) },
     ], Host.baseName(path));
@@ -562,6 +563,8 @@ const App = (() => {
       forget(p);
       return;
     }
+    // encrypted .acm document: unlock it with the account's keys, then open what is inside
+    if (typeof AcmShare !== 'undefined' && AcmShare.isAcm(p, bytes)) { await AcmShare.openFile(p, bytes); return; }
     const kind = Office.kindOf(p, bytes);
     // Word, Excel, PowerPoint go to their own editors
     if (['word', 'wordOld', 'text', 'sheet', 'slides'].includes(kind)) {

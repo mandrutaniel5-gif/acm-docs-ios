@@ -34,7 +34,24 @@ const Account = (() => {
     later: 'acm.account.later',
     saved: (uid) => 'acm.words.saved.' + uid,
     fp: (uid) => 'acm.fp.' + uid,
+    handle: (uid) => 'acm.handle.' + uid,
   };
+  // @name: 3-20 lowercase letters, digits, _ (checked again by the server rules)
+  const RESERVED = ['admin', 'administrator', 'acm', 'acmdocs', 'acm_docs', 'acmcode', 'acm_code', 'support', 'suport', 'help', 'ajutor', 'root', 'system', 'official', 'oficial', 'security', 'securitate'];
+  const cleanHandle = (h) => String(h || '').trim().replace(/^@+/, '').toLowerCase();
+  function handleProblem(h) {
+    h = cleanHandle(h);
+    if (h.length < 3) return 'Numele de utilizator are cel puțin 3 caractere.';
+    if (h.length > 20) return 'Numele de utilizator are cel mult 20 de caractere.';
+    if (!/^[a-z0-9_]+$/.test(h)) return 'Folosește doar litere mici fără diacritice, cifre și _.';
+    if (RESERVED.includes(h)) return 'Acest nume este rezervat. Alege altul.';
+    return null;
+  }
+  /** a suggestion from the display name: "Aniel Mândruț" → "aniel_mandrut" */
+  function suggestHandle(name) {
+    const s = String(name || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 20);
+    return s.length >= 3 ? s : '';
+  }
   const SEC = { words: (uid) => 'words.' + uid, secrets: (uid) => 'keys.' + uid };
 
   let fb = null, auth = null, db = null, user = null, firstState = null, identity = null;
@@ -93,8 +110,10 @@ const Account = (() => {
   }
 
   // ---------------------------------------------------------------- email + password
-  async function signUp(name, email, password) {
+  async function signUp(name, email, password, password2) {
     await ready();
+    if (!String(name || '').trim()) throw new Error('Scrie-ți numele.');
+    if (password2 !== undefined && password !== password2) throw new Error('Parolele nu sunt la fel. Scrie aceeași parolă de două ori.');
     if (String(password).length < 8) throw Object.assign(new Error(), { code: 'auth/weak-password' });
     const { auth: Au } = F();
     const cred = await Au.createUserWithEmailAndPassword(auth, email.trim(), password);
@@ -109,7 +128,7 @@ const Account = (() => {
   async function resetPassword(email) { await ready(); await F().auth.sendPasswordResetEmail(auth, email.trim()); }
   async function resendVerification() { if (user) await F().auth.sendEmailVerification(user); }
   async function refresh() { if (user) { await F().auth.reload(user); user = auth.currentUser; await user.getIdToken(true); } return user; }
-  async function signOut() { identity = null; await F().auth.signOut(auth); }
+  async function signOut() { identity = null; profile = null; await F().auth.signOut(auth); }
 
   // ---------------------------------------------------------------- Google (system browser, PKCE)
   const b64url = (u8) => Host.toB64(u8).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -138,40 +157,97 @@ const Account = (() => {
   }
 
   // ---------------------------------------------------------------- keys
-  const userDoc = () => F().firestore.doc(db, 'users', user.uid);
+  const Fs = () => F().firestore;
+  const userDoc = (uid) => Fs().doc(db, 'users', uid || user.uid);
+  const nameDoc = (h) => Fs().doc(db, 'usernames', h);
+  let profile = null; // this account's public profile on the server (cached)
   async function remoteKey() {
-    const snap = await F().firestore.getDoc(userDoc());
-    return snap.exists() ? snap.data() : null;
+    const snap = await Fs().getDoc(userDoc());
+    profile = snap.exists() ? snap.data() : null;
+    if (profile && profile.handle) store.set(LS.handle(user.uid), profile.handle);
+    return profile;
   }
-  async function publish(id) {
-    const { setDoc, serverTimestamp } = F().firestore;
-    await setDoc(userDoc(), {
-      name: user.displayName || '', email: user.email || '', emailLower: (user.email || '').toLowerCase(),
-      key: Host.toB64(id.bundle), fp: id.fingerprint, created: serverTimestamp(),
-    });
+  /** Writes the public profile (@name + padlock) and reserves the @name, in one step. */
+  async function publish(pub, handle) {
+    const h = cleanHandle(handle);
+    const p = handleProblem(h);
+    if (p) throw new Error(p);
+    const taken = await Fs().getDoc(nameDoc(h));
+    if (taken.exists() && taken.data().uid !== user.uid) throw Object.assign(new Error(`@${h} este deja folosit. Alege alt nume.`), { code: 'handle-taken' });
+    const old = profile && profile.handle;
+    const b = Fs().writeBatch(db);
+    if (old && old !== h) b.delete(nameDoc(old));
+    if (!taken.exists()) b.set(nameDoc(h), { uid: user.uid });
+    b.set(userDoc(), { name: (user.displayName || '').slice(0, 60), handle: h, key: pub.key, fp: pub.fp, created: Fs().serverTimestamp() });
+    try { await b.commit(); } catch (e) {
+      if (e && e.code === 'permission-denied') throw Object.assign(new Error(`Nu am putut rezerva @${h}. Poate tocmai l-a luat altcineva: alege alt nume.`), { code: 'handle-taken' });
+      throw e;
+    }
+    profile = { name: user.displayName || '', handle: h, key: pub.key, fp: pub.fp };
+    store.set(LS.handle(user.uid), h);
   }
-  /** What this device has for the signed-in account: 'ok' | 'create' | 'restore' */
+  const pubOf = (id) => ({ key: Host.toB64(id.bundle), fp: id.fingerprint });
+
+  /** What the signed-in account still needs on this device: 'ok' | 'create' | 'restore' | 'handle' */
   async function keyState() {
     if (!user) return 'none';
     const local = await Host.secureHas(SEC.secrets(user.uid));
     let remote = null;
-    try { remote = await remoteKey(); } catch (e) { if (!local) throw e; }
+    try { remote = await remoteKey(); } catch (e) { if (!local) throw e; return 'ok'; }
     if (local && remote && store.get(LS.fp(user.uid)) && store.get(LS.fp(user.uid)) !== remote.fp) return 'restore';
-    if (local) { if (!remote) await publishFromDevice(); return 'ok'; }
+    if (local) return remote && remote.handle && !remote.email ? 'ok' : 'handle';
     return remote ? 'restore' : 'create';
   }
-  async function publishFromDevice() { const id = await unlock('Publică lacătul contului tău'); await publish(id); }
+  /** Picks (or changes) the @name; the padlock comes from the server copy or from this device. */
+  async function setHandle(handle) {
+    let pub = profile && profile.key && profile.fp && store.get(LS.fp(user.uid)) === profile.fp ? { key: profile.key, fp: profile.fp } : null;
+    if (!pub) pub = pubOf(await unlock('Publică lacătul contului tău'));
+    await publish(pub, handle);
+  }
+  const handle = () => (profile && profile.handle) || (user && store.get(LS.handle(user.uid))) || null;
+  const fingerprint = () => (user && store.get(LS.fp(user.uid))) || (profile && profile.fp) || null;
 
-  /** New account: 24 words made automatically, keys saved on the device, padlock published. */
-  async function createKeys() {
+  /** New account: 24 words made automatically, keys saved on the device, padlock published with the @name. */
+  async function createKeys(handle) {
+    const p = handleProblem(handle);
+    if (p) throw new Error(p);
+    const taken = await Fs().getDoc(nameDoc(cleanHandle(handle)));
+    if (taken.exists() && taken.data().uid !== user.uid) throw Object.assign(new Error(`@${cleanHandle(handle)} este deja folosit. Alege alt nume.`), { code: 'handle-taken' });
     const words = A().generateMnemonic();
     const id = A().deriveIdentity(words);
     await Host.secureSet(SEC.words(user.uid), new TextEncoder().encode(words));
     await Host.secureSet(SEC.secrets(user.uid), A().exportSecrets(id));
     store.set(LS.fp(user.uid), id.fingerprint);
-    await publish(id);
     identity = id;
+    await publish(pubOf(id), handle);
     return id;
+  }
+
+  /** Someone else's public profile by @name: { uid, handle, name, key (bytes), fp }, or null. */
+  async function lookup(h) {
+    await ready();
+    h = cleanHandle(h);
+    if (handleProblem(h)) return null;
+    const n = await Fs().getDoc(nameDoc(h));
+    if (!n.exists()) return null;
+    const uid = n.data().uid;
+    const u = await Fs().getDoc(userDoc(uid));
+    if (!u.exists()) return null;
+    const d = u.data();
+    if (d.handle !== h) return null; // half-finished rename: not trustworthy
+    const key = Host.fromB64(d.key);
+    if (A().fingerprint(key) !== d.fp) return null; // the padlock does not match its own fingerprint
+    return { uid, handle: h, name: d.name || '', key, fp: d.fp };
+  }
+  /** The current profile of a known account (to notice a changed padlock). */
+  async function profileOf(uid) {
+    await ready();
+    const u = await Fs().getDoc(userDoc(uid));
+    if (!u.exists()) return null;
+    const d = u.data();
+    const key = Host.fromB64(d.key);
+    if (A().fingerprint(key) !== d.fp) return null;
+    return { uid, handle: d.handle, name: d.name || '', key, fp: d.fp };
   }
   /** Another device / reinstall: the 24 words give back exactly the same keys. */
   async function restoreKeys(words) {
@@ -184,8 +260,7 @@ const Account = (() => {
     await Host.secureSet(SEC.secrets(user.uid), A().exportSecrets(id));
     store.set(LS.fp(user.uid), id.fingerprint);
     store.set(LS.saved(user.uid), '1'); // they had them written down
-    if (!remote) await publish(id);
-    identity = id;
+    identity = id; // the @name step publishes the padlock if the server has none
     return id;
   }
   /** The account's keys for this session (asks for Face ID the first time). */
@@ -210,11 +285,18 @@ const Account = (() => {
       await Au.reauthenticateWithCredential(user, Au.EmailAuthProvider.credential(user.email, password));
     }
     const uid = user.uid;
-    try { await Fs.deleteDoc(userDoc()); } catch (e) { if (e.code !== 'not-found') console.warn(e); }
+    try {
+      const snap = await Fs.getDoc(userDoc());
+      const b = Fs.writeBatch(db);
+      if (snap.exists() && snap.data().handle) b.delete(nameDoc(snap.data().handle));
+      b.delete(userDoc());
+      await b.commit();
+    } catch (e) { if (e.code !== 'not-found') console.warn(e); }
     await Au.deleteUser(user);
     await Host.secureDelete(SEC.words(uid));
     await Host.secureDelete(SEC.secrets(uid));
-    [LS.saved(uid), LS.fp(uid)].forEach(store.del);
+    [LS.saved(uid), LS.fp(uid), LS.handle(uid), 'acm.contacts.' + uid].forEach(store.del);
+    profile = null;
     identity = null;
   }
 
@@ -225,7 +307,7 @@ const Account = (() => {
   return {
     init, ready, onChange, current, needsVerification, isPasswordUser, say,
     signUp, signIn, resetPassword, resendVerification, refresh, signOut, google,
-    keyState, createKeys, restoreKeys, unlock, words, wordsSaved, markWordsSaved, deleteAccount,
+    keyState, createKeys, restoreKeys, setHandle, handle, fingerprint, lookup, profileOf, handleProblem, suggestHandle, cleanHandle, unlock, words, wordsSaved, markWordsSaved, deleteAccount,
     skipped, setSkipped,
     get googleReady() { return !!(Host.info && Host.info.platform === 'ios' ? GOOGLE.ios : (!Host.mobile && GOOGLE.desktop)); },
   };

@@ -304,6 +304,18 @@ final class Bridge: NSObject, WKScriptMessageHandler {
             Secure.delete(a["name"] as? String ?? "")
             reply(id, nil, "true")
 
+        case "scanqr":
+            let title = (a["title"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? t("Îndreaptă camera spre codul QR", "Point the camera at the QR code")
+            let scanner = QRScannerViewController(title: title) { [weak self] code, error in
+                guard let self = self else { return }
+                if error == "camera-denied" {
+                    return self.reply(id, self.t("ACM Docs nu are acces la cameră. Permite-l din Setări › ACM Docs › Cameră.", "ACM Docs has no camera access. Allow it in Settings › ACM Docs › Camera."), nil)
+                }
+                if error != nil { return self.reply(id, self.t("Camera nu este disponibilă.", "The camera is not available."), nil) }
+                self.reply(id, nil, code)
+            }
+            vc.top.present(scanner, animated: true)
+
         case "confirmOwner":
             let reason = (a["reason"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? t("Confirmă că ești tu", "Confirm it's you")
             Secure.confirmOwner(reason: reason) { ok in self.reply(id, ok ? nil : "cancel", ok ? "true" : nil) }

@@ -163,3 +163,12 @@ test('changing ANY single byte gives a clear error (whole header + 300 random sp
     assert.ok(ok.has(code), `byte ${p}: ${code}`);
   }
 });
+
+test('the sender @name travels signed inside the box', () => {
+  const f = A.seal({ bytes: new Uint8Array([1, 2, 3]), name: 'a.pdf' }, ana, [mihai.bundle], { handle: 'ana_m' });
+  const r = A.open(f, mihai);
+  assert.equal(r.sender.handle, 'ana_m');
+  assert.equal(r.sender.fingerprint, ana.fingerprint);
+  const g = A.seal({ bytes: new Uint8Array([1]), name: 'b' }, ana, [mihai.bundle]);
+  assert.equal(A.open(g, mihai).sender.handle, null);
+});

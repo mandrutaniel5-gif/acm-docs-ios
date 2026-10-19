@@ -131,6 +131,10 @@ Section "Install"
   !insertmacro FileType "csv"
   !insertmacro FileType "pptx"
   !insertmacro FileType "txt"
+  ; .acm (encrypted ACM Docs documents) belongs to ACM Docs: open them with a double click
+  !insertmacro FileType "acm"
+  WriteRegStr HKCU "Software\Classes\.acm" "" "${PROGID}"
+  WriteRegStr HKCU "Software\Classes\.acm" "Content Type" "application/x-acm"
 
   ; Entry in Control Panel > Programs (same entry as the old "PDF Editor")
   WriteRegStr HKCU "${UNKEY}" "DisplayName" "${APP}"
@@ -165,6 +169,8 @@ FunctionEnd
   !insertmacro UnFileType "csv"
   !insertmacro UnFileType "pptx"
   !insertmacro UnFileType "txt"
+  !insertmacro UnFileType "acm"
+  DeleteRegValue HKCU "Software\Classes\.acm" ""
 !macroend
 !macro UnFileType EXT
   DeleteRegValue HKCU "Software\Classes\.${EXT}\OpenWithProgids" "${PROGID}"

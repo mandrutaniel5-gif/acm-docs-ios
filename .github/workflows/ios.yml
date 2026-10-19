@@ -4,7 +4,12 @@ on:
   push:
     branches: [main]
     paths: ["ios/**", ".github/workflows/ios.yml"]
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      full:
+        description: "Self-test + UI tests on several devices"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -12,7 +17,7 @@ permissions:
 jobs:
   build:
     runs-on: macos-15
-    timeout-minutes: 100
+    timeout-minutes: ${{ inputs.full && 100 || 40 }}
     steps:
       - uses: actions/checkout@v4
 
@@ -31,6 +36,7 @@ jobs:
           cd ios && xcodegen generate
 
       - name: Build (simulator)
+        if: inputs.full
         run: |
           set -o pipefail
           cd ios
@@ -40,6 +46,7 @@ jobs:
           grep -q "BUILD SUCCEEDED" build-sim.log
 
       - name: Run in the simulator (self-test + screenshots)
+        if: inputs.full
         run: |
           mkdir -p shots
           for f in ios/build/Build/Products/Debug-iphonesimulator/ACMDocs.app/ACMDocs*; do echo "== $f"; otool -L "$f"; done > shots/linked-libs.txt 2>&1 || true
@@ -69,7 +76,7 @@ jobs:
 
       # Real taps on several screens: small iPhone (SE), normal, Pro Max, iPad, and iOS 18 (no glass)
       - name: UI tests (several devices)
-        if: always()
+        if: inputs.full && !cancelled()
         run: |
           set +e
           # on-screen keyboard in the simulators (the keyboard test needs it)

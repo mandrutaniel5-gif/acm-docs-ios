@@ -132,7 +132,7 @@ const Host = (() => {
   const MIMES = {
     pdf: ['application/pdf', 'image/*', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'text/csv', 'text/comma-separated-values',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.oasis.opendocument.spreadsheet', 'text/plain', 'application/rtf', 'application/octet-stream'],
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.oasis.opendocument.spreadsheet', 'text/plain', 'application/rtf', 'application/x-acm', 'application/octet-stream'],
     image: ['image/*'],
     word: ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'text/plain', 'application/rtf'],
     sheet: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'text/csv', 'text/comma-separated-values', 'application/vnd.oasis.opendocument.spreadsheet'],
@@ -549,13 +549,19 @@ const Host = (() => {
     throw new Error('Conectarea cu Google merge doar în aplicație.');
   }
 
+  /** Live QR scanner of the phone (iOS); null = cancelled, undefined = not available here */
+  async function scanQR(title) {
+    if (AB && info.platform === 'ios') return (await call('scanqr', { title: title || '' })) || null;
+    return undefined;
+  }
+
   const available = platform !== 'web';
   const mobile = platform === 'android';
 
   return {
     platform, mobile, available, info, readFile, readFileAsync, writeFile, exists, baseName, dirName, openDialog, pickImages, camera, saveDialog, startupFile, onOpenFile, setTitle, wasmBytes, listFonts,
     ocr, ocrWarm, htmlToPdf, capture, ext, showInFolder, openPath, openExternal, fetchText, share, exportCopy, specialDir, listDir, mkdirp, join, mtime, remove, setTheme, exitApp, appVersion, toB64, fromB64,
-    secureSet, secureGet, secureHas, secureDelete, confirmOwner, oauth, googleToken,
+    secureSet, secureGet, secureHas, secureDelete, confirmOwner, oauth, googleToken, scanQR,
   };
 })();
 

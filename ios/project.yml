@@ -63,6 +63,17 @@ targets:
               - com.microsoft.word.doc
               - com.microsoft.excel.xls
               - public.plain-text
+          - CFBundleTypeName: Document criptat ACM
+            CFBundleTypeRole: Editor
+            LSHandlerRank: Owner
+            LSItemContentTypes: [ro.acmcode.acm]
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: ro.acmcode.acm
+            UTTypeDescription: Document criptat ACM Docs
+            UTTypeConformsTo: [public.data, public.content]
+            UTTypeTagSpecification:
+              public.filename-extension: [acm]
+              public.mime-type: [application/x-acm]
   ACMDocsUITests:
     type: bundle.ui-testing
     platform: iOS

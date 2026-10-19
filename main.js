@@ -90,12 +90,13 @@ const EXT = {
 };
 ipcMain.handle('dialog-open', async (_e, kind, lang) => {
   const en = lang === 'en';
-  const all = [...EXT.pdf, ...EXT.word, ...EXT.sheet, ...EXT.slides, ...EXT.image];
+  const all = [...EXT.pdf, ...EXT.word, ...EXT.sheet, ...EXT.slides, ...EXT.image, 'acm'];
   const filters = kind === 'image' || kind === 'images'
     ? [{ name: en ? 'Images' : 'Imagini', extensions: EXT.image }]
     : [
         { name: en ? 'All documents' : 'Toate documentele', extensions: all },
         { name: 'PDF', extensions: EXT.pdf },
+        { name: en ? 'Encrypted ACM Docs (.acm)' : 'Criptate ACM Docs (.acm)', extensions: ['acm'] },
         { name: en ? 'Word (documents)' : 'Word (documente)', extensions: EXT.word },
         { name: en ? 'Excel (spreadsheets)' : 'Excel (tabele)', extensions: EXT.sheet },
         { name: en ? 'PowerPoint (presentations)' : 'PowerPoint (prezentări)', extensions: EXT.slides },

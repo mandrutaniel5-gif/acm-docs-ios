@@ -90,9 +90,20 @@ const AccountUI = (() => {
       const name = field('Nume', { type: 'text', id: 'auth-name', autocomplete: 'name', autocapitalize: 'words' });
       const email = field('Email', { type: 'email', id: 'auth-email', autocomplete: 'username', inputmode: 'email' });
       const pass = passField('Parolă (cel puțin 8 caractere)', 'auth-pass', 'new-password');
+      const pass2 = passField('Confirmă parola', 'auth-pass2', 'new-password');
+      // both fields show / hide together
+      pass.node.querySelector('.auth-eye').addEventListener('click', () => { pass2.input.type = pass.input.type; });
+      pass2.node.querySelector('.auth-eye').addEventListener('click', () => { pass.input.type = pass2.input.type; });
+      const match = () => {
+        const a = pass.input.value, b = pass2.input.value;
+        pass2.node.classList.toggle('ok', !!b && a === b);
+        pass2.node.classList.toggle('bad', !!b && a !== b && b.length >= Math.min(a.length, 1) && (b.length >= a.length || !a.startsWith(b)));
+      };
+      pass.input.addEventListener('input', match);
+      pass2.input.addEventListener('input', match);
       const go = el('button', { class: 'btn primary auth-main', type: 'submit', text: 'Creează contul' });
-      const form = el('form', { class: 'auth-form', novalidate: true }, [name.node, email.node, pass.node, box, go]);
-      form.addEventListener('submit', (e) => { e.preventDefault(); showErr(box, ''); busy(go, async () => { try { await Account.signUp(name.input.value, email.input.value, pass.input.value); await route(); } catch (x) { showErr(box, x); } }); });
+      const form = el('form', { class: 'auth-form', novalidate: true }, [name.node, email.node, pass.node, pass2.node, box, go]);
+      form.addEventListener('submit', (e) => { e.preventDefault(); showErr(box, ''); busy(go, async () => { try { await Account.signUp(name.input.value, email.input.value, pass.input.value, pass2.input.value); await route(); } catch (x) { showErr(box, x); if (pass.input.value !== pass2.input.value) pass2.input.focus(); } }); });
       card.append(
         el('h2', { text: 'Cont nou' }),
         el('p', { class: 'auth-sub', text: 'Contul îți dă chei de criptare post-cuantică, create pe acest dispozitiv. Nimeni altcineva nu le are.' }),
@@ -136,6 +147,52 @@ const AccountUI = (() => {
       later(card);
     },
 
+    // @name: how other people find this account (instead of the email, which stays private)
+    handle(card, d) {
+      const box = err();
+      const u = Account.current();
+      const suggestion = d.value || Account.handle() || Account.suggestHandle(u && u.displayName);
+      const f = field('Nume de utilizator', { type: 'text', id: 'auth-handle', autocomplete: 'username', autocapitalize: 'none', autocorrect: 'off', maxlength: '21', value: suggestion });
+      f.node.classList.add('auth-handle');
+      f.node.insertBefore(el('i', { class: 'at', text: '@' }), f.input);
+      const hint = el('small', { class: 'auth-hint', text: '3–20 caractere: litere mici, cifre și _' });
+      f.input.addEventListener('input', () => {
+        const v = Account.cleanHandle(f.input.value);
+        if (f.input.value !== v) f.input.value = v;
+        const p = v ? Account.handleProblem(v) : null;
+        hint.textContent = p || '3–20 caractere: litere mici, cifre și _';
+        hint.classList.toggle('bad', !!p);
+      });
+      const go = el('button', { class: 'btn primary auth-main', type: 'submit', text: d.create ? 'Continuă' : 'Salvează' });
+      const form = el('form', { class: 'auth-form', novalidate: true }, [f.node, hint, box, go]);
+      form.addEventListener('submit', (e) => { e.preventDefault(); showErr(box, ''); busy(go, async () => {
+        const v = Account.cleanHandle(f.input.value);
+        const p = Account.handleProblem(v);
+        if (p) return showErr(box, p);
+        try {
+          if (d.create) {
+            render('keys');
+            const t0 = Date.now();
+            try { await Account.createKeys(v); } catch (x) { return render('handle', { create: true, value: v, error: x }); }
+            await new Promise((r) => setTimeout(r, Math.max(0, 900 - (Date.now() - t0))));
+            return render('done');
+          }
+          await Account.setHandle(v);
+          if (d.change) { UI.toast(`Numele tău este acum @${v}.`); return close(); }
+          await route();
+        } catch (x) { showErr(box, x); }
+      }); });
+      card.append(
+        el('div', { class: 'auth-icon', html: svg('user') }),
+        el('h2', { text: d.change ? 'Schimbă numele de utilizator' : 'Alege-ți numele de utilizator' }),
+        el('p', { class: 'auth-sub', text: 'Așa te găsesc cei care îți trimit documente criptate. Emailul tău rămâne privat: nimeni nu te poate căuta după el.' }),
+        form,
+      );
+      if (d.error) showErr(box, d.error);
+      if (d.change) card.append(el('button', { class: 'auth-link', type: 'button', text: 'Anulează', onclick: () => close() }));
+      else later(card);
+    },
+
     keys(card) {
       card.append(
         el('div', { class: 'auth-spin' }, [el('span'), el('span'), el('span')]),
@@ -171,7 +228,7 @@ const AccountUI = (() => {
       const count = el('small', { class: 'auth-count', text: '0 / 24' });
       ta.addEventListener('input', () => { const n = ta.value.trim() ? ta.value.trim().split(/\s+/).length : 0; count.textContent = `${n} / 24`; count.classList.toggle('full', n === 24); });
       const go = el('button', { class: 'btn primary auth-main', type: 'button', text: 'Recuperează cheile' });
-      go.addEventListener('click', () => busy(go, async () => { showErr(box, ''); try { await Account.restoreKeys(ta.value); UI.toast('Cheile au fost recuperate.'); close(); } catch (x) { showErr(box, x); } }));
+      go.addEventListener('click', () => busy(go, async () => { showErr(box, ''); try { await Account.restoreKeys(ta.value); UI.toast('Cheile au fost recuperate.'); await route(); } catch (x) { showErr(box, x); } }));
       card.append(
         el('div', { class: 'auth-icon', html: svg('key') }),
         el('h2', { text: 'Recuperează cheile' }),
@@ -192,8 +249,10 @@ const AccountUI = (() => {
     const t0 = Date.now();
     try {
       const st = await Account.keyState();
-      if (st === 'create') { await Account.createKeys(); await new Promise((r) => setTimeout(r, Math.max(0, 900 - (Date.now() - t0)))); return render('done'); }
+      if (st === 'create') return render('handle', { create: true });
       if (st === 'restore') return render('restore');
+      if (st === 'handle') return render('handle', {});
+      void t0;
       close();
     } catch (e) { console.error(e); render('keyError', { error: e }); }
   }
@@ -248,7 +307,13 @@ const AccountUI = (() => {
   function settingsGroup(group, srow, chev) {
     const u = Account.current();
     if (!u) return group('Cont', [srow('user', 'blue', 'Intră în cont sau creează unul', 'Pentru documente criptate .acm', chev(), () => { Account.setSkipped(false); render('signin'); })]);
-    const rows = [srow('user', 'blue', u.displayName || u.email, u.displayName ? u.email : 'Cont ACM Docs', null, null)];
+    const h = Account.handle();
+    const rows = [srow('user', 'blue', u.displayName || u.email, (h ? '@' + h + ' · ' : '') + (u.displayName ? u.email : 'Cont ACM Docs'), null, null)];
+    if (!Account.needsVerification() && typeof Contacts !== 'undefined') {
+      rows.push(srow('qr', 'blue', 'Codul meu', 'QR-ul cu care te adaugă alții', chev(), () => Contacts.showMyCode()));
+      rows.push(srow('people', 'green', 'Contacte', 'Persoanele cărora le trimiți .acm', chev(), () => Contacts.showList()));
+      if (h) rows.push(srow('edit', 'gray', 'Schimbă numele de utilizator', '@' + h, chev(), () => render('handle', { change: true })));
+    }
     if (Account.needsVerification()) rows.push(srow('mail', 'orange', 'Confirmă emailul', 'Fără confirmare nu poți primi documente', chev(), () => render('verify')));
     else rows.push(srow('key', 'green', 'Codul de recuperare', Account.wordsSaved() ? 'Notat ✓' : 'Nenotat încă: notează-l', chev(), showWords));
     rows.push(srow('logout', 'gray', 'Deconectează-te', 'Cheile rămân pe acest dispozitiv', null, async () => { await Account.signOut(); App.showView('settings'); }));

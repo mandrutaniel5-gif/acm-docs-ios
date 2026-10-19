@@ -15,8 +15,10 @@
     "docx": "^9.8.1",
     "docx-preview": "^0.4.1",
     "firebase": "^13.0.0",
+    "jsqr": "^1.4.0",
     "jszip": "^3.10.2",
     "pptxgenjs": "^3.12.0",
+    "qrcode-generator": "^2.0.4",
     "tesseract.js": "^5.1.1",
     "word-extractor": "^1.0.4",
     "xlsx-js-style": "^1.2.0"
