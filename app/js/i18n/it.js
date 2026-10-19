@@ -1443,5 +1443,19 @@
 "Ți-am trimis pe email linkul pentru parola nouă.":"Ti abbiamo inviato via email un link per impostare una nuova password.",
 "Fișierul Excel nu a putut fi citit: durează prea mult. Poate fi deteriorat.":"Impossibile leggere il file Excel: ci vuole troppo tempo. Potrebbe essere danneggiato.",
 "Fișierul Excel conține date care încearcă să modifice aplicația. Nu a fost deschis.":"Il file Excel contiene dati che cercano di modificare l'app. Non è stato aperto.",
-"Confirmă mai întâi emailul contului.":"Conferma prima l'email dell'account."
+"Confirmă mai întâi emailul contului.":"Conferma prima l'email dell'account.",
+"Cerere de contact":"Richiesta di contatto",
+"@${r.p.handle} te-a adăugat în contacte. Adaugi și tu acest cont? Așa vă puteți trimite documente criptate unul altuia.":"@${r.p.handle} ti ha aggiunto ai suoi contatti. Aggiungi anche tu questo account? Così potrete scambiarvi documenti cifrati.",
+"Pentru siguranță deplină, verificați-vă apoi față în față, scanând codurile QR.":"Per la massima sicurezza, verificatevi poi di persona scansionando i vostri codici QR.",
+"Adaugă în contacte":"Aggiungi ai contatti",
+"Ignoră":"Ignora",
+"@${r.p.handle} a fost adăugat în contacte.":"@${r.p.handle} è stato aggiunto ai tuoi contatti.",
+"Te-au adăugat":"Ti hanno aggiunto",
+"Contactele tale":"I tuoi contatti",
+"Cereri de contact":"Richieste di contatto",
+"@${c.handle} este verificat ✓":"@${c.handle} è verificato ✓",
+"@numele persoanei":"@nome della persona",
+"ACM Docs blocat":"ACM Docs bloccato",
+"ex. Renovare baie":"es. Ristrutturazione bagno",
+"ex. Atelierul lui Ion":"es. Officina Rossi"
 };

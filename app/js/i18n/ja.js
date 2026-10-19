@@ -1443,5 +1443,19 @@
 "Ți-am trimis pe email linkul pentru parola nouă.":"新しいパスワードを設定するリンクをメールで送信しました。",
 "Fișierul Excel nu a putut fi citit: durează prea mult. Poate fi deteriorat.":"Excel ファイルを読み込めませんでした。時間がかかりすぎています。ファイルが破損している可能性があります。",
 "Fișierul Excel conține date care încearcă să modifice aplicația. Nu a fost deschis.":"この Excel ファイルにはアプリを改変しようとするデータが含まれているため、開きませんでした。",
-"Confirmă mai întâi emailul contului.":"先にアカウントのメールアドレスを確認してください。"
+"Confirmă mai întâi emailul contului.":"先にアカウントのメールアドレスを確認してください。",
+"Cerere de contact":"連絡先リクエスト",
+"@${r.p.handle} te-a adăugat în contacte. Adaugi și tu acest cont? Așa vă puteți trimite documente criptate unul altuia.":"@${r.p.handle} があなたを連絡先に追加しました。このアカウントも追加しますか？お互いに暗号化された文書を送れるようになります。",
+"Pentru siguranță deplină, verificați-vă apoi față în față, scanând codurile QR.":"より確実にするため、あとで直接会って QR コードを読み取り、お互いを確認してください。",
+"Adaugă în contacte":"連絡先に追加",
+"Ignoră":"無視",
+"@${r.p.handle} a fost adăugat în contacte.":"@${r.p.handle} を連絡先に追加しました。",
+"Te-au adăugat":"あなたを追加",
+"Contactele tale":"あなたの連絡先",
+"Cereri de contact":"連絡先リクエスト",
+"@${c.handle} este verificat ✓":"@${c.handle} は確認済み ✓",
+"@numele persoanei":"@相手のユーザー名",
+"ACM Docs blocat":"ACM Docs はロックされています",
+"ex. Renovare baie":"例：浴室リフォーム",
+"ex. Atelierul lui Ion":"例：山田工房"
 };

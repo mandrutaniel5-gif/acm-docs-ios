@@ -85,6 +85,14 @@ service cloud.firestore {
       match /events/{e} {
         allow read: if activeDeviceOf(uid);
       }
+      // contact requests sent to this account (written only by the server function): the owner's
+      // devices read them and mark them added / ignored
+      match /requests/{from} {
+        allow read, delete: if activeDeviceOf(uid);
+        allow update: if activeDeviceOf(uid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+          && request.resource.data.status in ['done', 'ignored'];
+      }
       // encrypted records: { b: base64 ciphertext, v: version, at: time }, at most ~500 KB each
       match /vault/{rest=**} {
         allow read, delete: if activeDeviceOf(uid);

@@ -1443,5 +1443,19 @@
 "Ți-am trimis pe email linkul pentru parola nouă.":"Yeni parola belirlemeniz için e-postanıza bir bağlantı gönderdik.",
 "Fișierul Excel nu a putut fi citit: durează prea mult. Poate fi deteriorat.":"Excel dosyası okunamadı: çok uzun sürüyor. Dosya bozuk olabilir.",
 "Fișierul Excel conține date care încearcă să modifice aplicația. Nu a fost deschis.":"Excel dosyası uygulamayı değiştirmeye çalışan veriler içeriyor. Açılmadı.",
-"Confirmă mai întâi emailul contului.":"Önce hesabın e-posta adresini doğrulayın."
+"Confirmă mai întâi emailul contului.":"Önce hesabın e-posta adresini doğrulayın.",
+"Cerere de contact":"Kişi isteği",
+"@${r.p.handle} te-a adăugat în contacte. Adaugi și tu acest cont? Așa vă puteți trimite documente criptate unul altuia.":"@${r.p.handle} sizi kişilerine ekledi. Siz de bu hesabı ekler misiniz? Böylece birbirinize şifreli belgeler gönderebilirsiniz.",
+"Pentru siguranță deplină, verificați-vă apoi față în față, scanând codurile QR.":"Tam güvenlik için ardından QR kodlarınızı okutarak yüz yüze doğrulayın.",
+"Adaugă în contacte":"Kişilere ekle",
+"Ignoră":"Yok say",
+"@${r.p.handle} a fost adăugat în contacte.":"@${r.p.handle} kişilerinize eklendi.",
+"Te-au adăugat":"Sizi ekleyenler",
+"Contactele tale":"Kişileriniz",
+"Cereri de contact":"Kişi istekleri",
+"@${c.handle} este verificat ✓":"@${c.handle} doğrulandı ✓",
+"@numele persoanei":"@kişinin adı",
+"ACM Docs blocat":"ACM Docs kilitli",
+"ex. Renovare baie":"ör. Banyo yenileme",
+"ex. Atelierul lui Ion":"ör. Yılmaz Atölyesi"
 };

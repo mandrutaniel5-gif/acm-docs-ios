@@ -278,6 +278,43 @@ await attack('F04', 'MEDIU', 'Sesiune de dispozitiv folosită pentru a schimba p
   return { ok: r.ok, detail: r.ok ? 'o sesiune de dispozitiv (furată) poate schimba parola' : '' };
 });
 
+// ============================================================ R: contact requests ("X added you")
+await attack('R00', 'INFO', 'Funcțional: alt cont trimite o cerere, victima o vede (nu e atac)', async () => {
+  await o.call('contactRequest', { to: victim.uid });
+  const snap = await getDocs(collection(victim.c.db, 'accounts', victim.uid, 'requests'));
+  const okk = snap.docs.some((d) => d.id === other.uid && d.data().status === 'pending');
+  return { ok: !okk, detail: okk ? 'cererea a ajuns' : 'CEREREA NU A AJUNS' };
+});
+await attack('R01', 'MARE', 'Alt cont citește cererile de contact ale victimei', () => ok(getDocs(collection(o.db, 'accounts', victim.uid, 'requests'))));
+await attack('R02', 'MARE', 'Alt cont scrie direct o cerere falsă (în numele altcuiva)', () => ok(setDoc(doc(o.db, 'accounts', victim.uid, 'requests', 'someoneelse0000'), { status: 'pending', at: 1 })));
+await attack('R03', 'MEDIU', 'Victima pune câmpuri / stări arbitrare într-o cerere', async () => {
+  const a = await ok(updateDoc(doc(victim.c.db, 'accounts', victim.uid, 'requests', other.uid), { status: 'pending', x: 1 }));
+  const b = await ok(updateDoc(doc(victim.c.db, 'accounts', victim.uid, 'requests', other.uid), { status: 'hacked' }));
+  return { ok: a || b, detail: `câmp în plus:${a} stare liberă:${b}` };
+});
+await attack('R04', 'MIC', 'Funcțional: victima ignoră; o cerere ignorată nu mai poate fi retrimisă', async () => {
+  await updateDoc(doc(victim.c.db, 'accounts', victim.uid, 'requests', other.uid), { status: 'ignored' });
+  await o.call('contactRequest', { to: victim.uid });
+  const d = await getDoc(doc(victim.c.db, 'accounts', victim.uid, 'requests', other.uid));
+  return { ok: d.data().status !== 'ignored', detail: 'stare după retrimitere: ' + d.data().status };
+});
+await attack('R05', 'MARE', 'Doar cu parola: trimite cereri de contact în numele victimei', async () => {
+  const t = client(); await signInWithEmailAndPassword(t.auth, victim.email, victim.password).catch(() => {});
+  return ok(t.call('contactRequest', { to: other.uid }));
+});
+await attack('R06', 'MEDIU', 'Spam: un cont trimite 60 de cereri într-o oră (limita: 40)', async () => {
+  const targets = [];
+  for (let i = 0; i < 3; i++) targets.push((await makeAccount('t' + i)).uid);
+  let made = 0;
+  for (let i = 0; i < 60; i++) if (await ok(o.call('contactRequest', { to: targets[i % 3] }))) made++;
+  return { ok: made > 40, detail: `${made}/60 acceptate` };
+});
+await attack('R07', 'MIC', 'Cerere către un cont inexistent / către sine', async () => {
+  const a = await ok(o.call('contactRequest', { to: 'nobody000000000000' }));
+  const b = await ok(o.call('contactRequest', { to: other.uid }));
+  return { ok: a || b, detail: `inexistent:${a} sine:${b}` };
+});
+
 for (const c of [victim.c, other.c, thief, m1.c, m2.c]) { try { await signOut(c.auth); } catch (e) {} }
 fs.writeFileSync('attack3-log.json', JSON.stringify(log, null, 2));
 const bad = log.filter((x) => x.result === 'VULNERABIL');

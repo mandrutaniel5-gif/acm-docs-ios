@@ -1443,5 +1443,19 @@
 "Ți-am trimis pe email linkul pentru parola nouă.":"E-mailben elküldtük a linket az új jelszó beállításához.",
 "Fișierul Excel nu a putut fi citit: durează prea mult. Poate fi deteriorat.":"Az Excel-fájl nem olvasható be: túl sokáig tart. Lehet, hogy sérült.",
 "Fișierul Excel conține date care încearcă să modifice aplicația. Nu a fost deschis.":"Az Excel-fájl olyan adatokat tartalmaz, amelyek megpróbálják módosítani az alkalmazást. Nem nyitottuk meg.",
-"Confirmă mai întâi emailul contului.":"Előbb erősítsd meg a fiók e-mail-címét."
+"Confirmă mai întâi emailul contului.":"Előbb erősítsd meg a fiók e-mail-címét.",
+"Cerere de contact":"Kapcsolatfelvételi kérés",
+"@${r.p.handle} te-a adăugat în contacte. Adaugi și tu acest cont? Așa vă puteți trimite documente criptate unul altuia.":"@${r.p.handle} felvett a névjegyei közé. Felveszed te is ezt a fiókot? Így titkosított dokumentumokat küldhettek egymásnak.",
+"Pentru siguranță deplină, verificați-vă apoi față în față, scanând codurile QR.":"A teljes biztonság érdekében utána ellenőrizzétek egymást személyesen, a QR-kódok beolvasásával.",
+"Adaugă în contacte":"Felvétel a névjegyek közé",
+"Ignoră":"Figyelmen kívül hagyás",
+"@${r.p.handle} a fost adăugat în contacte.":"@${r.p.handle} bekerült a névjegyeid közé.",
+"Te-au adăugat":"Felvettek",
+"Contactele tale":"Névjegyeid",
+"Cereri de contact":"Kapcsolatfelvételi kérések",
+"@${c.handle} este verificat ✓":"@${c.handle} ellenőrizve ✓",
+"@numele persoanei":"@a személy neve",
+"ACM Docs blocat":"ACM Docs zárolva",
+"ex. Renovare baie":"pl. Fürdőszoba-felújítás",
+"ex. Atelierul lui Ion":"pl. Kovács Műhely"
 };

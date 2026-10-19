@@ -1443,5 +1443,19 @@
 "Ți-am trimis pe email linkul pentru parola nouă.":"हमने आपको नया पासवर्ड सेट करने का लिंक ईमेल कर दिया है।",
 "Fișierul Excel nu a putut fi citit: durează prea mult. Poate fi deteriorat.":"Excel फ़ाइल पढ़ी नहीं जा सकी: बहुत समय लग रहा है। फ़ाइल ख़राब हो सकती है।",
 "Fișierul Excel conține date care încearcă să modifice aplicația. Nu a fost deschis.":"Excel फ़ाइल में ऐसा डेटा है जो ऐप को बदलने की कोशिश करता है। इसे खोला नहीं गया।",
-"Confirmă mai întâi emailul contului.":"पहले खाते का ईमेल पुष्टि करें।"
+"Confirmă mai întâi emailul contului.":"पहले खाते का ईमेल पुष्टि करें।",
+"Cerere de contact":"संपर्क अनुरोध",
+"@${r.p.handle} te-a adăugat în contacte. Adaugi și tu acest cont? Așa vă puteți trimite documente criptate unul altuia.":"@${r.p.handle} ने आपको अपने संपर्कों में जोड़ा है। क्या आप भी इस खाते को जोड़ेंगे? तब आप एक-दूसरे को एन्क्रिप्टेड दस्तावेज़ भेज सकेंगे।",
+"Pentru siguranță deplină, verificați-vă apoi față în față, scanând codurile QR.":"पूरी निश्चितता के लिए, बाद में आमने-सामने QR कोड स्कैन करके एक-दूसरे को सत्यापित करें।",
+"Adaugă în contacte":"संपर्कों में जोड़ें",
+"Ignoră":"अनदेखा करें",
+"@${r.p.handle} a fost adăugat în contacte.":"@${r.p.handle} को आपके संपर्कों में जोड़ दिया गया।",
+"Te-au adăugat":"आपको जोड़ा",
+"Contactele tale":"आपके संपर्क",
+"Cereri de contact":"संपर्क अनुरोध",
+"@${c.handle} este verificat ✓":"@${c.handle} सत्यापित है ✓",
+"@numele persoanei":"@व्यक्ति का नाम",
+"ACM Docs blocat":"ACM Docs लॉक है",
+"ex. Renovare baie":"जैसे बाथरूम का नवीनीकरण",
+"ex. Atelierul lui Ion":"जैसे शर्मा वर्कशॉप"
 };

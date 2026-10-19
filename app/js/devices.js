@@ -164,6 +164,7 @@ const Devices = (() => {
   async function checkAlerts() {
     const u = uid();
     if (!u || !myDevice() || document.hidden) return;
+    try { if (typeof Contacts !== 'undefined') Contacts.checkRequests(); } catch (e) {}
     try { if ((await ensure()) === 'blocked') { stop(); return; } } catch (e) { /* offline: try later */ }
     let evs;
     try { evs = await events(); } catch (e) { if (/permission/i.test(String(e && (e.code || e.message)))) { const st = await ensure().catch(() => null); if (st === 'blocked') stop(); } return; }

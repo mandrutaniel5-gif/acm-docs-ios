@@ -1,7 +1,7 @@
 {
   "name": "acm-docs",
   "productName": "ACM Docs",
-  "version": "2.2.7",
+  "version": "2.2.8",
   "description": "ACM Docs - PDF, documente si facturi (ACM Code SRL)",
   "author": "ACM Code SRL",
   "main": "main.js",

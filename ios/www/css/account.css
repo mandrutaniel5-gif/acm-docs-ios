@@ -290,3 +290,11 @@ html.i18n-wait body { visibility: hidden; }
 .acm-ui .code-in { font-size: 26px; letter-spacing: .3em; text-align: center; font-variant-numeric: tabular-nums; margin: 6px 0 4px; }
 .mfa-set .qr-img { width: min(200px, 56vw); }
 .mfa-key { font: 600 15px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .04em; text-align: center; background: var(--fill); border-radius: 12px; padding: 10px 12px; margin: 4px 0 8px; word-break: break-all; user-select: all; -webkit-user-select: all; }
+
+/* contact requests */
+.hb { position: relative; }
+.hb-dot { position: absolute; top: 2px; right: 2px; width: 11px; height: 11px; border-radius: 50%; background: var(--red, #ff3b30); border: 2px solid var(--surface); }
+.acm-ui .csec { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted, #8e8e93); margin: 10px 4px 4px; }
+.acm-ui .creq-acts { display: flex; gap: 6px; flex-shrink: 0; }
+.acm-ui .btn.sm { padding: 6px 12px; min-height: 32px; font-size: 13px; border-radius: 10px; }
+.acm-ui.creq .crow { pointer-events: none; margin: 4px 0 6px; }

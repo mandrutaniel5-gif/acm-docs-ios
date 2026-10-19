@@ -208,6 +208,29 @@ export const pairPoll = onCall(async (req) => {
   return { status: 'approved', uid: p.uid, dev: p.dev, sealed: p.sealed, token: await token(p.uid, p.dev) };
 });
 
+// ------------------------------------------------------------------ contact requests
+/**
+ * "I added you": the other person sees a request and can add this account back (or ignore it).
+ * Nothing but the two account ids and a time is stored; the name and public key are read from the
+ * public profile. One request per pair; an ignored one is never shown again.
+ */
+const CREQ_LIMIT = 40;                  // requests per account…
+const CREQ_WINDOW_MS = 60 * 60 * 1000;  // …per hour
+export const contactRequest = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  const { to } = req.data || {};
+  if (typeof to !== 'string' || !/^[A-Za-z0-9]{10,64}$/.test(to) || to === uid) fail('invalid-argument', 'to');
+  await rateLimit(req, 'creq|' + uid, CREQ_LIMIT, CREQ_WINDOW_MS, true);
+  if (!(await db.collection('users').doc(to).get()).exists) fail('not-found', 'no such account');
+  const ref = db.collection('accounts').doc(to).collection('requests').doc(uid);
+  await db.runTransaction(async (tx) => {
+    const cur = await tx.get(ref);
+    if (cur.exists && cur.data().status !== 'done') return; // already waiting, or ignored for good
+    tx.set(ref, { status: 'pending', at: FieldValue.serverTimestamp() });
+  });
+  return { ok: true };
+});
+
 // ------------------------------------------------------------------ blocking
 /**
  * Blocks a device for good: its session stops working at once (the rules check the status on

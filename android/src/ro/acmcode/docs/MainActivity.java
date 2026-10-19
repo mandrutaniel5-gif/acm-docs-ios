@@ -30,6 +30,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.MimeTypeMap;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.PermissionRequest;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -65,7 +66,7 @@ public class MainActivity extends Activity {
     static final String HOST = "appassets.androidplatform.net";
     static final String ORIGIN = "https://" + HOST + "/";
 
-    static final int REQ_OPEN = 11, REQ_CAMERA = 12, REQ_EXPORT = 13, REQ_CHOOSER = 14, REQ_PERM = 15, REQ_IMAGES = 16, REQ_AUTH = 17;
+    static final int REQ_OPEN = 11, REQ_CAMERA = 12, REQ_EXPORT = 13, REQ_CHOOSER = 14, REQ_PERM = 15, REQ_IMAGES = 16, REQ_AUTH = 17, REQ_CAM_PERM = 18;
     SecureStore secure, secureQuiet;
     int authId = 0;
     Runnable authRetry = null;
@@ -111,7 +112,7 @@ public class MainActivity extends Activity {
         s.setDisplayZoomControls(false);
         s.setUseWideViewPort(true);
         s.setLoadWithOverviewMode(false);
-        s.setMediaPlaybackRequiresUserGesture(true);
+        s.setMediaPlaybackRequiresUserGesture(false); // the live QR scanner shows the camera at once
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
         web.setWebViewClient(new Client());
@@ -131,6 +132,23 @@ public class MainActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQ_PERM) start();
+        if (requestCode == REQ_CAM_PERM) {
+            boolean ok = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            Runnable r = ok ? afterCamera : cameraDenied;
+            afterCamera = null; cameraDenied = null;
+            if (r != null) r.run();
+        }
+    }
+
+    // ------------------------------------------------------------------ camera permission
+    Runnable afterCamera, cameraDenied;
+    boolean hasCamera() { return Build.VERSION.SDK_INT < 23 || checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED; }
+    /** Runs `then` once the camera may be used (asks the person the first time). */
+    void withCamera(Runnable then, Runnable denied) {
+        if (hasCamera()) { then.run(); return; }
+        if (cameraDenied != null) cameraDenied.run();
+        afterCamera = then; cameraDenied = denied;
+        requestPermissions(new String[] { Manifest.permission.CAMERA }, REQ_CAM_PERM);
     }
 
     void start() {
@@ -516,6 +534,12 @@ public class MainActivity extends Activity {
             i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             startFor(id, REQ_IMAGES, null, Intent.createChooser(i, t("Alege pozele", "Choose photos")));
         } else if ("camera".equals(op)) {
+            if (!hasCamera()) {
+                final JSONObject args = a;
+                withCamera(new Runnable() { @Override public void run() { try { handle(id, "camera", args); } catch (Exception e) { reply(id, e.getMessage(), null); } } },
+                    new Runnable() { @Override public void run() { reply(id, t("Fără acces la cameră. Îl poți permite din Setările telefonului › Aplicații › ACM Docs.", "No camera access. You can allow it in the phone's Settings › Apps › ACM Docs."), null); } });
+                return;
+            }
             File dir = new File(docsRoot, "Scanări");
             dir.mkdirs();
             File f = new File(dir, "Scan " + new SimpleDateFormat("yyyy-MM-dd HH.mm.ss", Locale.ROOT).format(new Date()) + ".jpg");
@@ -875,6 +899,19 @@ public class MainActivity extends Activity {
     }
 
     class Chrome extends WebChromeClient {
+        /** Live camera for the QR scanner: only for the app's own page, only the camera. */
+        @Override
+        public void onPermissionRequest(final PermissionRequest req) {
+            boolean ours = req.getOrigin() != null && HOST.equals(req.getOrigin().getHost());
+            boolean onlyCamera = true;
+            for (String r : req.getResources()) if (!PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(r)) onlyCamera = false;
+            if (!ours || !onlyCamera) { req.deny(); return; }
+            ui.post(new Runnable() { @Override public void run() {
+                withCamera(new Runnable() { @Override public void run() { req.grant(new String[] { PermissionRequest.RESOURCE_VIDEO_CAPTURE }); } },
+                    new Runnable() { @Override public void run() { req.deny(); } });
+            } });
+        }
+
         @Override
         public boolean onConsoleMessage(ConsoleMessage m) {
             Log.d(TAG, m.message() + " (" + m.sourceId() + ":" + m.lineNumber() + ")");

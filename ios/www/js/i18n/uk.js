@@ -1443,5 +1443,19 @@
 "Ți-am trimis pe email linkul pentru parola nouă.":"Ми надіслали вам на пошту посилання для нового пароля.",
 "Fișierul Excel nu a putut fi citit: durează prea mult. Poate fi deteriorat.":"Не вдалося прочитати файл Excel: це триває надто довго. Можливо, файл пошкоджено.",
 "Fișierul Excel conține date care încearcă să modifice aplicația. Nu a fost deschis.":"Файл Excel містить дані, які намагаються змінити застосунок. Його не відкрито.",
-"Confirmă mai întâi emailul contului.":"Спершу підтвердьте електронну пошту облікового запису."
+"Confirmă mai întâi emailul contului.":"Спершу підтвердьте електронну пошту облікового запису.",
+"Cerere de contact":"Запит на контакт",
+"@${r.p.handle} te-a adăugat în contacte. Adaugi și tu acest cont? Așa vă puteți trimite documente criptate unul altuia.":"@${r.p.handle} додав(-ла) вас до контактів. Додати й цей обліковий запис? Тоді ви зможете надсилати одне одному зашифровані документи.",
+"Pentru siguranță deplină, verificați-vă apoi față în față, scanând codurile QR.":"Для повної певності потім перевірте одне одного особисто, відсканувавши QR-коди.",
+"Adaugă în contacte":"Додати до контактів",
+"Ignoră":"Ігнорувати",
+"@${r.p.handle} a fost adăugat în contacte.":"@${r.p.handle} додано до ваших контактів.",
+"Te-au adăugat":"Додали вас",
+"Contactele tale":"Ваші контакти",
+"Cereri de contact":"Запити на контакт",
+"@${c.handle} este verificat ✓":"@${c.handle} перевірено ✓",
+"@numele persoanei":"@ім'я людини",
+"ACM Docs blocat":"ACM Docs заблоковано",
+"ex. Renovare baie":"напр. Ремонт ванної",
+"ex. Atelierul lui Ion":"напр. Майстерня Петренка"
 };

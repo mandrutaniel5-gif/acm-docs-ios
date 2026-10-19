@@ -1443,5 +1443,19 @@
 "Ți-am trimis pe email linkul pentru parola nouă.":"我们已通过电子邮件向你发送设置新密码的链接。",
 "Fișierul Excel nu a putut fi citit: durează prea mult. Poate fi deteriorat.":"无法读取该 Excel 文件：耗时过长。文件可能已损坏。",
 "Fișierul Excel conține date care încearcă să modifice aplicația. Nu a fost deschis.":"该 Excel 文件包含试图修改应用的数据，未予打开。",
-"Confirmă mai întâi emailul contului.":"请先验证账户的电子邮件。"
+"Confirmă mai întâi emailul contului.":"请先验证账户的电子邮件。",
+"Cerere de contact":"联系人请求",
+"@${r.p.handle} te-a adăugat în contacte. Adaugi și tu acest cont? Așa vă puteți trimite documente criptate unul altuia.":"@${r.p.handle} 已将你添加为联系人。你也要添加这个账户吗？这样你们就可以互相发送加密文档。",
+"Pentru siguranță deplină, verificați-vă apoi față în față, scanând codurile QR.":"为确保万无一失，之后请当面扫描彼此的二维码进行验证。",
+"Adaugă în contacte":"添加到联系人",
+"Ignoră":"忽略",
+"@${r.p.handle} a fost adăugat în contacte.":"已将 @${r.p.handle} 添加到你的联系人。",
+"Te-au adăugat":"添加了你",
+"Contactele tale":"你的联系人",
+"Cereri de contact":"联系人请求",
+"@${c.handle} este verificat ✓":"@${c.handle} 已验证 ✓",
+"@numele persoanei":"@对方的用户名",
+"ACM Docs blocat":"ACM Docs 已锁定",
+"ex. Renovare baie":"例如：浴室翻新",
+"ex. Atelierul lui Ion":"例如：王师傅工作室"
 };

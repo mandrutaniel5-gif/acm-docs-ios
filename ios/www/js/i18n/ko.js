@@ -1443,5 +1443,19 @@
 "Ți-am trimis pe email linkul pentru parola nouă.":"새 비밀번호를 설정할 수 있는 링크를 이메일로 보냈습니다.",
 "Fișierul Excel nu a putut fi citit: durează prea mult. Poate fi deteriorat.":"Excel 파일을 읽을 수 없습니다. 시간이 너무 오래 걸립니다. 파일이 손상되었을 수 있습니다.",
 "Fișierul Excel conține date care încearcă să modifice aplicația. Nu a fost deschis.":"이 Excel 파일에는 앱을 변경하려는 데이터가 있어 열지 않았습니다.",
-"Confirmă mai întâi emailul contului.":"먼저 계정 이메일을 인증하세요."
+"Confirmă mai întâi emailul contului.":"먼저 계정 이메일을 인증하세요.",
+"Cerere de contact":"연락처 요청",
+"@${r.p.handle} te-a adăugat în contacte. Adaugi și tu acest cont? Așa vă puteți trimite documente criptate unul altuia.":"@${r.p.handle}님이 회원님을 연락처에 추가했습니다. 이 계정도 추가할까요? 그러면 서로 암호화된 문서를 보낼 수 있습니다.",
+"Pentru siguranță deplină, verificați-vă apoi față în față, scanând codurile QR.":"확실히 하려면 나중에 직접 만나 QR 코드를 스캔해 서로 확인하세요.",
+"Adaugă în contacte":"연락처에 추가",
+"Ignoră":"무시",
+"@${r.p.handle} a fost adăugat în contacte.":"@${r.p.handle}님을 연락처에 추가했습니다.",
+"Te-au adăugat":"나를 추가함",
+"Contactele tale":"내 연락처",
+"Cereri de contact":"연락처 요청",
+"@${c.handle} este verificat ✓":"@${c.handle} 인증됨 ✓",
+"@numele persoanei":"@상대방 이름",
+"ACM Docs blocat":"ACM Docs 잠김",
+"ex. Renovare baie":"예: 욕실 리모델링",
+"ex. Atelierul lui Ion":"예: 김씨 공방"
 };

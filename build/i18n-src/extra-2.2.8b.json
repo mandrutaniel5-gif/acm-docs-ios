@@ -1,0 +1,104 @@
+{
+"keys": [
+"@numele persoanei",
+"ACM Docs blocat",
+"ex. Renovare baie",
+"ex. Atelierul lui Ion"
+],
+"en": [
+"@person's name",
+"ACM Docs locked",
+"e.g. Bathroom renovation",
+"e.g. John's Workshop"
+],
+"de": [
+"@Name der Person",
+"ACM Docs gesperrt",
+"z. B. Badsanierung",
+"z. B. Werkstatt Müller"
+],
+"fr": [
+"@nom de la personne",
+"ACM Docs verrouillé",
+"ex. Rénovation salle de bain",
+"ex. Atelier Martin"
+],
+"es": [
+"@nombre de la persona",
+"ACM Docs bloqueado",
+"p. ej. Reforma del baño",
+"p. ej. Taller García"
+],
+"it": [
+"@nome della persona",
+"ACM Docs bloccato",
+"es. Ristrutturazione bagno",
+"es. Officina Rossi"
+],
+"pt": [
+"@nome da pessoa",
+"ACM Docs bloqueado",
+"ex. Remodelação da casa de banho",
+"ex. Oficina Silva"
+],
+"hu": [
+"@a személy neve",
+"ACM Docs zárolva",
+"pl. Fürdőszoba-felújítás",
+"pl. Kovács Műhely"
+],
+"pl": [
+"@nazwa osoby",
+"ACM Docs zablokowany",
+"np. Remont łazienki",
+"np. Warsztat Kowalski"
+],
+"uk": [
+"@ім'я людини",
+"ACM Docs заблоковано",
+"напр. Ремонт ванної",
+"напр. Майстерня Петренка"
+],
+"ru": [
+"@имя человека",
+"ACM Docs заблокирован",
+"напр. Ремонт ванной",
+"напр. Мастерская Иванова"
+],
+"tr": [
+"@kişinin adı",
+"ACM Docs kilitli",
+"ör. Banyo yenileme",
+"ör. Yılmaz Atölyesi"
+],
+"ar": [
+"@اسم الشخص",
+"ACM Docs مقفل",
+"مثال: تجديد الحمّام",
+"مثال: ورشة أحمد"
+],
+"hi": [
+"@व्यक्ति का नाम",
+"ACM Docs लॉक है",
+"जैसे बाथरूम का नवीनीकरण",
+"जैसे शर्मा वर्कशॉप"
+],
+"zh": [
+"@对方的用户名",
+"ACM Docs 已锁定",
+"例如：浴室翻新",
+"例如：王师傅工作室"
+],
+"ja": [
+"@相手のユーザー名",
+"ACM Docs はロックされています",
+"例：浴室リフォーム",
+"例：山田工房"
+],
+"ko": [
+"@상대방 이름",
+"ACM Docs 잠김",
+"예: 욕실 리모델링",
+"예: 김씨 공방"
+]
+}

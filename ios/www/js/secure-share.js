@@ -124,24 +124,36 @@ const Contacts = (() => {
     if (!text) UI.toast('Nu am găsit niciun cod QR în poză. Încearcă din nou, mai de aproape.', { error: true });
     return text;
   }
+  /** A photo of a code (often taken from another phone's screen): tried at several sizes and crops. */
   async function readQrFromImage(bytes) {
     const blob = new Blob([bytes]);
     const img = await createImageBitmap(blob);
-    const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
     const c = document.createElement('canvas');
-    c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
-    const g = c.getContext('2d');
-    g.drawImage(img, 0, 0, c.width, c.height);
-    return window.__lib.qr.read(g.getImageData(0, 0, c.width, c.height));
+    const g = c.getContext('2d', { willReadFrequently: true });
+    const W = img.width, H = img.height;
+    const tries = [];
+    for (const size of [1200, 800, 1800, 560]) tries.push({ x: 0, y: 0, w: W, h: H, size });
+    // the middle of the photo, where people usually hold the code
+    for (const f of [0.6, 0.4]) tries.push({ x: W * (1 - f) / 2, y: H * (1 - f) / 2, w: W * f, h: H * f, size: 1000 });
+    for (const t of tries) {
+      const k = Math.min(1, t.size / Math.max(t.w, t.h));
+      c.width = Math.max(1, Math.round(t.w * k)); c.height = Math.max(1, Math.round(t.h * k));
+      g.drawImage(img, t.x, t.y, t.w, t.h, 0, 0, c.width, c.height);
+      const r = window.__lib.qr.read(g.getImageData(0, 0, c.width, c.height));
+      if (r) return r;
+    }
+    return null;
   }
   function webcamScan() {
     return new Promise(async (resolve, reject) => {
       let stream;
-      try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false }); } catch (e) { return reject(e); }
+      try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }); } catch (e) { return reject(e); }
       let stop = false;
       const video = el('video', { class: 'qr-video', autoplay: true, playsinline: true, muted: true });
       video.muted = true;
+      video.setAttribute('playsinline', '');
       video.srcObject = stream;
+      video.play().catch(() => {});
       const end = () => { stop = true; stream.getTracks().forEach((t) => t.stop()); };
       const res = UI.modal((box, close) => {
         box.classList.add('acm-ui', 'qr-scan');
@@ -152,9 +164,11 @@ const Contacts = (() => {
         const tick = () => {
           if (stop) return;
           if (video.readyState >= 2 && video.videoWidth) {
-            c.width = video.videoWidth; c.height = video.videoHeight;
-            const g = c.getContext('2d');
-            g.drawImage(video, 0, 0);
+            // a smaller copy of the frame is read much faster (and just as well)
+            const k = Math.min(1, 900 / Math.max(video.videoWidth, video.videoHeight));
+            c.width = Math.round(video.videoWidth * k); c.height = Math.round(video.videoHeight * k);
+            const g = c.getContext('2d', { willReadFrequently: true });
+            g.drawImage(video, 0, 0, c.width, c.height);
             const t = window.__lib.qr.read(g.getImageData(0, 0, c.width, c.height));
             if (t) return close(t);
           }
@@ -193,6 +207,7 @@ const Contacts = (() => {
       return null;
     }
     const cur = get(q.uid);
+    if (!cur) notifyAdded(q.uid);
     if (cur && cur.fp !== p.fp) acceptNewKey(q.uid, true); // the new padlock is confirmed face to face
     const c = cur && cur.fp === p.fp ? cur : get(q.uid) || addFromProfile(p);
     c.verified = true; c.verifiedAt = Date.now(); delete c.pending;
@@ -280,19 +295,32 @@ const Contacts = (() => {
       const listBox = el('div', { class: 'clist' });
       const draw = () => {
         listBox.innerHTML = '';
+        const reqs = requests.filter((r) => !get(r.uid));
+        if (reqs.length) {
+          listBox.append(el('h3', { class: 'csec', text: 'Te-au adăugat' }));
+          reqs.forEach((r) => {
+            const row = contactRow({ handle: r.p.handle, name: r.p.name, verified: false }, null, el('span', { class: 'creq-acts' }, [
+              el('button', { class: 'btn primary sm', type: 'button', text: 'Adaugă', onclick: async (e) => { e.stopPropagation(); await acceptRequest(r); draw(); } }),
+              el('button', { class: 'btn sm', type: 'button', text: 'Ignoră', onclick: async (e) => { e.stopPropagation(); await markRequest(r.uid, 'ignored'); draw(); } }),
+            ]));
+            listBox.append(row);
+          });
+          listBox.append(el('h3', { class: 'csec', text: 'Contactele tale' }));
+        }
         const cs = list();
         if (!cs.length) listBox.append(el('p', { class: 'cempty', text: 'Încă nu ai contacte. Caută pe cineva după @nume sau scanează-i codul QR.' }));
         cs.forEach((c) => listBox.append(contactRow(c, async () => { close(); await showContact(c.uid); })));
         hydrateIcons(listBox);
       };
       draw();
+      checkRequests(false).then(() => { if (box.isConnected) draw(); });
       box.append(
         el('h2', { text: 'Contacte' }),
         searchBox((p, out) => {
           const exists = get(p.uid);
           out.append(el('div', { class: 'cfound-card' }, [
             avatar(p), el('span', { class: 'ctx' }, [el('b', { class: 'no-tr', text: p.name || '@' + p.handle }), el('small', { class: 'no-tr', text: '@' + p.handle })]),
-            el('button', { class: 'btn primary', type: 'button', text: exists ? 'Deschide' : 'Adaugă', onclick: async () => { if (!exists) addFromProfile(p); close(); await showContact(p.uid, !exists); } }),
+            el('button', { class: 'btn primary', type: 'button', text: exists ? 'Deschide' : 'Adaugă', onclick: async () => { if (!exists) { addFromProfile(p); notifyAdded(p.uid); } close(); await showContact(p.uid, !exists); } }),
           ]));
         }),
         el('button', { class: 'btn cscan', type: 'button', html: svg('camera') + '<span>Scanează codul QR al cuiva</span>', onclick: async () => { const c = await scanAndVerify(); if (c) draw(); } }),
@@ -364,7 +392,78 @@ const Contacts = (() => {
     }
   }
 
-  return { checkIntegrity, scanCode: scan, list, get, put, remove, status, refresh, addFromProfile, acceptNewKey, badge, avatar, contactRow, searchBox, scanAndVerify, showMyCode, showList, showContact, parseQr };
+  // ---------------------------------------------------------------- contact requests ("X added you")
+  /** Tells the other person that this account added them (they can add it back). Best effort. */
+  function notifyAdded(uid) {
+    if (!uid || !me() || uid === me().uid) return;
+    Account.call('contactRequest', { to: uid }).catch((e) => console.warn('contact request', e && e.message));
+  }
+  let requests = []; // [{ uid, p (profile) }]
+  const seenKey = () => 'acm.creq.seen.' + (me() ? me().uid : '-');
+  const reqDoc = (from) => { const { F: f, db } = Account.internals(); return f.firestore.doc(db, 'accounts', me().uid, 'requests', from); };
+  async function markRequest(from, st) {
+    try { const { F: f } = Account.internals(); await f.firestore.updateDoc(reqDoc(from), { status: st }); } catch (e) { console.warn('request', e); }
+    requests = requests.filter((r) => r.uid !== from);
+    try { AcmShare.renderHome(); } catch (e) {}
+  }
+  let checking = null;
+  /** Reads the pending requests; asks once about each new one. */
+  function checkRequests(ask = true) {
+    if (checking) return checking;
+    checking = (async () => {
+      if (!me() || (typeof Devices !== 'undefined' && !Devices.myDevice())) return requests = [];
+      const { F: f, db } = Account.internals();
+      const snap = await f.firestore.getDocs(f.firestore.query(f.firestore.collection(db, 'accounts', me().uid, 'requests'), f.firestore.where('status', '==', 'pending')));
+      const out = [];
+      for (const d of snap.docs) {
+        if (get(d.id)) { markRequest(d.id, 'done'); continue; } // already a contact
+        let p = null;
+        try { p = await Account.profileOf(d.id); } catch (e) { continue; }
+        if (!p) { try { await f.firestore.deleteDoc(reqDoc(d.id)); } catch (e) {} continue; }
+        out.push({ uid: d.id, p });
+      }
+      requests = out;
+      try { AcmShare.renderHome(); } catch (e) {}
+      if (!ask) return requests;
+      let seen = [];
+      try { seen = JSON.parse(localStorage.getItem(seenKey()) || '[]'); } catch (e) {}
+      for (const r of out.filter((x) => !seen.includes(x.uid))) {
+        seen.push(r.uid);
+        try { localStorage.setItem(seenKey(), JSON.stringify(seen.slice(-200))); } catch (e) {}
+        await askRequest(r);
+      }
+      return requests;
+    })().catch((e) => { console.warn('requests', e); return requests; }).finally(() => { checking = null; });
+    return checking;
+  }
+  async function acceptRequest(r) {
+    addFromProfile(r.p);
+    await markRequest(r.uid, 'done');
+    UI.toast(`@${r.p.handle} a fost adăugat în contacte.`);
+  }
+  async function askRequest(r) {
+    const act = await UI.modal((box, close) => {
+      box.classList.add('acm-ui', 'creq');
+      box.append(
+        el('div', { class: 'acm-alert', html: svg('people') }),
+        el('h2', { text: 'Cerere de contact' }),
+        contactRow({ handle: r.p.handle, name: r.p.name, verified: false }, null, el('span')),
+        el('p', { text: `@${r.p.handle} te-a adăugat în contacte. Adaugi și tu acest cont? Așa vă puteți trimite documente criptate unul altuia.` }),
+        el('p', { class: 'muted small', text: 'Pentru siguranță deplină, verificați-vă apoi față în față, scanând codurile QR.' }),
+        el('div', { class: 'actions col' }, [
+          el('button', { class: 'btn primary', type: 'button', id: 'creq-add', text: 'Adaugă în contacte', onclick: () => close('add') }),
+          el('button', { class: 'btn', type: 'button', text: 'Mai târziu', onclick: () => close(null) }),
+          el('button', { class: 'btn danger-text', type: 'button', id: 'creq-ignore', text: 'Ignoră', onclick: () => close('ignore') }),
+        ]),
+      );
+      hydrateIcons(box);
+    });
+    if (act === 'add') await acceptRequest(r);
+    else if (act === 'ignore') await markRequest(r.uid, 'ignored');
+  }
+  const pendingRequests = () => requests.slice();
+
+  return { checkIntegrity, scanCode: scan, list, get, put, remove, status, refresh, addFromProfile, acceptNewKey, badge, avatar, contactRow, searchBox, scanAndVerify, showMyCode, showList, showContact, parseQr, notifyAdded, checkRequests, pendingRequests };
 })();
 
 const AcmShare = (() => {
@@ -724,6 +823,7 @@ const AcmShare = (() => {
     const u = Account.current();
     acts.innerHTML = '';
     const people = el('button', { class: 'hb', type: 'button', id: 'home-contacts', title: 'Contacte', 'aria-label': 'Contacte', html: svg('people') });
+    if (u && Contacts.pendingRequests().length) people.append(el('i', { class: 'hb-dot', title: 'Cereri de contact' }));
     people.addEventListener('click', () => Contacts.showList());
     const me = el('button', { class: 'hb avatar' + (u ? ' on' : ''), type: 'button', id: 'home-me', title: u ? 'Contul meu' : 'Intră în cont', 'aria-label': u ? 'Contul meu' : 'Intră în cont' });
     if (u) me.textContent = ((u.displayName || u.email || '?').trim()[0] || '?').toUpperCase(); else me.innerHTML = svg('user');
