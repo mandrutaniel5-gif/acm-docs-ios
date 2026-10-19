@@ -15,7 +15,7 @@ Versiune: 2.2.1. Server (reguli + funcții) atacat din nou, identic cu runda 1, 
 | S03 | CRITIC | Dispozitivul atacatorului înregistrat în cont | REPARAT (testat: blocat) |
 | S52 | MARE | Membru șterge contul | REPARAT — ștergerea cere semnătura cheilor contului (testat: blocat) |
 | S54 | CRITIC | (nou) Sesiune furată șterge contul | BLOCAT |
-| C3 | MARE | Sesiunea Firebase valabilă pentru totdeauna | REPARAT — regulile cer o sesiune de dispozitiv reînnoită în ultimele 26 h; aplicația o reînnoiește singur cu cheia dispozitivului |
+| C3 | MARE | Sesiunea Firebase valabilă pentru totdeauna | REPARAT — regulile cer o sesiune de dispozitiv reînnoită în ultimele 26 h; aplicația o reînnoiește singură cu cheia dispozitivului |
 | C4 | MEDIU | Cheia dispozitivului în stocarea paginii | REPARAT — Keychain (iOS) / Keystore (Android) / DPAPI (Windows); mutată automat la prima pornire |
 | C5 | MEDIU | Inspectare Safari în versiunea finală (iOS) | REPARAT în cod — intră în vigoare cu următorul build de iPhone |
 | C6 | MEDIU | Copii decriptate în Documents (Android) | REPARAT — în stocarea privată a aplicației; copiile vechi sunt șterse la pornire |
