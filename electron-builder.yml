@@ -34,13 +34,21 @@ files:
   - "!node_modules/@types/**"
   - "!node_modules/jszip/dist/**"
 asar: true
+# Hardening of the Electron binary: it cannot be turned into a plain Node.js, inspected with a
+# debugger switch, or made to load app code from outside the signed-up package.
+electronFuses:
+  runAsNode: false
+  enableCookieEncryption: true
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  onlyLoadAppFromAsar: true
 asarUnpack:
   - node_modules/**/*
   - app/ocr/**/*
 win:
   target:
     - target: dir
-      arch: [ia32]
+      arch: [x64]
   icon: build/icon.ico
   signAndEditExecutable: false
 linux:

@@ -958,7 +958,8 @@ const App = (() => {
       depth = 0;
       overlay.classList.add('hidden');
       const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-      if (f && f.path) openPath(f.path);
+      const fp = f && (window.ElectronHost && window.ElectronHost.pathOf ? window.ElectronHost.pathOf(f) : f.path);
+      if (fp) openPath(fp);
     });
 
     // Closing the window with unsaved changes

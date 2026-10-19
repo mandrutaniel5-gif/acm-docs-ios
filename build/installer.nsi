@@ -1,4 +1,4 @@
-; ACM Docs (by ACM Code SRL) — installer for Windows 7 / 8 / 10 / 11 (32 and 64 bit)
+; ACM Docs (by ACM Code SRL) — installer for Windows 10 / 11 (64 bit)
 ; Installs for the current user only: no administrator password needed.
 ; Replaces the older "PDF Editor" (same entry in Control Panel, data is kept).
 Unicode true
@@ -17,7 +17,7 @@ SetCompressorDictSize 64
 !define PROGID "ACMCode.ACMDocs.document"
 !define OLDPROGID "ACMandrut.PDFEditor.pdf"
 !ifndef SRC
-  !define SRC "../dist/win-ia32-unpacked"
+  !define SRC "../dist/win-unpacked"
 !endif
 !ifndef OUT
   !define OUT "../dist/ACM-Docs-Setup.exe"
@@ -42,6 +42,7 @@ VIAddVersionKey /LANG=0 "LegalCopyright" "© 2026 ${COMPANY}"
 !include "WinVer.nsh"
 !include "LogicLib.nsh"
 !include "FileFunc.nsh"
+!include "x64.nsh"
 
 !define MUI_ICON "icon.ico"
 !define MUI_UNICON "icon.ico"
@@ -70,13 +71,9 @@ VIAddVersionKey /LANG=0 "LegalCopyright" "© 2026 ${COMPANY}"
 
 ; Refuse to install where the app cannot run.
 Function .onInit
-  ${IfNot} ${AtLeastWin7}
-    MessageBox MB_ICONSTOP "${APP} are nevoie de Windows 7 sau mai nou."
-    Abort
-  ${EndIf}
-  ${If} ${IsWin7}
-  ${AndIfNot} ${AtLeastServicePack} 1
-    MessageBox MB_ICONSTOP "Pe Windows 7 trebuie instalat mai întâi Service Pack 1 (din Windows Update).$\r$\nFără el aplicația nu poate porni."
+  ${IfNot} ${AtLeastBuild} 10240
+  ${OrIfNot} ${RunningX64}
+    MessageBox MB_ICONSTOP "${APP} are nevoie de Windows 10 sau 11, pe 64 de biți.$\r$\n${APP} needs 64-bit Windows 10 or 11."
     Abort
   ${EndIf}
 FunctionEnd

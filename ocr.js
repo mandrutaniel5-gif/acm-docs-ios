@@ -13,10 +13,25 @@ function getWorker() {
   if (!workerPromise) {
     const { createWorker, OEM } = require('tesseract.js');
     const root = __dirname;
+    // Inside Electron the engine treats a folder as a web address and fails to load it, but it
+    // reads its own cache from disk: the language data is put there once (the engine unpacks it).
+    const fs = require('fs');
+    let cachePath = null;
+    try {
+      const { app } = require('electron');
+      cachePath = path.join(app.getPath('userData'), 'ocr');
+      const src = unpacked(path.join(root, 'app', 'ocr', 'ron.traineddata.gz'));
+      const dst = path.join(cachePath, 'ron.traineddata');
+      const st = fs.statSync(src);
+      let ok = false;
+      try { ok = fs.statSync(dst).size === st.size; } catch (e) {}
+      if (!ok) { fs.mkdirSync(cachePath, { recursive: true }); fs.copyFileSync(src, dst); }
+    } catch (e) { cachePath = null; }
     workerPromise = createWorker('ron', OEM.LSTM_ONLY, {
       workerPath: unpacked(path.join(root, 'node_modules', 'tesseract.js', 'src', 'worker-script', 'node', 'index.js')),
       langPath: unpacked(path.join(root, 'app', 'ocr')),
-      cacheMethod: 'none',
+      cacheMethod: cachePath ? 'readOnly' : 'none',
+      cachePath: cachePath || undefined,
       gzip: true,
       logger: (m) => {
         if (progressCb && m && typeof m.progress === 'number') progressCb(m.status, m.progress);
