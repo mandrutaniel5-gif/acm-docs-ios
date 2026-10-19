@@ -48,6 +48,8 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
           set -o pipefail
           firebase deploy --project acm-docs-52280 --only firestore:rules,functions --force --non-interactive 2>&1 | tee deploy.txt
+          # one real round trip with a throwaway account (created and deleted by the test)
+          node test/prod-smoke.mjs 2>&1 | tee -a deploy.txt
           rm -f "$RUNNER_TEMP/sa.json"
 
       # results readable with plain git (branch "server-results")
