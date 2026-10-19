@@ -61,6 +61,39 @@ Verificate fără probleme:
 - C9: fără al doilea factor, recomandat Identity Platform (gratuit până la 50.000 utilizatori activi / lună pe planul Blaze): permite TOTP / passkey și alerta la conectarea cu parola (P09).
 - S40: phishing cu cod QR (atenuat).
 
+## După reparații — versiunea 2.2.7 (20.10.2026)
+
+Reparat, publicat pe server și verificat pe proiectul real. Verificarea folosește un cont de test temporar, creat și șters automat.
+
+| # | Stare | Ce s-a făcut |
+|---|---|---|
+| R1 | REPARAT | Un cont neconfigurat pe dispozitiv nu rămâne conectat („Deconectează-te”); configurarea neterminată se reia |
+| P01, P02, P10 | REPARAT (live) | Profilul și @numele se schimbă doar de pe un dispozitiv al contului; doar cu parola, schimbarea e refuzată |
+| P03 | REPARAT (live) | Ștergerea contului de conectare din client e dezactivată; contul se șterge doar prin server, cu semnătura cheilor |
+| P04, P05, F04 | REPARAT | Verificare în doi pași (Setări › Securitate). Cu ea pornită, parola singură nu mai conectează nicăieri (verificat live: parola singură refuzată, cod greșit refuzat, cod corect acceptat). Dispozitivele contului se reconectează singure cu cheia lor dacă sesiunea e închisă din afară (schimbare de parolă). „Email enumeration protection” e activă. |
+| P09 | REPARAT (live) | Fiecare conectare cu parola apare ca alertă pe toate dispozitivele („Cineva a intrat cu parola contului”), cu buton „Nu am fost eu: schimbă parola” |
+| F01 | REPARAT (live) | Limita de coduri QR folosește adresa văzută de Google + o limită globală: 10 din 14 cu adrese false (limita e 10) |
+| V05 | REPARAT (live) | Un bloc din cloud nu mai poate fi rescris |
+| V07 | VERIFICAT (live) | Blocurile cu tip HTML sunt refuzate pe proiectul real (emulatorul nu aplică regula) |
+| C12 | REPARAT | Windows: Electron 44.9 (64 biți, Windows 10/11); pagina și preload-ul în sandbox; accesul la fișiere trece prin procesul principal, care refuză programele și scripturile (.exe, .bat, .ps1, .lnk…), folderul Startup, folderul aplicației și folderul cheilor; „Deschide” pornește doar documente; permisiuni doar cameră și clipboard; fuses (fără RunAsNode, fără NODE_OPTIONS, fără inspector, app doar din asar) |
+| C13 | REPARAT | Excel citit într-un Web Worker separat, cu oprire după 90 s; dacă workerul nu e disponibil, aplicația verifică după citire că obiectele de bază nu au fost modificate și refuză fișierul |
+| C14 | REPARAT | Sincronizarea aplică doar cheile din lista sincronizată; fișierele din cloud primesc nume curățate (fără `..`, fără căi absolute), doar tipuri de documente, doar în folderul de documente |
+| C15 | REPARAT | DevTools dezactivat în aplicația instalată |
+| C16 | REPARAT | Android: backup oprit (`allowBackup=false`, `fullBackupContent=false`). Transferul direct telefon-la-telefon de pe Android 12+ cere uneltele SDK 31 (aici e SDK 23); rămâne doar pentru proprietarul cu telefonul deblocat. |
+| C17, C19 | REPARAT | Android: folderul intern al aplicației (setări, stocarea paginii, chei) nu mai e servit paginii, partajat sau deschis la cererea altei aplicații |
+| C18 | REPARAT | iPhone: puntea nativă răspunde doar paginii principale `acm://app`; navigarea la `data:`/`javascript:`/`file:` e refuzată; Library-ul aplicației nu e servit paginii |
+| — | REPARAT | Windows: recunoașterea textului (OCR) nu mai mergea cu Electron nou; acum datele de limbă se citesc din cache-ul local (testat) |
+| V11 | RĂMÂNE | Fără cotă pe cont; recomandat: alertă de buget în Google Cloud › Billing › Budgets |
+| S40 | RĂMÂNE | Phishing cu cod QR (atenuat prin confirmare) |
+| C8 | RĂMÂNE | App Check + drepturi minime pentru conturile de serviciu |
+
+Teste rulate pentru 2.2.7:
+- Atacuri pe emulator: runda 2 are 43 din 44 blocate. În runda 3, cele 7 marcate tot „reușite” pe emulator sunt fie verificate ca blocate pe proiectul real (P03, P05, V07), fie închise prin verificarea în doi pași și reconectarea cu cheia dispozitivului (P04, F04), fie acceptate (P10: date publice; V11: cost).
+- Live pe proiectul real: toate verificările de mai sus.
+- Windows (Electron 44, sandbox): citire/scriere documente, blocarea .bat și a folderului cheilor, refuzul de a porni un program, PDF, Word, Excel, PowerPoint, .doc, .xls, PDF din factură, OCR, clipboard.
+- Excel în worker în browser și în Electron.
+- Ecranele de verificare în doi pași, în română și germană, pe telefon și calculator.
+
 ## Log runda 3
 ```
 ✗ VULNERABIL  [MARE] P01 Doar cu parola: schimbă numele afișat al victimei (văzut de toți contactele noi)
