@@ -14,7 +14,7 @@ on:
         default: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   test-and-deploy:
@@ -34,15 +34,27 @@ jobs:
           npm i -g firebase-tools@14
 
       - name: Test against the emulators
-        run: firebase emulators:exec --project acm-docs-52280 --only auth,firestore,functions "node --test test/server.test.mjs"
+        run: |
+          set -o pipefail
+          firebase emulators:exec --project acm-docs-52280 --only auth,firestore,functions "node --test test/server.test.mjs" 2>&1 | tee server-test.txt
 
       - name: Publish rules and functions
         if: github.event_name == 'push' || inputs.deploy
         env:
           SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
-          if [ -z "$SA" ]; then echo "No deploy key yet (secret FIREBASE_SERVICE_ACCOUNT): tests only."; exit 0; fi
+          if [ -z "$SA" ]; then echo "No deploy key yet (secret FIREBASE_SERVICE_ACCOUNT): tests only." | tee deploy.txt; exit 0; fi
           printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
-          firebase deploy --project acm-docs-52280 --only firestore:rules,functions --force --non-interactive
+          set -o pipefail
+          firebase deploy --project acm-docs-52280 --only firestore:rules,functions --force --non-interactive 2>&1 | tee deploy.txt
           rm -f "$RUNNER_TEMP/sa.json"
+
+      # results readable with plain git (branch "server-results")
+      - name: Publish results
+        if: always()
+        run: |
+          mkdir -p /tmp/out && cp server-test.txt deploy.txt /tmp/out/ 2>/dev/null || true
+          echo "run ${GITHUB_RUN_ID} ${GITHUB_SHA::7}" > /tmp/out/run.txt
+          cd /tmp/out && git init -q -b server-results && git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "server ${GITHUB_SHA::7}" && git push -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" server-results
