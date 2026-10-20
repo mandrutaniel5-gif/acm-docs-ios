@@ -5,6 +5,22 @@ const path = require('path');
 const fs = require('fs');
 
 let win = null;
+
+// Only the app's own page — the main frame of the main window, loaded from the app's folder — may
+// ask the main process for anything. Frames inside it (invoice previews) and other windows (the
+// invisible PDF printer) are refused, whatever they send.
+const APP_INDEX = require('path').join(__dirname, 'app', 'index.html').replace(/\\/g, '/').toLowerCase();
+/** file:///C:/x/app/index.html → c:/x/app/index.html (and file:///home/x → /home/x) */
+const urlPath = (u) => decodeURI(String(u || '')).split(/[?#]/)[0].replace(/^file:\/\//i, '').replace(/^\/([a-z]:)/i, '$1').toLowerCase();
+function trusted(e) {
+  try {
+    if (!win || e.sender !== win.webContents) return false;
+    const f = e.senderFrame;
+    if (!f || f !== win.webContents.mainFrame) return false;
+    return urlPath(f.url) === APP_INDEX;
+  } catch (x) { return false; }
+}
+const handle = (ch, fn) => ipcMain.handle(ch, (e, ...a) => { if (!trusted(e)) throw new Error('blocked'); return fn(e, ...a); });
 let pendingFile = null;
 
 function fileFromArgs(argv) {
@@ -90,7 +106,7 @@ if (!single) {
   app.on('window-all-closed', () => app.quit());
 }
 
-ipcMain.handle('startup-file', () => {
+handle('startup-file', () => {
   const f = pendingFile;
   pendingFile = null;
   return f;
@@ -100,7 +116,7 @@ const EXT = {
   pdf: ['pdf'], image: ['png', 'jpg', 'jpeg', 'bmp', 'gif', 'webp'],
   word: ['docx', 'doc', 'txt', 'rtf'], sheet: ['xlsx', 'xls', 'xlsm', 'csv', 'ods'], slides: ['pptx', 'ppt'],
 };
-ipcMain.handle('dialog-open', async (_e, kind, lang) => {
+handle('dialog-open', async (_e, kind, lang) => {
   const en = !!lang && lang !== 'ro';
   const all = [...EXT.pdf, ...EXT.word, ...EXT.sheet, ...EXT.slides, ...EXT.image, 'acm'];
   const filters = kind === 'image' || kind === 'images'
@@ -120,7 +136,7 @@ ipcMain.handle('dialog-open', async (_e, kind, lang) => {
   return kind === 'images' ? r.filePaths : r.filePaths[0];
 });
 
-ipcMain.handle('dialog-save', async (_e, suggestedName, defaultDir, ext, lang) => {
+handle('dialog-save', async (_e, suggestedName, defaultDir, ext, lang) => {
   ext = (ext || 'pdf').toLowerCase();
   const names = lang && lang !== 'ro'
     ? { pdf: 'PDF documents', docx: 'Word document', xlsx: 'Excel workbook', pptx: 'PowerPoint presentation' }
@@ -134,16 +150,16 @@ ipcMain.handle('dialog-save', async (_e, suggestedName, defaultDir, ext, lang) =
 });
 
 // Reads the text inside pictures (offline). Loaded only when first used.
-ipcMain.handle('ocr-warm', async () => { try { await require('./ocr').warm(); } catch (e) {} return true; });
-ipcMain.handle('ocr', async (e, bytes, opts) => {
+handle('ocr-warm', async () => { try { await require('./ocr').warm(); } catch (e) {} return true; });
+handle('ocr', async (e, bytes, opts) => {
   const ocr = require('./ocr');
   return ocr.recognize(Buffer.from(bytes), (status, progress) => {
     if (!e.sender.isDestroyed()) e.sender.send('ocr-progress', status, progress);
   }, opts || null);
 });
 
-ipcMain.handle('show-in-folder', (_e, p) => shell.showItemInFolder(p));
-ipcMain.handle('fetch-text', (_e, url) => new Promise((resolve, reject) => {
+handle('show-in-folder', (_e, p) => shell.showItemInFolder(p));
+handle('fetch-text', (_e, url) => new Promise((resolve, reject) => {
   if (!/^https:\/\/(www\.)?bnr\.ro\//.test(String(url))) { reject(new Error('blocked')); return; }
   const req = require('https').get(String(url), { timeout: 12000 }, (res) => {
     if (res.statusCode !== 200) { reject(new Error('HTTP ' + res.statusCode)); res.resume(); return; }
@@ -155,9 +171,9 @@ ipcMain.handle('fetch-text', (_e, url) => new Promise((resolve, reject) => {
   req.on('timeout', () => req.destroy(new Error('timeout')));
   req.on('error', reject);
 }));
-ipcMain.handle('open-external', (_e, url) => { if (/^(mailto:|https?:)/i.test(String(url))) shell.openExternal(String(url)); });
+handle('open-external', (_e, url) => { if (/^(mailto:|https?:)/i.test(String(url))) shell.openExternal(String(url)); });
 // Opens a document in its own program (Word, Excel, a PDF reader…): never a program or a script.
-ipcMain.handle('open-path', (_e, p) => {
+handle('open-path', (_e, p) => {
   p = String(p || '');
   try { canon(p); } catch (e) { return 'blocked'; } // no device / UNC / alternate-data-stream paths
   let dir = false;
@@ -165,9 +181,9 @@ ipcMain.handle('open-path', (_e, p) => {
   if (!dir && !OPENABLE.test(effName(p))) return 'blocked';
   return shell.openPath(p);
 });
-ipcMain.handle('special-dir', (_e, name) => (name === 'private' ? path.join(app.getPath('userData'), 'private') : app.getPath(name)));
+handle('special-dir', (_e, name) => (name === 'private' ? path.join(app.getPath('userData'), 'private') : app.getPath(name)));
 // Light / dark / like Windows (also colors the window frame on Windows 10/11).
-ipcMain.handle('set-theme', (_e, pref) => { nativeTheme.themeSource = pref === 'dark' || pref === 'light' ? pref : 'system'; });
+handle('set-theme', (_e, pref) => { nativeTheme.themeSource = pref === 'dark' || pref === 'light' ? pref : 'system'; });
 
 app.on('will-quit', () => {
   try { require('./ocr').shutdown(); } catch (e) {}
@@ -298,15 +314,15 @@ const HOST = {
   clipImage: () => { const img = clipboard.readImage(); if (!img || img.isEmpty()) return null; const sz = img.getSize(); return { url: img.toDataURL(), width: sz.width, height: sz.height }; },
 };
 ipcMain.on('host', (e, op, ...args) => {
-  if (!win || e.sender !== win.webContents) { e.returnValue = { err: 'blocked' }; return; }
+  if (!trusted(e)) { e.returnValue = { err: 'blocked' }; return; }
   const f = Object.prototype.hasOwnProperty.call(HOST, op) ? HOST[op] : null;
   if (!f) { e.returnValue = { err: 'unknown ' + op }; return; }
   try { e.returnValue = { v: f(...args) }; } catch (err) { e.returnValue = { err: err.message || String(err) }; }
 });
-ipcMain.handle('fs-read', async (_e, p) => fs.promises.readFile(checkRead(String(p))));
+handle('fs-read', async (_e, p) => fs.promises.readFile(checkRead(String(p))));
 
 // Turns an HTML page (the invoice) into a PDF, invisibly.
-ipcMain.handle('html-to-pdf', async (_e, html, opts) => {
+handle('html-to-pdf', async (_e, html, opts) => {
   const m = (opts && opts.margins) || 0;
   const os = require('os');
   const tmp = path.join(os.tmpdir(), `acmdocs-${process.pid}-${Date.now()}.html`);
@@ -328,7 +344,7 @@ ipcMain.handle('html-to-pdf', async (_e, html, opts) => {
 });
 
 // Picture of part of the window (thumbnails for the start screen).
-ipcMain.handle('capture', async (e, rect) => {
+handle('capture', async (e, rect) => {
   const w = BrowserWindow.fromWebContents(e.sender);
   if (!w) return null;
   const img = await w.webContents.capturePage({ x: Math.max(0, Math.round(rect.x)), y: Math.max(0, Math.round(rect.y)), width: Math.max(1, Math.round(rect.w)), height: Math.max(1, Math.round(rect.h)) });
@@ -343,7 +359,7 @@ ipcMain.handle('capture', async (e, rect) => {
 const secureDir = () => path.join(app.getPath('userData'), 'secure');
 const secureFile = (name) => path.join(secureDir(), String(name).replace(/[^a-z0-9_.-]/gi, '_') + '.bin');
 // sensitive screens (recovery words, a decrypted .acm): invisible to screenshots and screen sharing
-ipcMain.handle('privacy', (e, on) => {
+handle('privacy', (e, on) => {
   const w = BrowserWindow.fromWebContents(e.sender);
   if (w) w.setContentProtection(!!on);
   return true;
@@ -369,7 +385,7 @@ function windowsHello(mode, message) {
   });
 }
 
-ipcMain.handle('secure', async (e, op, args) => {
+handle('secure', async (e, op, args) => {
   const { safeStorage } = require('electron');
   const a = args || {};
   if (op === 'set') {
