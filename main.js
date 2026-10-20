@@ -159,9 +159,10 @@ ipcMain.handle('open-external', (_e, url) => { if (/^(mailto:|https?:)/i.test(St
 // Opens a document in its own program (Word, Excel, a PDF reader…): never a program or a script.
 ipcMain.handle('open-path', (_e, p) => {
   p = String(p || '');
+  try { canon(p); } catch (e) { return 'blocked'; } // no device / UNC / alternate-data-stream paths
   let dir = false;
   try { dir = fs.statSync(p).isDirectory(); } catch (e) { return 'not found'; }
-  if (!dir && !OPENABLE.test(p)) return 'blocked';
+  if (!dir && !OPENABLE.test(effName(p))) return 'blocked';
   return shell.openPath(p);
 });
 ipcMain.handle('special-dir', (_e, name) => (name === 'private' ? path.join(app.getPath('userData'), 'private') : app.getPath(name)));
@@ -179,7 +180,28 @@ app.on('will-quit', () => {
 // starts programs from, the app's own folder or its key folder.
 const PROGRAM = /\.(exe|com|bat|cmd|ps1|psm1|psd1|ps1xml|vbs|vbe|js|jse|mjs|cjs|wsf|wsh|wsc|msi|msp|mst|msix|appx|scr|pif|lnk|url|hta|cpl|dll|sys|drv|ocx|reg|jar|appref-ms|application|settingcontent-ms|inf|scf|library-ms|search-ms|msc|gadget|xll|chm|iso|img|vhd|vhdx|sh|py|pyw|asar|node)$/i;
 const OPENABLE = /\.(pdf|docx|doc|rtf|odt|txt|md|xlsx|xls|xlsm|csv|tsv|ods|pptx|ppt|odp|png|jpe?g|gif|bmp|webp|tiff?|heic|acm)$/i;
-const norm = (p) => { const r = path.resolve(String(p)); return process.platform === 'win32' ? r.toLowerCase() : r; };
+// Windows plays tricks with names: a trailing dot or space is dropped ("evil.bat." runs as
+// "evil.bat"), a colon opens an alternate data stream ("ok.pdf:evil.bat"), and the \\?\, \\.\ and
+// \\server\ prefixes reach the same files past a naive folder check. So every path from the page is
+// canonicalized first, device and network paths are refused, and the type is checked on the real name.
+const isWin = process.platform === 'win32';
+function canon(p) {
+  let s = String(p || '');
+  if (isWin) {
+    s = s.replace(/\//g, '\\');
+    // device / long-path / UNC prefixes are not valid document paths
+    if (/^\\\\[?.]\\/.test(s) || /^\\\\[^\\]/.test(s)) throw new Error('blocked path');
+    // a colon only right after a single drive letter (C:) is legitimate; anywhere else = ADS
+    if (/:/.test(s.replace(/^[A-Za-z]:/, ''))) throw new Error('blocked path');
+    const r = path.win32.resolve(s);
+    if (/^\\\\/.test(r)) throw new Error('blocked path'); // resolved to UNC
+    return r;
+  }
+  return path.resolve(s);
+}
+/** The effective Windows file name: trailing dots and spaces on the last segment are ignored by the OS. */
+const effName = (p) => (isWin ? path.win32.basename(canon(p)).replace(/[. ]+$/, '') : path.posix.basename(canon(p)));
+const norm = (p) => { const r = canon(p); return isWin ? r.toLowerCase() : r; };
 const under = (p, dir) => { const a = norm(p), b = norm(dir); return a === b || a.startsWith(b.endsWith(path.sep) ? b : b + path.sep); };
 function noWrite() {
   const list = [path.join(app.getPath('userData'), 'secure'), path.dirname(process.execPath), process.resourcesPath, __dirname,
@@ -190,12 +212,13 @@ function noWrite() {
 }
 function checkRead(p) {
   if (typeof p !== 'string' || !p || !path.isAbsolute(p)) throw new Error('bad path');
+  canon(p); // refuses device / UNC / alternate-data-stream paths (throws)
   if (under(p, path.join(app.getPath('userData'), 'secure'))) throw new Error('blocked path');
   return p;
 }
 function checkWrite(p, isDir) {
   checkRead(p);
-  if (!isDir && PROGRAM.test(p.replace(/\.tmp-acmdocs$/i, ''))) throw new Error('blocked file type');
+  if (!isDir && PROGRAM.test(effName(p).replace(/\.tmp-acmdocs$/i, ''))) throw new Error('blocked file type');
   if (noWrite().some((d) => under(p, d))) throw new Error('blocked path');
   return p;
 }
