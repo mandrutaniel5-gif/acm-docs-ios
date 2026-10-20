@@ -1,8 +1,9 @@
 'use strict';
 // Toolbars, floating bars, thumbnails, search and the signature dialog.
 
-const COLORS = [0xff111111, 0xff1c3faa, 0xffc62828, 0xff2e7d32];
-const HIGHLIGHTS = [0xffffe629, 0xff39e27a, 0xffff6fb5, 0xff48b4ff];
+// pen / text / marks: black, blue, light blue, red, green, orange, purple, gray, white
+const COLORS = [0xff111111, 0xff1c3faa, 0xff0288d1, 0xffc62828, 0xff2e7d32, 0xffef6c00, 0xff7b1fa2, 0xff757575, 0xffffffff];
+const HIGHLIGHTS = [0xffffe629, 0xff39e27a, 0xffff6fb5, 0xff48b4ff, 0xffffa94d, 0xffc49bff];
 const cssColor = (argb) => `rgb(${(argb >>> 16) & 255},${(argb >>> 8) & 255},${argb & 255})`;
 
 // -----------------------------------------------------------------------------
@@ -128,6 +129,10 @@ const Toolbar = (() => {
       b.classList.toggle('active', active);
     });
     const sc = document.getElementById('style-controls');
+    // phone: the colors and sizes sit in their own row right above the tools, not at the far end
+    // of the scrolling tool row
+    const tb = document.getElementById('toolbar');
+    if (Host.mobile && sc.parentNode === tb) { tb.before(sc); sc.classList.add('mob'); }
     sc.innerHTML = '';
     const s = Editor.style;
     const addDots = (list, current, set) => list.forEach((c) => {

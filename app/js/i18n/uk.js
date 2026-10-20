@@ -1458,5 +1458,6 @@
 "ACM Docs blocat":"ACM Docs заблоковано",
 "ex. Renovare baie":"напр. Ремонт ванної",
 "ex. Atelierul lui Ion":"напр. Майстерня Петренка",
-"Se aduce din cloud…":"Завантаження з хмари…"
+"Se aduce din cloud…":"Завантаження з хмари…",
+"Scrie":"Писати"
 };

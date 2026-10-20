@@ -297,6 +297,13 @@ const Slides = (() => {
           hd.dataset.h = h;
           box.append(hd);
         }
+        // phones: a clear "write" button on the selected text box (no double click with a finger)
+        if (Host.mobile && (e.type === 'text' || e.type === 'table' || (e.type === 'shape' && e.st.shape !== 'line'))) {
+          const wb = el('button', { class: 'sl-write', type: 'button', html: svg('edit') + '<span>Scrie</span>' });
+          wb.addEventListener('pointerdown', (ev) => { ev.stopPropagation(); });
+          wb.addEventListener('click', (ev) => { ev.stopPropagation(); beginEdit(e.id); });
+          box.append(wb);
+        }
       }
       ov.append(box);
     }
@@ -446,7 +453,8 @@ const Slides = (() => {
     const p = slidePoint(e);
     if (drag.type === 'move') {
       let dx = p.x - drag.start.x, dy = p.y - drag.start.y;
-      if (!drag.moved && Math.hypot(dx, dy) * k < 3) return;
+      // a finger always wobbles a little: a tap is not a move
+      if (!drag.moved && Math.hypot(dx, dy) * k < (e.pointerType === 'touch' ? 12 : 3)) return;
       if (!drag.moved) { snapshot(); drag.moved = true; }
       if (e.shiftKey) { if (Math.abs(dx) > Math.abs(dy)) dy = 0; else dx = 0; }
       const sn = e.altKey ? { dx, dy, guides: [] } : snapMove(dx, dy);
@@ -486,13 +494,21 @@ const Slides = (() => {
     }
   }
 
-  function onStageUp() {
+  let lastTap = null;
+  function onStageUp(e) {
     if (!drag) return;
     const d = drag;
     drag = null;
     if (d.type === 'move' || d.type === 'resize') {
       if (d.moved) { markDirty(); renderThumb(cur); drawSelection(); }
-      else if (d.type === 'move' && d.clickId && selIds.length === 1 && d.wasSelected) beginEdit(d.clickId, d.ev);
+      else if (d.type === 'move' && d.clickId && selIds.length === 1) {
+        // second tap on the selected box, or a quick double tap (phones have no double click): edit
+        const now = Date.now();
+        const twice = lastTap && lastTap.id === d.clickId && now - lastTap.t < 450;
+        lastTap = { id: d.clickId, t: now };
+        const it = findEl(d.clickId);
+        if (d.wasSelected || (twice && it && it.type !== 'image')) { lastTap = null; beginEdit(d.clickId, d.ev); }
+      }
     }
     if (d.type === 'marquee') { drawSelection(); refreshTools(); }
   }
@@ -1712,10 +1728,11 @@ ${CSS}
       const p = deck ? elAt(slidePoint(e)) : null;
       const was = p && selIds.length === 1 && selIds[0] === p.id;
       onStageDown(e);
-      if (drag && drag.type === 'move') { drag.wasSelected = was && (p.type === 'text' || p.type === 'shape'); drag.ev = { clientX: e.clientX, clientY: e.clientY }; }
+      if (drag && drag.type === 'move') { drag.wasSelected = was && (p.type === 'text' || p.type === 'shape' || p.type === 'table'); drag.ev = { clientX: e.clientX, clientY: e.clientY }; }
     });
     stage.addEventListener('pointermove', onStageMove);
     stage.addEventListener('pointerup', onStageUp);
+    stage.addEventListener('pointercancel', () => { drag = null; });
     stage.addEventListener('dblclick', onStageDbl);
     stage.addEventListener('contextmenu', (e) => {
       e.preventDefault();

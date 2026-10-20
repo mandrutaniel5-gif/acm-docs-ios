@@ -19,8 +19,6 @@ files:
   - app/vendor/xlsx.js
   - app/vendor/pptx.js
   - "!app/css/fonts-android.css"
-  - "!node_modules/tesseract.js-core/tesseract-core.*"
-  - "!node_modules/tesseract.js-core/tesseract-core-simd.*"
   - "!node_modules/tesseract.js-core/*.wasm.js"
   - "!node_modules/**/{README.md,CHANGELOG.md,*.d.ts,*.d.cts,*.map,docs,examples,test,tests,*.md}"
   - "!node_modules/docx/dist/{charts,math,shapes,watermarks}.*"

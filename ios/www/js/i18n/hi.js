@@ -1458,5 +1458,6 @@
 "ACM Docs blocat":"ACM Docs लॉक है",
 "ex. Renovare baie":"जैसे बाथरूम का नवीनीकरण",
 "ex. Atelierul lui Ion":"जैसे शर्मा वर्कशॉप",
-"Se aduce din cloud…":"क्लाउड से लाया जा रहा है…"
+"Se aduce din cloud…":"क्लाउड से लाया जा रहा है…",
+"Scrie":"लिखें"
 };

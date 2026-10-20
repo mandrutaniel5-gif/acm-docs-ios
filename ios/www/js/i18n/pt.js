@@ -1458,5 +1458,6 @@
 "ACM Docs blocat":"ACM Docs bloqueado",
 "ex. Renovare baie":"ex. Remodelação da casa de banho",
 "ex. Atelierul lui Ion":"ex. Oficina Silva",
-"Se aduce din cloud…":"A obter da nuvem…"
+"Se aduce din cloud…":"A obter da nuvem…",
+"Scrie":"Escrever"
 };

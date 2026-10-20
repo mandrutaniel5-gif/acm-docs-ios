@@ -1507,5 +1507,6 @@ window.I18N_EN = {"ACM Docs":"ACM Docs",
 "ACM Docs blocat":"ACM Docs locked",
 "ex. Renovare baie":"e.g. Bathroom renovation",
 "ex. Atelierul lui Ion":"e.g. John's Workshop",
-"Se aduce din cloud…":"Fetching from the cloud…"
+"Se aduce din cloud…":"Fetching from the cloud…",
+"Scrie":"Write"
 };

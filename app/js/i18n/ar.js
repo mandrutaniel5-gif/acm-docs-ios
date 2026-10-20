@@ -1458,5 +1458,6 @@
 "ACM Docs blocat":"ACM Docs مقفل",
 "ex. Renovare baie":"مثال: تجديد الحمّام",
 "ex. Atelierul lui Ion":"مثال: ورشة أحمد",
-"Se aduce din cloud…":"جارٍ الجلب من السحابة…"
+"Se aduce din cloud…":"جارٍ الجلب من السحابة…",
+"Scrie":"اكتب"
 };

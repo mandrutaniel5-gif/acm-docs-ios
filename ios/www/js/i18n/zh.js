@@ -1458,5 +1458,6 @@
 "ACM Docs blocat":"ACM Docs 已锁定",
 "ex. Renovare baie":"例如：浴室翻新",
 "ex. Atelierul lui Ion":"例如：王师傅工作室",
-"Se aduce din cloud…":"正在从云端获取…"
+"Se aduce din cloud…":"正在从云端获取…",
+"Scrie":"输入文字"
 };

@@ -170,3 +170,13 @@
   .sl-drop { display: none; }
   .thpop { grid-template-columns: repeat(3, 88px); }
 }
+
+/* phone: tool options (colors, size) in a row just above the tools */
+#style-controls.mob { order: 9; display: flex; justify-content: safe center; gap: 2px; padding: 6px 10px; margin: 0; border: 0; border-top: .5px solid var(--line); background: var(--bar); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); overflow-x: auto; scrollbar-width: none; }
+#style-controls.mob::-webkit-scrollbar { height: 0; }
+#style-controls.mob:empty { display: none; }
+#style-controls.mob .dot { width: 32px; height: 32px; }
+#style-controls.mob .dot i { width: 22px; height: 22px; }
+#style-controls.mob .stepper { flex: none; }
+.selbox .sl-write { position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%); pointer-events: auto; display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 18px; background: #007aff; color: #fff; font: 600 14px/1 var(--font, system-ui); box-shadow: 0 4px 14px rgba(0, 0, 0, .2); white-space: nowrap; z-index: 3; }
+.selbox .sl-write svg { width: 16px; height: 16px; fill: currentColor; }

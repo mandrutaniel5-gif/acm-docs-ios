@@ -1458,5 +1458,6 @@
 "ACM Docs blocat":"ACM Docs zárolva",
 "ex. Renovare baie":"pl. Fürdőszoba-felújítás",
 "ex. Atelierul lui Ion":"pl. Kovács Műhely",
-"Se aduce din cloud…":"Letöltés a felhőből…"
+"Se aduce din cloud…":"Letöltés a felhőből…",
+"Scrie":"Írás"
 };

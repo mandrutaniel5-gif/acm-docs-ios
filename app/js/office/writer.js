@@ -172,6 +172,51 @@ const Writer = (() => {
     refreshTools();
   }
 
+  // ---------------------------------------------------------------- marker (highlight)
+  const isMark = (n) => n && n.nodeType === 1 && n.style && n.style.backgroundColor
+    && !/^(transparent|initial|inherit|rgba\(0, 0, 0, 0\))$/.test(n.style.backgroundColor) && /^inline/.test(getComputedStyle(n).display);
+  /** The outermost highlighted piece of text around node (or null). */
+  function markAround(n) {
+    let out = null;
+    for (; n && n !== page(); n = n.parentNode) if (isMark(n)) out = n;
+    return out;
+  }
+  /** Splits the highlighted piece around (node, offset) in two; returns the gap (a text node) or null. */
+  function splitMark(node, offset) {
+    const hl = markAround(node);
+    if (!hl) return null;
+    const tailR = document.createRange();
+    tailR.setStart(node, offset); tailR.setEndAfter(hl);
+    const tail = tailR.extractContents();
+    const gap = document.createTextNode('\u200b');
+    hl.after(gap);
+    if (tail.textContent.replace(/\u200b/g, '')) gap.after(tail);
+    if (!hl.textContent.replace(/\u200b/g, '')) hl.remove();
+    return gap;
+  }
+  /** "No color" for the marker: the selected text (or what is typed next) is not highlighted any more. */
+  function unmark() {
+    restoreFocus();
+    snapshot();
+    const sel = window.getSelection();
+    if (!sel.rangeCount || !inPage(sel.anchorNode)) return;
+    const r = sel.getRangeAt(0);
+    if (r.collapsed) {
+      const gap = splitMark(r.startContainer, r.startOffset);
+      if (gap) { const nr = document.createRange(); nr.setStart(gap, 1); nr.collapse(true); sel.removeAllRanges(); sel.addRange(nr); }
+    } else {
+      const frag = r.extractContents();
+      frag.querySelectorAll('*').forEach((x) => { if (x.style) x.style.backgroundColor = ''; });
+      const first = frag.firstChild, last = frag.lastChild;
+      const gap = splitMark(r.startContainer, r.startOffset);
+      if (gap) gap.after(frag); else r.insertNode(frag);
+      if (first && last) { const nr = document.createRange(); nr.setStartBefore(first); nr.setEndAfter(last); sel.removeAllRanges(); sel.addRange(nr); }
+    }
+    tools.hlOn = null;
+    changed();
+    refreshTools();
+  }
+
   function restoreFocus() {
     if (document.activeElement !== page()) { page().focus(); restoreSel(); }
   }
@@ -452,7 +497,7 @@ const Writer = (() => {
     tools.u = T('underline', 'Subliniat (Ctrl+U)', () => cmd('underline'));
     tools.s = T('strike', 'Tăiat', () => cmd('strikeThrough'));
     tools.fc = Office.colorBtn('fontcolor', 'Culoarea textului', () => tools.fcVal || '#c00000', (c) => { tools.fcVal = c || '#000000'; cmd('foreColor', c || '#000000'); }, true);
-    tools.hl = Office.colorBtn('marker', 'Evidențiere (marker)', () => tools.hlVal || '#ffff00', (c) => { tools.hlVal = c || '#ffff00'; cmd('hiliteColor', c || 'transparent'); }, true);
+    tools.hl = Office.colorBtn('marker', 'Evidențiere (marker)', () => tools.hlOn || tools.hlVal || '#ffff00', (c) => { if (c) { tools.hlVal = c; cmd('hiliteColor', c); } else unmark(); }, true);
     for (const b of [tools.fc, tools.hl]) b.addEventListener('mousedown', saveSel);
     tools.al = T('alignleft', 'Aliniază la stânga', () => cmd('justifyLeft'));
     tools.ac = T('aligncenter', 'Centrează', () => cmd('justifyCenter'));
@@ -503,6 +548,11 @@ const Writer = (() => {
     tools.ul.classList.toggle('on', q('insertUnorderedList'));
     tools.ol.classList.toggle('on', q('insertOrderedList'));
     let n = s.anchorNode.nodeType === 3 ? s.anchorNode.parentNode : s.anchorNode;
+    // the marker shows when the text here is highlighted (and with which color)
+    const mk = markAround(n);
+    tools.hlOn = mk ? mk.style.backgroundColor : null;
+    tools.hl.classList.toggle('on', !!mk);
+    if (tools.hl.repaint) tools.hl.repaint();
     const cs = getComputedStyle(n);
     const al = cs.textAlign;
     tools.al.classList.toggle('on', al === 'left' || al === 'start');

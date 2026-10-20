@@ -1458,5 +1458,6 @@
 "ACM Docs blocat":"ACM Docs gesperrt",
 "ex. Renovare baie":"z. B. Badsanierung",
 "ex. Atelierul lui Ion":"z. B. Werkstatt Müller",
-"Se aduce din cloud…":"Wird aus der Cloud geholt…"
+"Se aduce din cloud…":"Wird aus der Cloud geholt…",
+"Scrie":"Schreiben"
 };

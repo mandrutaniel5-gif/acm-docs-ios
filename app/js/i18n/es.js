@@ -1458,5 +1458,6 @@
 "ACM Docs blocat":"ACM Docs bloqueado",
 "ex. Renovare baie":"p. ej. Reforma del baño",
 "ex. Atelierul lui Ion":"p. ej. Taller García",
-"Se aduce din cloud…":"Trayendo desde la nube…"
+"Se aduce din cloud…":"Trayendo desde la nube…",
+"Scrie":"Escribir"
 };
