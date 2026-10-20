@@ -1459,5 +1459,7 @@
 "ex. Renovare baie":"例：浴室リフォーム",
 "ex. Atelierul lui Ion":"例：山田工房",
 "Se aduce din cloud…":"クラウドから取得しています…",
-"Scrie":"入力"
+"Scrie":"入力",
+"Pornește verificarea în doi pași":"2 段階認証をオンにする",
+"Așa, parola singură nu mai ajunge nimănui":"パスワードだけでは誰もサインインできなくなります"
 };

@@ -1459,5 +1459,7 @@
 "ex. Renovare baie":"p. ej. Reforma del baño",
 "ex. Atelierul lui Ion":"p. ej. Taller García",
 "Se aduce din cloud…":"Trayendo desde la nube…",
-"Scrie":"Escribir"
+"Scrie":"Escribir",
+"Pornește verificarea în doi pași":"Activa la verificación en dos pasos",
+"Așa, parola singură nu mai ajunge nimănui":"Así la contraseña sola no le sirve a nadie"
 };

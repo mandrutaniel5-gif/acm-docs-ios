@@ -1459,5 +1459,7 @@
 "ex. Renovare baie":"ör. Banyo yenileme",
 "ex. Atelierul lui Ion":"ör. Yılmaz Atölyesi",
 "Se aduce din cloud…":"Buluttan getiriliyor…",
-"Scrie":"Yaz"
+"Scrie":"Yaz",
+"Pornește verificarea în doi pași":"İki adımlı doğrulamayı açın",
+"Așa, parola singură nu mai ajunge nimănui":"Böylece tek başına parola kimsenin işine yaramaz"
 };

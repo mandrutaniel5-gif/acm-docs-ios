@@ -1459,5 +1459,7 @@
 "ex. Renovare baie":"जैसे बाथरूम का नवीनीकरण",
 "ex. Atelierul lui Ion":"जैसे शर्मा वर्कशॉप",
 "Se aduce din cloud…":"क्लाउड से लाया जा रहा है…",
-"Scrie":"लिखें"
+"Scrie":"लिखें",
+"Pornește verificarea în doi pași":"दो-चरणीय सत्यापन चालू करें",
+"Așa, parola singură nu mai ajunge nimănui":"ताकि अकेला पासवर्ड किसी के काम न आए"
 };

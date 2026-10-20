@@ -1459,5 +1459,7 @@
 "ex. Renovare baie":"ex. Rénovation salle de bain",
 "ex. Atelierul lui Ion":"ex. Atelier Martin",
 "Se aduce din cloud…":"Récupération depuis le cloud…",
-"Scrie":"Écrire"
+"Scrie":"Écrire",
+"Pornește verificarea în doi pași":"Activer la validation en deux étapes",
+"Așa, parola singură nu mai ajunge nimănui":"Ainsi, le mot de passe seul ne suffit à personne"
 };

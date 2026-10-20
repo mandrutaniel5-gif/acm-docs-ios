@@ -1459,5 +1459,7 @@
 "ex. Renovare baie":"напр. Ремонт ванної",
 "ex. Atelierul lui Ion":"напр. Майстерня Петренка",
 "Se aduce din cloud…":"Завантаження з хмари…",
-"Scrie":"Писати"
+"Scrie":"Писати",
+"Pornește verificarea în doi pași":"Увімкніть двоетапну перевірку",
+"Așa, parola singură nu mai ajunge nimănui":"Тоді самого пароля нікому не вистачить"
 };

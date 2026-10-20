@@ -1459,5 +1459,7 @@
 "ex. Renovare baie":"pl. Fürdőszoba-felújítás",
 "ex. Atelierul lui Ion":"pl. Kovács Műhely",
 "Se aduce din cloud…":"Letöltés a felhőből…",
-"Scrie":"Írás"
+"Scrie":"Írás",
+"Pornește verificarea în doi pași":"Kapcsold be a kétlépéses azonosítást",
+"Așa, parola singură nu mai ajunge nimănui":"Így a jelszó önmagában senkinek sem elég"
 };

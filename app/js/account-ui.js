@@ -550,9 +550,21 @@ const AccountUI = (() => {
     const old = document.getElementById('acct-banner');
     if (old) old.remove();
     const u = Account.current();
-    if (!u || Account.needsVerification() || Account.wordsSaved()) return;
+    if (!u || Account.needsVerification()) return;
     const quick = document.getElementById('quick');
     if (!quick) return;
+    if (Account.wordsSaved()) {
+      // next step for an account that signs in with a password: the password alone should not be enough
+      if (!Account.isPasswordUser() || Account.twoStep()) return;
+      const b2 = el('button', { id: 'acct-banner', class: 'acct-banner', type: 'button' }, [
+        el('span', { class: 'ab-i', html: svg('shield') }),
+        el('span', { class: 'ab-t' }, [el('b', { text: 'Pornește verificarea în doi pași' }), el('small', { text: 'Așa, parola singură nu mai ajunge nimănui' })]),
+        el('span', { class: 'chev', html: svg('right') }),
+      ]);
+      b2.addEventListener('click', async () => { await twoStepFlow(); banner(); });
+      quick.before(b2);
+      return;
+    }
     const b = el('button', { id: 'acct-banner', class: 'acct-banner', type: 'button' }, [
       el('span', { class: 'ab-i', html: svg('key') }),
       el('span', { class: 'ab-t' }, [el('b', { text: 'Notează codul de recuperare' }), el('small', { text: 'Îți trebuie dacă pierzi acest dispozitiv' })]),

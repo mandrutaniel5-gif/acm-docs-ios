@@ -1459,5 +1459,7 @@
 "ex. Renovare baie":"np. Remont łazienki",
 "ex. Atelierul lui Ion":"np. Warsztat Kowalski",
 "Se aduce din cloud…":"Pobieranie z chmury…",
-"Scrie":"Pisz"
+"Scrie":"Pisz",
+"Pornește verificarea în doi pași":"Włącz weryfikację dwuetapową",
+"Așa, parola singură nu mai ajunge nimănui":"Wtedy samo hasło nikomu nie wystarczy"
 };

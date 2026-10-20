@@ -1459,5 +1459,7 @@
 "ex. Renovare baie":"例如：浴室翻新",
 "ex. Atelierul lui Ion":"例如：王师傅工作室",
 "Se aduce din cloud…":"正在从云端获取…",
-"Scrie":"输入文字"
+"Scrie":"输入文字",
+"Pornește verificarea în doi pași":"开启两步验证",
+"Așa, parola singură nu mai ajunge nimănui":"这样仅凭密码谁也登录不了"
 };

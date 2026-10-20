@@ -1459,5 +1459,7 @@
 "ex. Renovare baie":"es. Ristrutturazione bagno",
 "ex. Atelierul lui Ion":"es. Officina Rossi",
 "Se aduce din cloud…":"Recupero dal cloud…",
-"Scrie":"Scrivi"
+"Scrie":"Scrivi",
+"Pornește verificarea în doi pași":"Attiva la verifica in due passaggi",
+"Așa, parola singură nu mai ajunge nimănui":"Così la sola password non basta a nessuno"
 };

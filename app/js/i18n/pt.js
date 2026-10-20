@@ -1459,5 +1459,7 @@
 "ex. Renovare baie":"ex. Remodelação da casa de banho",
 "ex. Atelierul lui Ion":"ex. Oficina Silva",
 "Se aduce din cloud…":"A obter da nuvem…",
-"Scrie":"Escrever"
+"Scrie":"Escrever",
+"Pornește verificarea în doi pași":"Ativa a verificação em dois passos",
+"Așa, parola singură nu mai ajunge nimănui":"Assim a palavra-passe sozinha não serve a ninguém"
 };

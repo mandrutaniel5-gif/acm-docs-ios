@@ -1,0 +1,70 @@
+{
+"keys": [
+"Pornește verificarea în doi pași",
+"Așa, parola singură nu mai ajunge nimănui"
+],
+"en": [
+"Turn on two-step verification",
+"So the password alone is no use to anyone"
+],
+"de": [
+"Zwei-Schritt-Bestätigung einschalten",
+"Damit das Passwort allein niemandem mehr nützt"
+],
+"fr": [
+"Activer la validation en deux étapes",
+"Ainsi, le mot de passe seul ne suffit à personne"
+],
+"es": [
+"Activa la verificación en dos pasos",
+"Así la contraseña sola no le sirve a nadie"
+],
+"it": [
+"Attiva la verifica in due passaggi",
+"Così la sola password non basta a nessuno"
+],
+"pt": [
+"Ativa a verificação em dois passos",
+"Assim a palavra-passe sozinha não serve a ninguém"
+],
+"hu": [
+"Kapcsold be a kétlépéses azonosítást",
+"Így a jelszó önmagában senkinek sem elég"
+],
+"pl": [
+"Włącz weryfikację dwuetapową",
+"Wtedy samo hasło nikomu nie wystarczy"
+],
+"uk": [
+"Увімкніть двоетапну перевірку",
+"Тоді самого пароля нікому не вистачить"
+],
+"ru": [
+"Включите двухэтапную проверку",
+"Тогда одного пароля никому не хватит"
+],
+"tr": [
+"İki adımlı doğrulamayı açın",
+"Böylece tek başına parola kimsenin işine yaramaz"
+],
+"ar": [
+"فعّل التحقق بخطوتين",
+"حتى لا تكفي كلمة المرور وحدها أي أحد"
+],
+"hi": [
+"दो-चरणीय सत्यापन चालू करें",
+"ताकि अकेला पासवर्ड किसी के काम न आए"
+],
+"zh": [
+"开启两步验证",
+"这样仅凭密码谁也登录不了"
+],
+"ja": [
+"2 段階認証をオンにする",
+"パスワードだけでは誰もサインインできなくなります"
+],
+"ko": [
+"2단계 인증 켜기",
+"비밀번호만으로는 누구도 로그인할 수 없게 됩니다"
+]
+}

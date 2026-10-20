@@ -1459,5 +1459,7 @@
 "ex. Renovare baie":"예: 욕실 리모델링",
 "ex. Atelierul lui Ion":"예: 김씨 공방",
 "Se aduce din cloud…":"클라우드에서 가져오는 중…",
-"Scrie":"입력"
+"Scrie":"입력",
+"Pornește verificarea în doi pași":"2단계 인증 켜기",
+"Așa, parola singură nu mai ajunge nimănui":"비밀번호만으로는 누구도 로그인할 수 없게 됩니다"
 };

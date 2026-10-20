@@ -1508,5 +1508,7 @@ window.I18N_EN = {"ACM Docs":"ACM Docs",
 "ex. Renovare baie":"e.g. Bathroom renovation",
 "ex. Atelierul lui Ion":"e.g. John's Workshop",
 "Se aduce din cloud…":"Fetching from the cloud…",
-"Scrie":"Write"
+"Scrie":"Write",
+"Pornește verificarea în doi pași":"Turn on two-step verification",
+"Așa, parola singură nu mai ajunge nimănui":"So the password alone is no use to anyone"
 };

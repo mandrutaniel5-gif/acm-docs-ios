@@ -1459,5 +1459,7 @@
 "ex. Renovare baie":"z. B. Badsanierung",
 "ex. Atelierul lui Ion":"z. B. Werkstatt Müller",
 "Se aduce din cloud…":"Wird aus der Cloud geholt…",
-"Scrie":"Schreiben"
+"Scrie":"Schreiben",
+"Pornește verificarea în doi pași":"Zwei-Schritt-Bestätigung einschalten",
+"Așa, parola singură nu mai ajunge nimănui":"Damit das Passwort allein niemandem mehr nützt"
 };

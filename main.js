@@ -99,8 +99,18 @@ if (!single) {
     }
     // only what the app uses: the camera (scanning) and the clipboard; nothing else is ever granted
     const allowed = new Set(['media', 'clipboard-read', 'clipboard-sanitized-write', 'fullscreen']);
-    session.defaultSession.setPermissionRequestHandler((_wc, perm, cb) => cb(allowed.has(perm)));
-    session.defaultSession.setPermissionCheckHandler((_wc, perm) => allowed.has(perm));
+    // the camera only for the app's own page, and never the microphone
+    const own = (wc) => !!win && wc === win.webContents;
+    session.defaultSession.setPermissionRequestHandler((wc, perm, cb, details) => {
+      if (!own(wc) || !allowed.has(perm)) return cb(false);
+      if (perm === 'media') { const t = (details && details.mediaTypes) || []; return cb(t.length > 0 && t.every((x) => x === 'video')); }
+      cb(true);
+    });
+    session.defaultSession.setPermissionCheckHandler((wc, perm, _origin, details) => {
+      if (!own(wc) || !allowed.has(perm)) return false;
+      if (perm === 'media' && details && details.mediaType && details.mediaType !== 'video') return false;
+      return true;
+    });
   });
 
   app.on('window-all-closed', () => app.quit());
