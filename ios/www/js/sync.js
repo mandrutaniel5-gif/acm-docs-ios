@@ -200,7 +200,8 @@ const Sync = (() => {
     }
     // documents first, so placeholders in other values can be turned back into local paths
     let changedKV = [];
-    for (const p of recs.filter((x) => x.kind === 'file')) await applyFile(s, p);
+    // one document that cannot be written never stops the others (or the rest of the data)
+    for (const p of recs.filter((x) => x.kind === 'file')) { try { await applyFile(s, p); } catch (e) { console.warn('sync file', e); } }
     for (const p of recs.filter((x) => x.kind === 'kv')) {
       // only the data that is meant to travel between devices: never device settings, keys or state
       if (typeof p.k !== 'string' || !sharedKeys().includes(p.k)) continue;
@@ -220,7 +221,9 @@ const Sync = (() => {
   }
   async function applyFile(s, p) {
     if (!HEX32.test(String(p.fk))) return;
-    const local = Object.entries(s.files).find(([, r]) => r.fk === p.fk);
+    let local = Object.entries(s.files).find(([, r]) => r.fk === p.fk);
+    // a path from an older install (other app folder) that can no longer be written: start fresh
+    if (local && !Host.exists(local[0]) && !Host.mkdirp(Host.dirName(local[0]))) { delete s.files[local[0]]; local = null; }
     if (p.del) {
       if (local) { delete s.files[local[0]]; try { App.forgetPath && App.forgetPath(local[0]); } catch (e) {} }
       return;

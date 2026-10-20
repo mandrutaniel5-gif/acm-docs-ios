@@ -54,6 +54,30 @@ const Host = (() => {
   }
   const info = AB ? JSON.parse(AB.info()) : {};
 
+  // iPhone: every app update (or reinstall) gets a new container folder
+  // (/var/mobile/Containers/Data/Application/<new id>/Documents). Paths saved by the previous version
+  // point into the old folder, so documents seemed to vanish and the cloud sync could not write.
+  // The files themselves moved along: saved paths are pointed at the current folder.
+  (function relocateIosPaths() {
+    if (!(AB && info.platform === 'ios' && info.docs)) return;
+    const m = /\/Containers\/Data\/Application\/([0-9A-Fa-f-]{36})\//.exec(info.docs);
+    if (!m) return;
+    const cur = m[1];
+    const re = /(\/Containers\/Data\/Application\/)([0-9A-Fa-f-]{36})(\/)/g;
+    const fix = (v) => v.replace(re, (all, a, id, b) => (id === cur ? all : a + cur + b));
+    try {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i));
+      for (const k of keys) {
+        const v = localStorage.getItem(k);
+        const nk = k.indexOf('/Containers/Data/Application/') >= 0 ? fix(k) : k;
+        const nv = v && v.indexOf('/Containers/Data/Application/') >= 0 ? fix(v) : v;
+        if (nk !== k) { localStorage.removeItem(k); localStorage.setItem(nk, nv); }
+        else if (nv !== v) localStorage.setItem(k, nv);
+      }
+    } catch (e) { console.warn('relocate', e); }
+  })();
+
   // ---------------------------------------------------------------- paths
   function baseName(p) {
     return pathMod ? pathMod.basename(p) : String(p).split(/[\\/]/).pop();
