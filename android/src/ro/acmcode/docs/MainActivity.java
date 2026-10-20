@@ -854,6 +854,15 @@ public class MainActivity extends Activity {
 
     // ------------------------------------------------------------------ the app's own pages
 
+    /** Major version of the system WebView (Chrome), 0 when unknown (old Android). */
+    int webViewMajor() {
+        try {
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("Chrome/(\\d+)").matcher(WebSettings.getDefaultUserAgent(this));
+            if (m.find()) return Integer.parseInt(m.group(1));
+        } catch (Exception e) { /* unknown */ }
+        return 0;
+    }
+
     class Client extends WebViewClient {
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest req) {
@@ -874,6 +883,12 @@ public class MainActivity extends Activity {
             }
             try {
                 InputStream in = getAssets().open("www" + Uri.decode(path));
+                // a WebView older than Chrome 97 does not know 'wasm-unsafe-eval' (needed by the PDF
+                // and text-recognition engines): only there the page keeps the older, wider permission
+                if ("/index.html".equals(path) && webViewMajor() < 97) {
+                    String html = new String(readAll(in), "UTF-8").replace("script-src 'self' acm: 'wasm-unsafe-eval'", "script-src 'self' acm: 'unsafe-eval' 'wasm-unsafe-eval'");
+                    in = new java.io.ByteArrayInputStream(html.getBytes("UTF-8"));
+                }
                 Map<String, String> headers = new HashMap<String, String>();
                 headers.put("Access-Control-Allow-Origin", "*");
                 headers.put("Cache-Control", "no-cache");

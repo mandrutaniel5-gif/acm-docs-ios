@@ -145,6 +145,14 @@ final class SchemeHandler: NSObject, WKURLSchemeHandler {
         // never leave the web app folder
         guard url.standardizedFileURL.path.hasPrefix(Files.www.standardizedFileURL.path),
               let data = FileManager.default.contents(atPath: url.path) else { return nil }
+        // iOS 15 does not know 'wasm-unsafe-eval' (the PDF and text-recognition engines need it):
+        // only there the page keeps the older, wider permission. iOS 16+ gets the strict policy.
+        if rel == "/index.html" {
+            if #available(iOS 16.0, *) {} else if var html = String(data: data, encoding: .utf8) {
+                html = html.replacingOccurrences(of: "script-src 'self' acm: 'wasm-unsafe-eval'", with: "script-src 'self' acm: 'unsafe-eval' 'wasm-unsafe-eval'")
+                return (Data(html.utf8), Files.mime(url.lastPathComponent))
+            }
+        }
         return (data, Files.mime(url.lastPathComponent))
     }
 }
