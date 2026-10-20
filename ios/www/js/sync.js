@@ -251,6 +251,50 @@ const Sync = (() => {
     try { App.rememberFile(path, p.fileKind || 'original', /\.pdf$/i.test(path) ? bytes : null); } catch (e) {}
   }
 
+  /**
+   * A synced document whose file is gone from this device (moved app folder, reinstall, deleted
+   * outside the app): brought back from the cloud under the documents folder. Returns the new path.
+   */
+  async function restoreFile(s, path) {
+    const rec = s.files[path];
+    if (!rec || !HEX32.test(String(rec.blob))) return null;
+    const root = await docsRoot();
+    const parts = safeParts(null, Host.baseName(path));
+    if (!root || !parts) return null;
+    let np = Host.join(root, ...parts);
+    const bytes = await downloadBlob(rec.blob);
+    Host.mkdirp(Host.dirName(np));
+    if (Host.exists(np) && np !== path) {
+      const m = /^(.*?)(\.[^.]*)?$/.exec(Host.baseName(np));
+      let i = 2;
+      while (Host.exists(Host.join(Host.dirName(np), `${m[1]} (${i})${m[2] || ''}`))) i++;
+      np = Host.join(Host.dirName(np), `${m[1]} (${i})${m[2] || ''}`);
+    }
+    Host.writeFile(np, bytes);
+    delete s.files[path];
+    s.files[np] = Object.assign({}, rec, { mtime: Host.mtime(np) });
+    try { if (np !== path) App.forgetPath(path); App.rememberFile(np, 'original', /\.pdf$/i.test(np) ? bytes : null); } catch (e) {}
+    return np;
+  }
+  /** Opening a document that is not on this device any more: fetch it again (null if it was never synced). */
+  async function recover(path) {
+    const s = state();
+    if (s.mode !== 'cloud' || !uid() || !s.files[path]) return null;
+    await vaultKey();
+    const np = await restoreFile(s, path);
+    saveState(s);
+    return np;
+  }
+  async function repairMissing(s) {
+    let n = 0;
+    for (const path of Object.keys(s.files)) {
+      if (n >= 20) break;
+      if (Host.exists(path)) continue;
+      n++;
+      try { await restoreFile(s, path); } catch (e) { console.warn('sync restore', e); }
+    }
+  }
+
   // ---------------------------------------------------------------- one sync round
   async function run(what) {
     if (busy) return busy;
@@ -271,6 +315,9 @@ const Sync = (() => {
           }
           saveState(s);
           if (changed.length) afterPull(changed);
+          // documents the account has but this device lost: back from the cloud
+          await repairMissing(s);
+          saveState(s);
         }
         noticeChangesInto(s);
         await push(s);
@@ -399,5 +446,5 @@ const Sync = (() => {
   }
   if (typeof Account !== 'undefined' && Account.onChange) Account.onChange(() => { if (!uid()) reset(); });
 
-  return { start, stop, reset, run, forget, forgetAccount, summary, show, setMode, onChange: (f) => listeners.push(f) };
+  return { start, stop, reset, run, forget, forgetAccount, summary, show, setMode, recover, onChange: (f) => listeners.push(f) };
 })();

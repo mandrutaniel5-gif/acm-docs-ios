@@ -1457,5 +1457,6 @@
 "@numele persoanei":"@kişinin adı",
 "ACM Docs blocat":"ACM Docs kilitli",
 "ex. Renovare baie":"ör. Banyo yenileme",
-"ex. Atelierul lui Ion":"ör. Yılmaz Atölyesi"
+"ex. Atelierul lui Ion":"ör. Yılmaz Atölyesi",
+"Se aduce din cloud…":"Buluttan getiriliyor…"
 };

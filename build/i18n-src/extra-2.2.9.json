@@ -1,0 +1,53 @@
+{
+"keys": [
+"Se aduce din cloud…"
+],
+"en": [
+"Fetching from the cloud…"
+],
+"de": [
+"Wird aus der Cloud geholt…"
+],
+"fr": [
+"Récupération depuis le cloud…"
+],
+"es": [
+"Trayendo desde la nube…"
+],
+"it": [
+"Recupero dal cloud…"
+],
+"pt": [
+"A obter da nuvem…"
+],
+"hu": [
+"Letöltés a felhőből…"
+],
+"pl": [
+"Pobieranie z chmury…"
+],
+"uk": [
+"Завантаження з хмари…"
+],
+"ru": [
+"Загрузка из облака…"
+],
+"tr": [
+"Buluttan getiriliyor…"
+],
+"ar": [
+"جارٍ الجلب من السحابة…"
+],
+"hi": [
+"क्लाउड से लाया जा रहा है…"
+],
+"zh": [
+"正在从云端获取…"
+],
+"ja": [
+"クラウドから取得しています…"
+],
+"ko": [
+"클라우드에서 가져오는 중…"
+]
+}

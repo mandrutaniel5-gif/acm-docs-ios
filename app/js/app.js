@@ -568,6 +568,13 @@ const App = (() => {
     try {
       bytes = given || Host.readFile(p);
     } catch (e) {
+      // a synced document missing on this device: fetched again from the cloud, then opened
+      if (!given && typeof Sync !== 'undefined') {
+        UI.busy('Se aduce din cloud…');
+        let np = null;
+        try { np = await Sync.recover(p); } catch (x) { console.warn('recover', x); } finally { UI.busy(); }
+        if (np) return openPath(np);
+      }
       UI.toast(`Nu pot citi „${name}”. Poate a fost mutat, șters sau e deschis în alt program.`, { error: true, action: { label: 'Detalii', run: () => UI.errorDetails('Nu pot citi fișierul', e) } });
       forget(p);
       return;

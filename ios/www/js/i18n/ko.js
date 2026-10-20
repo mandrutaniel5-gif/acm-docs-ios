@@ -1457,5 +1457,6 @@
 "@numele persoanei":"@상대방 이름",
 "ACM Docs blocat":"ACM Docs 잠김",
 "ex. Renovare baie":"예: 욕실 리모델링",
-"ex. Atelierul lui Ion":"예: 김씨 공방"
+"ex. Atelierul lui Ion":"예: 김씨 공방",
+"Se aduce din cloud…":"클라우드에서 가져오는 중…"
 };

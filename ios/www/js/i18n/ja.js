@@ -1457,5 +1457,6 @@
 "@numele persoanei":"@相手のユーザー名",
 "ACM Docs blocat":"ACM Docs はロックされています",
 "ex. Renovare baie":"例：浴室リフォーム",
-"ex. Atelierul lui Ion":"例：山田工房"
+"ex. Atelierul lui Ion":"例：山田工房",
+"Se aduce din cloud…":"クラウドから取得しています…"
 };
