@@ -664,12 +664,5 @@ const Chat = (() => {
     return b;
   }
 
-  /** Send an encrypted document (from the file menu) to a conversation. */
-  async function sendDocument(bytes, name) {
-    await show();
-    UI.toast(I18n.t('Alege conversația, apoi apasă agrafa pentru a trimite documentul.'), { duration: 5000 });
-    void bytes; void name;
-  }
-
-  return { start, stop, show, back, openChat, withPerson, button, unreadCount, onChange: (f) => listeners.add(f), sendDocument };
+  return { start, stop, show, back, openChat, withPerson, button, unreadCount, onChange: (f) => listeners.add(f) };
 })();
