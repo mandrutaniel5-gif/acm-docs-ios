@@ -56,7 +56,27 @@ const Invoice = (() => {
     'Curs BNR': 'NBR exchange rate', 'Total în lei': 'Total in RON', 'TVA în lei': 'VAT in RON',
     'Furnizor neplătitor de TVA (regim special de scutire, art. 310 Cod fiscal).': 'Supplier not registered for VAT (special exemption scheme, art. 310 of the Romanian Fiscal Code).',
   };
-  const DOC_LANGS = [['ro', 'Română'], ['en', 'English']];
+  const XL = () => window.INVOICE_LANGS || {};
+  // every language a document can be written in: [code, its own name]
+  const DOC_LANGS = [['ro', 'Română'], ['en', 'English'], ...Object.entries(window.INVOICE_LANGS || {}).map(([c, x]) => [c, x.name])];
+  const docLang = (data) => (data && (data.lang === 'ro' || data.lang === 'en' || XL()[data.lang]) ? data.lang : 'ro');
+  /** A Romanian word of the document in the document's language (English, then Romanian, if missing). */
+  const trDoc = (lang, s) => {
+    if (lang === 'ro') return s;
+    const x = XL()[lang];
+    if (x && x.terms[s] !== undefined) return x.terms[s];
+    return DOC_EN[s] !== undefined ? DOC_EN[s] : s;
+  };
+  const docLocale = (lang) => (lang === 'ro' ? 'ro-RO' : lang === 'en' ? 'en-GB' : (XL()[lang] && XL()[lang].loc) || 'en-GB');
+  /** The texts printed on the document: yours (Aspect) over the built-in ones of that language. */
+  function labelsFor(T, lang) {
+    if (lang === 'ro') return T.labels;
+    if (lang === 'en') return T.labelsEn;
+    T.labelsBy = T.labelsBy || {};
+    const mine = (T.labelsBy[lang] = T.labelsBy[lang] || {});
+    const base = (XL()[lang] && XL()[lang].labels) || T.labelsEn;
+    return new Proxy(mine, { get: (o, k) => (o[k] !== undefined && o[k] !== '' ? o[k] : base[k]), set: (o, k, v) => { o[k] = v; return true; } });
+  }
   const num = (s) => {
     if (typeof s === 'number') return s;
     let t = String(s || '').trim().replace(/\s/g, '');
@@ -182,7 +202,7 @@ const Invoice = (() => {
   function withDefaults(t) {
     const d = clone(DEFAULT_TPL);
     t = t || {};
-    const out = { ...d, ...t, logo: { ...d.logo, ...(t.logo || {}) }, columns: { ...d.columns, ...(t.columns || {}) }, labels: { ...d.labels, ...(t.labels || {}) }, labelsEn: { ...d.labelsEn, ...(t.labelsEn || {}) } };
+    const out = { ...d, ...t, logo: { ...d.logo, ...(t.logo || {}) }, columns: { ...d.columns, ...(t.columns || {}) }, labels: { ...d.labels, ...(t.labels || {}) }, labelsEn: { ...d.labelsEn, ...(t.labelsEn || {}) }, labelsBy: clone(t.labelsBy || {}) };
     const map = (s) => (s === 'car' ? 'extra' : s);
     const order = (Array.isArray(t.order) ? t.order.map(map) : d.order).filter((s) => d.order.includes(s));
     for (const s of d.order) if (!order.includes(s)) order.splice(Math.min(order.length, d.order.indexOf(s)), 0, s);
@@ -221,20 +241,22 @@ const Invoice = (() => {
   }
 
   function titleFor(data, T, b = biz) {
-    const en = data.lang === 'en';
-    const L = en ? T.labelsEn : T.labels;
+    const lang = docLang(data);
+    const L = labelsFor(T, lang);
     const custom = { invoice: L.titleInvoice, proforma: L.titleProforma, quote: L.titleQuote }[data.docType];
     const t = Biz.docTitle(data.docType, Biz.industry(b && b.industry));
-    return custom || (en ? DOC_EN[t] || t : t);
+    return custom || trDoc(lang, t);
   }
 
   /** The document as a web page (made into a PDF by the app). */
   function html(data = inv, T = tplDraft || tplOf(), b = biz) {
-    const en = data.lang === 'en';
-    const D = (s) => (en ? (DOC_EN[s] !== undefined ? DOC_EN[s] : s) : s);
-    const loc = en ? 'en-GB' : 'ro-RO';
+    const lang = docLang(data);
+    const en = lang !== 'ro'; // any language but Romanian: RON instead of "lei", the decimal point of the language
+    const D = (s) => trDoc(lang, s);
+    const loc = docLocale(lang);
+    const rtl = !!(XL()[lang] && XL()[lang].rtl);
     const money = (v) => (Number.isFinite(v) ? v : 0).toLocaleString(loc, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const c = b || Biz.blankProfile(), t = compute(data, b), L = en ? T.labelsEn : T.labels, A = T.color;
+    const c = b || Biz.blankProfile(), t = compute(data, b), L = labelsFor(T, lang), A = T.color;
     const I = Biz.industry(c.industry);
     const cur = en && (data.currency || 'RON') === 'RON' ? 'RON' : Biz.curSymbol(data.currency || 'RON');
     const kv = (k, v) => (v ? `<div><span>${esc(D(k))}</span> ${esc(v)}</div>` : '');
@@ -251,7 +273,7 @@ const Invoice = (() => {
     const rowHtml = (r) => {
       n++;
       const cat = I.cats.find((x) => x.id === typeOf(r));
-      return `<tr>${cols.nr ? `<td class="c">${n}</td>` : ''}<td>${esc(r.desc)}</td>${cols.um ? `<td class="c">${esc(D(r.um || (cat ? cat.um : 'buc')))}</td>` : ''}${cols.qty ? `<td class="r">${esc(en ? String(r.qtyN) : String(r.qtyN).replace('.', ','))}</td>` : ''}
+      return `<tr>${cols.nr ? `<td class="c">${n}</td>` : ''}<td>${esc(r.desc)}</td>${cols.um ? `<td class="c">${esc(D(r.um || (cat ? cat.um : 'buc')))}</td>` : ''}${cols.qty ? `<td class="r">${esc(r.qtyN.toLocaleString(loc, { maximumFractionDigits: 3 }))}</td>` : ''}
         ${cols.price ? `<td class="r">${money(r.unit)}</td>` : ''}<td class="r">${money(r.base)}</td>${t.vat ? `<td class="r">${money(r.tva)}</td>` : ''}</tr>`;
     };
     let body = '';
@@ -289,7 +311,7 @@ const Invoice = (() => {
         <tbody>${body}</tbody></table>`,
       totals: () => {
         let h = '';
-        if (T.subtotals && used.length > 1) for (const ty of used) h += `<div><span>Total ${esc(D(I.cats.find((x) => x.id === ty).group).toLowerCase())}</span><b>${money(t.groups[ty] || 0)} ${cur}</b></div>`;
+        if (T.subtotals && used.length > 1) for (const ty of used) h += `<div><span>${esc(D('Total'))} ${esc(D(I.cats.find((x) => x.id === ty).group).toLocaleLowerCase(loc))}</span><b>${money(t.groups[ty] || 0)} ${cur}</b></div>`;
         if (t.discount > 0) h += `<div><span>${esc(L.subtotal)}</span><b>${money(t.subGross)} ${cur}</b></div><div><span>${esc(L.discount)} ${esc(String(r2(t.discount * 100)).replace('.', ','))}%</span><b>−${money(t.discountValue)} ${cur}</b></div>`;
         if (t.vat) h += `<div><span>${esc(L.totalBase)}</span><b>${money(t.base)} ${cur}</b></div><div><span>${esc(L.totalVat)} ${esc(c.vatRate)}%</span><b>${money(t.tva)} ${cur}</b></div>`;
         const rate = (data.currency || 'RON') !== 'RON' ? num(data.rate) : 0;
@@ -337,7 +359,7 @@ const Invoice = (() => {
     const fontStack = `"${T.font}", ${/times|georgia|cambria/i.test(T.font) ? '"Liberation Serif", "Noto Serif", Georgia, serif' : 'Arial, "Liberation Sans", Roboto, sans-serif'}`;
     const docTitle = titleFor(data, T, b);
 
-    return `<!doctype html><html lang="${en ? 'en' : 'ro'}"><head><meta charset="utf-8"><title>${esc(docTitle)} ${esc(data.series)}-${pad(data.number)}</title><style>
+    return `<!doctype html><html lang="${lang}" dir="${rtl ? 'rtl' : 'ltr'}"><head><meta charset="utf-8"><title>${esc(docTitle)} ${esc(data.series)}-${pad(data.number)}</title><style>
 @page { size: A4; margin: 0; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: #fff; }
@@ -387,7 +409,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
   ${logo}
   <div class="co"><b>${esc(supplierName)}</b>${[c.cui && D('CUI') + ' ' + c.cui, c.regcom && D('Reg. Com.') + ' ' + c.regcom].filter(Boolean).map(esc).join(' · ')}
     ${addr ? `<br>${esc(addr)}` : ''}
-    ${c.phone || c.email ? `<br>${esc([c.phone && 'Tel. ' + c.phone, c.email].filter(Boolean).join(' · '))}` : ''}</div>
+    ${c.phone || c.email ? `<br>${esc([c.phone && D('Tel.') + ' ' + c.phone, c.email].filter(Boolean).join(' · '))}` : ''}</div>
   <div class="doc"><h1>${esc(docTitle)}</h1>
     <div>${esc(L.series)} <strong>${esc(data.series)}</strong> ${esc(L.number)} <strong>${pad(data.number)}</strong></div>
     <div>${esc(L.date)}: <strong>${dateRo(data.date)}</strong></div></div>
@@ -401,14 +423,14 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     const firstExtra = I.extra ? (data.extra || {})[I.extra.fields[0].key] || '' : '';
     const plate = (data.extra || {}).plate || (data.extra || {}).vehicle || firstExtra;
     const name = String(T.fileName || DEFAULT_TPL.fileName)
-      .replace(/\{tip\}/gi, data.lang === 'en' ? DOC_EN[Biz.docLabel(data.docType, I)] || Biz.docLabel(data.docType, I) : Biz.docLabel(data.docType, I))
+      .replace(/\{tip\}/gi, trDoc(docLang(data), Biz.docLabel(data.docType, I)))
       .replace(/\{serie\}/gi, data.series)
       .replace(/\{nr\}/gi, pad(data.number))
       .replace(/\{client\}/gi, (data.client.name || '').trim())
       .replace(/\{data\}/gi, dateRo(data.date))
       .replace(/\{masina\}|\{detalii\}/gi, String(plate || '').toUpperCase());
     const base = clean(name) || `${data.series}-${pad(data.number)}`;
-    const lbl = data.lang === 'en' ? DOC_EN[Biz.docLabel(data.docType, I)] || Biz.docLabel(data.docType, I) : Biz.docLabel(data.docType, I);
+    const lbl = trDoc(docLang(data), Biz.docLabel(data.docType, I));
     return data.docType === 'invoice' || /\{tip\}/i.test(T.fileName) ? base : `${lbl} ${base}`;
   }
 
@@ -789,7 +811,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     if (cu) cu.textContent = cur;
     $('inv-title').textContent = `${I18n.t(Biz.docLabel(inv.docType, I))} ${inv.series}-${pad(inv.number)}`;
     $('inv-subtitle').textContent = biz.name || 'Firma ta';
-    document.querySelectorAll('#pv-lang .chip, #pv-lang-top .chip').forEach((b) => b.classList.toggle('on', b.dataset.v === (inv.lang || 'ro')));
+    document.querySelectorAll('#pv-lang, #pv-lang-top').forEach((sel) => { sel.value = docLang(inv); });
     clearTimeout(previewTimer);
     previewTimer = setTimeout(renderPreview, 140);
   }
@@ -1058,6 +1080,8 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     });
     if (!target) return;
     if (Host.exists(target) && !(await UI.confirm('Fișierul există deja', `„${Host.baseName(target)}” există. Îl înlocuiesc?`, 'Înlocuiește'))) return;
+    // one document of the plan per series + number (creating it again does not count twice)
+    if (typeof Plan !== 'undefined' && !(await Plan.allow('invoices', [biz.id, inv.docType, inv.series, inv.number].join('|')))) return;
 
     UI.busy(`Se creează ${label.toLowerCase()}…`);
     try {
@@ -1127,6 +1151,15 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     parties: 'Furnizor și client', extra: ind().extra ? ind().extra.title : 'Detalii (după domeniu)', table: 'Tabelul cu produse / servicii', totals: 'Totaluri',
     notes: 'Plată, mențiuni, observații', signatures: 'Semnături', footer: 'Subsol',
   });
+  /** The document's language: a compact list (short code shown, the language's own name in the list). */
+  function langSelect(value, onPick) {
+    const sel = el('select', { class: 'in lang-sel no-tr', title: I18n.t('Limba facturii') });
+    for (const [c, n] of DOC_LANGS) sel.append(el('option', { value: c, text: `${c.toUpperCase()} · ${n}`, selected: c === value }));
+    sel.value = value;
+    sel.addEventListener('change', () => onPick(sel.value));
+    return sel;
+  }
+
   const LABEL_NAMES = [
     ['titleInvoice', 'Titlu factură (gol = FACTURĂ)'], ['titleProforma', 'Titlu proformă'], ['titleQuote', 'Titlu ofertă'],
     ['series', 'Seria'], ['number', 'Număr'], ['date', 'Data emiterii'], ['due', 'Scadență'], ['valid', 'Valabilă până la'],
@@ -1328,8 +1361,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     ]));
 
     const texts = el('div', { class: 'grid' });
-    const docEn = inv && inv.lang === 'en';
-    const LBL = docEn ? T.labelsEn : T.labels;
+    const LBL = labelsFor(T, docLang(inv));
     for (const [k, name] of LABEL_NAMES) {
       const i = el('input', { class: 'in', spellcheck: 'false' });
       i.value = LBL[k] || '';
@@ -1340,12 +1372,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     foot.value = T.footer;
     foot.addEventListener('input', () => { T.footer = foot.value; advChanged(); });
     texts.append(el('label', { class: 'fld-l wide' }, [el('span', { text: 'Text subsol' }), foot]));
-    const langSeg = el('div', { class: 'chips' });
-    for (const [c, n] of DOC_LANGS) {
-      const b = el('button', { class: 'chip' + ((inv && inv.lang || 'ro') === c ? ' on' : ''), type: 'button', text: n });
-      b.addEventListener('click', () => { if (inv) { inv.lang = c; saveDraft(); } advChanged(true); });
-      langSeg.append(b);
-    }
+    const langSeg = langSelect(docLang(inv), (c) => { if (inv) { inv.lang = c; saveDraft(); } advChanged(true); });
     body.append(card('Texte de pe document', [
       el('div', { class: 'adv-row' }, [el('div', { class: 'adv-l' }, [el('span', { text: 'Limba documentului' }), el('small', { text: 'Fiecare limbă are textele ei' })]), langSeg]),
       texts,
@@ -1443,21 +1470,16 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     $('inv-pv-btn').addEventListener('click', () => togglePreview(true));
     $('inv-pv-close').addEventListener('click', () => togglePreview(false));
     // language of the document, right above the preview
-    const pvl = el('div', { class: 'chips pv-lang', id: 'pv-lang' });
-    for (const [c, n] of [['ro', 'RO'], ['en', 'EN']]) {
-      const b = el('button', { class: 'chip no-tr', type: 'button', text: n, title: I18n.t(c === 'ro' ? 'Factură în română' : 'Factură în engleză') });
-      b.dataset.v = c;
-      b.addEventListener('click', () => { if (!inv || inv.lang === c) return; inv.lang = c; if (advOpen) buildAdvanced(); else buildForm(); changed(); });
-      pvl.append(b);
-    }
+    const pickLang = (c) => { if (!inv || inv.lang === c) return; inv.lang = c; if (advOpen) buildAdvanced(); else buildForm(); changed(); };
+    const pvl = langSelect('ro', pickLang);
+    pvl.id = 'pv-lang';
     const lbl = document.querySelector('#inv-preview-box .pv-label');
     lbl.insertBefore(el('span', { class: 'pv-l2', text: 'Limba facturii' }), lbl.children[1] || null);
     lbl.insertBefore(pvl, lbl.children[2] || null);
     // on the phone the same switch sits at the top of the form (the preview is a separate screen there)
     const top = el('div', { class: 'inv-lang-top phone-only', id: 'inv-lang-top' }, [el('span', { text: 'Limba facturii' })]);
-    const pvl2 = pvl.cloneNode(true);
+    const pvl2 = langSelect('ro', pickLang);
     pvl2.id = 'pv-lang-top';
-    pvl2.querySelectorAll('.chip').forEach((b) => b.addEventListener('click', () => { const c = b.dataset.v; if (!inv || inv.lang === c) return; inv.lang = c; if (advOpen) buildAdvanced(); else buildForm(); changed(); }));
     top.append(pvl2);
     $('inv-left').insertBefore(top, $('inv-left').firstChild);
     window.addEventListener('resize', () => { if (!$('invoice').classList.contains('hidden')) renderPreview(); });

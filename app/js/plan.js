@@ -13,7 +13,7 @@ Object.assign(Icons, {
 
 const Plan = (() => {
   // the server's public key for plan tokens (its private half never leaves the server)
-  const SERVER_PK = 'PLAN_PUBLIC_KEY';
+  const SERVER_PK = 'KDiTwFGQcANLwxeLXtgux6I2eKmwf4c8yo2CEOawL3o=';
   const A = () => window.__lib.acmcrypto;
   const uid = () => (typeof Account !== 'undefined' && Account.current() ? Account.current().uid : null);
   const LS = { status: (u) => 'acm.plan.' + u, token: (u) => 'acm.plan.tok.' + u, clock: 'acm.plan.clock' };

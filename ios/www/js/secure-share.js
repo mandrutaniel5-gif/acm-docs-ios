@@ -508,6 +508,7 @@ const AcmShare = (() => {
     if (!choice) return;
     let { people, password } = choice;
 
+    if (typeof Plan !== 'undefined' && !(await Plan.allow('acmSend'))) return;
     let id;
     try { id = await Account.unlock(`Confirmă criptarea documentului „${name}”`); } catch (e) { if (String(e && e.message) !== 'cancel') UI.toast(Account.say(e), { error: true }); return; }
     if (!(await Contacts.checkIntegrity(id))) {
@@ -705,6 +706,7 @@ const AcmShare = (() => {
     if (isSentPath(path) || Sent.get(path)) { try { App.rememberFile(path, 'secure'); } catch (e) {} return showSent(path); }
     try { A().inspect(bytes); } catch (e) { return UI.toast(e.message || 'Nu este un fișier .acm.', { error: true }); }
     if (!(await ensureAccount())) return;
+    if (!(await planOpen(bytes))) return;
     const res = await decryptBytes(Host.baseName(path), bytes);
     if (!res) return;
     try { await Contacts.checkIntegrity(await Account.unlock()); } catch (e) {}
@@ -755,9 +757,16 @@ const AcmShare = (() => {
   }
 
   /** "Save a decrypted copy" from the file menu: unlock, then the same warning. */
+  /** Opening an encrypted document is one action of the plan; the same file counts once a month. */
+  async function planOpen(bytes) {
+    if (typeof Plan === 'undefined') return true;
+    const h = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), (x) => x.toString(16).padStart(2, '0')).join('');
+    return Plan.allow('acmOpen', h);
+  }
   async function saveDecryptedFromFile(path) {
     if (!(await ensureAccount())) return;
     const bytes = await Host.readFileAsync(path);
+    if (!(await planOpen(bytes))) return;
     const res = await decryptBytes(Host.baseName(path), bytes);
     if (res) await saveDecrypted(res);
   }

@@ -153,6 +153,8 @@ const Office = (() => {
   const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
   async function writeFile(st, path, bytes, thumbEl) {
+    // one action of the plan per document and month (the server counts; the same file counts once)
+    if (typeof Plan !== 'undefined' && !(await Plan.allow('docs', (st.source && st.source.path) || path))) return false;
     // picture for the start screen first, while nothing covers the page
     let thumb = null;
     if (thumbEl) { await frame(); thumb = await thumbOf(thumbEl); }
@@ -191,6 +193,7 @@ const Office = (() => {
     const base = st.copyPath ? Host.baseName(st.copyPath).replace(/\.[^.]+$/, '') : st.source ? st.source.base : newBase;
     const p = await askName({ title: 'Exportă ca PDF', base, dir, ext: 'pdf' });
     if (!p) return;
+    if (typeof Plan !== 'undefined' && !(await Plan.allow('docs', (st.source && st.source.path) || st.copyPath || p))) return;
     UI.busy('Se creează PDF-ul…');
     try {
       const bytes = await Host.htmlToPdf(html, opts);

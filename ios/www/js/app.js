@@ -661,6 +661,11 @@ const App = (() => {
     const p = await Host.openDialog('pdf');
     if (p) openPath(p);
   }
+  /** Home › PDF: only PDF files in the picker. */
+  async function openPdf() {
+    const p = await Host.openDialog('pdfonly');
+    if (p) openPath(p);
+  }
 
   async function openImage() {
     const p = await Host.openDialog('image');
@@ -737,11 +742,18 @@ const App = (() => {
     return true;
   }
 
+  /** Saving an edited document is one action of the plan (the same document counts once a month). */
+  async function planOk(target) {
+    if (typeof Plan === 'undefined') return true;
+    return Plan.allow('docs', (source && source.path) || target);
+  }
+
   async function save() {
     if (!Editor.doc) return false;
     if (!(await guardProtected())) return false;
     Pages.closeEditor(true);
     const target = copyPath || (await nextCopyPath());
+    if (!(await planOk(target))) return false;
     return writeTo(target);
   }
 
@@ -753,6 +765,7 @@ const App = (() => {
     const p = await Host.saveDialog(Host.baseName(suggestion), Host.dirName(suggestion));
     if (!p) return false;
     if (source && source.path && p === source.path && !(await UI.confirm('Suprascrii originalul?', 'Ai ales chiar fișierul original. Dacă continui, originalul se pierde.', 'Suprascrie'))) return false;
+    if (!(await planOk(p))) return false;
     return writeTo(p);
   }
 
@@ -912,7 +925,7 @@ const App = (() => {
   }
 
   function wire() {
-    $('act-open').addEventListener('click', openDialog);
+    $('act-open').addEventListener('click', openPdf);
     $('act-scan').addEventListener('click', scan);
     $('act-invoice').addEventListener('click', () => Invoice.open({ type: 'invoice' }));
     $('act-doc').addEventListener('click', async () => { if (await Office.ensureSaved()) Writer.open(null); });
@@ -1088,6 +1101,8 @@ const App = (() => {
     // accounts: sign-in screen on first start, then the account's keys (does not wait for the PDF engine)
     try { if (typeof AppLock !== 'undefined') AppLock.start(); } catch (e) { console.error('lock', e); }
     try { if (typeof AccountUI !== 'undefined') AccountUI.start().catch((e) => console.error('account', e)); } catch (e) { console.error('account', e); }
+    try { if (typeof Plan !== 'undefined') Plan.start(); } catch (e) { console.error('plan', e); }
+    try { if (typeof Security !== 'undefined') Security.mountHomeTip(); } catch (e) { console.error('tip', e); }
     window.addEventListener('keydown', onKey);
     // The page itself never scrolls (only the panels inside it do).
     window.addEventListener('scroll', () => { if (window.scrollY || window.scrollX) window.scrollTo(0, 0); });

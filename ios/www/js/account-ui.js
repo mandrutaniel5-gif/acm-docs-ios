@@ -163,6 +163,13 @@ const AccountUI = (() => {
         el('h2', { text: 'Cont nou' }),
         el('p', { class: 'auth-sub', text: 'Contul îți dă chei de criptare post-cuantică, create pe acest dispozitiv. Nimeni altcineva nu le are.' }),
         form,
+        el('p', { class: 'auth-legal muted small' }, [
+          el('span', { text: 'Creând contul, accepți' }), ' ',
+          (() => { const a = el('a', { href: '#', text: 'Termenii și condițiile' }); a.addEventListener('click', (e) => { e.preventDefault(); Host.openExternal('https://acmdocs.acmandrut.com/termeni'); }); return a; })(), ' ',
+          el('span', { text: 'și' }), ' ',
+          (() => { const a = el('a', { href: '#', text: 'Politica de confidențialitate' }); a.addEventListener('click', (e) => { e.preventDefault(); Host.openExternal('https://acmdocs.acmandrut.com/confidentialitate'); }); return a; })(), '.',
+        ]),
+        typeof Security !== 'undefined' ? el('div', { class: 'acm-note ok', html: `${svg('shield')}<span>${escHtml(I18n.t(Security.nextTip()))}</span>` }) : null,
         el('div', { class: 'auth-or' }, [el('span', { text: 'sau' })]),
         el('p', { class: 'auth-switch' }, [document.createTextNode('Ai deja cont? '), el('button', { type: 'button', class: 'auth-link inline', text: 'Intră în cont', onclick: () => render('signin') })]),
       );
@@ -316,7 +323,12 @@ const AccountUI = (() => {
   /** Keys are here: this device registers / renews its device session, then watches for new sign-ins. */
   async function afterKeys() {
     if (typeof Devices === 'undefined') return;
-    try { const st = await Devices.ensure(); if (st === 'ok') { Devices.start(); if (typeof Sync !== 'undefined') Sync.start(); } }
+    try {
+      const st = await Devices.ensure();
+      if (st === 'ok') { Devices.start(); if (typeof Sync !== 'undefined') Sync.start(); if (typeof Plan !== 'undefined') Plan.refresh().catch(() => {}); }
+      // the plan's devices are all in use and this one did not take a place: not signed in here
+      if (st === 'limit') { await Account.signOut(); UI.toast(I18n.t('Contul nu a fost deschis pe acest dispozitiv.'), { duration: 6000 }); }
+    }
     catch (e) { console.warn('devices', e); }
   }
 
@@ -371,14 +383,19 @@ const AccountUI = (() => {
   // ---------------------------------------------------------------- Settings › Cont
   function settingsGroup(group, srow, chev) {
     const u = Account.current();
-    if (!u) return group('Cont', [srow('user', 'blue', 'Intră în cont sau creează unul', 'Pentru documente criptate și sincronizare în cloud', chev(), () => { Account.setSkipped(false); render('signin'); })]);
+    if (!u) return group('Cont', [
+      srow('user', 'blue', 'Intră în cont sau creează unul', 'Pentru salvare, documente criptate și cloud', chev(), () => { Account.setSkipped(false); render('signin'); }),
+      typeof Security !== 'undefined' ? srow('shield', 'green', 'Securitate și criptare', 'Cum îți protejăm datele', chev(), () => Security.show()) : null,
+    ].filter(Boolean));
     const h = Account.handle();
     const out = document.createDocumentFragment();
     const acct = [srow('user', 'blue', u.displayName || u.email, (h ? '@' + h + ' · ' : '') + 'Profil, cod QR, contacte', chev(), showProfile)];
+    if (typeof Plan !== 'undefined' && !Account.needsVerification()) acct.push(srow('star', 'orange', 'Abonament', Plan.summary(), chev(), () => Plan.show()));
     if (Account.needsVerification()) acct.push(srow('mail', 'orange', 'Confirmă emailul', 'Fără confirmare nu poți primi documente', chev(), () => render('verify')));
     out.append(group('Cont', acct));
     if (!Account.needsVerification()) {
       const sec = [];
+      if (typeof Security !== 'undefined') sec.push(srow('shield', 'green', 'Securitate și criptare', 'Cum îți protejăm datele și starea contului', chev(), () => Security.show()));
       if (typeof Sync !== 'undefined') sec.push(srow('refresh', 'teal', 'Sincronizare în cloud', Sync.summary(), chev(), () => Sync.show()));
       if (typeof Devices !== 'undefined') sec.push(srow('lock', 'indigo', 'Dispozitive', 'Vezi și administrează dispozitivele conectate', chev(), () => Devices.show()));
       if (Account.isPasswordUser()) sec.push(srow('key', Account.twoStep() ? 'green' : 'orange', 'Verificare în doi pași', Account.twoStep() ? 'Activă: la conectarea cu parola se cere și un cod' : 'Oprită: pornește-o ca parola singură să nu fie de ajuns', chev(), async () => { await twoStepFlow(); App.showView('settings'); }));
@@ -603,5 +620,5 @@ const AccountUI = (() => {
     banner();
   }
 
-  return { start, chooseLanguage, showProfile, show: (v) => render(v || 'signin'), settingsGroup, showWords, route, get view() { return view; } };
+  return { start, chooseLanguage, showProfile, show: (v) => render(v || 'signin'), settingsGroup, showWords, twoStepFlow, route, get view() { return view; } };
 })();

@@ -326,7 +326,15 @@ const Sync = (() => {
         s.counts = { files: Object.keys(s.files).length, data: Object.keys(s.kvT).length };
       } catch (e) {
         console.warn('sync', e);
-        s.err = e.status === 404 ? 'storage' : /permission/i.test(String(e.code || e.message)) ? 'permission' : 'offline';
+        s.err = e.status === 404 ? 'storage' : /permission/i.test(String(e.code || e.message)) || e.status === 403 ? 'permission' : 'offline';
+        // refused because the plan's cloud space is used up?
+        if (s.err === 'permission') {
+          try {
+            const { F: f, db } = Account.internals();
+            const c = (await f.firestore.getDoc(f.firestore.doc(db, 'accounts', uid(), 'meta', 'cloud'))).data();
+            if (c && c.used >= c.limit * 0.9) s.err = 'full';
+          } catch (x) {}
+        }
       } finally {
         saveState(s);
         busy = null;
@@ -395,6 +403,7 @@ const Sync = (() => {
     if (!uid()) return 'Necesită cont';
     if (s.mode !== 'cloud') return 'Oprită: datele stau doar pe acest dispozitiv';
     if (s.err === 'storage') return 'Stocarea în cloud nu este activată încă';
+    if (s.err === 'full') return 'Spațiul din cloud al planului este plin';
     if (s.err) return 'Nesincronizat (fără internet?)';
     if (!s.lastSync) return 'Pornește…';
     return I18n.t('Sincronizat') + ' ' + new Date(s.lastSync).toLocaleTimeString(I18n.locale(), { hour: '2-digit', minute: '2-digit' });
@@ -412,6 +421,8 @@ const Sync = (() => {
         el('p', { class: 'muted small', text: 'Firmele, facturile, clienții, semnăturile, setările, contactele și documentele tale apar la fel pe toate dispozitivele contului.' }),
         el('div', { class: 'list-card' }, [row]),
         s.mode === 'cloud' ? el('p', { class: 'muted small', text: `${(s.counts && s.counts.files) || 0} documente și ${(s.counts && s.counts.data) || 0} seturi de date sincronizate.` }) : null,
+        s.err === 'full' ? el('div', { class: 'acm-note warn', html: `${svg('cloud')}<span>${escHtml(I18n.t('Cloudul criptat al planului tău este plin. Documentele noi rămân pe acest dispozitiv până faci loc sau alegi un abonament cu mai mult spațiu.'))}</span>` }) : null,
+        s.err === 'full' && typeof Plan !== 'undefined' ? el('button', { class: 'btn', type: 'button', text: 'Vezi abonamentele', onclick: () => close('plans') }) : null,
         el('div', { class: 'acm-note ok', html: `${svg('shield')}<span>Totul se criptează pe dispozitiv înainte să plece, cu cheia contului, cu o criptare care rezistă și computerelor cuantice. Serverul păstrează doar blocuri criptate, fără nume și fără conținut lizibil. Nici ACM Docs nu le poate citi.</span>` }),
         el('div', { class: 'actions col' }, [
           s.mode === 'cloud' ? el('button', { class: 'btn primary', type: 'button', text: 'Sincronizează acum', onclick: () => close('now') }) : null,
@@ -429,6 +440,7 @@ const Sync = (() => {
       }
       return show();
     }
+    if (act === 'plans') return Plan.show();
     if (act === 'now') { UI.busy('Se sincronizează…'); try { await run('all'); } finally { UI.busy(); } return show(); }
     if (act === 'wipe') {
       if (!(await UI.confirm('Ștergi datele din cloud?', 'Se șterg din cloud toate datele criptate ale contului. Datele de pe acest dispozitiv rămân. Celelalte dispozitive care au sincronizarea pornită le vor încărca din nou.', 'Șterge'))) return show();
