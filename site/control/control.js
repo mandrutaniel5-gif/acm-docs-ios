@@ -27,6 +27,8 @@
     return n;
   }
   const clear = (n) => { while (n.firstChild) n.firstChild.remove(); return n; };
+  /** Empties the main area and puts the given nodes in it (null / false entries are skipped). */
+  const fill = (...nodes) => clear(main).append(...nodes.filter((x) => x != null && x !== false));
   const dt = (t) => (t ? new Date(t).toLocaleString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '–');
   const day = (t) => (t ? new Date(t).toLocaleDateString('ro-RO', { day: '2-digit', month: 'short', year: 'numeric' }) : '–');
   const MB = 1048576, GB = 1024 * MB;
@@ -244,9 +246,9 @@
   function show(id, arg) {
     current = id;
     nav.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.v === id));
-    clear(main).append(h('div', { class: 'sub', text: 'Se încarcă…' }));
+    fill(h('div', { class: 'sub', text: 'Se încarcă…' }));
     const run = { overview, accounts, switches, reports, promos, stripe, log }[id];
-    run(arg).catch((e) => { clear(main).append(h('div', { class: 'alert bad', text: say(e) })); });
+    run(arg).catch((e) => { fill(h('div', { class: 'alert bad', text: say(e) })); });
   }
   function head(title, sub, right) {
     return h('div', { class: 'head' }, [h('div', {}, [h('h1', { text: title }), sub ? h('div', { class: 'sub', text: sub }) : null]), right || null]);
@@ -255,7 +257,8 @@
     if (!rows.length) return h('div', { class: 'empty', text: 'Nimic de afișat.' });
     const tb = h('tbody');
     for (const r of rows) {
-      const tr = h('tr', { class: onRow ? 'click' : '' }, r.cells.map((c) => h('td', { class: c && c.cls ? c.cls : '' }, [c && c.node ? c.node : c && c.text != null ? String(c.text) : c == null ? '–' : String(c)])));
+      const cell = (c) => (c == null ? '–' : typeof c === 'object' && 'node' in c ? c.node || '' : typeof c === 'object' && 'text' in c ? String(c.text) : String(c));
+      const tr = h('tr', { class: onRow ? 'click' : '' }, r.cells.map((c) => h('td', {}, [cell(c)])));
       if (onRow) tr.addEventListener('click', (e) => { if (!e.target.closest('button')) onRow(r); });
       tb.append(tr);
     }
@@ -274,7 +277,7 @@
     const rcount = nav.querySelector('[data-v=reports]');
     rcount.querySelector('.count') && rcount.querySelector('.count').remove();
     if (o.openReports) rcount.append(h('span', { class: 'count', text: String(o.openReports) }));
-    clear(main).append(
+    fill(
       head('Prezentare', 'Starea serviciului ACM Docs acum'),
       paused ? h('div', { class: 'alert bad', text: paused }) : h('div', { class: 'alert ok', text: 'Toate funcțiile sunt pornite.' }),
       h('div', { class: 'grid' }, [
@@ -315,7 +318,7 @@
     };
     const form = h('form', { class: 'row' }, [q, h('button', { class: 'btn primary', type: 'submit', text: 'Caută' })]);
     form.addEventListener('submit', (e) => { e.preventDefault(); run(); });
-    clear(main).append(head('Conturi', 'Fără căutare: ultimele 50 de conturi create'), h('div', { class: 'card' }, [form]), h('div', { class: 'card' }, [out]));
+    fill(head('Conturi', 'Fără căutare: ultimele 50 de conturi create'), h('div', { class: 'card' }, [form]), h('div', { class: 'card' }, [out]));
     run();
   }
 
@@ -348,7 +351,7 @@
       });
       return { cells: [{ node: h('span', { class: 'mono', text: v.id.slice(0, 8) }) }, v.role === 'primary' ? 'Principal' : 'Membru', { node: pill(v.status === 'active' ? 'Activ' : v.status === 'blocked' ? 'Blocat' : 'Scos', v.status === 'active' ? 'ok' : 'bad') }, v.via || '–', day(v.created), dt(v.lastSeen), { node: h('span', { class: 'mono', text: v.ip || '–' }) }, v.agent || '–', { node: b }] };
     });
-    clear(main).append(
+    fill(
       head(u.handle ? '@' + u.handle : u.email || u.uid, u.email || '', back),
       u.disabled ? h('div', { class: 'alert bad', text: 'Cont suspendat' + (a.billing.suspended && a.billing.suspended.reason ? ': ' + a.billing.suspended.reason : '') }) : null,
       h('div', { class: 'cols' }, [
@@ -400,7 +403,7 @@
       if (stopping && !(await confirmBox('Aplici modificările?', !all.checked ? 'Tot serviciul se oprește pentru toți utilizatorii, în câteva secunde.' : 'Funcțiile oprite nu mai pot fi folosite de nimeni până le pornești din nou.', 'Aplică', true))) return;
       act(save, async () => { await call('switches.set', { off, all: !all.checked, msg: msg.value }); toast('Salvat. Se aplică în cel mult 15 secunde.'); show('switches'); });
     });
-    clear(main).append(
+    fill(
       head('Kill switches', 'Verde = pornit · Roșu = oprit. Se aplică pe server, în toate aplicațiile, în cel mult 15 secunde.'),
       s.all ? h('div', { class: 'alert bad', text: 'Mentenanță: tot serviciul este oprit.' }) : Object.keys(s.off).length ? h('div', { class: 'alert warn', text: 'Unele funcții sunt oprite.' }) : null,
       h('div', { class: 'card' }, [h('div', { class: 'sw' }, [h('div', { class: 'tx' }, [h('b', { text: 'Tot serviciul' }), h('small', { text: 'Oprit = mentenanță: nicio conectare, sesiune sau acțiune. Pentru atacuri în desfășurare.' })]), h('span', { class: 'toggle' }, [all, h('span')])])]),
@@ -414,7 +417,7 @@
     status = status || 'open';
     const rows = await call('reports', { status });
     const tabs = h('div', { class: 'tabs' }, [['open', 'Deschise'], ['resolved', 'Rezolvate'], ['dismissed', 'Respinse']].map(([k, l]) => h('button', { class: k === status ? 'on' : '', text: l, onclick: () => show('reports', k) })));
-    clear(main).append(head('Rapoarte', 'Conturi raportate de alți utilizatori', tabs), h('div', { class: 'card' }, [table(['Data', 'Cont raportat', 'Motiv', 'Detalii', 'Raportat de', ''], rows.map((r) => {
+    fill(head('Rapoarte', 'Conturi raportate de alți utilizatori', tabs), h('div', { class: 'card' }, [table(['Data', 'Cont raportat', 'Motiv', 'Detalii', 'Raportat de', ''], rows.map((r) => {
       const actions = h('span', { class: 'row' });
       if (r.status === 'open') {
         for (const [st, label] of [['resolved', 'Rezolvat'], ['dismissed', 'Respinge']]) {
@@ -434,7 +437,7 @@
   async function promos() {
     const list = await call('promos');
     const add = h('button', { class: 'btn primary', text: 'Promoție nouă', onclick: () => promoForm(null) });
-    clear(main).append(head('Promoții', 'Reduceri și perioade de probă, aplicate automat la plata abonamentelor', add),
+    fill(head('Promoții', 'Reduceri și perioade de probă, aplicate automat la plata abonamentelor', add),
       h('div', { class: 'card' }, [table(['Titlu', 'Tip', 'Planuri', 'Interval', 'Folosiri', 'Stare', ''], list.map((p) => {
         const live = p.active && (p.start || 0) <= Date.now() && (!p.end || p.end > Date.now());
         const edit = h('button', { class: 'btn small', text: 'Editează', onclick: () => promoForm(p) });
@@ -511,7 +514,7 @@
       if (!(await confirmBox('Deconectezi Stripe?', 'Cheile setate din panou se șterg și webhook-ul se elimină. Abonamentele existente rămân în Stripe, dar aplicația nu mai primește actualizări până conectezi din nou.', 'Deconectează', true))) return;
       act(clearBtn, async () => { await call('stripeClear'); show('stripe'); });
     });
-    clear(main).append(
+    fill(
       head('Stripe', 'Plățile abonamentelor'),
       h('div', { class: 'card' }, [h('h2', { text: 'Stare' }), h('dl', { class: 'kv' }, [
         h('dt', { text: 'Plăți' }), h('dd', {}, [s.active ? pill('Active', 'ok') : pill('Neconfigurate', 'bad')]),
@@ -533,7 +536,7 @@
   async function log() {
     const rows = await call('log');
     const OPS = { setPlan: 'Plan manual', suspend: 'Suspendare', blockDevice: 'Dispozitiv blocat', 'switches.set': 'Kill switches', resolveReport: 'Raport închis', savePromo: 'Promoție salvată', deletePromo: 'Promoție ștearsă', stripeSet: 'Cheie Stripe', stripeTax: 'Taxe Stripe', stripeClear: 'Stripe deconectat' };
-    clear(main).append(head('Jurnal', 'Tot ce s-a schimbat din panou (păstrat 2 ani)'), h('div', { class: 'card' }, [table(['Data', 'Acțiune', 'Țintă', 'Detalii', 'Administrator', 'IP'], rows.map((r) => ({
+    fill(head('Jurnal', 'Tot ce s-a schimbat din panou (păstrat 2 ani)'), h('div', { class: 'card' }, [table(['Data', 'Acțiune', 'Țintă', 'Detalii', 'Administrator', 'IP'], rows.map((r) => ({
       uid: r.target, cells: [dt(r.at), OPS[r.op] || r.op, r.target ? { node: h('span', { class: 'mono', text: String(r.target).slice(0, 12) }) } : '–', r.detail || '–', r.email, { node: h('span', { class: 'mono', text: r.ip || '–' }) }],
     })))]));
   }

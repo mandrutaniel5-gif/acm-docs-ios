@@ -163,7 +163,7 @@
 <header class="hero" data-l="ro">
   <h1>Politica de confidențialitate</h1>
   <p>Ce date personale prelucrăm când folosești ACM Docs, de ce, și ce drepturi ai.</p>
-  <div class="meta"><span>Versiunea 1.1</span><span>În vigoare de la 22 octombrie 2026</span><span>Ultima actualizare: 22 octombrie 2026</span></div>
+  <div class="meta"><span>Versiunea 1.2</span><span>În vigoare de la 22 octombrie 2026</span><span>Ultima actualizare: 22 octombrie 2026</span></div>
 </header>
 
 <nav class="toc" data-l="ro" aria-label="Cuprins">
@@ -236,13 +236,15 @@
     <li><strong>Profil public:</strong> @numele, numele afișat, cheia publică și amprenta ei. Acestea sunt vizibile altor utilizatori ACM Docs, ca să te poată găsi și să îți poată trimite documente criptate.</li>
     <li><strong>Verificarea în doi pași</strong>, dacă o pornești: informațiile tehnice necesare pentru verificarea codurilor.</li>
     <li><strong>Dispozitive:</strong> cheia publică a fiecărui dispozitiv, rolul lui (principal sau secundar), starea (activ sau blocat), modul în care a fost adăugat și momentul ultimei activități.</li>
-    <li><strong>Evenimente de securitate:</strong> conectări cu parola, dispozitive noi sau blocate. Pentru conectările cu parola reținem doar o descriere generală a programului (de exemplu „Chrome · Windows”), <strong>nu adresa IP</strong>.</li>
+    <li><strong>Evenimente de securitate:</strong> conectări cu parola, dispozitive noi sau blocate, cu o descriere generală a programului (de exemplu „Chrome · Windows”). Evenimentele afișate pe dispozitivele tale nu conțin adresa IP.</li>
+    <li><strong>Jurnalul conectărilor:</strong> pentru fiecare conectare cu parola, creare de cont, dispozitiv nou sau sesiune de dispozitiv dintr-o adresă nouă reținem data, tipul conectării, <strong>adresa IP</strong>, descrierea generală a programului și dispozitivul. Pentru fiecare dispozitiv reținem și ultima adresă IP folosită. Le păstrăm <strong>90 de zile</strong>, exclusiv pentru securitate: depistarea parolelor furate, a conturilor compromise, a atacurilor și a abuzurilor. Nu sunt vizibile altor utilizatori.</li>
+    <li><strong>Rapoarte:</strong> dacă raportezi un cont, reținem cine a raportat, contul raportat, motivul ales, detaliile scrise de tine și starea analizei. Contul raportat nu află cine l-a raportat. Dacă ești raportat, reținem aceleași informații despre raport.</li>
     <li><strong>Cereri de contact:</strong> faptul că un cont a adăugat alt cont, până când cererea este acceptată sau ignorată.</li>
   </ul>
   <h3>Planul și abonamentul</h3>
   <ul>
     <li><strong>Contoarele lunare</strong> ale planului: câte documente editate, scanări, facturi și documente criptate ai folosit în luna curentă. Ca același document să nu fie numărat de două ori, păstrăm o amprentă criptografică a lui (un șir de caractere din care documentul nu poate fi refăcut), <strong>nu numele și nici conținutul lui</strong>.</li>
-    <li><strong>Datele abonamentului:</strong> planul, perioada (lunar sau anual), starea abonamentului, data reînnoirii sau a încheierii și identificatorii clientului și ai abonamentului la procesatorul de plăți.</li>
+    <li><strong>Datele abonamentului:</strong> planul, perioada (lunar sau anual), starea abonamentului, data reînnoirii sau a încheierii și identificatorii clientului și ai abonamentului la procesatorul de plăți. Dacă un plan îți este acordat manual, reținem planul, durata și o notă internă. Pentru promoții (reduceri, perioade de probă) reținem dacă ai avut anterior un abonament, ca o ofertă pentru clienți noi să fie folosită o singură dată.</li>
     <li><strong>Family și Business:</strong> ce conturi fac parte din abonament și invitațiile trimise. Titularul vede doar @numele și numele afișat ale membrilor, nimic din datele lor.</li>
     <li><strong>Datele de plată</strong> (card, nume, adresa de facturare, eventual codul fiscal) sunt introduse direct pe pagina Stripe și prelucrate de Stripe. Noi nu primim datele cardului; primim doar confirmarea plății, suma și datele necesare facturării.</li>
   </ul>
@@ -252,7 +254,11 @@
   </ul>
   <h3>Date tehnice prelucrate automat</h3>
   <ul>
-    <li>Adresa IP și datele tehnice ale cererilor ajung inevitabil la servere când aplicația comunică cu ele. Le folosim temporar pentru a limita abuzurile (de exemplu, numărul de încercări de asociere a unui dispozitiv) și pentru securitate. Pentru această limitare nu păstrăm adresa IP în clar, ci doar o amprentă criptografică a ei. Furnizorul nostru de servere poate păstra jurnale tehnice pe o perioadă scurtă, conform propriilor reguli de securitate.</li>
+    <li>Adresa IP și datele tehnice ale cererilor ajung inevitabil la servere când aplicația comunică cu ele. Pentru limitarea încercărilor repetate (de exemplu, asocierea unui dispozitiv) nu păstrăm adresa IP în clar, ci doar o amprentă criptografică a ei. Adresele IP ale conectărilor sunt păstrate 90 de zile în jurnalul conectărilor (vezi mai sus). Furnizorul nostru de servere poate păstra jurnale tehnice pe o perioadă scurtă, conform propriilor reguli de securitate.</li>
+  </ul>
+  <h3>Administrarea serviciului</h3>
+  <ul>
+    <li>Administratorul ACM Docs are acces, printr-un panou de control protejat cu parolă și Two-Factor Authentication, doar la datele descrise mai sus: contul, planul, contoarele, dispozitivele, jurnalul conectărilor și rapoartele. <strong>Conținutul tău rămâne criptat și nu poate fi văzut nici din panoul de control.</strong> Fiecare acțiune din panou (de exemplu acordarea unui plan, suspendarea unui cont sau oprirea temporară a unei funcții) este înregistrată.</li>
   </ul>
   <h3>Când ne scrii</h3>
   <ul>
@@ -267,6 +273,7 @@
     <tr><th>Planuri, limite și abonamente: numărarea acțiunilor lunare, încasarea plăților, reînnoirea și anularea</th><td>Executarea contractului — art. 6 alin. (1) lit. b)</td></tr>
     <tr><th>Evidența contabilă și fiscală a plăților (facturi, încasări)</th><td>Obligația legală — art. 6 alin. (1) lit. c)</td></tr>
     <tr><th>Protejarea conturilor: anunțuri de securitate, limitarea încercărilor, prevenirea abuzurilor și a fraudei</th><td>Interesul nostru legitim și al utilizatorilor de a avea un serviciu sigur — art. 6 alin. (1) lit. f)</td></tr>
+    <tr><th>Jurnalul conectărilor cu adresa IP (90 de zile), analiza rapoartelor, suspendarea conturilor care încalcă termenii și oprirea temporară a unor funcții în caz de atac</th><td>Interesul legitim de a proteja conturile, serviciul și ceilalți utilizatori — art. 6 alin. (1) lit. f)</td></tr>
     <tr><th>E-mailuri de serviciu (confirmarea adresei, resetarea parolei, modificări importante ale termenilor)</th><td>Executarea contractului — art. 6 alin. (1) lit. b)</td></tr>
     <tr><th>Răspunsul la cererile și reclamațiile tale</th><td>Interesul legitim de a-ți răspunde și, după caz, obligația legală — art. 6 alin. (1) lit. f) și c)</td></tr>
     <tr><th>Respectarea obligațiilor legale și apărarea în fața instanțelor sau a autorităților</th><td>Obligația legală și interesul legitim — art. 6 alin. (1) lit. c) și f)</td></tr>
@@ -314,6 +321,8 @@
     <li><strong>Contoarele lunare ale planului</strong> și amprentele documentelor numărate: se șterg automat după aproximativ 13 luni.</li>
     <li><strong>Datele abonamentului și ale plăților</strong> (facturi, încasări): cât timp ai abonament și apoi cât cere legea contabilă (în România, de regulă 10 ani pentru documentele financiar-contabile).</li>
     <li><strong>Datele pentru limitarea abuzurilor</strong> (amprente, nu adrese IP): expiră după 10 minute până la o oră și sunt șterse automat, de regulă în cel mult o zi de la expirare.</li>
+    <li><strong>Jurnalul conectărilor și ultima adresă IP a dispozitivelor:</strong> 90 de zile, apoi se șterg automat (de regulă în cel mult o zi de la expirare).</li>
+    <li><strong>Rapoartele</strong> și <strong>jurnalul acțiunilor de administrare</strong>: cel mult 2 ani, pentru a putea dovedi și justifica deciziile luate (de exemplu o suspendare), apoi se șterg automat.</li>
     <li><strong>Corespondența cu noi:</strong> cel mult 3 ani de la ultima comunicare, sau mai mult dacă este necesar pentru apărarea unui drept.</li>
     <li><strong>Datele de pe dispozitivele tale</strong> rămân acolo până le ștergi tu sau dezinstalezi aplicația.</li>
   </ul>
@@ -361,7 +370,7 @@
 
 <section id="ro-14">
   <h2><span class="n">14.</span>Decizii automate</h2>
-  <p>Nu luăm decizii bazate exclusiv pe prelucrare automată care să producă efecte juridice asupra ta. Singurele mecanisme automate sunt cele de securitate (de exemplu, limitarea temporară a încercărilor repetate), care nu îți afectează drepturile și pot fi contestate scriindu-ne.</p>
+  <p>Nu luăm decizii bazate exclusiv pe prelucrare automată care să producă efecte juridice asupra ta. Singurele mecanisme automate sunt cele de securitate (de exemplu, limitarea temporară a încercărilor repetate), care nu îți afectează drepturile și pot fi contestate scriindu-ne. Suspendarea unui cont este decisă de o persoană, după analiză, și o poți contesta scriindu-ne.</p>
 </section>
 
 <section id="ro-15">
@@ -386,7 +395,7 @@
 <header class="hero" data-l="en">
   <h1>Privacy Policy</h1>
   <p>What personal data we process when you use ACM Docs, why, and what rights you have.</p>
-  <div class="meta"><span>Version 1.1</span><span>Effective 22 October 2026</span><span>Last updated: 22 October 2026</span></div>
+  <div class="meta"><span>Version 1.2</span><span>Effective 22 October 2026</span><span>Last updated: 22 October 2026</span></div>
 </header>
 
 <nav class="toc" data-l="en" aria-label="Contents">
@@ -461,13 +470,15 @@
     <li><strong>Public profile:</strong> @name, display name, public key and its fingerprint. These are visible to other ACM Docs users so they can find you and send you encrypted documents.</li>
     <li><strong>Two-step verification</strong>, if you turn it on: the technical information needed to verify codes.</li>
     <li><strong>Devices:</strong> each device’s public key, its role (primary or secondary), status (active or blocked), how it was added and when it was last active.</li>
-    <li><strong>Security events:</strong> sign-ins with the password, new or blocked devices. For password sign-ins we keep only a general description of the software (for example “Chrome · Windows”), <strong>not the IP address</strong>.</li>
+    <li><strong>Security events:</strong> sign-ins with the password, new or blocked devices, with a general description of the software (for example “Chrome · Windows”). The events shown on your devices do not contain the IP address.</li>
+    <li><strong>Sign-in log:</strong> for every sign-in with the password, account creation, new device or device session from a new address we keep the date, the kind of sign-in, the <strong>IP address</strong>, the general description of the software and the device. For each device we also keep the last IP address used. We keep them for <strong>90 days</strong>, for security only: spotting stolen passwords, compromised accounts, attacks and abuse. They are not visible to other users.</li>
+    <li><strong>Reports:</strong> if you report an account, we keep who reported, the reported account, the reason chosen, the details you wrote and the status of the review. The reported account does not learn who reported it. If you are reported, we keep the same information about the report.</li>
     <li><strong>Contact requests:</strong> the fact that one account added another, until the request is accepted or ignored.</li>
   </ul>
   <h3>Your plan and subscription</h3>
   <ul>
     <li><strong>The plan's monthly counters:</strong> how many edited documents, scans, invoices and encrypted documents you used this month. So that the same document is not counted twice, we keep a cryptographic fingerprint of it (a string from which the document cannot be rebuilt), <strong>not its name or content</strong>.</li>
-    <li><strong>Subscription data:</strong> the plan, the period (monthly or yearly), the subscription status, the renewal or end date and the customer and subscription identifiers at the payment processor.</li>
+    <li><strong>Subscription data:</strong> the plan, the period (monthly or yearly), the subscription status, the renewal or end date and the customer and subscription identifiers at the payment processor. If a plan is granted to you manually, we keep the plan, its duration and an internal note. For promotions (discounts, trial periods) we keep whether you had a subscription before, so that an offer for new customers is used only once.</li>
     <li><strong>Family and Business:</strong> which accounts belong to the subscription and the invitations sent. The holder sees only the members' @name and display name, nothing of their data.</li>
     <li><strong>Payment data</strong> (card, name, billing address, possibly a tax ID) is entered directly on the Stripe page and processed by Stripe. We never receive card details; we receive only the payment confirmation, the amount and the data needed for invoicing.</li>
   </ul>
@@ -477,7 +488,11 @@
   </ul>
   <h3>Technical data processed automatically</h3>
   <ul>
-    <li>IP addresses and technical request data inevitably reach the servers when the app talks to them. We use them temporarily to limit abuse (for example, the number of device-pairing attempts) and for security. For this limit we do not keep the IP address itself, only a cryptographic hash of it. Our server provider may keep technical logs for a short period under its own security rules.</li>
+    <li>IP addresses and technical request data inevitably reach the servers when the app talks to them. To limit repeated attempts (for example, device pairing) we do not keep the IP address itself, only a cryptographic hash of it. The IP addresses of sign-ins are kept for 90 days in the sign-in log (see above). Our server provider may keep technical logs for a short period under its own security rules.</li>
+  </ul>
+  <h3>Running the service</h3>
+  <ul>
+    <li>The ACM Docs administrator has access, through a control panel protected by a password and Two-Factor Authentication, only to the data described above: the account, the plan, the counters, the devices, the sign-in log and the reports. <strong>Your content stays encrypted and cannot be seen from the control panel either.</strong> Every action in the panel (for example granting a plan, suspending an account or temporarily pausing a feature) is logged.</li>
   </ul>
   <h3>When you write to us</h3>
   <ul>
@@ -492,6 +507,7 @@
     <tr><th>Plans, limits and subscriptions: counting monthly actions, collecting payments, renewal and cancellation</th><td>Performance of the contract — Art. 6(1)(b)</td></tr>
     <tr><th>Accounting and tax records of payments (invoices, receipts)</th><td>Legal obligation — Art. 6(1)(c)</td></tr>
     <tr><th>Protecting accounts: security notices, attempt limits, preventing abuse and fraud</th><td>Our and our users’ legitimate interest in a secure service — Art. 6(1)(f)</td></tr>
+    <tr><th>The sign-in log with IP addresses (90 days), reviewing reports, suspending accounts that break the terms and temporarily pausing features during an attack</th><td>Legitimate interest in protecting accounts, the service and other users — Art. 6(1)(f)</td></tr>
     <tr><th>Service emails (address confirmation, password reset, important changes to the terms)</th><td>Performance of the contract — Art. 6(1)(b)</td></tr>
     <tr><th>Answering your requests and complaints</th><td>Legitimate interest in replying and, where applicable, legal obligation — Art. 6(1)(f) and (c)</td></tr>
     <tr><th>Meeting legal obligations and defending legal claims</th><td>Legal obligation and legitimate interest — Art. 6(1)(c) and (f)</td></tr>
@@ -539,6 +555,8 @@
     <li><strong>The plan's monthly counters</strong> and the fingerprints of counted documents: deleted automatically after about 13 months.</li>
     <li><strong>Subscription and payment data</strong> (invoices, receipts): while you have a subscription and then as long as accounting law requires (in Romania, usually 10 years for financial and accounting records).</li>
     <li><strong>Data used to limit abuse</strong> (hashes, not IP addresses): expires after 10 minutes to one hour and is deleted automatically, usually within a day of expiring.</li>
+    <li><strong>The sign-in log and the devices’ last IP address:</strong> 90 days, then deleted automatically (usually within a day of expiring).</li>
+    <li><strong>Reports</strong> and the <strong>log of administration actions</strong>: up to 2 years, so that decisions taken (for example a suspension) can be shown and justified, then deleted automatically.</li>
     <li><strong>Correspondence with us:</strong> up to 3 years after the last exchange, or longer if needed to defend a legal claim.</li>
     <li><strong>Data on your devices</strong> stays there until you delete it or uninstall the app.</li>
   </ul>
@@ -586,7 +604,7 @@
 
 <section id="en-14">
   <h2><span class="n">14.</span>Automated decisions</h2>
-  <p>We do not make decisions based solely on automated processing that have legal effects on you. The only automated mechanisms are security ones (for example, temporarily limiting repeated attempts), which do not affect your rights and can be challenged by writing to us.</p>
+  <p>We do not make decisions based solely on automated processing that have legal effects on you. The only automated mechanisms are security ones (for example, temporarily limiting repeated attempts), which do not affect your rights and can be challenged by writing to us. Suspending an account is decided by a person, after a review, and you can challenge it by writing to us.</p>
 </section>
 
 <section id="en-15">
