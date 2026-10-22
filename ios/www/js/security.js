@@ -12,16 +12,16 @@ Object.assign(Icons, {
 const Security = (() => {
   // short notes around the app (Home, empty lists, sign-up): one at a time
   const TIPS = [
-    'Criptare post-cuantică: documentele tale rezistă și computerelor viitorului.',
-    'Nici ACM Docs nu îți poate citi documentele. Cheile sunt doar pe dispozitivele tale.',
-    'Parola singură nu deschide nimic: fără cheile contului, datele rămân criptate.',
-    'Fiecare dispozitiv nou îți apare pe celelalte, cu buton de blocare.',
-    'Documentele .acm sunt semnate: afli imediat dacă au fost modificate pe drum.',
-    'În cloud ajung doar blocuri criptate, fără nume de fișiere și fără conținut lizibil.',
-    'Textul din poze se recunoaște pe dispozitiv. Pozele nu pleacă nicăieri.',
-    'Fără reclame, fără urmărire, fără analiza datelor tale.',
-    'Servere în Uniunea Europeană, cu date criptate de la un capăt la altul.',
-    'Criptare verificată de biblioteci auditate public, nimic inventat de noi.',
+    'Post-Quantum Cryptography: documentele sunt protejate cu standardele NIST pentru era computerelor cuantice.',
+    'Zero-Knowledge Architecture: cheile de criptare există doar pe dispozitivele tale.',
+    'End-to-End Encryption pentru documente, facturi și date sincronizate.',
+    'Device-Bound Keys: fiecare dispozitiv al contului are propria cheie.',
+    'Documentele .acm poartă semnătura digitală a expeditorului.',
+    'Cloudul păstrează exclusiv date criptate, fără nume de fișiere.',
+    'Recunoașterea textului (OCR) rulează local, pe dispozitiv.',
+    'Fără reclame, fără tracking, fără profilare.',
+    'EU Data Residency: datele criptate sunt găzduite în Uniunea Europeană.',
+    'Criptare bazată pe biblioteci open-source auditate public.',
   ];
   let tipIx = (() => { try { const n = (Number(localStorage.getItem('acm.tip')) + 1) % TIPS.length; localStorage.setItem('acm.tip', String(n)); return n || 0; } catch (e) { return 0; } })();
   const tip = () => TIPS[tipIx % TIPS.length];
@@ -41,11 +41,14 @@ const Security = (() => {
   function status() {
     const out = [];
     const signed = typeof Account !== 'undefined' && Account.current() && !Account.needsVerification();
-    if (!signed) return [{ ok: false, t: 'Fără cont, documentele stau doar pe acest dispozitiv', s: 'Cu un cont primești criptare de la un capăt la altul, sincronizare criptată și documente .acm.', go: 'account' }];
-    out.push({ ok: Account.wordsSaved(), t: Account.wordsSaved() ? 'Codul de recuperare este notat' : 'Codul de recuperare nu e notat încă', s: 'Cele 24 de cuvinte sunt singura cale de a-ți recupera datele dacă pierzi toate dispozitivele.', go: Account.wordsSaved() ? null : 'words' });
-    if (Account.isPasswordUser()) out.push({ ok: Account.twoStep(), t: Account.twoStep() ? 'Verificarea în doi pași este activă' : 'Verificarea în doi pași este oprită', s: 'Cu ea pornită, cine îți află parola tot nu se poate conecta.', go: Account.twoStep() ? null : 'twostep' });
-    if (typeof AppLock !== 'undefined') { const on = AppLock.enabled(); out.push({ ok: on, t: on ? 'Aplicația se blochează' : 'Blocarea aplicației este oprită', s: 'Cu Face ID, amprentă, Windows Hello sau un cod, nimeni nu o deschide în locul tău.', go: on ? null : 'applock' }); }
-    out.push({ ok: true, t: 'Dispozitivele contului sunt sub control', s: 'Vezi fiecare dispozitiv conectat și blochează-l pe loc dacă nu-l recunoști.', go: 'devices' });
+    if (!signed) return [{ ok: false, t: 'Cont neconectat', s: 'Conectează-te pentru End-to-End Encryption, sincronizare criptată și documente .acm.', go: 'account' }];
+    out.push({ ok: Account.wordsSaved(), t: Account.wordsSaved() ? 'Cod de recuperare notat' : 'Cod de recuperare nenotat', s: 'Cele 24 de cuvinte permit restaurarea cheilor pe un dispozitiv nou.', go: Account.wordsSaved() ? null : 'words' });
+    if (Account.isPasswordUser()) {
+      const on = Account.twoStep() || (AccountUI.emailTwoStep && AccountUI.emailTwoStep());
+      out.push({ ok: on, t: on ? 'Two-Factor Authentication activă' : 'Two-Factor Authentication oprită', s: 'Conectarea unui dispozitiv nou cere o confirmare suplimentară.', go: on ? null : 'twostep' });
+    }
+    if (typeof AppLock !== 'undefined') { const on = AppLock.enabled(); out.push({ ok: on, t: on ? 'Blocarea aplicației activă' : 'Blocarea aplicației oprită', s: 'Deschiderea aplicației cere Face ID, amprentă, Windows Hello sau cod.', go: on ? null : 'applock' }); }
+    out.push({ ok: true, t: 'Dispozitive conectate', s: 'Lista dispozitivelor contului, cu posibilitatea de a le deconecta sau bloca.', go: 'devices' });
     return out;
   }
 
@@ -70,26 +73,26 @@ const Security = (() => {
         el('div', { class: 'sec-hero' }, [
           el('span', { class: 'sec-shield', html: svg('shield') }),
           el('h2', { text: 'Securitate și criptare' }),
-          el('p', { text: 'Documentele, facturile și datele tale sunt criptate pe dispozitivul tău, înainte să plece undeva. Doar tu ai cheile. Nici noi nu le putem citi.' }),
+          el('p', { text: 'ACM Docs protejează documentele, facturile și datele prin End-to-End Encryption și Post-Quantum Cryptography. Criptarea are loc pe dispozitiv, iar cheile nu părăsesc dispozitivele contului.' }),
         ]),
         el('h3', { class: 'plan-h', text: 'Contul tău' }),
         checks,
-        el('h3', { class: 'plan-h', text: 'Cum te protejăm' }),
+        el('h3', { class: 'plan-h', text: 'Tehnologii de protecție' }),
         el('div', { class: 'sec-cards' }, [
-          card('lock', 'blue', 'Criptare de la un capăt la altul', 'Cheile contului se creează pe dispozitivul tău și nu ajung niciodată la noi. Serverul primește doar date criptate, pe care nu le poate deschide.', 'XChaCha20-Poly1305 · HKDF-SHA256'),
-          card('atom', 'indigo', 'Rezistentă la computerele cuantice', 'Folosim deodată criptarea clasică și cea post-cuantică standardizată de NIST. Ca să-ți citească datele, cineva ar trebui să le spargă pe amândouă.', 'X25519 + ML-KEM-768 (FIPS 203) · Ed25519 + ML-DSA-65 (FIPS 204)'),
-          card('key', 'orange', 'Fără uși din spate', 'Nu există o cheie de rezervă la noi și nici o resetare care să ocolească criptarea. Contul se recuperează doar cu cele 24 de cuvinte, pe care le ai doar tu.', 'BIP-39 · 256 bit'),
-          card('devices', 'teal', 'Fiecare dispozitiv are cheia lui', 'Un dispozitiv nou intră doar cu aprobarea ta, de pe un dispozitiv deja conectat, sau cu codul de recuperare. Toate celelalte sunt anunțate și îl pot bloca pe loc.', null),
-          card('fingerprint', 'green', 'Parola singură nu ajunge', 'Cine îți află parola nu poate citi nimic: datele se deschid doar cu cheile de pe dispozitivele tale. Cu verificarea în doi pași, nici măcar nu se poate conecta.', null),
-          card('lockfile', 'purple', 'Documente semnate, imposibil de falsificat', 'Fișierele .acm se deschid doar pentru destinatarii aleși și poartă semnătura expeditorului. Orice modificare pe drum se vede imediat.', 'Ed25519 + ML-DSA-65 · Argon2id'),
-          card('cloud', 'blue', 'Cloud care nu știe ce păstrează', 'În cloud ajung doar blocuri criptate, cu nume aleatorii. Fără numele fișierelor, fără conținut, fără legături între ele.', null),
-          card('eu', 'indigo', 'Servere în Uniunea Europeană', 'Datele criptate stau în centre de date din UE, protejate de GDPR. Nu vindem date, nu afișăm reclame și nu urmărim ce faci în aplicație.', null),
-          card('shield', 'red', 'Protecție anti-spyware', 'Cheile se închid singure când ieși din aplicație, codul de recuperare și documentele decriptate nu pot fi capturate pe ecran, iar copiile decriptate temporare se șterg când închizi documentul.', null),
-          card('verified', 'gray', 'Verificată, nu doar promisă', 'Criptarea folosește biblioteci open-source auditate public. Serverul și aplicația trec regulat prin teste de atac, la fiecare versiune nouă.', null),
+          card('lock', 'blue', 'End-to-End Encryption', 'Datele sunt criptate pe dispozitiv înainte de sincronizare sau trimitere. Serverul stochează exclusiv date criptate.', 'XChaCha20-Poly1305 · 256-bit · HKDF-SHA256'),
+          card('atom', 'indigo', 'Post-Quantum Cryptography', 'Criptare hibridă: algoritmi clasici împreună cu algoritmii post-cuantici standardizați de NIST, pentru protecție pe termen lung, inclusiv împotriva computerelor cuantice.', 'X25519 + ML-KEM-768 (FIPS 203) · Ed25519 + ML-DSA-65 (FIPS 204)'),
+          card('key', 'orange', 'Zero-Knowledge Architecture', 'Cheile de criptare sunt generate și păstrate pe dispozitivele contului. ACM Docs nu deține chei de rezervă și nu are acces la conținut. Recuperarea se face exclusiv cu cele 24 de cuvinte.', 'BIP-39 · 256-bit'),
+          card('devices', 'teal', 'Device-Bound Keys', 'Fiecare dispozitiv are propria cheie. Un dispozitiv nou se adaugă prin aprobare de pe un dispozitiv existent sau cu codul de recuperare, iar celelalte dispozitive sunt notificate.', null),
+          card('fingerprint', 'green', 'Two-Factor Authentication', 'Conectarea unui dispozitiv nou cere, pe lângă parolă, un cod trimis pe email sau generat de o aplicație de autentificare. Conținutul rămâne accesibil doar cu cheile contului.', null),
+          card('lockfile', 'purple', 'Digital Signatures', 'Documentele .acm se deschid doar pentru destinatarii aleși și poartă semnătura digitală a expeditorului, verificată automat la deschidere.', 'Ed25519 + ML-DSA-65 · Argon2id'),
+          card('cloud', 'blue', 'Encrypted Cloud', 'Cloudul primește blocuri criptate cu identificatori aleatorii, fără nume de fișiere și fără metadate de conținut.', null),
+          card('eu', 'indigo', 'EU Data Residency', 'Datele criptate sunt găzduite în centre de date din Uniunea Europeană, conform GDPR. Fără reclame, tracking sau profilare.', null),
+          card('shield', 'red', 'Anti-Spyware Protection', 'Cheile se blochează la ieșirea din aplicație, codul de recuperare și documentele decriptate sunt protejate la capturile de ecran, iar copiile temporare se șterg automat.', null),
+          card('verified', 'gray', 'Penetration Testing', 'Criptarea folosește biblioteci open-source auditate public. Serverul și aplicațiile sunt testate prin scenarii de atac la fiecare versiune.', null),
         ]),
-        el('div', { class: 'recov-warn', html: `${svg('info')}<span>${escHtml(I18n.t('Sincer: nicio aplicație nu te poate apăra pe un dispozitiv deja compromis. Ține sistemul actualizat, folosește blocarea ecranului și nu instala aplicații din surse necunoscute.'))}</span>` }),
+        el('div', { class: 'recov-warn', html: `${svg('info')}<span>${escHtml(I18n.t('Protecția completă presupune și un dispozitiv sigur: sistem de operare actualizat, blocarea ecranului activă și aplicații instalate doar din surse de încredere.'))}</span>` }),
         el('div', { class: 'actions col' }, [
-          typeof Shield !== 'undefined' ? el('button', { class: 'btn', type: 'button', html: svg('shield') + '<span>' + escHtml(I18n.t('Detalii anti-spyware')) + '</span>', onclick: () => close('shield') }) : null,
+          typeof Shield !== 'undefined' ? el('button', { class: 'btn', type: 'button', html: svg('shield') + '<span>' + escHtml(I18n.t('Detalii Anti-Spyware')) + '</span>', onclick: () => close('shield') }) : null,
           el('button', { class: 'btn primary', type: 'button', text: 'Închide', onclick: () => close(null) }),
         ]),
       );
@@ -97,7 +100,7 @@ const Security = (() => {
     if (!act) return;
     if (act === 'account') { Account.setSkipped(false); return AccountUI.show('signin'); }
     if (act === 'words') { await AccountUI.showWords(); return show(); }
-    if (act === 'twostep') { await AccountUI.twoStepFlow(); return show(); }
+    if (act === 'twostep') { await AccountUI.twoStepScreen(); return show(); }
     if (act === 'applock') { await AppLock.settings(); return show(); }
     if (act === 'devices') return Devices.show();
     if (act === 'shield') { await Shield.showInfo(); return show(); }

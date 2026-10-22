@@ -114,24 +114,38 @@ const Plan = (() => {
     if (!ACTIONS[action]) return false;
     if (!uid()) { await needAccount(action); return false; }
     if (Account.needsVerification()) { AccountUI.show('verify'); return false; }
-    let st;
-    try { st = await Account.keyState(); } catch (e) { st = 'offline'; }
-    if (st !== 'ok' && st !== 'offline') { await AccountUI.route(); return false; }
+    if (typeof Devices !== 'undefined' && !Devices.myDevice()) { await AccountUI.route(); return false; }
     const u = uid();
     const r = ref ? await sha(action + '|' + ref) : null;
-    try {
+    const ask = async () => {
       if (!(await sessionReady())) throw Object.assign(new Error('offline'), { code: 'unavailable' });
       const res = await Account.call('useQuota', r ? { action, ref: r } : { action });
       keepToken(u, res.token);
       const s = cached();
       if (s && s.usage && s.usage[action]) { s.usage[action].used = res.used; s.usage[action].limit = res.limit; s.plan = res.plan; last = s; ls.set(LS.status(u), s); emit(); }
+      return res;
+    };
+    // a paid plan with a valid server-signed token does not wait for the server: the action goes ahead
+    // at once and is counted in the background (the server still refuses past the plan's ceiling,
+    // and the next action then stops)
+    const t = tokenPlan(u);
+    const over = ls.get('acm.plan.over.' + u) || {};
+    if (t && !(over[action] && over[action] === new Date().toISOString().slice(0, 7))) {
+      ask().catch((e) => {
+        if (/limit:/.test(String(e.server || e.message || ''))) { over[action] = new Date().toISOString().slice(0, 7); ls.set('acm.plan.over.' + u, over); }
+      });
+      return true;
+    }
+    try {
+      await ask();
+      if (over[action]) { delete over[action]; ls.set('acm.plan.over.' + u, over); }
       return true;
     } catch (e) {
       const m = String(e.server || e.message || '');
-      if (/^limit:/.test(m) || /limit:/.test(m)) { await limitReached(action); return false; }
+      if (/limit:/.test(m)) { await limitReached(action); return false; }
       if (/no device session|device blocked|device removed/.test(m)) { await AccountUI.route(); return false; }
       // no connection: a paid plan carries on with its signed token (up to 7 days)
-      if (tokenPlan(u)) return true;
+      if (t) return true;
       await UI.confirm('Ai nevoie de internet', 'Fără abonament, fiecare acțiune se confirmă cu serverul ACM Docs. Conectează-te la internet și încearcă din nou. Abonamentele funcționează și fără internet, până la 7 zile.', 'Am înțeles', 'Închide');
       return false;
     }
@@ -329,7 +343,7 @@ const Plan = (() => {
       seg,
       cards,
       !s.payments ? el('div', { class: 'acm-note warn', html: `${svg('info')}<span>${escHtml(I18n.t('Plata abonamentelor va fi disponibilă în curând.'))}</span>` }) : null,
-      el('div', { class: 'acm-note ok', html: `${svg('shield')}<span>${escHtml(I18n.t('Orice plan are aceeași securitate: criptare de la un capăt la altul, post-cuantică. Abonamentul mărește doar limitele, nu protecția.'))}</span>` }),
+      el('div', { class: 'acm-note ok', html: `${svg('shield')}<span>${escHtml(I18n.t('Toate planurile au aceeași securitate: End-to-End Encryption și Post-Quantum Cryptography. Abonamentul mărește doar limitele.'))}</span>` }),
       el('div', { class: 'actions col' }, [
         s.manage ? el('button', { class: 'btn', type: 'button', html: svg('wallet') + '<span>' + escHtml(I18n.t('Plată, facturi și anulare')) + '</span>', onclick: () => close({ do: 'manage' }) }) : null,
         el('button', { class: 'btn', type: 'button', html: svg('shield') + '<span>' + escHtml(I18n.t('Cum îți protejăm datele')) + '</span>', onclick: () => close({ do: 'security' }) }),
@@ -517,11 +531,16 @@ const Plan = (() => {
     return NAMES[p] + (p === 'basic' ? ' · ' + I18n.t('fără abonament') : '');
   }
 
-  // refreshed quietly when the app starts and comes back to the front
+  // refreshed quietly: a few seconds after start, then at most every 15 minutes when the app comes back
+  let lastRefresh = 0;
   function start() {
-    const go = () => { if (uid() && !document.hidden) refresh().catch(() => {}); };
-    setTimeout(go, 4000);
-    document.addEventListener('visibilitychange', go);
+    const go = (force) => {
+      if (!uid() || document.hidden || (!force && Date.now() - lastRefresh < 15 * 60000)) return;
+      lastRefresh = Date.now();
+      refresh().catch(() => {});
+    };
+    setTimeout(() => go(true), 6000);
+    document.addEventListener('visibilitychange', () => go(false));
   }
   if (typeof Account !== 'undefined' && Account.onChange) Account.onChange(() => { last = null; });
 

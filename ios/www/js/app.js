@@ -65,6 +65,7 @@ const App = (() => {
     const list = files().filter((f) => f.path !== path);
     list.unshift({ path, kind, from: from || null, time: Date.now() });
     saveJSON(FILES_KEY, list.slice(0, 300));
+    try { if (typeof Sync !== 'undefined') Sync.touch(); } catch (e) {}
     if (docOrBytes) {
       if (typeof docOrBytes === 'string') setThumb(path, docOrBytes);
       else if (docOrBytes instanceof Uint8Array) {

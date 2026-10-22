@@ -118,16 +118,36 @@ const Devices = (() => {
     const id = await Account.unlock('Confirmă ca să adaugi acest dispozitiv la cont');
     const key = newKey();
     const ts = Date.now();
-    let r;
-    try {
-      r = await Account.call('registerDevice', { bundle: Host.toB64(key.bundle), ts, proof: Host.toB64(A().signEd(id, `acm-register\n${u}\n${key.fingerprint}\n${ts}`)) });
-    } catch (e) {
-      if (!/device limit/.test(e.server || '')) throw e;
-      // the plan's number of devices is reached: this one may take the place of the least used one
-      if (!(await deviceLimit(true))) return 'limit';
-      const ts2 = Date.now();
-      r = await Account.call('registerDevice', { bundle: Host.toB64(key.bundle), ts: ts2, proof: Host.toB64(A().signEd(id, `acm-register\n${u}\n${key.fingerprint}\n${ts2}`)), replace: 'auto' });
+    // registration: the email code (two-step verification) and the plan's number of devices are asked
+    // for only when the server says they are needed
+    let emailCode = null, replace = null, r = null;
+    for (let round = 0; round < 8 && !r; round++) {
+      const ts1 = Date.now();
+      const body = { bundle: Host.toB64(key.bundle), ts: ts1, proof: Host.toB64(A().signEd(id, `acm-register\n${u}\n${key.fingerprint}\n${ts1}`)) };
+      if (emailCode) body.emailCode = emailCode;
+      if (replace) body.replace = replace;
+      try { r = await Account.call('registerDevice', body); } catch (e) {
+        const m = e.server || '';
+        if (/email code required|bad email code|email code expired/.test(m)) {
+          if (/expired/.test(m) || !emailCode) {
+            let sent;
+            try { sent = await Account.call('emailCodeSend', {}); } catch (x) { throw x; }
+            if (sent && sent.needed === false) { emailCode = null; continue; }
+            emailCode = await askEmailCode(sent && sent.to, false);
+          } else emailCode = await askEmailCode(null, true);
+          if (!emailCode) return 'limit';
+          continue;
+        }
+        if (/device limit/.test(m)) {
+          // the plan's number of devices is reached: this one may take the place of the least used one
+          if (!(await deviceLimit(true))) return 'limit';
+          replace = 'auto';
+          continue;
+        }
+        throw e;
+      }
     }
+    if (!r) return 'limit';
     await keep(u, r.dev, key);
     await Account.signInWithToken(r.token);
     vkey = A().vaultKey(id);
@@ -139,6 +159,26 @@ const Devices = (() => {
     const { F: f, db } = Account.internals();
     const dev = myDevice();
     await f.firestore.updateDoc(f.firestore.doc(db, 'accounts', uid(), 'devices', dev), { info: await sealInfo(dev) });
+  }
+
+  /** Two-step verification by email: the 6-digit code just sent to the account's address. */
+  function askEmailCode(to, wrong) {
+    return UI.modal((box, done) => {
+      const inp = el('input', { type: 'text', class: 'in code-in no-tr', id: 'email-code', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '7', placeholder: '123456', autofocus: true });
+      const go = () => { const v = inp.value.replace(/\D/g, ''); if (v.length === 6) done(v); else inp.focus(); };
+      inp.addEventListener('input', () => { if (inp.value.replace(/\D/g, '').length === 6) go(); });
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+      box.classList.add('acm-ui');
+      box.append(
+        el('div', { class: 'acm-alert', html: svg('mail') }),
+        el('h2', { text: 'Codul de verificare' }),
+        to ? el('p', {}, [el('span', { text: 'Am trimis un cod de 6 cifre la' }), el('b', { class: 'no-tr', text: ' ' + to })]) : el('p', { text: 'Scrie codul de 6 cifre primit pe email.' }),
+        wrong ? el('p', { class: 'auth-err on', text: 'Codul nu este corect. Verifică ultimul email primit.' }) : null,
+        inp,
+        el('p', { class: 'muted small', text: 'Codul este valabil 10 minute. Nu-l găsești? Verifică și dosarul Spam.' }),
+        el('div', { class: 'actions' }, [el('button', { class: 'btn', type: 'button', text: 'Anulează', onclick: () => done(null) }), el('button', { class: 'btn primary', type: 'button', text: 'Confirmă', onclick: go })]),
+      );
+    });
   }
 
   /** The plan allows no more devices. Here (new device): offer to take the place of the least used one. */
