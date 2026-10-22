@@ -108,6 +108,8 @@ const Devices = (() => {
         await Account.signInWithToken(r.token);
         return 'ok';
       } catch (e) {
+        // paused for maintenance / account suspended by ACM Docs: explained, keys kept
+        if (typeof Service !== 'undefined' && /account suspended|paused:/.test(e.server || '')) { Service.handle(e); throw e; }
         if (/blocked/.test(e.server || '')) return wipeBlocked();
         if (/device removed/.test(e.server || '')) return replacedHere();
         if (!/unknown device/.test(e.server || '')) throw e;

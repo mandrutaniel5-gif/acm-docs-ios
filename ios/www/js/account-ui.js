@@ -158,7 +158,7 @@ const AccountUI = (() => {
       pass2.input.addEventListener('input', match);
       const go = el('button', { class: 'btn primary auth-main', type: 'submit', text: 'Creează contul' });
       const form = el('form', { class: 'auth-form', novalidate: true }, [name.node, email.node, pass.node, pass2.node, box, go]);
-      form.addEventListener('submit', (e) => { e.preventDefault(); showErr(box, ''); busy(go, async () => { try { await Account.signUp(name.input.value, email.input.value, pass.input.value, pass2.input.value); await route(); } catch (x) { showErr(box, x); if (pass.input.value !== pass2.input.value) pass2.input.focus(); } }); });
+      form.addEventListener('submit', (e) => { e.preventDefault(); showErr(box, ''); busy(go, async () => { if (typeof Service !== 'undefined' && Service.blocked('signup')) return; try { await Account.signUp(name.input.value, email.input.value, pass.input.value, pass2.input.value); await route(); } catch (x) { showErr(box, x); if (pass.input.value !== pass2.input.value) pass2.input.focus(); } }); });
       card.append(
         el('h2', { text: 'Cont nou' }),
         el('p', { class: 'auth-sub', text: 'Contul folosește End-to-End Encryption și Post-Quantum Cryptography. Cheile se generează pe acest dispozitiv.' }),
@@ -405,6 +405,7 @@ const AccountUI = (() => {
       if (typeof AppLock !== 'undefined') sec.push(srow('lock', 'blue', 'Blocarea aplicației', AppLock.summary(), chev(), async () => { await AppLock.settings(); App.showView('settings'); }));
       sec.push(srow('key', Account.wordsSaved() ? 'green' : 'orange', 'Codul de recuperare', Account.wordsSaved() ? 'Notat ✓' : 'Nenotat încă: notează-l', chev(), showWords));
       if (typeof Shield !== 'undefined') sec.push(srow('shield', 'indigo', 'Protecție anti-spyware', 'Ce face aplicația și ce poți face tu', chev(), () => Shield.showInfo()));
+      if (typeof Service !== 'undefined') sec.push(srow('warn', 'red', 'Raportează un cont', 'Spam, fraudă, abuz sau un cont fals', chev(), () => Service.report()));
       out.append(group('Securitate', sec, 'Cheile de criptare sunt create și păstrate doar pe dispozitivele tale. Serverul păstrează doar date criptate și cheia publică.'));
     }
     const leave = [srow('logout', 'gray', 'Deconectează-te', 'Cheile rămân pe acest dispozitiv', null, async () => { if (await confirmSignOut()) App.showView('settings'); })];

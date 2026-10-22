@@ -96,7 +96,7 @@ const Account = (() => {
       'auth/too-many-requests': 'Prea multe încercări. Mai încearcă peste câteva minute.',
       'auth/network-request-failed': 'Nu există conexiune la internet.',
       'auth/requires-recent-login': 'Din motive de siguranță, intră din nou în cont și reîncearcă.',
-      'auth/user-disabled': 'Contul a fost dezactivat.',
+      'auth/user-disabled': 'Contul a fost suspendat. Pentru detalii, scrie-ne la mandrutaniel5@gmail.com.',
       'auth/invalid-verification-code': 'Codul nu este corect. Folosește codul afișat acum în aplicația de autentificare.',
       'auth/unverified-email': 'Confirmă mai întâi emailul contului.',
       'auth/missing-multi-factor-session': 'Din motive de siguranță, intră din nou în cont și reîncearcă.',
@@ -105,6 +105,8 @@ const Account = (() => {
     }[c];
     if (m) return m;
     const msg = String((e && (e.server || e.message)) || '');
+    if (/paused:/.test(msg)) return 'Funcția este oprită temporar de echipa ACM Docs. Reîncearcă în curând.';
+    if (/account suspended/.test(msg)) return 'Contul a fost suspendat. Pentru detalii, scrie-ne la mandrutaniel5@gmail.com.';
     if (/disposable email/.test(msg)) return 'Folosește o adresă de email permanentă: adresele temporare nu sunt acceptate.';
     if (/too many (new )?accounts/.test(msg)) return 'Prea multe conturi noi din această rețea. Încearcă mai târziu.';
     if (/device limit/.test(msg)) return 'Ai atins numărul de dispozitive al planului tău.';

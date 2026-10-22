@@ -358,6 +358,8 @@ const Sync = (() => {
           saveState(s);
         }
         noticeChangesInto(s);
+        // uploads paused by ACM Docs (security / maintenance): changes stay queued on this device
+        if (typeof Service !== 'undefined' && Service.off('sync')) { s.err = 'paused'; return; }
         await push(s);
         s.lastSync = Date.now();
         s.err = null;
@@ -442,6 +444,7 @@ const Sync = (() => {
     if (s.mode !== 'cloud') return 'Oprită: datele stau doar pe acest dispozitiv';
     if (s.err === 'storage') return 'Stocarea în cloud nu este activată încă';
     if (s.err === 'full') return 'Spațiul din cloud al planului este plin';
+    if (s.err === 'paused') return 'Încărcarea este oprită temporar de ACM Docs';
     if (s.err) return 'Nesincronizat (fără internet?)';
     if (!s.lastSync) return 'Pornește…';
     return I18n.t('Sincronizat') + ' ' + new Date(s.lastSync).toLocaleTimeString(I18n.locale(), { hour: '2-digit', minute: '2-digit' });
