@@ -366,6 +366,7 @@ const Contacts = (() => {
         );
       }
       const acts = [];
+      if (!c.gone && st !== 'changed' && typeof Chat !== 'undefined') acts.push(el('button', { class: 'btn primary', type: 'button', html: svg('chat') + '<span>' + escHtml(I18n.t('Trimite un mesaj criptat')) + '</span>', onclick: () => close('chat') }));
       if (!c.gone && st !== 'changed') {
         if (st !== 'verified') acts.push(el('button', { class: 'btn primary', type: 'button', html: svg('camera') + '<span>Verifică prin cod QR</span>', onclick: () => close('scan') }));
         if (st !== 'verified') acts.push(el('button', { class: 'btn', type: 'button', text: 'Cifrele sunt identice: marchează verificat', onclick: () => close('mark') }));
@@ -375,6 +376,7 @@ const Contacts = (() => {
       acts.push(el('button', { class: 'btn', type: 'button', text: 'Închide', onclick: () => close() }));
       box.append(el('div', { class: 'actions col' }, acts));
     });
+    if (action === 'chat') return Chat.withPerson(uid);
     if (action === 'scan') { const v = await scanAndVerify(uid); if (v) return showContact(uid); }
     else if (action === 'mark') {
       if (await UI.confirm('Sunt cifrele identice?', 'Marchează verificat doar dacă ați comparat toate cele 60 de cifre față în față sau la telefon, cu vocea persoanei.', 'Da, sunt identice')) {
@@ -831,6 +833,7 @@ const AcmShare = (() => {
     if (!acts || typeof Account === 'undefined') return;
     const u = Account.current();
     acts.innerHTML = '';
+    if (!u && typeof Chat !== 'undefined') Chat.stop();
     const people = el('button', { class: 'hb', type: 'button', id: 'home-contacts', title: 'Contacte', 'aria-label': 'Contacte', html: svg('people') });
     if (u && Contacts.pendingRequests().length) people.append(el('i', { class: 'hb-dot', title: 'Cereri de contact' }));
     people.addEventListener('click', () => Contacts.showList());
@@ -838,6 +841,8 @@ const AcmShare = (() => {
     if (u) me.textContent = ((u.displayName || u.email || '?').trim()[0] || '?').toUpperCase(); else me.innerHTML = svg('user');
     me.addEventListener('click', () => (u ? AccountUI.showProfile() : (Account.setSkipped(false), AccountUI.show('signin'))));
     if (u) acts.append(people);
+    // encrypted chat, next to the profile (the conversation list is live once the device has a session)
+    if (u && typeof Chat !== 'undefined' && !Account.needsVerification()) { acts.append(Chat.button()); Chat.start(); }
     acts.append(me);
 
   }
