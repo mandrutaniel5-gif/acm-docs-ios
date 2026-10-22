@@ -23,6 +23,20 @@ service firebase.storage {
            <= firestore.get(/databases/(default)/documents/accounts/$(uid)/meta/cloud).data.limit;
       allow list, update: if false;
     }
+    // documents sent in a chat: sealed on the sender's device for the chat's members (.acm)
+    function chatMember(cid) {
+      return request.auth != null && devId() is string && freshSession() && request.auth.token.email_verified == true
+        && firestore.get(/databases/(default)/documents/accounts/$(request.auth.uid)/devices/$(devId())).data.status == 'active'
+        && request.auth.uid in firestore.get(/databases/(default)/documents/chats/$(cid)).data.members;
+    }
+    match /chats/{cid}/files/{fid} {
+      allow get: if fid.matches('^[0-9a-f]{32}$') && chatMember(cid);
+      allow create: if fid.matches('^[0-9a-f]{32}$') && chatMember(cid) && resource == null
+        && request.resource.size <= 110 * 1024 * 1024
+        && request.resource.contentType == 'application/octet-stream'
+        && request.resource.metadata.uploader == request.auth.uid;
+      allow list, update, delete: if false;
+    }
     match /{all=**} { allow read, write: if false; }
   }
 }

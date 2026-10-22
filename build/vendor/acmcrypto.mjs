@@ -135,6 +135,8 @@ function passwordKey(password, salt, p) {
 }
 
 // ------------------------------------------------------------------ .acm files
+/** Short envelope tag (chat messages): which envelope is whose, without trying them all. */
+function envelopeTag(fp, nonce) { return b64(sha256(concatBytes(utf8ToBytes('ACM1 tag ' + fp), toBytes(nonce)))).slice(0, 8); }
 function wrapKey(recipientPub, dek, pwKey) {
   const eph = x25519.utils.randomSecretKey();
   const ephPub = x25519.getPublicKey(eph);
@@ -184,8 +186,14 @@ export function seal(doc, sender, recipients, opts = {}) {
     pw = { s: b64(s), t: p.t, m: p.m, p: p.p };
     pwKey = passwordKey(opts.password, s, p);
   }
-  // envelopes, in random order (the order says nothing about who is who)
-  const r = recipients.map((bundle) => wrapKey(decodePublicKey(bundle), dek, pwKey));
+  // envelopes, in random order (the order says nothing about who is who). With opts.hint (chat
+  // messages, where the members are known anyway) each envelope carries a short tag so a member finds
+  // its own at once instead of trying every envelope of a large group.
+  const r = recipients.map((bundle) => {
+    const w = wrapKey(decodePublicKey(bundle), dek, pwKey);
+    if (opts.hint) w.t = envelopeTag(fingerprint(bundle), nonce);
+    return w;
+  });
   for (let i = r.length - 1; i > 0; i--) { const j = randomBytes(1)[0] % (i + 1); [r[i], r[j]] = [r[j], r[i]]; }
   const header = te.encode(JSON.stringify({ v: VERSION, alg: 'x25519+mlkem768/xchacha20poly1305/ed25519+mldsa65', n: b64(nonce), pw, r }));
   const prefix = concatBytes(MAGIC, new Uint8Array([VERSION]), u32(header.length), header);
@@ -234,7 +242,9 @@ export function open(file, id, opts = {}) {
     try { pwKey = passwordKey(opts.password, unb64(header.pw.s), header.pw); } catch (e) { throw new AcmError('TAMPERED', 'Fișierul este deteriorat.'); }
   }
   let dek = null;
-  for (const entry of header.r) { dek = unwrapKey(entry, id, pwKey); if (dek) break; }
+  const mine = header.r.some((e) => e && e.t) ? envelopeTag(id.fingerprint, unb64(header.n)) : null;
+  for (const entry of header.r) { if (mine && entry.t && entry.t !== mine) continue; dek = unwrapKey(entry, id, pwKey); if (dek) break; }
+  if (!dek && mine) for (const entry of header.r) { dek = unwrapKey(entry, id, pwKey); if (dek) break; }
   if (!dek) throw new AcmError(header.pw ? 'BAD_PASSWORD_OR_NOT_FOR_YOU' : 'NOT_FOR_YOU', header.pw ? 'Parola este greșită sau documentul nu îți este adresat.' : 'Documentul nu îți este adresat.');
   let body;
   try { body = xchacha20poly1305(dek, unb64(header.n), prefix).decrypt(ct); } catch (e) { throw new AcmError('TAMPERED', 'Fișierul a fost modificat.'); }

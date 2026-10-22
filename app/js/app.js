@@ -1068,6 +1068,7 @@ const App = (() => {
   // Phone Back button: close what is on top, then go back one screen.
   async function back() {
     if (UI.back()) return true;
+    if (typeof Chat !== 'undefined' && Chat.back()) return true;
     if (!$('sl-present').classList.contains('hidden')) { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); return true; }
     if (Search.isOpen()) { Search.close(); return true; }
     if (Scanner.isOpen) { Scanner.back(); return true; }

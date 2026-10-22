@@ -120,6 +120,37 @@ service cloud.firestore {
         allow read: if activeDeviceOf(uid);
       }
     }
+    // encrypted chat: only the members of a conversation read it, and only from an active device of
+    // theirs. Messages are .acm envelopes sealed on the sender's device; the server cannot read them.
+    function chatOn() {
+      let p = /databases/$(database)/documents/server/switches;
+      return !exists(p) || (get(p).data.get('all', false) != true && get(p).data.get('off', {}).get('chat', false) != true);
+    }
+    function chatDoc(cid) { return get(/databases/$(database)/documents/chats/$(cid)).data; }
+    match /chats/{cid} {
+      allow read: if request.auth != null && activeDeviceOf(request.auth.uid) && request.auth.uid in resource.data.members;
+      // a member only marks the latest activity (for the conversation list)
+      allow update: if request.auth != null && activeDeviceOf(request.auth.uid) && request.auth.uid in resource.data.members
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastAt', 'lastFrom'])
+        && request.resource.data.lastAt == request.time && request.resource.data.lastFrom == request.auth.uid;
+      match /msgs/{mid} {
+        allow read: if request.auth != null && activeDeviceOf(request.auth.uid) && request.auth.uid in chatDoc(cid).members;
+        allow create: if request.auth != null && activeDeviceOf(request.auth.uid) && chatOn()
+          && request.auth.uid in chatDoc(cid).members
+          && chatDoc(cid).get('blocked', []).size() == 0
+          && request.resource.data.keys().hasOnly(['from', 'at', 'kind', 'box', 'fid'])
+          && request.resource.data.from == request.auth.uid
+          && request.resource.data.at == request.time
+          && request.resource.data.kind in ['text', 'file']
+          && request.resource.data.box is string && request.resource.data.box.size() <= 600000
+          && (request.resource.data.kind == 'text'
+              ? !('fid' in request.resource.data)
+              : request.resource.data.fid is string && request.resource.data.fid.matches('^[0-9a-f]{32}$'));
+        // a sender may delete its own message (for everyone)
+        allow delete: if request.auth != null && activeDeviceOf(request.auth.uid) && resource.data.from == request.auth.uid;
+      }
+    }
+
     // what is paused right now (kill switches from the control panel) and the message about it:
     // public, so the app can say so even before signing in. Written only by the server.
     match /server/switches {

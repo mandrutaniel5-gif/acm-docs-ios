@@ -357,6 +357,15 @@ export const wipeAccount = onCall(async (req) => {
   batch.delete(pref);
   await batch.commit();
   await db.recursiveDelete(db.collection('accounts').doc(uid));
+  // the account leaves its chats (its messages stay, sealed, for the others)
+  try {
+    const chats = await chatsCol.where('members', 'array-contains', uid).get();
+    for (const c of chats.docs) {
+      const members = c.data().members.filter((m) => m !== uid);
+      if (!members.length) await db.recursiveDelete(c.ref);
+      else await c.ref.update({ members, admins: (c.data().admins || []).filter((m) => m !== uid).concat(c.data().admins.length === 1 && c.data().admins[0] === uid ? [members[0]] : []) });
+    }
+  } catch (e) { console.warn('wipe chats', e.message); }
   // the encrypted blocks of the cloud sync
   try { await getStorage().bucket('acm-docs-52280.firebasestorage.app').deleteFiles({ prefix: `accounts/${uid}/` }); }
   catch (e) { console.warn('storage cleanup', e.message); }
@@ -518,6 +527,7 @@ export const vaultSize = onDocumentWritten({ document: 'accounts/{uid}/vault/{ri
 });
 /** Encrypted blocks: counted when stored; one that goes over the limit is removed again. */
 export const blobStored = onObjectFinalized({ bucket: BUCKET }, async (ev) => {
+  if (await chatFileStored(ev.data.name, ev.data.metadata, Number(ev.data.size || 0))) return;
   const m = /^accounts\/([A-Za-z0-9]{10,64})\/blobs\/[0-9a-f]{32}$/.exec(ev.data.name || '');
   if (!m) return;
   // the cloud sync paused from the control panel (the storage rules can read only two documents,
@@ -1129,3 +1139,157 @@ export const admin = makeAdmin({
   effective, refresh, metaOf, billingOf, devicesOf, signinsOf, privOf, event, clientAddress, agentOf,
   switches, resetSwitches, stripeConf, resetStripe, activePromos, resetPromos,
 });
+
+// ================================================================== encrypted chat (2.5.0)
+//
+//   chats/{cid}                    members, admins (groups), who blocked (direct), last activity
+//                                  · read by its members; members may only move lastAt / lastFrom
+//   chats/{cid}/msgs/{mid}         one message: { from, at, kind, box } where box is an .acm envelope
+//                                  sealed on the sender's device for every member (End-to-End
+//                                  Encryption + Post-Quantum Cryptography, signed by the sender)
+//   chats/{cid}/files/{fid}        (Storage) a document sent in the chat, sealed the same way
+//
+// The server never sees a message, a group name or a document: it only knows who is in which chat.
+// Changing who is in a chat goes through these functions; messages are written directly (rules).
+const chatsCol = db.collection('chats');
+const MAX_GROUP = 50;
+const isUidStr = (u) => typeof u === 'string' && /^[A-Za-z0-9]{10,64}$/.test(u);
+/** A sealed group name: an .acm envelope in base64, at most ~200 KB. */
+const validTitle = (t) => typeof t === 'string' && t.length > 20 && t.length <= 200000 && /^[A-Za-z0-9+/]+=*$/.test(t);
+const directId = (a, b) => 'd' + hex(sha256(new TextEncoder().encode('acm-chat\n' + [a, b].sort().join('\n')))).slice(0, 32);
+async function sysMsg(cid, data) {
+  await chatsCol.doc(cid).collection('msgs').add({ from: 'system', kind: 'sys', sys: data, at: FieldValue.serverTimestamp() });
+  await chatsCol.doc(cid).update({ lastAt: FieldValue.serverTimestamp(), lastFrom: 'system' });
+}
+async function allExist(uids) {
+  const snaps = await db.getAll(...uids.map((u) => db.collection('users').doc(u)));
+  return snaps.every((s) => s.exists);
+}
+
+/** A conversation between two accounts (the same one every time). */
+export const chatDirect = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  await needOn('chat');
+  const other = (req.data || {}).uid;
+  if (!isUidStr(other) || other === uid) fail('invalid-argument', 'uid');
+  if (!(await allExist([other]))) fail('not-found', 'no such account');
+  await rateLimit(req, 'chatnew|' + uid, 60, 60 * 60 * 1000, true);
+  const id = directId(uid, other);
+  const ref = chatsCol.doc(id);
+  await db.runTransaction(async (tx) => {
+    const s = await tx.get(ref);
+    if (!s.exists) tx.set(ref, { kind: 'direct', members: [uid, other].sort(), admins: [], blocked: [], createdBy: uid, created: FieldValue.serverTimestamp(), lastAt: FieldValue.serverTimestamp(), lastFrom: null });
+  });
+  return { id };
+});
+
+/** Groups: create, add / remove members, rename, leave, make admin. The name travels sealed for the members. */
+export const chatGroup = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  await needOn('chat');
+  const { op, cid, uids, title } = req.data || {};
+  await rateLimit(req, 'chatgrp|' + uid, 120, 60 * 60 * 1000, true);
+  if (op === 'create') {
+    const list = [...new Set(Array.isArray(uids) ? uids : [])].filter((u) => u !== uid);
+    if (!list.length || list.length > MAX_GROUP - 1 || !list.every(isUidStr)) fail('invalid-argument', 'members');
+    if (!validTitle(title)) fail('invalid-argument', 'title');
+    if (!(await allExist(list))) fail('not-found', 'no such account');
+    const ref = chatsCol.doc();
+    await ref.set({ kind: 'group', members: [uid, ...list], admins: [uid], title, createdBy: uid, created: FieldValue.serverTimestamp(), lastAt: FieldValue.serverTimestamp(), lastFrom: null });
+    await sysMsg(ref.id, { type: 'created', by: uid });
+    return { id: ref.id };
+  }
+  if (typeof cid !== 'string' || !/^[A-Za-z0-9]{10,40}$/.test(cid)) fail('invalid-argument', 'cid');
+  const ref = chatsCol.doc(cid);
+  const res = await db.runTransaction(async (tx) => {
+    const s = await tx.get(ref);
+    if (!s.exists || s.data().kind !== 'group') fail('not-found', 'no such group');
+    const g = s.data();
+    if (!g.members.includes(uid)) fail('permission-denied', 'not a member');
+    const admin = g.admins.includes(uid);
+    if (op === 'leave') {
+      const members = g.members.filter((m) => m !== uid);
+      let admins = g.admins.filter((m) => m !== uid);
+      if (!members.length) { tx.delete(ref); return { gone: true }; }
+      if (!admins.length) admins = [members[0]];
+      // the remaining members get the name sealed again without the one who left (sent by the app)
+      tx.update(ref, { members, admins, ...(validTitle(title) ? { title } : {}) });
+      return { sys: { type: 'left', by: uid } };
+    }
+    if (!admin) fail('permission-denied', 'admins only');
+    if (op === 'add') {
+      const add = [...new Set(Array.isArray(uids) ? uids : [])].filter((u) => isUidStr(u) && !g.members.includes(u));
+      if (!add.length) fail('invalid-argument', 'members');
+      if (g.members.length + add.length > MAX_GROUP) fail('resource-exhausted', 'group full');
+      if (!validTitle(title)) fail('invalid-argument', 'title');
+      tx.update(ref, { members: [...g.members, ...add], title });
+      return { add, sys: { type: 'added', by: uid, uids: add } };
+    }
+    if (op === 'remove') {
+      const rm = (Array.isArray(uids) ? uids : []).filter((u) => g.members.includes(u) && u !== uid);
+      if (!rm.length) fail('invalid-argument', 'members');
+      tx.update(ref, { members: g.members.filter((m) => !rm.includes(m)), admins: g.admins.filter((m) => !rm.includes(m)), ...(validTitle(title) ? { title } : {}) });
+      return { sys: { type: 'removed', by: uid, uids: rm } };
+    }
+    if (op === 'title') {
+      if (!validTitle(title)) fail('invalid-argument', 'title');
+      tx.update(ref, { title });
+      return { sys: { type: 'renamed', by: uid } };
+    }
+    if (op === 'admin') {
+      const u = (Array.isArray(uids) ? uids : [])[0];
+      if (!g.members.includes(u)) fail('invalid-argument', 'members');
+      tx.update(ref, { admins: [...new Set([...g.admins, u])] });
+      return { sys: { type: 'admin', by: uid, uids: [u] } };
+    }
+    fail('invalid-argument', 'op');
+  });
+  if (res.add && !(await allExist(res.add))) {
+    await ref.update({ members: FieldValue.arrayRemove(...res.add) });
+    fail('not-found', 'no such account');
+  }
+  if (res.sys) await sysMsg(cid, res.sys);
+  return { ok: true, gone: !!res.gone };
+});
+
+/** A conversation between two accounts: one of them stops it (no new messages either way) or allows it again. */
+export const chatBlock = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  const { cid, on } = req.data || {};
+  if (typeof cid !== 'string' || !/^d[0-9a-f]{32}$/.test(cid)) fail('invalid-argument', 'cid');
+  const ref = chatsCol.doc(cid);
+  const s = await ref.get();
+  if (!s.exists || !s.data().members.includes(uid)) fail('not-found', 'no such chat');
+  await ref.update({ blocked: on === false ? FieldValue.arrayRemove(uid) : FieldValue.arrayUnion(uid) });
+  return { ok: true };
+});
+
+/**
+ * Documents sent in a chat are an encrypted-document action of the plan (acmSend): a file stored
+ * without that count (a script going around the app) is removed at once.
+ */
+async function chatFileStored(name, meta, size) {
+  const m = /^chats\/([A-Za-z0-9]{10,40})\/files\/([0-9a-f]{32})$/.exec(name || '');
+  if (!m) return false;
+  const file = getStorage().bucket(BUCKET).file(name);
+  const uploader = meta && meta.uploader;
+  let ok = isUidStr(uploader) && size <= 110 * 1024 * 1024;
+  const sw = await switches();
+  if (sw.all || sw.off.chat) ok = false;
+  if (ok) {
+    const c = (await chatsCol.doc(m[1]).get()).data();
+    ok = !!c && c.members.includes(uploader);
+  }
+  if (ok) {
+    // the app counts the document as hash("acmSend|" + file id) before uploading it (see plan.js)
+    const r = hex(sha256(new TextEncoder().encode('acmSend|' + m[2])).slice(0, 16));
+    const now = Date.now();
+    ok = false;
+    for (const month of [monthOf(now), monthOf(now - 3 * DAY)]) {
+      const d = await db.collection('accounts').doc(uploader).collection('usage').doc(month).collection('refs').doc('acmSend-' + r).get();
+      if (d.exists) { ok = true; break; }
+    }
+  }
+  if (!ok) { try { await file.delete(); } catch (e) { console.warn('chat file', e.message); } }
+  return true;
+}

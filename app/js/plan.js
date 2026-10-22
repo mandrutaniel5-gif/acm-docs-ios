@@ -110,7 +110,7 @@ const Plan = (() => {
    * Asks the server for one action (edit / scan / invoice / encrypted send / open). `ref` names the
    * document so the same one counts once a month. true = go ahead.
    */
-  async function allow(action, ref) {
+  async function allow(action, ref, opts = {}) {
     if (!ACTIONS[action]) return false;
     if (typeof Service !== 'undefined' && Service.blocked(action)) return false;
     if (!uid()) { await needAccount(action); return false; }
@@ -131,7 +131,8 @@ const Plan = (() => {
     // and the next action then stops)
     const t = tokenPlan(u);
     const over = ls.get('acm.plan.over.' + u) || {};
-    if (t && !(over[action] && over[action] === new Date().toISOString().slice(0, 7))) {
+    // (opts.wait: the server must have counted it before going on, e.g. a document sent in a chat)
+    if (t && !opts.wait && !(over[action] && over[action] === new Date().toISOString().slice(0, 7))) {
       ask().catch((e) => {
         if (/limit:/.test(String(e.server || e.message || ''))) { over[action] = new Date().toISOString().slice(0, 7); ls.set('acm.plan.over.' + u, over); }
       });
