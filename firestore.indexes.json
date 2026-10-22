@@ -2,6 +2,12 @@
   "indexes": [],
   "fieldOverrides": [
     {
+      "collectionGroup": "challenges",
+      "fieldPath": "expires",
+      "ttl": true,
+      "indexes": []
+    },
+    {
       "collectionGroup": "pairings",
       "fieldPath": "expires",
       "ttl": true,

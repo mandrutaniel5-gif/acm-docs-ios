@@ -19,6 +19,8 @@ import { onObjectFinalized, onObjectDeleted } from 'firebase-functions/v2/storag
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import Stripe from 'stripe';
 import { PLANS, PRICES, ACTIONS, PAID, GROUP_PLANS, monthOf } from './plans.js';
+import { mailReady, sendSignInCode } from './mail.js';
+import { timingSafeEqual } from 'node:crypto';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore';
@@ -88,7 +90,10 @@ export const registerDevice = onCall(async (req) => {
   if (!profile.exists) fail('failed-precondition', 'no profile');
   if (!verify(parseBundle(profile.data().key).ed, `acm-register\n${uid}\n${fp}\n${ts}`, proof)) fail('permission-denied', 'no account keys');
   if (info != null && (typeof info !== 'string' || info.length > 4000)) fail('invalid-argument', 'info');
-  const { replace } = req.data || {};
+  const { replace, emailCode } = req.data || {};
+  // two-step verification by email: a new device signed in with the password also needs the code
+  // that was just emailed to the account (devices joined by QR are approved by a device instead)
+  if (!(await emailFirstDevice(uid)) && (await emailCodeRequired(uid))) await checkEmailCode(uid, emailCode);
   if (replace != null && (typeof replace !== 'string' || !/^([0-9a-f]{32}|auto)$/.test(replace))) fail('invalid-argument', 'replace');
   const col = devicesOf(uid);
   const id = newId();
@@ -508,12 +513,12 @@ export const blobRemoved = onObjectDeleted({ bucket: BUCKET }, async (ev) => {
  * document (ref) per month; past the plan's number, the action is refused. Returns a plan token the
  * device keeps for working offline (paid plans only).
  */
-export const useQuota = onCall(async (req) => {
+// one instance stays warm: saving a document never waits for a cold start
+export const useQuota = onCall({ minInstances: 1 }, async (req) => {
   const { uid, dev } = await needDevice(req);
   const { action, ref } = req.data || {};
   if (!ACTIONS.includes(action)) fail('invalid-argument', 'action');
   if (ref != null && (typeof ref !== 'string' || !/^[0-9a-f]{16,64}$/.test(ref))) fail('invalid-argument', 'ref');
-  await rateLimit(req, 'quota|' + uid, 120, 10 * 60 * 1000, true);
   const e = await effective(uid);
   const limit = e.month[action];
   const month = monthOf();
@@ -521,8 +526,16 @@ export const useQuota = onCall(async (req) => {
   const rref = ref ? uref.collection('refs').doc(action + '-' + ref) : null;
   const used = await db.runTransaction(async (tx) => {
     const u = await tx.get(uref);
-    const n = (u.exists && u.data()[action]) || 0;
-    if (rref && (await tx.get(rref)).exists) return n; // same document again this month: free
+    const seen = rref ? (await tx.get(rref)).exists : false; // (all reads before any write)
+    const d = u.exists ? u.data() : {};
+    const n = d[action] || 0;
+    // scripted bursts: at most 120 calls per 10 minutes per account (kept in the same document)
+    const now = Date.now();
+    const win = d.win && d.win + 600000 > now ? d.win : now;
+    const calls = win === d.win ? (d.calls || 0) + 1 : 1;
+    if (calls > 120) fail('resource-exhausted', 'too many requests, try again later');
+    tx.set(uref, { win, calls }, { merge: true });
+    if (seen) return n; // same document again this month: free
     if (n >= limit) fail('resource-exhausted', 'limit:' + action);
     // counters and document marks delete themselves after about 13 months (Firestore TTL on "expires")
     const expires = Timestamp.fromMillis(Date.now() + 400 * DAY);
@@ -544,7 +557,7 @@ export const planStatus = onCall(async (req) => {
     plan: e.plan, until: e.until, source: e.source, group: e.group, cancelAt: e.cancelAt, period: e.period,
     devices: { used: active, limit: e.devices }, cloud: { used: cloud.used, limit: cloud.limit },
     month: monthOf(), usage: Object.fromEntries(ACTIONS.map((a) => [a, { used: usage[a] || 0, limit: e.month[a] }])),
-    plans: PLANS, prices: PRICES, payments: !!process.env.STRIPE_SECRET_KEY, manage: e.hasStripe,
+    plans: PLANS, prices: PRICES, payments: !!process.env.STRIPE_SECRET_KEY, manage: e.hasStripe, mail: mailReady(),
     token: e.plan !== 'basic' ? await planToken(uid, dev, e.plan, e.until) : null,
   };
 });
@@ -872,4 +885,53 @@ export const beforeCreate = beforeUserCreated(async (ev) => {
   if (process.env.FUNCTIONS_EMULATOR === 'true') return; // the test accounts all come from one address
   if (await limited('signup|' + ip, 5, 3600 * 1000)) throw new HttpsError('resource-exhausted', 'too many accounts from this network');
   if (await limited('signup-all', 300, 3600 * 1000)) throw new HttpsError('resource-exhausted', 'too many new accounts, try later');
+});
+
+// ================================================================== two-step verification by email
+const challengeOf = (uid) => db.collection('challenges').doc(uid); // closed to every device by the rules
+const codeHash = (uid, code) => Buffer.from(sha256(new TextEncoder().encode(`acm-email-code\n${uid}\n${code}`)));
+/** The very first device of a new account needs no code (the email was just confirmed). */
+async function emailFirstDevice(uid) { return (await devicesOf(uid).limit(1).get()).empty; }
+/** On for every account (it can be turned off from a device of the account), once mail is set up. */
+async function emailCodeRequired(uid) {
+  if (!mailReady() && process.env.MAIL_TEST !== '1') return false;
+  const sec = (await metaOf(uid, 'security').get()).data() || {};
+  return sec.emailCode !== false;
+}
+async function checkEmailCode(uid, code) {
+  if (typeof code !== 'string' || !/^\d{6}$/.test(code)) fail('failed-precondition', 'email code required');
+  const ref = challengeOf(uid);
+  const ok = await db.runTransaction(async (tx) => {
+    const s = await tx.get(ref);
+    if (!s.exists) return 'none';
+    const d = s.data();
+    if (d.expires.toMillis() < Date.now() || d.tries >= 5) { tx.delete(ref); return 'expired'; }
+    const good = timingSafeEqual(Buffer.from(d.h, 'base64'), codeHash(uid, code));
+    if (good) tx.delete(ref); else tx.update(ref, { tries: d.tries + 1 });
+    return good ? 'ok' : 'bad';
+  });
+  if (ok === 'ok') return;
+  fail('permission-denied', ok === 'bad' ? 'bad email code' : 'email code expired');
+}
+
+/** Sends the 6-digit code to the account's email (signed in with the password, not yet a device). */
+export const emailCodeSend = onCall(async (req) => {
+  const uid = needUser(req);
+  if (!(await emailCodeRequired(uid))) return { needed: false };
+  await rateLimit(req, 'mailcode|' + uid, 5, 60 * 60 * 1000, true);
+  const code = String(randomBytes(4).readUInt32BE(0) % 1000000).padStart(6, '0');
+  const user = await getAuth().getUser(uid);
+  await challengeOf(uid).set({ h: codeHash(uid, code).toString('base64'), tries: 0, expires: Timestamp.fromMillis(Date.now() + 10 * 60 * 1000), ...(process.env.MAIL_TEST === '1' ? { test: code } : {}) });
+  if (mailReady()) await sendSignInCode(user.email, code, agentOf(req.rawRequest && req.rawRequest.headers['user-agent']));
+  const [name, dom] = String(user.email || '').split('@');
+  return { needed: true, to: name ? name.slice(0, 2) + '•••@' + dom : '' };
+});
+
+/** Turns the email code on or off (only from a device of the account). */
+export const emailCodeSet = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  const on = (req.data || {}).on !== false;
+  await metaOf(uid, 'security').set({ emailCode: on, at: FieldValue.serverTimestamp() }, { merge: true });
+  await event(uid, { type: on ? 'twostep-on' : 'twostep-off', method: 'email' });
+  return { on, ready: mailReady() };
 });

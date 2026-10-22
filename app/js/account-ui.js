@@ -161,7 +161,7 @@ const AccountUI = (() => {
       form.addEventListener('submit', (e) => { e.preventDefault(); showErr(box, ''); busy(go, async () => { try { await Account.signUp(name.input.value, email.input.value, pass.input.value, pass2.input.value); await route(); } catch (x) { showErr(box, x); if (pass.input.value !== pass2.input.value) pass2.input.focus(); } }); });
       card.append(
         el('h2', { text: 'Cont nou' }),
-        el('p', { class: 'auth-sub', text: 'Contul îți dă chei de criptare post-cuantică, create pe acest dispozitiv. Nimeni altcineva nu le are.' }),
+        el('p', { class: 'auth-sub', text: 'Contul folosește End-to-End Encryption și Post-Quantum Cryptography. Cheile se generează pe acest dispozitiv.' }),
         form,
         el('p', { class: 'auth-legal muted small' }, [
           el('span', { text: 'Creând contul, accepți' }), ' ',
@@ -258,7 +258,7 @@ const AccountUI = (() => {
       card.append(
         el('div', { class: 'auth-spin' }, [el('span'), el('span'), el('span')]),
         el('h2', { text: 'Pregătim cheile tale' }),
-        el('p', { class: 'auth-sub', text: 'Se creează pe acest dispozitiv cheile de criptare post-cuantică ale contului. Durează câteva secunde.' }),
+        el('p', { class: 'auth-sub', text: 'Se generează pe acest dispozitiv cheile contului (Post-Quantum Cryptography). Durează câteva secunde.' }),
       );
     },
 
@@ -325,7 +325,7 @@ const AccountUI = (() => {
     if (typeof Devices === 'undefined') return;
     try {
       const st = await Devices.ensure();
-      if (st === 'ok') { Devices.start(); if (typeof Sync !== 'undefined') Sync.start(); if (typeof Plan !== 'undefined') Plan.refresh().catch(() => {}); }
+      if (st === 'ok') { Devices.start(); if (typeof Sync !== 'undefined') Sync.start(); if (typeof Plan !== 'undefined') Plan.refresh().catch(() => {}); loadSecurity(); }
       // the plan's devices are all in use and this one did not take a place: not signed in here
       if (st === 'limit') { await Account.signOut(); UI.toast(I18n.t('Contul nu a fost deschis pe acest dispozitiv.'), { duration: 6000 }); }
     }
@@ -398,7 +398,10 @@ const AccountUI = (() => {
       if (typeof Security !== 'undefined') sec.push(srow('shield', 'green', 'Securitate și criptare', 'Cum îți protejăm datele și starea contului', chev(), () => Security.show()));
       if (typeof Sync !== 'undefined') sec.push(srow('refresh', 'teal', 'Sincronizare în cloud', Sync.summary(), chev(), () => Sync.show()));
       if (typeof Devices !== 'undefined') sec.push(srow('lock', 'indigo', 'Dispozitive', 'Vezi și administrează dispozitivele conectate', chev(), () => Devices.show()));
-      if (Account.isPasswordUser()) sec.push(srow('key', Account.twoStep() ? 'green' : 'orange', 'Verificare în doi pași', Account.twoStep() ? 'Activă: la conectarea cu parola se cere și un cod' : 'Oprită: pornește-o ca parola singură să nu fie de ajuns', chev(), async () => { await twoStepFlow(); App.showView('settings'); }));
+      if (Account.isPasswordUser()) {
+        const on = emailTwoStep() || Account.twoStep();
+        sec.push(srow('key', on ? 'green' : 'orange', 'Two-Factor Authentication', on ? (emailTwoStep() ? (Account.twoStep() ? 'Activă · cod pe email și aplicație de autentificare' : 'Activă · cod pe email') : 'Activă · aplicație de autentificare') : 'Oprită', chev(), async () => { await twoStepScreen(); App.showView('settings'); }));
+      }
       if (typeof AppLock !== 'undefined') sec.push(srow('lock', 'blue', 'Blocarea aplicației', AppLock.summary(), chev(), async () => { await AppLock.settings(); App.showView('settings'); }));
       sec.push(srow('key', Account.wordsSaved() ? 'green' : 'orange', 'Codul de recuperare', Account.wordsSaved() ? 'Notat ✓' : 'Nenotat încă: notează-l', chev(), showWords));
       if (typeof Shield !== 'undefined') sec.push(srow('shield', 'indigo', 'Protecție anti-spyware', 'Ce face aplicația și ce poți face tu', chev(), () => Shield.showInfo()));
@@ -443,9 +446,59 @@ const AccountUI = (() => {
   /** After a password check this device is back on its own device session (rules need it). */
   async function backToDevice() { try { if (typeof Devices !== 'undefined') await Devices.ensure(); } catch (e) { console.warn('device session', e); } }
 
+  // ---------------------------------------------------------------- Two-Factor Authentication
+  // By default a new device signed in with the password also needs a code sent by email; an
+  // authenticator app (TOTP) can be added on top.
+  const SEC_KEY = () => 'acm.2fa.email.' + (Account.current() ? Account.current().uid : '-');
+  const emailTwoStep = () => { try { return localStorage.getItem(SEC_KEY()) !== 'off'; } catch (e) { return true; } };
+  async function loadSecurity() {
+    const u = Account.current();
+    if (!u) return;
+    try {
+      const { F: f, db } = Account.internals();
+      const d = (await f.firestore.getDoc(f.firestore.doc(db, 'accounts', u.uid, 'meta', 'security'))).data() || {};
+      localStorage.setItem(SEC_KEY(), d.emailCode === false ? 'off' : 'on');
+    } catch (e) {}
+  }
+  async function twoStepScreen() {
+    await loadSecurity();
+    const act = await UI.modal((box, close) => {
+      box.classList.add('acm-ui');
+      const sw = (on) => el('span', { class: 'acm-sw' + (on ? ' on' : ''), 'aria-hidden': 'true' });
+      const mail = el('button', { class: 'srow', type: 'button' }, [
+        el('span', { class: 'si blue', html: svg('mail') }),
+        el('span', { class: 'stx' }, [el('b', { text: 'Cod pe email' }), el('small', { text: 'La conectarea pe un dispozitiv nou se cere un cod trimis pe email.' })]),
+        sw(emailTwoStep()),
+      ]);
+      mail.addEventListener('click', () => close('mail'));
+      const app = el('button', { class: 'srow', type: 'button' }, [
+        el('span', { class: 'si indigo', html: svg('key') }),
+        el('span', { class: 'stx' }, [el('b', { text: 'Aplicație de autentificare' }), el('small', { text: Account.twoStep() ? 'Activă (TOTP)' : 'Opțional: Google Authenticator, Microsoft Authenticator, 1Password' })]),
+        el('span', { class: 'chev', html: svg('right') }),
+      ]);
+      app.addEventListener('click', () => close('app'));
+      box.append(
+        el('div', { class: 'acm-alert', html: svg('key') }),
+        el('h2', { class: 'no-tr', text: 'Two-Factor Authentication' }),
+        el('p', { text: 'Pe lângă parolă, conectarea unui dispozitiv nou cere o a doua confirmare. Dispozitivele deja conectate nu sunt afectate.' }),
+        el('div', { class: 'list-card' }, [mail, app]),
+        el('div', { class: 'actions' }, [el('button', { class: 'btn', type: 'button', text: 'Închide', onclick: () => close(null) })]),
+      );
+    });
+    if (act === 'app') { await twoStepFlow(); return twoStepScreen(); }
+    if (act === 'mail') {
+      const on = !emailTwoStep();
+      if (!on && !(await UI.confirm('Oprești codul pe email?', 'Un dispozitiv nou se va putea conecta doar cu parola și cheile contului.', 'Oprește'))) return twoStepScreen();
+      UI.busy('Se salvează…');
+      try { await Account.call('emailCodeSet', { on }); localStorage.setItem(SEC_KEY(), on ? 'on' : 'off'); UI.busy(); UI.toast(on ? 'Codul pe email este activ.' : 'Codul pe email a fost oprit.'); }
+      catch (e) { UI.busy(); UI.toast(Account.say(e), { error: true }); }
+      return twoStepScreen();
+    }
+  }
+
   async function twoStepFlow() {
     if (Account.twoStep()) {
-      const pw = await askPassword('Oprești verificarea în doi pași?', 'Fără ea, cine îți află parola se poate conecta (fără să-ți poată deschide documentele). Confirmă cu parola contului.', 'Oprește');
+      const pw = await askPassword('Oprești verificarea în doi pași?', 'Conectarea unui dispozitiv nou nu va mai cere codul din aplicația de autentificare. Confirmă cu parola contului.', 'Oprește');
       if (!pw) return;
       UI.busy('Se oprește…');
       try { await Account.twoStepOff(pw); UI.busy(); UI.toast('Verificarea în doi pași a fost oprită.'); }
@@ -572,7 +625,7 @@ const AccountUI = (() => {
     if (!quick) return;
     if (Account.wordsSaved()) {
       // next step for an account that signs in with a password: the password alone should not be enough
-      if (!Account.isPasswordUser() || Account.twoStep()) return;
+      if (!Account.isPasswordUser() || Account.twoStep() || emailTwoStep()) return;
       const b2 = el('button', { id: 'acct-banner', class: 'acct-banner', type: 'button' }, [
         el('span', { class: 'ab-i', html: svg('shield') }),
         el('span', { class: 'ab-t' }, [el('b', { text: 'Pornește verificarea în doi pași' }), el('small', { text: 'Așa, parola singură nu mai ajunge nimănui' })]),
@@ -620,5 +673,5 @@ const AccountUI = (() => {
     banner();
   }
 
-  return { start, chooseLanguage, showProfile, show: (v) => render(v || 'signin'), settingsGroup, showWords, twoStepFlow, route, get view() { return view; } };
+  return { start, chooseLanguage, showProfile, show: (v) => render(v || 'signin'), settingsGroup, showWords, twoStepFlow, twoStepScreen, loadSecurity, emailTwoStep, route, get view() { return view; } };
 })();

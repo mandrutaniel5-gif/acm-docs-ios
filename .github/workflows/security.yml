@@ -24,7 +24,7 @@ jobs:
           (cd functions && npm ci --no-audit --no-fund)
           npm i -g firebase-tools@14.27.0
       - name: Test-only payment keys for the emulator
-        run: printf 'STRIPE_SECRET_KEY=sk_test_emulator\nSTRIPE_WEBHOOK_SECRET=whsec_test_acmdocs\n' > functions/.env.local
+        run: printf 'STRIPE_SECRET_KEY=sk_test_emulator\nSTRIPE_WEBHOOK_SECRET=whsec_test_acmdocs\nMAIL_TEST=1\n' > functions/.env.local
       - name: Plans and limits (bypass attempts)
         run: firebase emulators:exec --project acm-docs-52280 --only auth,firestore,functions,storage "node test/plans.test.mjs" 2>&1 | tee plans.txt
       - name: Round 2 attacks (again)

@@ -37,7 +37,7 @@ jobs:
         run: |
           set -o pipefail
           # test-only payment keys for the emulator (the real ones are never in the repository)
-          printf 'STRIPE_SECRET_KEY=sk_test_emulator\nSTRIPE_WEBHOOK_SECRET=whsec_test_acmdocs\n' > functions/.env.local
+          printf 'STRIPE_SECRET_KEY=sk_test_emulator\nSTRIPE_WEBHOOK_SECRET=whsec_test_acmdocs\nMAIL_TEST=1\n' > functions/.env.local
           firebase emulators:exec --project acm-docs-52280 --only auth,firestore,functions,storage "node --test test/server.test.mjs && node test/plans.test.mjs" 2>&1 | tee server-test.txt
           rm -f functions/.env.local
 
@@ -48,6 +48,8 @@ jobs:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           STRIPE_TAX: ${{ secrets.STRIPE_TAX }}
+          SMTP_URL: ${{ secrets.SMTP_URL }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
         run: |
           if [ -z "$SA" ]; then echo "No deploy key yet (secret FIREBASE_SERVICE_ACCOUNT): tests only." | tee deploy.txt; exit 0; fi
           printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
@@ -57,6 +59,8 @@ jobs:
           [ -n "$STRIPE_SECRET_KEY" ] && echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" >> functions/.env
           [ -n "$STRIPE_WEBHOOK_SECRET" ] && echo "STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET" >> functions/.env
           [ -n "$STRIPE_TAX" ] && echo "STRIPE_TAX=$STRIPE_TAX" >> functions/.env
+          [ -n "$SMTP_URL" ] && echo "SMTP_URL=$SMTP_URL" >> functions/.env
+          [ -n "$MAIL_FROM" ] && echo "MAIL_FROM=$MAIL_FROM" >> functions/.env
           echo "payments: $([ -n "$STRIPE_SECRET_KEY" ] && echo on || echo 'off (no STRIPE_SECRET_KEY secret yet)')" | tee -a deploy.txt
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
           set -o pipefail

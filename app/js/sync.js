@@ -11,8 +11,11 @@ const Sync = (() => {
   const BUCKET = 'acm-docs-52280.firebasestorage.app';
   const MAX_FILE = 100 * 1024 * 1024;
   const MAX_INLINE = 600000;
-  const CHECK_MS = 5000;
-  const PULL_MS = 60000;
+  // changes travel at once: a live listener brings other devices' changes in a second or two, and a
+  // change made here is sent ~1 s after it happens. The timers below are only a safety net.
+  const CHECK_MS = 45000;
+  const PULL_MS = 5 * 60000;
+  const PUSH_DELAY = 900;
 
   // data that belongs to the account (device-only data such as app lock or device keys stays local)
   const SHARED = ['acm.businesses', 'acm.business', 'acm.invoiceItems', 'acm.invoiceClients', 'acm.docs', 'acm.invoiceDraft',
@@ -80,13 +83,47 @@ const Sync = (() => {
   /** Compares the shared keys with what was last seen: anything different is queued for upload. */
   function noticeChanges() {
     const s = state();
-    if (s.mode !== 'cloud' || !uid() || busy) return;
+    if (s.mode !== 'cloud' || !uid()) return;
+    if (busy) { busy.then(() => touch()); return; }
     if (noticeChangesInto(s)) { saveState(s); schedulePush(); }
   }
   const fileList = () => (typeof App !== 'undefined' && App.recentFiles ? App.recentFiles() : [])
     .filter((f) => !(typeof Shield !== 'undefined' && Shield.isProtected(f.path)));
 
-  function schedulePush() { clearTimeout(pushTimer); pushTimer = setTimeout(() => run('push'), 3000); }
+  function schedulePush() { clearTimeout(pushTimer); pushTimer = setTimeout(() => run('push'), PUSH_DELAY); }
+  /** Something shared changed here (a setting, a list, a saved document): looked at right away. */
+  let touchTimer = null;
+  function touch() { clearTimeout(touchTimer); touchTimer = setTimeout(noticeChanges, 250); }
+  // every write of shared data in this window is noticed without polling
+  (function watchStorage() {
+    try {
+      const S = Storage.prototype, set = S.setItem, del = S.removeItem;
+      if (S.__acmSync) return;
+      S.__acmSync = true;
+      S.setItem = function (k, v) { set.call(this, k, v); if (this === window.localStorage && uid() && sharedKeys().includes(k)) touch(); };
+      S.removeItem = function (k) { del.call(this, k); if (this === window.localStorage && uid() && sharedKeys().includes(k)) touch(); };
+    } catch (e) {}
+  })();
+
+  // ---------------------------------------------------------------- live changes from the other devices
+  let unlisten = null, pullSoon = null;
+  function listen() {
+    stopListening();
+    const s = state();
+    if (s.mode !== 'cloud' || !uid()) return;
+    try {
+      const { F: f, db } = Account.internals();
+      const fs = f.firestore;
+      if (!fs.onSnapshot) return;
+      const q = fs.query(vaultCol(), fs.where('at', '>', new Date(s.lastAt || Date.now() - 300000)), fs.orderBy('at'));
+      unlisten = fs.onSnapshot(q, (snap) => {
+        if (snap.metadata.hasPendingWrites || !snap.docChanges().length) return;
+        clearTimeout(pullSoon);
+        pullSoon = setTimeout(() => { if (!document.hidden) run('pull'); }, 300);
+      }, (e) => { console.warn('sync listen', e && e.code); stopListening(); setTimeout(listen, 30000); });
+    } catch (e) { console.warn('sync listen', e); }
+  }
+  function stopListening() { if (unlisten) { try { unlisten(); } catch (e) {} unlisten = null; } }
 
   // ---------------------------------------------------------------- path placeholders
   // Paths differ per device: inside synced values they travel as "acmcloud:<id>".
@@ -306,6 +343,7 @@ const Sync = (() => {
         await vaultKey();
         if (typeof Devices !== 'undefined' && (await Devices.ensure()) !== 'ok') return;
         if (what !== 'push') {
+          // (what === 'pull' comes from the live listener: only what is new)
           const changed = await pull(s);
           if (!s.inited) {
             // queue whatever this device has that the account does not have yet (and the joined lists)
@@ -366,12 +404,12 @@ const Sync = (() => {
   function start() {
     stop();
     if (state().mode !== 'cloud') return;
-    run('all');
+    run('all').then(listen);
     checkTimer = setInterval(noticeChanges, CHECK_MS);
     pullTimer = setInterval(() => { if (!document.hidden) run('all'); }, PULL_MS);
     document.addEventListener('visibilitychange', onVisible);
   }
-  function stop() { clearInterval(checkTimer); clearInterval(pullTimer); clearTimeout(pushTimer); document.removeEventListener('visibilitychange', onVisible); }
+  function stop() { clearInterval(checkTimer); clearInterval(pullTimer); clearTimeout(pushTimer); stopListening(); document.removeEventListener('visibilitychange', onVisible); }
   function onVisible() { if (!document.hidden) run('all'); }
   function reset() { stop(); vkey = null; }
 
@@ -458,5 +496,5 @@ const Sync = (() => {
   }
   if (typeof Account !== 'undefined' && Account.onChange) Account.onChange(() => { if (!uid()) reset(); });
 
-  return { start, stop, reset, run, forget, forgetAccount, summary, show, setMode, recover, onChange: (f) => listeners.push(f) };
+  return { start, stop, reset, run, forget, touch, forgetAccount, summary, show, setMode, recover, onChange: (f) => listeners.push(f) };
 })();

@@ -80,6 +80,15 @@ async function makeAccount(tag) {
   await signInWithCustomToken(c.auth, r.token);
   return { c, uid, email, password, id, handle, dev: r.dev };
 }
+/** registerDevice for a device signed in with the password: asks for the emailed code (test mode keeps it readable). */
+async function regEmail(c, uid, body) {
+  try { return await c.call('registerDevice', body); } catch (e) {
+    if (!/email code required/.test(e.message)) throw e;
+  }
+  await c.call('emailCodeSend', {});
+  const ch = await adminGet(`challenges/${uid}`);
+  return c.call('registerDevice', { ...body, emailCode: ch.test });
+}
 async function tryPair(acc) {
   const k = A.deriveIdentity(A.generateMnemonic());
   const c = client();
@@ -167,9 +176,9 @@ await check('Basic: password + 24 words on a new device: refused, unless it take
   const dk = A.deriveIdentity(A.generateMnemonic());
   const ts = Date.now();
   const proof = b64(A.signEd(a.id, `acm-register\n${a.uid}\n${dk.fingerprint}\n${ts}`));
-  assert.match(await code(c.call('registerDevice', { bundle: b64(dk.bundle), ts, proof })), /device limit/);
-  assert.match(await code(c.call('registerDevice', { bundle: b64(dk.bundle), ts, proof, replace: rid() })), /device limit/);
-  const r = await c.call('registerDevice', { bundle: b64(dk.bundle), ts, proof, replace: a.dev });
+  assert.match(await code(regEmail(c, a.uid, { bundle: b64(dk.bundle), ts, proof })), /device limit/);
+  assert.match(await code(regEmail(c, a.uid, { bundle: b64(dk.bundle), ts, proof, replace: rid() })), /device limit/);
+  const r = await regEmail(c, a.uid, { bundle: b64(dk.bundle), ts, proof, replace: a.dev });
   assert.equal(r.role, 'primary');
   await signInWithCustomToken(c.auth, r.token);
   // the old device is out at once
@@ -180,10 +189,34 @@ await check('Basic: password + 24 words on a new device: refused, unless it take
   await signInWithEmailAndPassword(c2.auth, a.email, a.password);
   const dk2 = A.deriveIdentity(A.generateMnemonic());
   const ts2 = Date.now();
-  const r2 = await c2.call('registerDevice', { bundle: b64(dk2.bundle), ts: ts2, proof: b64(A.signEd(a.id, `acm-register\n${a.uid}\n${dk2.fingerprint}\n${ts2}`)), replace: 'auto' });
+  const r2 = await regEmail(c2, a.uid, { bundle: b64(dk2.bundle), ts: ts2, proof: b64(A.signEd(a.id, `acm-register\n${a.uid}\n${dk2.fingerprint}\n${ts2}`)), replace: 'auto' });
   await signInWithCustomToken(c2.auth, r2.token);
   assert.notEqual(await code(a.c.call('planStatus')), 'ok');
   a.c = c2; a.dev = r2.dev;
+});
+
+await check('Two-step by email: a new device needs the emailed code; wrong codes run out', async () => {
+  const c = client();
+  await signInWithEmailAndPassword(c.auth, a.email, a.password);
+  const dk = A.deriveIdentity(A.generateMnemonic());
+  const ts = Date.now();
+  const body = { bundle: b64(dk.bundle), ts, proof: b64(A.signEd(a.id, `acm-register\n${a.uid}\n${dk.fingerprint}\n${ts}`)), replace: 'auto' };
+  assert.match(await code(c.call('registerDevice', body)), /email code required/);
+  const sent = await c.call('emailCodeSend', {});
+  assert.equal(sent.needed, true);
+  const ch = await adminGet(`challenges/${a.uid}`);
+  const wrong = ch.test === '000000' ? '111111' : '000000';
+  assert.match(await code(c.call('registerDevice', { ...body, emailCode: wrong })), /bad email code/);
+  // a device cannot read the code
+  assert.equal(await ok(getDoc(doc(a.c.db, 'challenges', a.uid))), false);
+  for (let i = 0; i < 5; i++) await code(c.call('registerDevice', { ...body, emailCode: wrong }));
+  assert.match(await code(c.call('registerDevice', { ...body, emailCode: ch.test })), /expired|required/);
+  // turned off from a device of the account: no code needed
+  await a.c.call('emailCodeSet', { on: false });
+  const r = await c.call('registerDevice', body);
+  await signInWithCustomToken(c.auth, r.token);
+  a.c = c; a.dev = r.dev;
+  await a.c.call('emailCodeSet', { on: true });
 });
 
 await check('Cloud: writes stop at the plan limit (Firestore and Storage)', async () => {

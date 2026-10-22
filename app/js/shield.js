@@ -89,7 +89,7 @@ const Shield = (() => {
           ok('Chei închise în telefon', `Cheile private se deschid doar cu ${ios ? 'Face ID' : Host.mobile ? 'amprenta sau PIN-ul' : 'confirmarea Windows'} și se închid singure când ieși din aplicație sau după 3 minute fără activitate.`),
           ok('Fără capturi de ecran', ios ? 'Codul de recuperare și documentele decriptate se ascund când ecranul e înregistrat sau partajat și în lista de aplicații deschise.' : 'Codul de recuperare și documentele decriptate nu pot fi capturate sau înregistrate.'),
           ok('Copii decriptate temporare', 'Un document .acm deschis se șterge din telefon când îl închizi, dacă nu alegi să-l păstrezi.'),
-          ok('Criptare post-cuantică', 'Chiar dacă cineva copiază fișierele .acm acum, nu le poate deschide nici cu un computer cuantic de mai târziu.'),
+          ok('Post-Quantum Cryptography', 'Fișierele .acm rămân protejate pe termen lung, inclusiv față de computerele cuantice.'),
           !Host.mobile ? null : ok(ig.risk ? 'Verificarea telefonului: problemă' : 'Telefon verificat', ig.risk ? 'Am găsit semne de jailbreak/root.' : 'Nu am găsit semne de jailbreak sau root.'),
         ]),
         el('h3', { class: 'csub', text: 'Ce poți face tu' }),
@@ -100,7 +100,7 @@ const Shield = (() => {
           Host.mobile ? el('li', { text: 'Repornește telefonul o dată pe zi: multe programe spion nu supraviețuiesc unei reporniri.' }) : null,
           el('li', { text: 'Nu deschide linkuri sau fișiere de la persoane necunoscute și nu instala aplicații din afara magazinului.' }),
         ]),
-        el('div', { class: 'recov-warn', html: `${svg('info')}<span>Sincer: nicio aplicație nu se poate apăra complet de un spyware care a preluat controlul întregului telefon. Măsurile de mai sus reduc mult ce ar putea fura și când.</span>` }),
+        el('div', { class: 'recov-warn', html: `${svg('info')}<span>Protecția aplicației este completată de securitatea dispozitivului: sistem actualizat, blocarea ecranului și aplicații doar din surse de încredere.</span>` }),
         el('div', { class: 'actions' }, [el('button', { class: 'btn primary', type: 'button', text: 'Am înțeles', onclick: () => close() })]),
       );
     });
