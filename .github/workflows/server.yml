@@ -75,7 +75,7 @@ jobs:
           firebase deploy --project acm-docs-52280 --only storage --non-interactive 2>&1 | tee -a deploy.txt || echo "STORAGE NOT ACTIVE" | tee -a deploy.txt
           # one real round trip with a throwaway account (created and deleted by the test)
           node test/prod-smoke.mjs 2>&1 | tee -a deploy.txt
-          (cd functions && node tools/plan-key.mjs && node tools/migrate-cloud.mjs) 2>&1 | tee -a deploy.txt
+          (cd functions && node tools/plan-key.mjs && node tools/migrate-cloud.mjs && node --env-file=.env tools/mail-test.mjs) 2>&1 | tee -a deploy.txt
           rm -f "$RUNNER_TEMP/sa.json" functions/.env
 
       # results readable with plain git (branch "server-results")
