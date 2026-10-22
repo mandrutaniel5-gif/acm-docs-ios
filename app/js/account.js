@@ -104,6 +104,11 @@ const Account = (() => {
       'unavailable': 'Serverul nu răspunde. Verifică internetul.',
     }[c];
     if (m) return m;
+    const msg = String((e && (e.server || e.message)) || '');
+    if (/disposable email/.test(msg)) return 'Folosește o adresă de email permanentă: adresele temporare nu sunt acceptate.';
+    if (/too many (new )?accounts/.test(msg)) return 'Prea multe conturi noi din această rețea. Încearcă mai târziu.';
+    if (/device limit/.test(msg)) return 'Ai atins numărul de dispozitive al planului tău.';
+    if (/payments not active/.test(msg)) return 'Plata abonamentelor va fi disponibilă în curând.';
     if (e && e.message === 'cancel') return 'Anulat.';
     return (e && e.message) || String(e);
   }

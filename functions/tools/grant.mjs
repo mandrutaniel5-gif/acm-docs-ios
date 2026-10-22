@@ -1,16 +1,19 @@
 // Gives an account a plan by hand (without payment), e.g. for the owner, testers or partners:
-//   node tools/grant.mjs <@name> <personal|pro|basic> <days>
+//   node tools/grant.mjs <@name or email> <personal|pro|basic> <days>
 // "basic" (or 0 days) takes a manual plan away. Subscriptions paid through Stripe are not touched.
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { getAuth } from 'firebase-admin/auth';
 import { PLANS } from '../plans.js';
 initializeApp({ projectId: 'acm-docs-52280' });
 const db = getFirestore();
-const [handle, plan, days] = [String(process.argv[2] || '').replace(/^@/, '').toLowerCase(), process.argv[3], Number(process.argv[4] || 0)];
-if (!/^[a-z0-9_]{3,20}$/.test(handle) || !PLANS[plan] || ['family', 'business'].includes(plan)) { console.error('usage: grant.mjs <@name> <personal|pro|basic> <days>'); process.exit(2); }
-const u = await db.collection('usernames').doc(handle).get();
-if (!u.exists) { console.error('no such @name'); process.exit(1); }
-const uid = u.data().uid;
+const [who, plan, days] = [String(process.argv[2] || '').trim().replace(/^@/, '').toLowerCase(), process.argv[3], Number(process.argv[4] || 0)];
+const byEmail = /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/.test(who);
+if ((!byEmail && !/^[a-z0-9_]{3,20}$/.test(who)) || !PLANS[plan] || ['family', 'business'].includes(plan)) { console.error('usage: grant.mjs <@name or email> <personal|pro|basic> <days>'); process.exit(2); }
+let uid;
+if (byEmail) { try { uid = (await getAuth().getUserByEmail(who)).uid; } catch (e) { console.error('no account with this email'); process.exit(1); } }
+else { const u = await db.collection('usernames').doc(who).get(); if (!u.exists) { console.error('no such @name'); process.exit(1); } uid = u.data().uid; }
+const handle = byEmail ? who.replace(/@.*/, '…') : who;
 const ref = db.collection('billing').doc(uid);
 const cur = (await ref.get()).data() || {};
 if (cur.source === 'stripe' && (cur.until || 0) > Date.now()) { console.error('this account pays through Stripe: change it there'); process.exit(1); }

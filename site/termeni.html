@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Termeni și condiții · ACM Docs</title>
+<meta name="description" content="Termenii și condițiile de utilizare a aplicației ACM Docs, furnizată de ACM Code SRL.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://acmdocs.acmandrut.com/termeni">
+<link rel="alternate" hreflang="ro" href="https://acmdocs.acmandrut.com/termeni">
+<link rel="alternate" hreflang="en" href="https://acmdocs.acmandrut.com/termeni#en">
+<meta name="color-scheme" content="light dark">
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --text: #1d1d1f;
+    --muted: #6e6e73;
+    --line: rgba(0, 0, 0, .09);
+    --accent: #0066cc;
+    --accent-soft: rgba(0, 102, 204, .08);
+    --warn-bg: #fff8e6;
+    --warn-line: #f0c36d;
+    --warn-text: #5c4300;
+    --ph-bg: #ffe9a8;
+    --radius: 18px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000;
+      --surface: #1c1c1e;
+      --text: #f5f5f7;
+      --muted: #a1a1a6;
+      --line: rgba(255, 255, 255, .12);
+      --accent: #4da3ff;
+      --accent-soft: rgba(77, 163, 255, .12);
+      --warn-bg: #2a2310;
+      --warn-line: #7a6124;
+      --warn-text: #f3dfa6;
+      --ph-bg: #5b4a12;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #1c1c1e; --text: #f5f5f7; --muted: #a1a1a6; --line: rgba(255, 255, 255, .12);
+    --accent: #4da3ff; --accent-soft: rgba(77, 163, 255, .12); --warn-bg: #2a2310; --warn-line: #7a6124; --warn-text: #f3dfa6; --ph-bg: #5b4a12;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 84px; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.6 var(--font); letter-spacing: -.01em; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* top bar */
+  .bar { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 78%, transparent); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); border-bottom: .5px solid var(--line); }
+  .bar-in { max-width: 1120px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 600; font-size: 17px; }
+  .brand:hover { text-decoration: none; }
+  .logo { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(145deg, #3a8dff, #5b5bf0); display: grid; place-items: center; flex: none; }
+  .logo svg { width: 18px; height: 18px; }
+  .spacer { flex: 1; }
+  .seg { display: inline-flex; background: var(--line); border-radius: 10px; padding: 2px; }
+  .seg button { border: 0; background: transparent; color: var(--text); font: 600 13px/1 var(--font); padding: 7px 12px; border-radius: 8px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--surface); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+  .print { border: 0; background: transparent; color: var(--accent); font: 500 14px/1 var(--font); cursor: pointer; padding: 8px 4px; }
+
+  /* layout */
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px 80px; display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 40px; }
+  header.hero { grid-column: 1 / -1; padding: 56px 0 8px; }
+  header.hero h1 { font-size: clamp(34px, 6vw, 52px); line-height: 1.07; letter-spacing: -.03em; margin: 0 0 12px; font-weight: 700; }
+  header.hero p { color: var(--muted); margin: 0; font-size: 19px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 18px; color: var(--muted); font-size: 14px; }
+
+  nav.toc { position: sticky; top: 84px; align-self: start; max-height: calc(100vh - 100px); overflow: auto; padding: 4px 0; }
+  nav.toc h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px 12px; font-weight: 600; }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: t; }
+  nav.toc li { counter-increment: t; }
+  nav.toc a { display: flex; gap: 8px; padding: 6px 12px; border-radius: 10px; color: var(--text); font-size: 14px; line-height: 1.35; }
+  nav.toc a::before { content: counter(t) "."; color: var(--muted); min-width: 20px; font-variant-numeric: tabular-nums; }
+  nav.toc a:hover { background: var(--accent-soft); text-decoration: none; }
+  nav.toc a.on { background: var(--accent-soft); color: var(--accent); }
+
+  main { min-width: 0; }
+  .doc { background: var(--surface); border-radius: var(--radius); padding: 40px 48px; box-shadow: 0 1px 2px rgba(0, 0, 0, .04); }
+  .doc section { padding-top: 8px; }
+  .doc section + section { margin-top: 34px; padding-top: 34px; border-top: .5px solid var(--line); }
+  .doc h2 { font-size: 24px; letter-spacing: -.02em; line-height: 1.25; margin: 0 0 14px; }
+  .doc h2 .n { color: var(--muted); font-weight: 600; margin-right: 8px; }
+  .doc h3 { font-size: 18px; margin: 22px 0 8px; }
+  .doc p { margin: 0 0 12px; }
+  .doc ul, .doc ol { margin: 0 0 12px; padding-left: 22px; }
+  .doc li { margin: 6px 0; }
+  .doc li::marker { color: var(--muted); }
+  .doc strong { font-weight: 600; }
+  .lead { font-size: 18px; color: var(--muted); }
+  .note { border-radius: 14px; padding: 16px 18px; margin: 16px 0; background: var(--accent-soft); }
+  .note.warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-line); }
+  .note p:last-child, .note ul:last-child { margin-bottom: 0; }
+  .note-t { display: block; font-weight: 700; margin-bottom: 6px; }
+  .ph { background: var(--ph-bg); border-radius: 6px; padding: 0 6px; font-weight: 600; white-space: nowrap; }
+  table.id { width: 100%; border-collapse: collapse; margin: 6px 0 12px; font-size: 16px; }
+  table.id th, table.id td { text-align: left; padding: 9px 0; border-bottom: .5px solid var(--line); vertical-align: top; }
+  table.id th { width: 42%; color: var(--muted); font-weight: 500; padding-right: 14px; }
+  dl.defs { margin: 0 0 12px; }
+  dl.defs dt { font-weight: 600; margin-top: 12px; }
+  dl.defs dd { margin: 2px 0 0; }
+  .sal { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+  .sal a { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; color: var(--text); font-size: 15px; font-weight: 500; }
+  .sal a:hover { border-color: var(--accent); text-decoration: none; }
+  footer { grid-column: 1 / -1; color: var(--muted); font-size: 14px; text-align: center; padding-top: 12px; }
+  footer p { margin: 4px 0; }
+
+  [data-l] { display: none; }
+  html[data-lang="ro"] [data-l="ro"], html[data-lang="en"] [data-l="en"] { display: revert; }
+  html[data-lang="ro"] article[data-l="ro"], html[data-lang="en"] article[data-l="en"] { display: block; }
+
+  @media (max-width: 900px) {
+    .wrap { grid-template-columns: 1fr; gap: 0; }
+    nav.toc { position: static; max-height: none; background: var(--surface); border-radius: var(--radius); padding: 18px 8px; margin: 8px 0 20px; }
+    header.hero { padding-top: 32px; }
+  }
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    .doc { padding: 24px 18px; border-radius: 16px; }
+    .doc h2 { font-size: 21px; }
+    .bar-in { padding: 10px 16px; }
+    .brand > span:last-child { display: none; }
+    .print { display: none; }
+    table.id th, table.id td { display: block; width: 100%; padding: 2px 0; border: 0; }
+    table.id tr { display: block; padding: 8px 0; border-bottom: .5px solid var(--line); }
+  }
+  @media print {
+    :root { --bg: #fff; --surface: #fff; --text: #000; --muted: #444; --line: #ccc; }
+    .bar, nav.toc, .seg, .print { display: none !important; }
+    .wrap { display: block; padding: 0; }
+    .doc { box-shadow: none; padding: 0; }
+    .doc section { break-inside: auto; }
+    .doc h2 { break-after: avoid; }
+    a { color: #000; }
+    .ph { background: none; border: 1px solid #000; }
+  }
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="bar-in">
+    <a class="brand" href="/" aria-label="ACM Docs">
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#fff"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v1.6H8V13zm0 3.4h8V18H8v-1.6z"/></svg></span>
+      <span>ACM Docs</span>
+    </a>
+    <div class="spacer"></div>
+    <button class="print" type="button" onclick="window.print()"><span data-l="ro">Tipărește</span><span data-l="en">Print</span></button>
+    <div class="seg" role="group" aria-label="Limba / Language">
+      <button type="button" data-set="ro" aria-pressed="true">RO</button>
+      <button type="button" data-set="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ============================== ROMÂNĂ ============================== -->
+<header class="hero" data-l="ro">
+  <h1>Termeni și condiții</h1>
+  <p>Regulile de utilizare a aplicației ACM Docs, scrise cât mai clar posibil.</p>
+  <div class="meta"><span>Versiunea 1.1</span><span>În vigoare de la 22 octombrie 2026</span><span>Ultima actualizare: 22 octombrie 2026</span></div>
+</header>
+
+<nav class="toc" data-l="ro" aria-label="Cuprins">
+  <h2>Cuprins</h2>
+  <ol>
+    <li><a href="#ro-1">Cine suntem</a></li>
+    <li><a href="#ro-2">Definiții</a></li>
+    <li><a href="#ro-3">Acceptarea termenilor</a></li>
+    <li><a href="#ro-4">Cine poate folosi ACM Docs</a></li>
+    <li><a href="#ro-5">Ce oferă ACM Docs, planuri și abonamente</a></li>
+    <li><a href="#ro-6">Contul ACM Docs</a></li>
+    <li><a href="#ro-7">Cheile și codul de recuperare</a></li>
+    <li><a href="#ro-8">Dispozitivele contului</a></li>
+    <li><a href="#ro-9">Sincronizarea în cloud</a></li>
+    <li><a href="#ro-10">Documente criptate .acm și contacte</a></li>
+    <li><a href="#ro-11">Facturare</a></li>
+    <li><a href="#ro-12">Semnături, PDF și recunoașterea textului</a></li>
+    <li><a href="#ro-13">Conținutul tău</a></li>
+    <li><a href="#ro-14">Utilizare permisă și interzisă</a></li>
+    <li><a href="#ro-15">Proprietate intelectuală și licență</a></li>
+    <li><a href="#ro-16">Securitate</a></li>
+    <li><a href="#ro-17">Disponibilitate și actualizări</a></li>
+    <li><a href="#ro-18">Suspendare și închiderea contului</a></li>
+    <li><a href="#ro-19">Garanții și drepturile consumatorilor</a></li>
+    <li><a href="#ro-20">Limitarea răspunderii</a></li>
+    <li><a href="#ro-21">Date personale</a></li>
+    <li><a href="#ro-22">Modificarea termenilor</a></li>
+    <li><a href="#ro-23">Legea aplicabilă și litigii</a></li>
+    <li><a href="#ro-24">Dispoziții finale</a></li>
+    <li><a href="#ro-25">Contact</a></li>
+  </ol>
+</nav>
+
+<main data-l="ro">
+<article class="doc" data-l="ro" lang="ro">
+
+<section id="ro-1">
+  <h2><span class="n">1.</span>Cine suntem</h2>
+  <p>Aplicația ACM Docs (denumită în continuare „aplicația” sau „ACM Docs”) și serviciile online asociate sunt furnizate de:</p>
+  <table class="id">
+    <tr><th>Denumire</th><td>ACM CODE S.R.L.</td></tr>
+    <tr><th>Sediul social</th><td>Comuna Avram Iancu, sat Avram Iancu, nr. 344, cod poștal 417035, județul Bihor, România</td></tr>
+    <tr><th>Cod unic de înregistrare (CUI)</th><td><span class="ph">[CUI]</span></td></tr>
+    <tr><th>Nr. de ordine în Registrul Comerțului</th><td><span class="ph">[J05/…/2026]</span></td></tr>
+    <tr><th>E-mail</th><td><a href="mailto:mandrutaniel5@gmail.com">mandrutaniel5@gmail.com</a></td></tr>
+    <tr><th>Site</th><td><a href="https://acmdocs.acmandrut.com">acmdocs.acmandrut.com</a></td></tr>
+  </table>
+  <p>În acești termeni, „noi”, „ne” și „al nostru” se referă la ACM CODE S.R.L., iar „tu” se referă la persoana care folosește aplicația.</p>
+</section>
+
+<section id="ro-2">
+  <h2><span class="n">2.</span>Definiții</h2>
+  <dl class="defs">
+    <dt>Aplicația</dt><dd>Programul ACM Docs pentru Windows, Android și iOS, inclusiv actualizările lui.</dd>
+    <dt>Serviciile online</dt><dd>Funcțiile care folosesc serverele noastre: contul, dispozitivele, sincronizarea în cloud, trimiterea de documente criptate și cererile de contact.</dd>
+    <dt>Contul</dt><dd>Contul ACM Docs creat cu o adresă de e-mail și o parolă, identificat public printr-un nume de utilizator („@nume”).</dd>
+    <dt>Cheile contului</dt><dd>Cheile de criptare create pe dispozitivul tău la crearea contului. Cheia privată nu părăsește niciodată dispozitivele tale în formă necriptată.</dd>
+    <dt>Codul de recuperare</dt><dd>Cele 24 de cuvinte din care se pot reface cheile contului.</dd>
+    <dt>Conținutul tău</dt><dd>Orice document, fișier, factură, dată a firmei, client, produs, semnătură, contact sau setare pe care o creezi, deschizi sau păstrezi în aplicație.</dd>
+    <dt>Document .acm</dt><dd>Un fișier criptat creat de aplicație, care poate fi deschis doar de destinatarii aleși de expeditor.</dd>
+    <dt>Consumator</dt><dd>O persoană fizică care folosește aplicația în scopuri din afara activității sale comerciale, industriale, de producție, artizanale sau liberale.</dd>
+  </dl>
+</section>
+
+<section id="ro-3">
+  <h2><span class="n">3.</span>Acceptarea termenilor</h2>
+  <p>Acești termeni formează contractul dintre tine și noi pentru utilizarea aplicației și a serviciilor online. Îi accepți când creezi un cont sau, dacă nu ai cont, când folosești aplicația. Dacă nu ești de acord cu ei, te rugăm să nu folosești aplicația.</p>
+  <p>Dacă folosești aplicația în numele unei firme sau al unei alte organizații, declari că ai dreptul să o angajezi prin acești termeni. În acest caz, „tu” se referă și la acea organizație.</p>
+  <p>Modul în care prelucrăm datele personale este descris separat, în <a href="/confidentialitate">Politica de confidențialitate</a>, care face parte din acești termeni.</p>
+</section>
+
+<section id="ro-4">
+  <h2><span class="n">4.</span>Cine poate folosi ACM Docs</h2>
+  <ul>
+    <li>Pentru a crea un cont trebuie să ai cel puțin <strong>16 ani</strong>. Dacă ai între 16 și 18 ani, ai nevoie de acordul părintelui sau al reprezentantului legal.</li>
+    <li>Nu poți folosi aplicația dacă legea care ți se aplică te interzice, sau dacă ți-am închis anterior contul pentru încălcarea acestor termeni.</li>
+    <li>Aplicația poate fi folosită atât în scop personal, cât și profesional (de persoane fizice autorizate, firme, organizații).</li>
+    <li>Ești responsabil să respecți legile din țara în care folosești aplicația, inclusiv eventualele reguli locale privind criptarea.</li>
+  </ul>
+</section>
+
+<section id="ro-5">
+  <h2><span class="n">5.</span>Ce oferă ACM Docs, planuri și abonamente</h2>
+  <p>ACM Docs este o aplicație pentru lucrul cu documente și pentru facturare. Printre funcții se numără:</p>
+  <ul>
+    <li>deschiderea și editarea fișierelor PDF, Word, Excel și PowerPoint;</li>
+    <li>scanarea cu camera și transformarea pozelor în documente, cu recunoașterea textului;</li>
+    <li>emiterea de facturi, facturi proforma și oferte, cu evidența clienților și a produselor;</li>
+    <li>trimiterea și primirea de documente criptate (.acm) între conturi ACM Docs;</li>
+    <li>sincronizarea criptată a datelor între dispozitivele aceluiași cont.</li>
+  </ul>
+  <p>Deschiderea și vizualizarea documentelor funcționează și fără cont. Pentru a salva documente editate, scanări și facturi, pentru documentele criptate, contacte și sincronizarea în cloud ai nevoie de un cont.</p>
+
+  <h3>Planuri și limite</h3>
+  <p>ACM Docs poate fi folosită fără abonament, în planul <strong>Basic</strong>, cu limite lunare potrivite pentru folosire ocazională, sau cu un abonament plătit: <strong>Personal</strong>, <strong>Pro</strong>, <strong>Family</strong> sau <strong>Business</strong>. Limitele fiecărui plan (documente editate, scanări, facturi, documente criptate trimise și deschise, spațiu în cloud și numărul de dispozitive conectate în același timp) sunt afișate în aplicație, în Setări › Abonament, înainte de orice plată.</p>
+  <ul>
+    <li>Limitele se numără pe serverele noastre, pe lună calendaristică. Același document salvat de mai multe ori în aceeași lună se numără o singură dată.</li>
+    <li>În planul Basic, acțiunile numărate cer conexiune la internet. Abonamentele funcționează și fără internet, până la 7 zile.</li>
+    <li>Planurile descrise ca „fără limite practice” au totuși plafoane lunare mari, stabilite doar pentru a preveni folosirea automatizată abuzivă. O folosire obișnuită, chiar intensă, nu le atinge.</li>
+    <li>Toate planurile au aceeași securitate și aceeași criptare. Abonamentul mărește doar limitele.</li>
+  </ul>
+
+  <h3>Abonamente și plată</h3>
+  <ul>
+    <li><strong>Preț.</strong> Prețurile sunt în euro, cu TVA inclus, și sunt cele afișate în aplicație în momentul comenzii, lunar sau anual. La Business, prețul este pe cont, de la cel puțin 3 conturi.</li>
+    <li><strong>Plata</strong> se face pe pagina securizată a procesatorului de plăți Stripe. Noi nu vedem și nu păstrăm datele cardului. Pentru fiecare plată primești pe email factura sau chitanța.</li>
+    <li><strong>Reînnoire automată.</strong> Abonamentul se reînnoiește automat la sfârșitul fiecărei perioade (lună sau an), la prețul în vigoare, până îl anulezi.</li>
+    <li><strong>Anulare.</strong> Poți anula oricând din aplicație (Setări › Abonament › Plată, facturi și anulare). Anularea are efect la sfârșitul perioadei deja plătite, până atunci abonamentul rămâne activ. Sumele pentru perioada în curs nu se rambursează, cu excepția dreptului de retragere de mai jos sau a altor cazuri prevăzute de lege.</li>
+    <li><strong>Dreptul de retragere (consumatori).</strong> Ai dreptul să te retragi din contract în 14 zile de la încheierea lui, fără să dai vreun motiv, conform Ordonanței de urgență a Guvernului nr. 34/2014. Înainte de plată îți cerem acordul expres ca abonamentul să înceapă imediat. Dacă te retragi în cele 14 zile, îți rambursăm suma plătită, mai puțin partea proporțională cu perioada deja folosită, în cel mult 14 zile de la cerere, prin aceeași metodă de plată. Cererea de retragere ne-o poți trimite pe email, la adresa de la punctul 25.</li>
+    <li><strong>Schimbarea planului.</strong> La trecerea între planuri sau între plata lunară și cea anuală, diferența de preț se calculează automat, proporțional cu zilele rămase.</li>
+    <li><strong>Modificarea prețurilor.</strong> Te anunțăm despre orice creștere de preț cu cel puțin 30 de zile înainte. Noul preț se aplică de la următoarea perioadă de facturare, iar până atunci poți anula fără costuri suplimentare.</li>
+    <li><strong>Plată nereușită.</strong> Dacă o reînnoire nu poate fi încasată, păstrăm planul încă 3 zile, timp în care poți actualiza metoda de plată. Apoi contul trece la Basic.</li>
+    <li><strong>După încheierea abonamentului</strong> contul trece la Basic. Nu ștergem nimic: documentele și datele din cloud rămân și pot fi citite, descărcate sau șterse, dar, peste limitele planului Basic, nu se mai pot adăuga altele noi. Dispozitivele deja conectate rămân conectate.</li>
+  </ul>
+
+  <h3>Family și Business</h3>
+  <ul>
+    <li>Titularul abonamentului îl plătește și poate invita alte conturi ACM Docs, după @nume, până la numărul de conturi inclus (Family: până la 5 conturi, inclusiv titularul; Business: numărul de conturi plătit). Invitatul alege dacă acceptă.</li>
+    <li><strong>Fiecare membru își păstrează propriul cont, propriile chei și propriile date.</strong> Titularul nu poate vedea documentele, facturile, contactele sau alte date ale membrilor.</li>
+    <li>Titularul poate scoate oricând un membru, iar un membru poate ieși oricând. Când un cont iese din abonament sau abonamentul se încheie, contul trece la Basic, cu toate datele lui.</li>
+    <li>Titularul Business răspunde de faptul că are dreptul să invite persoanele respective (de exemplu, angajați sau colaboratori).</li>
+  </ul>
+</section>
+
+<section id="ro-6">
+  <h2><span class="n">6.</span>Contul ACM Docs</h2>
+  <ul>
+    <li>Contul se creează cu o adresă de e-mail validă, pe care trebuie să o confirmi, și cu o parolă de cel puțin 8 caractere. Te rugăm să folosești o parolă pe care nu o folosești în altă parte.</li>
+    <li>Alegi un nume de utilizator (@nume) prin care te găsesc alții. @numele, numele afișat și cheia publică sunt vizibile pentru alți utilizatori, pentru a-ți putea trimite documente criptate. Adresa ta de e-mail nu este afișată nimănui.</li>
+    <li>Nu poți alege un @nume care încalcă drepturile altcuiva, care se dă drept altă persoană sau organizație, ori care este jignitor sau înșelător. Putem refuza sau retrage un astfel de @nume.</li>
+    <li>Îți recomandăm să pornești <strong>verificarea în doi pași</strong> (Setări › Securitate). Cu ea pornită, la conectarea cu parola se cere și un cod dintr-o aplicație de autentificare.</li>
+    <li>Ești responsabil pentru păstrarea în siguranță a parolei, a dispozitivelor tale și a codului de recuperare, precum și pentru activitatea din contul tău. Dacă afli că cineva a obținut acces la contul tău, schimbă parola și blochează dispozitivul necunoscut din aplicație, apoi anunță-ne.</li>
+    <li>Un cont este personal. Nu îl vinde, nu îl închiria și nu îl transfera.</li>
+  </ul>
+</section>
+
+<section id="ro-7">
+  <h2><span class="n">7.</span>Cheile de criptare și codul de recuperare</h2>
+  <p>ACM Docs folosește criptare de la un capăt la altul, inclusiv algoritmi post-cuantici. Cheile contului sunt create și păstrate pe dispozitivele tale. Serverele noastre primesc doar date criptate și cheia ta publică.</p>
+  <div class="note warn">
+    <span class="note-t">Important: noi nu putem recupera datele tale</span>
+    <p>Pentru că nu avem cheile tale, <strong>nu putem citi, recupera sau reseta</strong> documentele criptate, datele sincronizate sau documentele .acm. Dacă pierzi toate dispozitivele contului <strong>și</strong> codul de recuperare (cele 24 de cuvinte), datele criptate devin definitiv inaccesibile, inclusiv pentru noi.</p>
+    <p>Resetarea parolei prin e-mail îți redă accesul la cont, dar nu și la cheile de criptare.</p>
+  </div>
+  <ul>
+    <li>Notează codul de recuperare pe hârtie și păstrează-l într-un loc sigur. Nu-l fotografia și nu-l trimite nimănui.</li>
+    <li><strong>Nimeni de la ACM Docs nu îți va cere vreodată codul de recuperare, parola sau codurile de verificare.</strong> Orice astfel de cerere este o tentativă de fraudă.</li>
+    <li>Cine are codul tău de recuperare poate reface cheile contului. Ești singurul responsabil pentru păstrarea lui.</li>
+  </ul>
+</section>
+
+<section id="ro-8">
+  <h2><span class="n">8.</span>Dispozitivele contului</h2>
+  <ul>
+    <li>Fiecare dispozitiv conectat la cont are propria cheie. Un dispozitiv nou se poate adăuga cu codul de recuperare sau prin scanarea unui cod QR aprobat de pe un dispozitiv deja conectat.</li>
+    <li>Numărul de dispozitive conectate în același timp depinde de plan (vezi punctul 5). Când este atins, un dispozitiv nou poate intra în locul dispozitivului folosit cel mai rar, care se deconectează imediat, sau poți alege un plan cu mai multe dispozitive.</li>
+    <li>Primul dispozitiv al contului este dispozitivul principal. El poate bloca orice alt dispozitiv. Celelalte dispozitive pot bloca dispozitive de același nivel.</li>
+    <li>Un dispozitiv blocat pierde imediat accesul la cont și la datele din cloud. Blocarea este definitivă.</li>
+    <li>Toate dispozitivele contului sunt anunțate când se conectează un dispozitiv nou sau când cineva intră în cont cu parola.</li>
+    <li>Aprobă un cod QR doar dacă îl vezi pe ecranul unui dispozitiv care este al tău. Nu aproba coduri primite prin mesaj sau de la alte persoane.</li>
+  </ul>
+</section>
+
+<section id="ro-9">
+  <h2><span class="n">9.</span>Sincronizarea în cloud</h2>
+  <ul>
+    <li>Sincronizarea în cloud este opțională și poate fi oprită pe fiecare dispozitiv („Doar pe acest dispozitiv”).</li>
+    <li>Datele sincronizate (documente, facturi, clienți, produse, datele firmei, semnături, contacte și unele setări) sunt criptate pe dispozitivul tău înainte de a fi trimise. Pe server se păstrează doar înregistrări criptate și blocuri criptate de date.</li>
+    <li>Serverele sunt furnizate de Google (Firebase / Google Cloud), în calitate de împuternicit. Detaliile, inclusiv locațiile, sunt în Politica de confidențialitate.</li>
+    <li>Sincronizarea nu înlocuiește o copie de siguranță proprie. Te rugăm să păstrezi copii ale documentelor importante, mai ales a celor cu obligații legale de păstrare (de exemplu, facturile).</li>
+    <li>Spațiul din cloud depinde de plan (vezi punctul 5), iar un fișier sincronizat poate avea cel mult 100 MB. Când spațiul se umple, documentele noi rămân pe dispozitiv până faci loc sau alegi un plan mai mare.</li>
+  </ul>
+</section>
+
+<section id="ro-10">
+  <h2><span class="n">10.</span>Documente criptate .acm și contacte</h2>
+  <ul>
+    <li>Un document .acm poate fi deschis doar de destinatarii aleși, cu cheile conturilor lor și, dacă expeditorul a pus una, cu parola documentului.</li>
+    <li>Ești responsabil pentru alegerea destinatarilor. Pentru siguranță deplină, verifică-ți contactele față în față, scanând codurile QR din aplicație. Aplicația te avertizează dacă cheia unui contact se schimbă.</li>
+    <li>Când adaugi pe cineva în contacte, acea persoană este anunțată și te poate adăuga la rândul ei sau poate ignora cererea. Pentru a preveni abuzurile, numărul de cereri trimise este limitat.</li>
+    <li>Nu putem vedea conținutul documentelor .acm și nu putem intermedia recuperarea lor.</li>
+    <li>Ești singurul responsabil pentru documentele pe care le trimiți. Nu trimite conținut ilegal, nesolicitat sau care încalcă drepturile altora.</li>
+  </ul>
+</section>
+
+<section id="ro-11">
+  <h2><span class="n">11.</span>Facturare și documente comerciale</h2>
+  <ul>
+    <li>Funcțiile de facturare sunt un instrument care te ajută să întocmești documente comerciale (facturi, facturi proforma, oferte). <strong>Tu ești responsabil</strong> pentru corectitudinea datelor din ele (date de identificare, cote de TVA, sume, monede, numerotare) și pentru respectarea obligațiilor fiscale și contabile care ți se aplică.</li>
+    <li>Aplicația <strong>nu transmite facturi în sistemul național RO e-Factura</strong> și nu ține evidența contabilă. Dacă legea îți cere raportarea în RO e-Factura sau în alte sisteme, trebuie să o faci separat.</li>
+    <li>Cursurile de schimb preluate de la Banca Națională a României sunt informative. Verifică-le înainte de a le folosi în documente cu efecte fiscale.</li>
+    <li>Șabloanele și calculele din aplicație nu reprezintă consultanță fiscală, contabilă sau juridică. Pentru situații specifice, consultă un specialist.</li>
+    <li>Păstrarea documentelor pe perioada cerută de lege îți revine ție (vezi și punctul 9).</li>
+  </ul>
+</section>
+
+<section id="ro-12">
+  <h2><span class="n">12.</span>Semnături, editarea PDF-urilor și recunoașterea textului</h2>
+  <ul>
+    <li>Semnătura desenată sau adăugată ca imagine în aplicație este o semnătură electronică simplă. <strong>Nu este o semnătură electronică calificată</strong> în sensul Regulamentului (UE) nr. 910/2014 (eIDAS). Efectele ei juridice depind de lege și de acordul părților.</li>
+    <li>Poți edita, semna sau modifica doar documente pe care ai dreptul să le modifici. Ești responsabil pentru folosirea documentelor modificate.</li>
+    <li>Recunoașterea textului din poze (OCR) și conversiile între formate pot conține erori. Verifică rezultatul înainte de a-l folosi.</li>
+  </ul>
+</section>
+
+<section id="ro-13">
+  <h2><span class="n">13.</span>Conținutul tău</h2>
+  <ul>
+    <li><strong>Conținutul tău rămâne al tău.</strong> Nu revendicăm niciun drept de proprietate asupra lui.</li>
+    <li>Pentru a furniza serviciile online, ne acorzi permisiunea limitată de a stoca, transmite și șterge conținutul tău în formă criptată, strict cât este necesar pentru funcționarea contului, a sincronizării și a trimiterii documentelor. Această permisiune încetează când ștergi datele sau contul.</li>
+    <li>Nu folosim conținutul tău pentru publicitate și nu îl vindem. Datorită criptării, nici nu îl putem citi.</li>
+    <li>Declari că ai drepturile necesare asupra conținutului pe care îl încarci sau îl trimiți și că acesta nu încalcă legea sau drepturile altora.</li>
+  </ul>
+</section>
+
+<section id="ro-14">
+  <h2><span class="n">14.</span>Utilizare permisă și interzisă</h2>
+  <p>Te angajezi să nu folosești aplicația sau serviciile online pentru:</p>
+  <ul>
+    <li>activități ilegale, inclusiv fraudă, falsificarea documentelor, evaziune fiscală sau spălare de bani;</li>
+    <li>conținut care exploatează sau pune în pericol minori, conținut terorist, ori care incită la violență sau ură;</li>
+    <li>hărțuire, amenințări, spam sau trimiterea de documente nesolicitate;</li>
+    <li>încălcarea drepturilor de proprietate intelectuală, a vieții private sau a datelor personale ale altor persoane;</li>
+    <li>răspândirea de programe malițioase sau de fișiere create pentru a afecta aplicația sau dispozitivele altora;</li>
+    <li>a te da drept altă persoană sau organizație, inclusiv drept ACM Docs sau ACM Code SRL;</li>
+    <li>accesarea sau încercarea de a accesa conturi, date sau sisteme care nu îți aparțin, ori ocolirea măsurilor de securitate;</li>
+    <li>supraîncărcarea serverelor, crearea automată de conturi sau folosirea serviciilor online prin alte programe decât aplicația oficială, fără acordul nostru scris;</li>
+    <li>publicarea sau distribuirea unor copii modificate ale aplicației sub numele ACM Docs;</li>
+    <li>ocolirea sau încercarea de a ocoli limitele planurilor, de exemplu prin crearea mai multor conturi pentru a obține limite suplimentare, prin aplicații modificate, scripturi sau manipularea ceasului dispozitivului, ori împărțirea unui cont cu alte persoane.</li>
+  </ul>
+  <p>Cercetarea de securitate făcută cu bună-credință, pe propriile conturi și fără a afecta alți utilizatori, este binevenită dacă o raportezi conform punctului 16.</p>
+</section>
+
+<section id="ro-15">
+  <h2><span class="n">15.</span>Proprietate intelectuală și licența de utilizare</h2>
+  <ul>
+    <li>Aplicația, numele ACM Docs, sigla, designul și codul sunt proprietatea ACM CODE S.R.L. sau sunt folosite sub licență.</li>
+    <li>Îți acordăm o licență personală, neexclusivă, netransferabilă și revocabilă de a instala și folosi aplicația pe dispozitivele tale, conform acestor termeni.</li>
+    <li>Nu ai dreptul să vinzi, să închiriezi sau să redistribui aplicația ca produs propriu. Drepturile pe care ți le acordă legea în mod imperativ (de exemplu, cele privind interoperabilitatea programelor de calculator) nu sunt afectate.</li>
+    <li>Aplicația include componente open-source, folosite conform licențelor lor. Licențele acestor componente au prioritate pentru componentele respective.</li>
+    <li>Dacă ne trimiți sugestii sau idei, le putem folosi liber, fără vreo obligație față de tine.</li>
+  </ul>
+</section>
+
+<section id="ro-16">
+  <h2><span class="n">16.</span>Securitate și raportarea vulnerabilităților</h2>
+  <p>Testăm periodic securitatea aplicației și a serverelor. Nicio aplicație nu poate garanta însă securitate absolută. Dacă descoperi o vulnerabilitate, te rugăm să ne scrii la adresa de la punctul 25, cu o descriere suficientă pentru a o reproduce, și să nu o faci publică până nu o reparăm. Nu vom acționa împotriva cercetătorilor care respectă aceste reguli și nu accesează datele altor persoane.</p>
+</section>
+
+<section id="ro-17">
+  <h2><span class="n">17.</span>Disponibilitate, actualizări și modificarea serviciului</h2>
+  <ul>
+    <li>Depunem eforturi rezonabile ca serviciile online să funcționeze permanent, dar pot exista întreruperi pentru mentenanță, actualizări sau din motive independente de noi.</li>
+    <li>Lansăm actualizări pentru securitate și pentru îmbunătățiri. Unele actualizări pot fi necesare pentru a folosi în continuare serviciile online. Îți recomandăm să instalezi mereu cea mai nouă versiune.</li>
+    <li>Putem modifica, adăuga sau retrage funcții. Dacă retragem o funcție importantă a serviciilor online, te vom anunța cu cel puțin 30 de zile înainte, când este posibil, și îți vom da posibilitatea să îți salvezi datele.</li>
+  </ul>
+</section>
+
+<section id="ro-18">
+  <h2><span class="n">18.</span>Suspendarea și închiderea contului</h2>
+  <ul>
+    <li><strong>De către tine.</strong> Poți șterge oricând contul din aplicație (Setări › Șterge contul). Ștergerea cere confirmarea cu cheile contului, pentru ca nimeni să nu o poată face doar cu parola ta. La ștergere eliminăm de pe servere profilul public, @numele, dispozitivele, datele criptate din cloud și contul de conectare. Copiile locale de pe dispozitivele tale rămân acolo până le ștergi tu. Documentele .acm primite de la tine nu vor mai putea fi deschise dacă depind de cheile șterse.</li>
+    <li><strong>Abonamentul se încheie odată cu contul.</strong> La ștergerea contului, abonamentul se anulează automat și nu mai este reînnoit; perioada rămasă nu se rambursează, cu excepția dreptului de retragere.</li>
+    <li><strong>De către noi.</strong> Putem suspenda sau închide un cont dacă încalcă grav sau repetat acești termeni, dacă legea ne obligă ori dacă există un risc serios pentru alți utilizatori sau pentru servicii. Când este posibil și permis de lege, te vom anunța în prealabil și îți vom explica motivul.</li>
+    <li>Poți folosi în continuare funcțiile aplicației care nu necesită cont.</li>
+  </ul>
+</section>
+
+<section id="ro-19">
+  <h2><span class="n">19.</span>Garanții și drepturile consumatorilor</h2>
+  <p>Dacă ești consumator, beneficiezi de toate drepturile prevăzute de lege, inclusiv de cele privind conformitatea conținutului și a serviciilor digitale prevăzute de Ordonanța de urgență a Guvernului nr. 141/2021. <strong>Nimic din acești termeni nu limitează sau exclude drepturile pe care legea ți le acordă în mod imperativ.</strong></p>
+  <p>În afara acestor drepturi legale, aplicația este oferită „așa cum este” și „în măsura disponibilității”. Nu garantăm că va fi lipsită de erori, că va funcționa neîntrerupt sau că va corespunde unui scop anume care nu este descris în acești termeni.</p>
+</section>
+
+<section id="ro-20">
+  <h2><span class="n">20.</span>Limitarea răspunderii</h2>
+  <ul>
+    <li>În măsura permisă de lege, nu răspundem pentru prejudicii indirecte, pentru pierderi de profit, de venituri sau de clienți ori pentru pierderi de date care decurg din:
+      <ul>
+        <li>pierderea codului de recuperare, a parolei sau a dispozitivelor;</li>
+        <li>dezvăluirea acestora de către tine sau compromiterea dispozitivelor tale;</li>
+        <li>erori din documentele, facturile sau datele introduse de tine;</li>
+        <li>folosirea aplicației contrar acestor termeni.</li>
+      </ul>
+    </li>
+    <li>Pentru utilizatorii profesioniști, răspunderea noastră totală legată de aplicație și de serviciile online este limitată la suma plătită de tine pentru acestea în ultimele 12 luni sau, dacă nu ai plătit nimic, la 100 de lei.</li>
+    <li>Dacă serviciile online plătite nu sunt disponibile din vina noastră pentru o perioadă semnificativă, ai dreptul, ca și consumator, la remediile prevăzute de lege, inclusiv la reducerea proporțională a prețului.</li>
+    <li>Aceste limitări <strong>nu se aplică</strong> în caz de dol sau culpă gravă, pentru vătămarea vieții, integrității corporale sau sănătății și nici în alte situații în care legea nu permite limitarea răspunderii.</li>
+  </ul>
+</section>
+
+<section id="ro-21">
+  <h2><span class="n">21.</span>Date personale</h2>
+  <p>Prelucrăm doar datele personale necesare funcționării contului și serviciilor online, conform Regulamentului (UE) 2016/679 (GDPR). Ce date prelucrăm, în ce scop, cât timp le păstrăm, cui le transmitem și ce drepturi ai sunt descrise în <a href="/confidentialitate">Politica de confidențialitate</a>.</p>
+  <p>Ai dreptul să depui o plângere la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (<a href="https://www.dataprotection.ro" rel="noopener">www.dataprotection.ro</a>).</p>
+</section>
+
+<section id="ro-22">
+  <h2><span class="n">22.</span>Modificarea termenilor</h2>
+  <p>Putem actualiza acești termeni când se schimbă aplicația, serviciile sau legea. Data ultimei actualizări este afișată la începutul paginii. Despre modificările importante te vom anunța în aplicație sau prin e-mail cu cel puțin <strong>30 de zile</strong> înainte de intrarea lor în vigoare, cu excepția celor impuse de lege sau necesare urgent pentru securitate. Dacă nu ești de acord cu noii termeni, poți înceta să folosești serviciile și îți poți șterge contul înainte de intrarea lor în vigoare.</p>
+</section>
+
+<section id="ro-23">
+  <h2><span class="n">23.</span>Legea aplicabilă și soluționarea litigiilor</h2>
+  <ul>
+    <li>Acești termeni sunt guvernați de legea română. Dacă ești consumator cu reședința în alt stat al Uniunii Europene, beneficiezi în plus de protecția prevederilor imperative din legea statului tău.</li>
+    <li>Te rugăm să ne contactezi mai întâi, la adresa de la punctul 25. Încercăm să rezolvăm orice nemulțumire pe cale amiabilă, într-un termen de cel mult 30 de zile.</li>
+    <li>Dacă ești consumator, te poți adresa Autorității Naționale pentru Protecția Consumatorilor (ANPC) sau poți folosi procedurile de soluționare alternativă a litigiilor (SAL).</li>
+    <li>Litigiile care nu se rezolvă amiabil sunt de competența instanțelor din România. Pentru consumatori, competența se stabilește conform legii, inclusiv la instanța de la domiciliul lor.</li>
+  </ul>
+  <div class="sal">
+    <a href="https://anpc.ro/ce-este-sal/" rel="noopener">ANPC · Soluționarea alternativă a litigiilor (SAL)</a>
+    <a href="https://anpc.ro" rel="noopener">Autoritatea Națională pentru Protecția Consumatorilor</a>
+  </div>
+</section>
+
+<section id="ro-24">
+  <h2><span class="n">24.</span>Dispoziții finale</h2>
+  <ul>
+    <li>Dacă o prevedere a acestor termeni este declarată nevalabilă, celelalte rămân în vigoare.</li>
+    <li>Faptul că nu ne exercităm un drept la un moment dat nu înseamnă că renunțăm la el.</li>
+    <li>Putem transfera drepturile și obligațiile din acești termeni unei societăți care preia aplicația, cu condiția ca drepturile tale să nu fie diminuate. Te vom anunța despre un astfel de transfer.</li>
+    <li>Nu răspundem pentru neîndeplinirea obligațiilor din cauza unor evenimente de forță majoră.</li>
+    <li>Acești termeni sunt disponibili în mai multe limbi. În caz de neconcordanță, versiunea în limba română prevalează, cu excepția situațiilor în care legea aplicabilă consumatorului impune altfel.</li>
+  </ul>
+</section>
+
+<section id="ro-25">
+  <h2><span class="n">25.</span>Contact</h2>
+  <p>Pentru întrebări, reclamații, cereri privind datele personale sau raportarea unor probleme de securitate, ne poți scrie la <a href="mailto:mandrutaniel5@gmail.com">mandrutaniel5@gmail.com</a> sau prin poștă, la sediul social menționat la punctul 1. Răspundem de regulă în cel mult 30 de zile.</p>
+</section>
+
+</article>
+</main>
+
+<!-- ============================== ENGLISH ============================== -->
+<header class="hero" data-l="en">
+  <h1>Terms and Conditions</h1>
+  <p>The rules for using the ACM Docs app, written as clearly as we can.</p>
+  <div class="meta"><span>Version 1.1</span><span>Effective 22 October 2026</span><span>Last updated: 22 October 2026</span></div>
+</header>
+
+<nav class="toc" data-l="en" aria-label="Contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#en-1">Who we are</a></li>
+    <li><a href="#en-2">Definitions</a></li>
+    <li><a href="#en-3">Accepting these terms</a></li>
+    <li><a href="#en-4">Who can use ACM Docs</a></li>
+    <li><a href="#en-5">What ACM Docs offers, plans and subscriptions</a></li>
+    <li><a href="#en-6">Your ACM Docs account</a></li>
+    <li><a href="#en-7">Keys and recovery code</a></li>
+    <li><a href="#en-8">Account devices</a></li>
+    <li><a href="#en-9">Cloud sync</a></li>
+    <li><a href="#en-10">Encrypted .acm documents and contacts</a></li>
+    <li><a href="#en-11">Invoicing</a></li>
+    <li><a href="#en-12">Signatures, PDFs and text recognition</a></li>
+    <li><a href="#en-13">Your content</a></li>
+    <li><a href="#en-14">Acceptable use</a></li>
+    <li><a href="#en-15">Intellectual property and licence</a></li>
+    <li><a href="#en-16">Security</a></li>
+    <li><a href="#en-17">Availability and updates</a></li>
+    <li><a href="#en-18">Suspension and closing an account</a></li>
+    <li><a href="#en-19">Warranties and consumer rights</a></li>
+    <li><a href="#en-20">Limitation of liability</a></li>
+    <li><a href="#en-21">Personal data</a></li>
+    <li><a href="#en-22">Changes to these terms</a></li>
+    <li><a href="#en-23">Governing law and disputes</a></li>
+    <li><a href="#en-24">Final provisions</a></li>
+    <li><a href="#en-25">Contact</a></li>
+  </ol>
+</nav>
+
+<main data-l="en">
+<article class="doc" data-l="en" lang="en">
+
+<p class="note"><span class="note-t">Translation</span>This English version is provided for convenience. If it differs from the Romanian version, the Romanian version prevails, except where the law that protects you as a consumer requires otherwise.</p>
+
+<section id="en-1">
+  <h2><span class="n">1.</span>Who we are</h2>
+  <p>The ACM Docs app (the “app” or “ACM Docs”) and its online services are provided by:</p>
+  <table class="id">
+    <tr><th>Company</th><td>ACM CODE S.R.L.</td></tr>
+    <tr><th>Registered office</th><td>Comuna Avram Iancu, sat Avram Iancu, nr. 344, postcode 417035, Bihor County, Romania</td></tr>
+    <tr><th>Tax ID (CUI)</th><td><span class="ph">[CUI]</span></td></tr>
+    <tr><th>Trade Register number</th><td><span class="ph">[J05/…/2026]</span></td></tr>
+    <tr><th>Email</th><td><a href="mailto:mandrutaniel5@gmail.com">mandrutaniel5@gmail.com</a></td></tr>
+    <tr><th>Website</th><td><a href="https://acmdocs.acmandrut.com">acmdocs.acmandrut.com</a></td></tr>
+  </table>
+  <p>In these terms, “we”, “us” and “our” mean ACM CODE S.R.L., and “you” means the person using the app.</p>
+</section>
+
+<section id="en-2">
+  <h2><span class="n">2.</span>Definitions</h2>
+  <dl class="defs">
+    <dt>The app</dt><dd>The ACM Docs software for Windows, Android and iOS, including its updates.</dd>
+    <dt>Online services</dt><dd>The features that use our servers: the account, devices, cloud sync, sending encrypted documents and contact requests.</dd>
+    <dt>Account</dt><dd>An ACM Docs account created with an email address and a password, publicly identified by a username (“@name”).</dd>
+    <dt>Account keys</dt><dd>The encryption keys created on your device when the account is created. The private key never leaves your devices unencrypted.</dd>
+    <dt>Recovery code</dt><dd>The 24 words from which the account keys can be restored.</dd>
+    <dt>Your content</dt><dd>Any document, file, invoice, company data, client, product, signature, contact or setting you create, open or keep in the app.</dd>
+    <dt>.acm document</dt><dd>An encrypted file created by the app that can be opened only by the recipients chosen by the sender.</dd>
+    <dt>Consumer</dt><dd>An individual using the app for purposes outside their trade, business, craft or profession.</dd>
+  </dl>
+</section>
+
+<section id="en-3">
+  <h2><span class="n">3.</span>Accepting these terms</h2>
+  <p>These terms form the contract between you and us for using the app and the online services. You accept them when you create an account or, if you have no account, when you use the app. If you do not agree, please do not use the app.</p>
+  <p>If you use the app on behalf of a company or other organisation, you confirm that you are authorised to bind it to these terms. In that case, “you” also means that organisation.</p>
+  <p>How we process personal data is described separately in the <a href="/confidentialitate">Privacy Policy</a>, which forms part of these terms.</p>
+</section>
+
+<section id="en-4">
+  <h2><span class="n">4.</span>Who can use ACM Docs</h2>
+  <ul>
+    <li>You must be at least <strong>16 years old</strong> to create an account. If you are between 16 and 18, you need the consent of a parent or legal guardian.</li>
+    <li>You may not use the app if the law that applies to you prohibits it, or if we previously closed your account for breaching these terms.</li>
+    <li>The app may be used for personal and professional purposes (by sole traders, companies and organisations).</li>
+    <li>You are responsible for complying with the laws of the country where you use the app, including any local rules on encryption.</li>
+  </ul>
+</section>
+
+<section id="en-5">
+  <h2><span class="n">5.</span>What ACM Docs offers, plans and subscriptions</h2>
+  <p>ACM Docs is an app for working with documents and for invoicing. Its features include:</p>
+  <ul>
+    <li>opening and editing PDF, Word, Excel and PowerPoint files;</li>
+    <li>scanning with the camera and turning photos into documents, with text recognition;</li>
+    <li>issuing invoices, pro forma invoices and quotes, with client and product records;</li>
+    <li>sending and receiving encrypted documents (.acm) between ACM Docs accounts;</li>
+    <li>encrypted sync of data between the devices of the same account.</li>
+  </ul>
+  <p>Opening and viewing documents works without an account. Saving edited documents, scans and invoices, encrypted documents, contacts and cloud sync require an account.</p>
+
+  <h3>Plans and limits</h3>
+  <p>ACM Docs can be used without a subscription, on the <strong>Basic</strong> plan, with monthly limits suited to occasional use, or with a paid subscription: <strong>Personal</strong>, <strong>Pro</strong>, <strong>Family</strong> or <strong>Business</strong>. The limits of each plan (edited documents, scans, invoices, encrypted documents sent and opened, cloud space and the number of devices signed in at the same time) are shown in the app, in Settings › Subscription, before any payment.</p>
+  <ul>
+    <li>Limits are counted on our servers, per calendar month. The same document saved several times in the same month counts once.</li>
+    <li>On the Basic plan, counted actions need an internet connection. Subscriptions also work offline, for up to 7 days.</li>
+    <li>Plans described as having “no practical limits” still have high monthly caps, set only to prevent abusive automated use. Normal use, even heavy use, does not reach them.</li>
+    <li>All plans have the same security and the same encryption. A subscription only raises the limits.</li>
+  </ul>
+
+  <h3>Subscriptions and payment</h3>
+  <ul>
+    <li><strong>Price.</strong> Prices are in euro, VAT included, as shown in the app when you order, monthly or yearly. Business is priced per account, from at least 3 accounts.</li>
+    <li><strong>Payment</strong> is made on the secure page of the payment processor Stripe. We never see or keep your card details. You receive an invoice or receipt by email for every payment.</li>
+    <li><strong>Automatic renewal.</strong> The subscription renews automatically at the end of each period (month or year), at the price then in force, until you cancel it.</li>
+    <li><strong>Cancelling.</strong> You can cancel at any time in the app (Settings › Subscription › Payment, invoices and cancelling). Cancellation takes effect at the end of the period already paid; until then the subscription stays active. Amounts for the current period are not refunded, except under the right of withdrawal below or other cases provided by law.</li>
+    <li><strong>Right of withdrawal (consumers).</strong> You may withdraw from the contract within 14 days of concluding it, without giving any reason, under Romanian Government Emergency Ordinance No 34/2014 (implementing Directive 2011/83/EU). Before payment we ask for your express request that the subscription start immediately. If you withdraw within the 14 days, we refund the amount paid minus the part proportional to the period already used, within 14 days of your request, using the same payment method. You can send your withdrawal request by email to the address in section 25.</li>
+    <li><strong>Changing plan.</strong> When you switch between plans or between monthly and yearly billing, the price difference is calculated automatically, in proportion to the remaining days.</li>
+    <li><strong>Price changes.</strong> We will tell you about any price increase at least 30 days in advance. The new price applies from the next billing period, and until then you can cancel at no extra cost.</li>
+    <li><strong>Failed payment.</strong> If a renewal cannot be collected, we keep the plan for 3 more days so you can update the payment method. After that the account moves to Basic.</li>
+    <li><strong>When a subscription ends</strong> the account moves to Basic. Nothing is deleted: documents and cloud data remain and can be read, downloaded or deleted, but above the Basic limits nothing new can be added. Devices already signed in stay signed in.</li>
+  </ul>
+
+  <h3>Family and Business</h3>
+  <ul>
+    <li>The subscription holder pays for it and may invite other ACM Docs accounts by @name, up to the number of accounts included (Family: up to 5 accounts, including the holder; Business: the number of accounts paid for). The invited person chooses whether to accept.</li>
+    <li><strong>Every member keeps their own account, keys and data.</strong> The holder cannot see the members’ documents, invoices, contacts or any other data.</li>
+    <li>The holder may remove a member at any time, and a member may leave at any time. When an account leaves the subscription or the subscription ends, the account moves to Basic with all its data.</li>
+    <li>A Business holder is responsible for being entitled to invite the people concerned (for example employees or contractors).</li>
+  </ul>
+</section>
+
+<section id="en-6">
+  <h2><span class="n">6.</span>Your ACM Docs account</h2>
+  <ul>
+    <li>An account is created with a valid email address, which you must confirm, and a password of at least 8 characters. Please use a password you do not use anywhere else.</li>
+    <li>You choose a username (@name) by which others find you. Your @name, display name and public key are visible to other users so they can send you encrypted documents. Your email address is not shown to anyone.</li>
+    <li>You may not choose an @name that infringes someone else’s rights, impersonates another person or organisation, or is offensive or misleading. We may refuse or withdraw such an @name.</li>
+    <li>We recommend turning on <strong>two-step verification</strong> (Settings › Security). With it on, signing in with the password also requires a code from an authenticator app.</li>
+    <li>You are responsible for keeping your password, devices and recovery code safe, and for activity in your account. If you learn that someone has gained access to your account, change your password and block the unknown device in the app, then let us know.</li>
+    <li>An account is personal. Do not sell, rent or transfer it.</li>
+  </ul>
+</section>
+
+<section id="en-7">
+  <h2><span class="n">7.</span>Encryption keys and the recovery code</h2>
+  <p>ACM Docs uses end-to-end encryption, including post-quantum algorithms. The account keys are created and kept on your devices. Our servers receive only encrypted data and your public key.</p>
+  <div class="note warn">
+    <span class="note-t">Important: we cannot recover your data</span>
+    <p>Because we do not have your keys, we <strong>cannot read, recover or reset</strong> encrypted documents, synced data or .acm documents. If you lose all your account devices <strong>and</strong> your recovery code (the 24 words), the encrypted data becomes permanently inaccessible, including to us.</p>
+    <p>Resetting your password by email restores access to your account, but not to the encryption keys.</p>
+  </div>
+  <ul>
+    <li>Write the recovery code down on paper and keep it somewhere safe. Do not photograph it or send it to anyone.</li>
+    <li><strong>No one from ACM Docs will ever ask you for your recovery code, password or verification codes.</strong> Any such request is an attempt at fraud.</li>
+    <li>Anyone who has your recovery code can restore your account keys. You alone are responsible for keeping it safe.</li>
+  </ul>
+</section>
+
+<section id="en-8">
+  <h2><span class="n">8.</span>Account devices</h2>
+  <ul>
+    <li>Each device signed in to the account has its own key. A new device can be added with the recovery code or by scanning a QR code approved on a device that is already signed in.</li>
+    <li>The number of devices signed in at the same time depends on the plan (see section 5). When it is reached, a new device can take the place of the least used device, which is signed out at once, or you can choose a plan with more devices.</li>
+    <li>The account’s first device is the primary device. It can block any other device. The other devices can block devices of the same level.</li>
+    <li>A blocked device immediately loses access to the account and to cloud data. Blocking is permanent.</li>
+    <li>All the account’s devices are notified when a new device signs in or when someone signs in with the password.</li>
+    <li>Only approve a QR code you see on the screen of a device that is yours. Do not approve codes received by message or from other people.</li>
+  </ul>
+</section>
+
+<section id="en-9">
+  <h2><span class="n">9.</span>Cloud sync</h2>
+  <ul>
+    <li>Cloud sync is optional and can be turned off on each device (“Only on this device”).</li>
+    <li>Synced data (documents, invoices, clients, products, company data, signatures, contacts and some settings) is encrypted on your device before it is sent. The server keeps only encrypted records and encrypted blocks of data.</li>
+    <li>The servers are provided by Google (Firebase / Google Cloud) as our processor. Details, including locations, are in the Privacy Policy.</li>
+    <li>Sync does not replace your own backup. Please keep copies of important documents, especially those you are legally required to keep (for example, invoices).</li>
+    <li>Cloud space depends on the plan (see section 5), and a synced file may be up to 100 MB. When the space is full, new documents stay on the device until you free up space or choose a larger plan.</li>
+  </ul>
+</section>
+
+<section id="en-10">
+  <h2><span class="n">10.</span>Encrypted .acm documents and contacts</h2>
+  <ul>
+    <li>An .acm document can be opened only by the chosen recipients, with their account keys and, if the sender set one, with the document password.</li>
+    <li>You are responsible for choosing the recipients. For full certainty, verify your contacts in person by scanning their QR codes in the app. The app warns you if a contact’s key changes.</li>
+    <li>When you add someone to your contacts, they are notified and can add you back or ignore the request. To prevent abuse, the number of requests is limited.</li>
+    <li>We cannot see the content of .acm documents and cannot help recover them.</li>
+    <li>You alone are responsible for the documents you send. Do not send content that is illegal, unsolicited or infringes others’ rights.</li>
+  </ul>
+</section>
+
+<section id="en-11">
+  <h2><span class="n">11.</span>Invoicing and commercial documents</h2>
+  <ul>
+    <li>The invoicing features are a tool that helps you prepare commercial documents (invoices, pro forma invoices, quotes). <strong>You are responsible</strong> for the accuracy of their content (identification details, VAT rates, amounts, currencies, numbering) and for meeting the tax and accounting obligations that apply to you.</li>
+    <li>The app <strong>does not submit invoices to the Romanian RO e-Factura system</strong> or to any other tax system, and it does not keep accounting records. If the law requires such reporting, you must do it separately.</li>
+    <li>Exchange rates taken from the National Bank of Romania are for information only. Check them before using them in documents with tax effects.</li>
+    <li>The templates and calculations in the app are not tax, accounting or legal advice. For specific situations, consult a professional.</li>
+    <li>Keeping documents for the period required by law is your responsibility (see also section 9).</li>
+  </ul>
+</section>
+
+<section id="en-12">
+  <h2><span class="n">12.</span>Signatures, PDF editing and text recognition</h2>
+  <ul>
+    <li>A signature drawn or added as an image in the app is a simple electronic signature. <strong>It is not a qualified electronic signature</strong> under Regulation (EU) No 910/2014 (eIDAS). Its legal effect depends on the law and on the agreement between the parties.</li>
+    <li>You may edit, sign or change only documents you are entitled to change. You are responsible for how you use changed documents.</li>
+    <li>Text recognition from photos (OCR) and format conversions may contain errors. Check the result before relying on it.</li>
+  </ul>
+</section>
+
+<section id="en-13">
+  <h2><span class="n">13.</span>Your content</h2>
+  <ul>
+    <li><strong>Your content remains yours.</strong> We claim no ownership of it.</li>
+    <li>To provide the online services, you give us a limited permission to store, transmit and delete your content in encrypted form, strictly as needed for the account, sync and sending documents to work. This permission ends when you delete the data or the account.</li>
+    <li>We do not use your content for advertising and do not sell it. Because of the encryption, we cannot read it either.</li>
+    <li>You confirm that you hold the necessary rights to the content you upload or send, and that it does not break the law or infringe others’ rights.</li>
+  </ul>
+</section>
+
+<section id="en-14">
+  <h2><span class="n">14.</span>Acceptable use</h2>
+  <p>You agree not to use the app or the online services for:</p>
+  <ul>
+    <li>illegal activity, including fraud, forging documents, tax evasion or money laundering;</li>
+    <li>content that exploits or endangers minors, terrorist content, or content inciting violence or hatred;</li>
+    <li>harassment, threats, spam or sending unsolicited documents;</li>
+    <li>infringing the intellectual property, privacy or personal data of others;</li>
+    <li>spreading malware or files crafted to harm the app or other people’s devices;</li>
+    <li>impersonating another person or organisation, including ACM Docs or ACM Code SRL;</li>
+    <li>accessing or trying to access accounts, data or systems that are not yours, or bypassing security measures;</li>
+    <li>overloading the servers, creating accounts automatically, or using the online services through software other than the official app without our written consent;</li>
+    <li>publishing or distributing modified copies of the app under the ACM Docs name;</li>
+    <li>getting around or trying to get around plan limits, for example by creating several accounts to obtain extra limits, by modified apps, scripts or tampering with the device clock, or by sharing one account with other people.</li>
+  </ul>
+  <p>Good-faith security research on your own accounts, without affecting other users, is welcome if you report it as described in section 16.</p>
+</section>
+
+<section id="en-15">
+  <h2><span class="n">15.</span>Intellectual property and licence</h2>
+  <ul>
+    <li>The app, the ACM Docs name, logo, design and code are the property of ACM CODE S.R.L. or are used under licence.</li>
+    <li>We grant you a personal, non-exclusive, non-transferable and revocable licence to install and use the app on your devices in line with these terms.</li>
+    <li>You may not sell, rent or redistribute the app as your own product. Rights that the law grants you on a mandatory basis (for example, regarding the interoperability of computer programs) are not affected.</li>
+    <li>The app includes open-source components used under their licences. Those licences take precedence for the components concerned.</li>
+    <li>If you send us suggestions or ideas, we may use them freely, without any obligation to you.</li>
+  </ul>
+</section>
+
+<section id="en-16">
+  <h2><span class="n">16.</span>Security and reporting vulnerabilities</h2>
+  <p>We regularly test the security of the app and the servers. No app can guarantee absolute security, however. If you discover a vulnerability, please write to us at the address in section 25 with enough detail to reproduce it, and do not make it public until we have fixed it. We will not take action against researchers who follow these rules and do not access other people’s data.</p>
+</section>
+
+<section id="en-17">
+  <h2><span class="n">17.</span>Availability, updates and changes to the service</h2>
+  <ul>
+    <li>We make reasonable efforts to keep the online services running at all times, but there may be interruptions for maintenance, updates or reasons beyond our control.</li>
+    <li>We release updates for security and improvements. Some updates may be required to keep using the online services. We recommend always installing the latest version.</li>
+    <li>We may change, add or withdraw features. If we withdraw an important feature of the online services, we will tell you at least 30 days in advance where possible and give you a way to save your data.</li>
+  </ul>
+</section>
+
+<section id="en-18">
+  <h2><span class="n">18.</span>Suspension and closing an account</h2>
+  <ul>
+    <li><strong>By you.</strong> You can delete your account at any time in the app (Settings › Delete account). Deletion requires confirmation with the account keys, so that no one can do it with your password alone. When you delete it, we remove from the servers your public profile, @name, devices, encrypted cloud data and sign-in. Local copies on your devices stay there until you delete them. .acm documents you sent may no longer open if they depend on the deleted keys.</li>
+    <li><strong>The subscription ends with the account.</strong> When you delete the account, the subscription is cancelled automatically and not renewed; the remaining period is not refunded, except under the right of withdrawal.</li>
+    <li><strong>By us.</strong> We may suspend or close an account for serious or repeated breaches of these terms, where the law requires it, or where there is a serious risk to other users or to the services. Where possible and allowed by law, we will tell you in advance and explain why.</li>
+    <li>You can keep using the app features that do not need an account.</li>
+  </ul>
+</section>
+
+<section id="en-19">
+  <h2><span class="n">19.</span>Warranties and consumer rights</h2>
+  <p>If you are a consumer, you have all the rights provided by law, including those on the conformity of digital content and digital services under Romanian Government Emergency Ordinance No 141/2021 (which implements Directive (EU) 2019/770). <strong>Nothing in these terms limits or excludes the rights that the law grants you on a mandatory basis.</strong></p>
+  <p>Beyond those statutory rights, the app is provided “as is” and “as available”. We do not guarantee that it will be error-free, uninterrupted, or fit for a particular purpose not described in these terms.</p>
+</section>
+
+<section id="en-20">
+  <h2><span class="n">20.</span>Limitation of liability</h2>
+  <ul>
+    <li>To the extent permitted by law, we are not liable for indirect damage, loss of profit, revenue or customers, or loss of data resulting from:
+      <ul>
+        <li>losing your recovery code, password or devices;</li>
+        <li>your disclosing them, or your devices being compromised;</li>
+        <li>errors in documents, invoices or data entered by you;</li>
+        <li>use of the app contrary to these terms.</li>
+      </ul>
+    </li>
+    <li>For business users, our total liability relating to the app and the online services is limited to the amount you paid us for them in the last 12 months or, if you paid nothing, to RON 100.</li>
+    <li>If paid online services are unavailable through our fault for a significant period, you have, as a consumer, the remedies provided by law, including a proportionate price reduction.</li>
+    <li>These limitations <strong>do not apply</strong> in cases of intent or gross negligence, to harm to life, body or health, or in other cases where the law does not allow liability to be limited.</li>
+  </ul>
+</section>
+
+<section id="en-21">
+  <h2><span class="n">21.</span>Personal data</h2>
+  <p>We process only the personal data needed for the account and the online services to work, in line with Regulation (EU) 2016/679 (GDPR). What data we process, why, for how long, who we share it with and what rights you have are described in the <a href="/confidentialitate">Privacy Policy</a>.</p>
+  <p>You have the right to lodge a complaint with the Romanian data protection authority (ANSPDCP, <a href="https://www.dataprotection.ro" rel="noopener">www.dataprotection.ro</a>) or with the authority in your country of residence.</p>
+</section>
+
+<section id="en-22">
+  <h2><span class="n">22.</span>Changes to these terms</h2>
+  <p>We may update these terms when the app, the services or the law change. The date of the last update is shown at the top of this page. We will tell you about important changes in the app or by email at least <strong>30 days</strong> before they take effect, except for changes required by law or urgently needed for security. If you do not agree with the new terms, you can stop using the services and delete your account before they take effect.</p>
+</section>
+
+<section id="en-23">
+  <h2><span class="n">23.</span>Governing law and dispute resolution</h2>
+  <ul>
+    <li>These terms are governed by Romanian law. If you are a consumer living in another EU country, you also keep the protection of the mandatory provisions of the law of your country.</li>
+    <li>Please contact us first at the address in section 25. We try to resolve any complaint amicably within 30 days at the latest.</li>
+    <li>If you are a consumer, you may contact the Romanian National Authority for Consumer Protection (ANPC) or use alternative dispute resolution (ADR/SAL) procedures.</li>
+    <li>Disputes that are not resolved amicably fall under the jurisdiction of the courts of Romania. For consumers, jurisdiction is determined by law, including the courts of their place of residence.</li>
+  </ul>
+  <div class="sal">
+    <a href="https://anpc.ro/ce-este-sal/" rel="noopener">ANPC · Alternative dispute resolution (SAL)</a>
+    <a href="https://anpc.ro" rel="noopener">National Authority for Consumer Protection</a>
+  </div>
+</section>
+
+<section id="en-24">
+  <h2><span class="n">24.</span>Final provisions</h2>
+  <ul>
+    <li>If any provision of these terms is found invalid, the others remain in force.</li>
+    <li>If we do not exercise a right at a given time, that does not mean we waive it.</li>
+    <li>We may transfer our rights and obligations under these terms to a company that takes over the app, provided your rights are not reduced. We will tell you about such a transfer.</li>
+    <li>We are not liable for failing to meet our obligations because of force majeure.</li>
+    <li>These terms are available in several languages. If they differ, the Romanian version prevails, except where the law that protects you as a consumer requires otherwise.</li>
+  </ul>
+</section>
+
+<section id="en-25">
+  <h2><span class="n">25.</span>Contact</h2>
+  <p>For questions, complaints, personal data requests or security reports, write to us at <a href="mailto:mandrutaniel5@gmail.com">mandrutaniel5@gmail.com</a> or by post to the registered office in section 1. We usually reply within 30 days.</p>
+</section>
+
+</article>
+</main>
+
+<footer>
+  <p>© 2026 ACM CODE S.R.L. · <a href="/confidentialitate"><span data-l="ro">Politica de confidențialitate</span><span data-l="en">Privacy Policy</span></a> · <a href="https://anpc.ro" rel="noopener">ANPC</a></p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var KEY = 'acmdocs.legal.lang';
+  function pick() {
+    if (location.hash.indexOf('#en') === 0) return 'en';
+    if (location.hash.indexOf('#ro') === 0) return 'ro';
+    try { var s = localStorage.getItem(KEY); if (s === 'ro' || s === 'en') return s; } catch (e) {}
+    var l = (navigator.language || 'ro').toLowerCase();
+    return l.indexOf('ro') === 0 ? 'ro' : 'en';
+  }
+  function set(l, remember) {
+    root.setAttribute('data-lang', l);
+    root.setAttribute('lang', l);
+    document.title = l === 'ro' ? 'Termeni și condiții · ACM Docs' : 'Terms and Conditions · ACM Docs';
+    var b = document.querySelectorAll('.seg button');
+    for (var i = 0; i < b.length; i++) b[i].setAttribute('aria-pressed', String(b[i].getAttribute('data-set') === l));
+    if (remember) { try { localStorage.setItem(KEY, l); } catch (e) {} }
+    watch();
+  }
+  var seg = document.querySelectorAll('.seg button');
+  for (var i = 0; i < seg.length; i++) seg[i].addEventListener('click', function () { set(this.getAttribute('data-set'), true); window.scrollTo(0, 0); });
+
+  // highlight the section being read in the table of contents
+  var obs = null;
+  function watch() {
+    if (obs) obs.disconnect();
+    if (!('IntersectionObserver' in window)) return;
+    var l = root.getAttribute('data-lang');
+    var links = document.querySelectorAll('nav.toc[data-l="' + l + '"] a');
+    var map = {};
+    for (var j = 0; j < links.length; j++) map[links[j].getAttribute('href').slice(1)] = links[j];
+    obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        for (var k in map) map[k].classList.remove('on');
+        var a = map[en.target.id]; if (a) a.classList.add('on');
+      });
+    }, { rootMargin: '-90px 0px -70% 0px' });
+    var secs = document.querySelectorAll('article[data-l="' + l + '"] section');
+    for (var m = 0; m < secs.length; m++) obs.observe(secs[m]);
+  }
+  set(pick(), false);
+})();
+</script>
+</body>
+</html>

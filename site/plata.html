@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plată · ACM Docs</title>
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light dark">
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --text: #1d1d1f;
+    --muted: #6e6e73;
+    --line: rgba(0, 0, 0, .09);
+    --accent: #0066cc;
+    --accent-soft: rgba(0, 102, 204, .08);
+    --warn-bg: #fff8e6;
+    --warn-line: #f0c36d;
+    --warn-text: #5c4300;
+    --ph-bg: #ffe9a8;
+    --radius: 18px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000;
+      --surface: #1c1c1e;
+      --text: #f5f5f7;
+      --muted: #a1a1a6;
+      --line: rgba(255, 255, 255, .12);
+      --accent: #4da3ff;
+      --accent-soft: rgba(77, 163, 255, .12);
+      --warn-bg: #2a2310;
+      --warn-line: #7a6124;
+      --warn-text: #f3dfa6;
+      --ph-bg: #5b4a12;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #1c1c1e; --text: #f5f5f7; --muted: #a1a1a6; --line: rgba(255, 255, 255, .12);
+    --accent: #4da3ff; --accent-soft: rgba(77, 163, 255, .12); --warn-bg: #2a2310; --warn-line: #7a6124; --warn-text: #f3dfa6; --ph-bg: #5b4a12;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 84px; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.6 var(--font); letter-spacing: -.01em; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* top bar */
+  .bar { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 78%, transparent); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); border-bottom: .5px solid var(--line); }
+  .bar-in { max-width: 1120px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 600; font-size: 17px; }
+  .brand:hover { text-decoration: none; }
+  .logo { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(145deg, #3a8dff, #5b5bf0); display: grid; place-items: center; flex: none; }
+  .logo svg { width: 18px; height: 18px; }
+  .spacer { flex: 1; }
+  .seg { display: inline-flex; background: var(--line); border-radius: 10px; padding: 2px; }
+  .seg button { border: 0; background: transparent; color: var(--text); font: 600 13px/1 var(--font); padding: 7px 12px; border-radius: 8px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--surface); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+  .print { border: 0; background: transparent; color: var(--accent); font: 500 14px/1 var(--font); cursor: pointer; padding: 8px 4px; }
+
+  /* layout */
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px 80px; display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 40px; }
+  header.hero { grid-column: 1 / -1; padding: 56px 0 8px; }
+  header.hero h1 { font-size: clamp(34px, 6vw, 52px); line-height: 1.07; letter-spacing: -.03em; margin: 0 0 12px; font-weight: 700; }
+  header.hero p { color: var(--muted); margin: 0; font-size: 19px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 18px; color: var(--muted); font-size: 14px; }
+
+  nav.toc { position: sticky; top: 84px; align-self: start; max-height: calc(100vh - 100px); overflow: auto; padding: 4px 0; }
+  nav.toc h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px 12px; font-weight: 600; }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: t; }
+  nav.toc li { counter-increment: t; }
+  nav.toc a { display: flex; gap: 8px; padding: 6px 12px; border-radius: 10px; color: var(--text); font-size: 14px; line-height: 1.35; }
+  nav.toc a::before { content: counter(t) "."; color: var(--muted); min-width: 20px; font-variant-numeric: tabular-nums; }
+  nav.toc a:hover { background: var(--accent-soft); text-decoration: none; }
+  nav.toc a.on { background: var(--accent-soft); color: var(--accent); }
+
+  main { min-width: 0; }
+  .doc { background: var(--surface); border-radius: var(--radius); padding: 40px 48px; box-shadow: 0 1px 2px rgba(0, 0, 0, .04); }
+  .doc section { padding-top: 8px; }
+  .doc section + section { margin-top: 34px; padding-top: 34px; border-top: .5px solid var(--line); }
+  .doc h2 { font-size: 24px; letter-spacing: -.02em; line-height: 1.25; margin: 0 0 14px; }
+  .doc h2 .n { color: var(--muted); font-weight: 600; margin-right: 8px; }
+  .doc h3 { font-size: 18px; margin: 22px 0 8px; }
+  .doc p { margin: 0 0 12px; }
+  .doc ul, .doc ol { margin: 0 0 12px; padding-left: 22px; }
+  .doc li { margin: 6px 0; }
+  .doc li::marker { color: var(--muted); }
+  .doc strong { font-weight: 600; }
+  .lead { font-size: 18px; color: var(--muted); }
+  .note { border-radius: 14px; padding: 16px 18px; margin: 16px 0; background: var(--accent-soft); }
+  .note.warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-line); }
+  .note p:last-child, .note ul:last-child { margin-bottom: 0; }
+  .note-t { display: block; font-weight: 700; margin-bottom: 6px; }
+  .ph { background: var(--ph-bg); border-radius: 6px; padding: 0 6px; font-weight: 600; white-space: nowrap; }
+  table.id { width: 100%; border-collapse: collapse; margin: 6px 0 12px; font-size: 16px; }
+  table.id th, table.id td { text-align: left; padding: 9px 0; border-bottom: .5px solid var(--line); vertical-align: top; }
+  table.id th { width: 42%; color: var(--muted); font-weight: 500; padding-right: 14px; }
+  dl.defs { margin: 0 0 12px; }
+  dl.defs dt { font-weight: 600; margin-top: 12px; }
+  dl.defs dd { margin: 2px 0 0; }
+  .sal { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+  .sal a { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; color: var(--text); font-size: 15px; font-weight: 500; }
+  .sal a:hover { border-color: var(--accent); text-decoration: none; }
+  footer { grid-column: 1 / -1; color: var(--muted); font-size: 14px; text-align: center; padding-top: 12px; }
+  footer p { margin: 4px 0; }
+
+  [data-l] { display: none; }
+  html[data-lang="ro"] [data-l="ro"], html[data-lang="en"] [data-l="en"] { display: revert; }
+  html[data-lang="ro"] article[data-l="ro"], html[data-lang="en"] article[data-l="en"] { display: block; }
+
+  @media (max-width: 900px) {
+    .wrap { grid-template-columns: 1fr; gap: 0; }
+    nav.toc { position: static; max-height: none; background: var(--surface); border-radius: var(--radius); padding: 18px 8px; margin: 8px 0 20px; }
+    header.hero { padding-top: 32px; }
+  }
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    .doc { padding: 24px 18px; border-radius: 16px; }
+    .doc h2 { font-size: 21px; }
+    .bar-in { padding: 10px 16px; }
+    .brand > span:last-child { display: none; }
+    .print { display: none; }
+    table.id th, table.id td { display: block; width: 100%; padding: 2px 0; border: 0; }
+    table.id tr { display: block; padding: 8px 0; border-bottom: .5px solid var(--line); }
+  }
+  @media print {
+    :root { --bg: #fff; --surface: #fff; --text: #000; --muted: #444; --line: #ccc; }
+    .bar, nav.toc, .seg, .print { display: none !important; }
+    .wrap { display: block; padding: 0; }
+    .doc { box-shadow: none; padding: 0; }
+    .doc section { break-inside: auto; }
+    .doc h2 { break-after: avoid; }
+    a { color: #000; }
+    .ph { background: none; border: 1px solid #000; }
+  }
+</style>
+<style>
+  .pay { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+  .pay .doc { max-width: 460px; width: 100%; text-align: center; }
+  .pay .ic { width: 72px; height: 72px; border-radius: 22px; display: inline-grid; place-items: center; color: #fff; margin-bottom: 14px; }
+  .pay .ic svg { width: 38px; height: 38px; fill: currentColor; }
+  .ok .ic { background: linear-gradient(150deg, #4cd471, #1f9d45); }
+  .no .ic { background: linear-gradient(150deg, #a1a1a8, #7c7c84); }
+  .pay h1 { font-size: 26px; letter-spacing: -.02em; margin: 0 0 8px; }
+  .pay p { color: var(--muted); margin: 0 0 10px; }
+  .pay small { color: var(--muted); display: block; margin-top: 18px; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="pay"><div class="doc" id="box"></div></div>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search).get('ok');
+  var ro = (navigator.language || 'ro').toLowerCase().indexOf('ro') === 0;
+  var T = {
+    ok: ro ? ['Plata a fost primită', 'Mulțumim! Abonamentul se activează în câteva secunde. Revino în aplicația ACM Docs: îl vezi în Setări › Abonament.']
+           : ['Payment received', 'Thank you! Your subscription activates within a few seconds. Go back to the ACM Docs app: you will see it in Settings › Subscription.'],
+    portal: ro ? ['Gata', 'Modificările au fost salvate. Poți reveni în aplicația ACM Docs.'] : ['Done', 'Your changes were saved. You can go back to the ACM Docs app.'],
+    no: ro ? ['Plata nu a fost finalizată', 'Nu ți-a fost retras niciun ban. Poți încerca din nou oricând din aplicație, în Setări › Abonament.']
+           : ['Payment not completed', 'You have not been charged. You can try again at any time in the app, in Settings › Subscription.'],
+  };
+  var k = q === '1' ? 'ok' : q === 'portal' ? 'portal' : 'no';
+  var good = k !== 'no';
+  var box = document.getElementById('box');
+  box.parentNode.classList.add(good ? 'ok' : 'no');
+  box.innerHTML = '<span class="ic"><svg viewBox="0 0 24 24"><path d="' + (good ? 'M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z' : 'M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z') + '"/></svg></span>'
+    + '<h1></h1><p></p><small>ACM Docs · ACM CODE S.R.L. · <a href="/termeni"></a></small>';
+  box.querySelector('h1').textContent = T[k][0];
+  box.querySelector('p').textContent = T[k][1];
+  box.querySelector('a').textContent = ro ? 'Termeni și condiții' : 'Terms and Conditions';
+  document.documentElement.lang = ro ? 'ro' : 'en';
+})();
+</script>
+</body>
+</html>

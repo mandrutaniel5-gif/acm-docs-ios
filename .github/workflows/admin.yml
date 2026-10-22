@@ -4,7 +4,7 @@ name: Admin
 on:
   workflow_dispatch:
     inputs:
-      handle: { description: "@name of the account", required: true, type: string }
+      handle: { description: "@name or email of the account", required: true, type: string }
       plan:
         description: "Plan"
         type: choice

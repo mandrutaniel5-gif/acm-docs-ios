@@ -501,7 +501,7 @@ const Scanner = (() => {
       paths = await pick(how);
     }
     if (!paths || !paths.length) return;
-    pages = []; cur = -1; saved = false; cropping = null;
+    pages = []; cur = -1; saved = false; cropping = null; scanRef = null;
     $('sc-ocr').checked = prefs.ocr;
     isOpen = true;
     App.showScreen('scanner');
@@ -796,8 +796,17 @@ const Scanner = (() => {
    * saved with the pictures now and the hidden text is added a few seconds later
    * (the file is updated quietly; nothing to wait for).
    */
+  /** One scan of the plan per scanning session, whatever comes out of it (PDF or document). */
+  async function planOk() {
+    if (typeof Plan === 'undefined') return true;
+    if (!scanRef) scanRef = Date.now() + '-' + Math.random();
+    return Plan.allow('scans', scanRef);
+  }
+  let scanRef = null;
+
   async function savePdf() {
     if (!pages.length) return;
+    if (!(await planOk())) return;
     let doc = null;
     try {
       await finish(false);
@@ -863,6 +872,7 @@ const Scanner = (() => {
 
   async function makeWord() {
     if (!pages.length) return;
+    if (!(await planOk())) return;
     try {
       await finish(true);
       setBusy(I18n.t('Se așază documentul…'));

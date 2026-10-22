@@ -89,7 +89,7 @@ export const registerDevice = onCall(async (req) => {
   if (!verify(parseBundle(profile.data().key).ed, `acm-register\n${uid}\n${fp}\n${ts}`, proof)) fail('permission-denied', 'no account keys');
   if (info != null && (typeof info !== 'string' || info.length > 4000)) fail('invalid-argument', 'info');
   const { replace } = req.data || {};
-  if (replace != null && (typeof replace !== 'string' || !/^[0-9a-f]{32}$/.test(replace))) fail('invalid-argument', 'replace');
+  if (replace != null && (typeof replace !== 'string' || !/^([0-9a-f]{32}|auto)$/.test(replace))) fail('invalid-argument', 'replace');
   const col = devicesOf(uid);
   const id = newId();
   const cap = Math.min(MAX_DEVICES, (await effective(uid)).devices);
@@ -100,7 +100,9 @@ export const registerDevice = onCall(async (req) => {
     // the plan's number of devices: holding the account keys (24 words) lets this device take the
     // place of an old one (it is signed out at once), never add one more
     if (!all.empty && active.length >= cap) {
-      const old = replace && active.find((d) => d.id === replace);
+      // "auto": the device that was used least recently makes room
+      const byAge = active.slice().sort((x, y) => ((x.data().lastSeen && x.data().lastSeen.toMillis()) || 0) - ((y.data().lastSeen && y.data().lastSeen.toMillis()) || 0));
+      const old = replace === 'auto' ? byAge[0] : replace && active.find((d) => d.id === replace);
       if (!old || active.length > cap) fail('resource-exhausted', 'device limit');
       tx.update(old.ref, { status: 'removed', removedAt: FieldValue.serverTimestamp(), replacedBy: id });
       replaced = old.id;
@@ -127,7 +129,7 @@ export const deviceSession = onCall(async (req) => {
   const snap = await ref.get();
   if (!snap.exists) fail('not-found', 'unknown device');
   const d = snap.data();
-  if (d.status !== 'active') fail('permission-denied', 'device blocked');
+  if (d.status !== 'active') fail('permission-denied', d.status === 'removed' ? 'device removed' : 'device blocked');
   if (!verify(unb64(d.pub), `acm-session\n${uid}\n${dev}\n${ts}`, sig)) fail('permission-denied', 'bad signature');
   // a signature is good once: the next one must carry a later time (no replay)
   const fresh = await db.runTransaction(async (tx) => {
@@ -522,8 +524,10 @@ export const useQuota = onCall(async (req) => {
     const n = (u.exists && u.data()[action]) || 0;
     if (rref && (await tx.get(rref)).exists) return n; // same document again this month: free
     if (n >= limit) fail('resource-exhausted', 'limit:' + action);
-    tx.set(uref, { [action]: n + 1, month }, { merge: true });
-    if (rref) tx.set(rref, { at: FieldValue.serverTimestamp() });
+    // counters and document marks delete themselves after about 13 months (Firestore TTL on "expires")
+    const expires = Timestamp.fromMillis(Date.now() + 400 * DAY);
+    tx.set(uref, { [action]: n + 1, month, expires }, { merge: true });
+    if (rref) tx.set(rref, { at: FieldValue.serverTimestamp(), expires });
     return n + 1;
   });
   return { ok: true, plan: e.plan, used, limit, token: e.plan !== 'basic' ? await planToken(uid, dev, e.plan, e.until) : null };

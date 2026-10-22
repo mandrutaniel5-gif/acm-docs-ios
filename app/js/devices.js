@@ -109,6 +109,7 @@ const Devices = (() => {
         return 'ok';
       } catch (e) {
         if (/blocked/.test(e.server || '')) return wipeBlocked();
+        if (/device removed/.test(e.server || '')) return replacedHere();
         if (!/unknown device/.test(e.server || '')) throw e;
         forget(u); // the server no longer knows it: register again
       }
@@ -117,7 +118,16 @@ const Devices = (() => {
     const id = await Account.unlock('Confirmă ca să adaugi acest dispozitiv la cont');
     const key = newKey();
     const ts = Date.now();
-    const r = await Account.call('registerDevice', { bundle: Host.toB64(key.bundle), ts, proof: Host.toB64(A().signEd(id, `acm-register\n${u}\n${key.fingerprint}\n${ts}`)) });
+    let r;
+    try {
+      r = await Account.call('registerDevice', { bundle: Host.toB64(key.bundle), ts, proof: Host.toB64(A().signEd(id, `acm-register\n${u}\n${key.fingerprint}\n${ts}`)) });
+    } catch (e) {
+      if (!/device limit/.test(e.server || '')) throw e;
+      // the plan's number of devices is reached: this one may take the place of the least used one
+      if (!(await deviceLimit(true))) return 'limit';
+      const ts2 = Date.now();
+      r = await Account.call('registerDevice', { bundle: Host.toB64(key.bundle), ts: ts2, proof: Host.toB64(A().signEd(id, `acm-register\n${u}\n${key.fingerprint}\n${ts2}`)), replace: 'auto' });
+    }
     await keep(u, r.dev, key);
     await Account.signInWithToken(r.token);
     vkey = A().vaultKey(id);
@@ -129,6 +139,39 @@ const Devices = (() => {
     const { F: f, db } = Account.internals();
     const dev = myDevice();
     await f.firestore.updateDoc(f.firestore.doc(db, 'accounts', uid(), 'devices', dev), { info: await sealInfo(dev) });
+  }
+
+  /** The plan allows no more devices. Here (new device): offer to take the place of the least used one. */
+  async function deviceLimit(here) {
+    const n = typeof Plan !== 'undefined' ? Plan.label() : '';
+    const act = await UI.modal((box, close) => {
+      box.classList.add('acm-ui', 'plan-ask');
+      box.append(
+        el('div', { class: 'plan-ico warn', html: svg('devices') }),
+        el('h2', { text: 'Ai atins numărul de dispozitive' }),
+        el('p', {}, [el('span', { text: 'Planul tău' }), el('b', { class: 'no-tr', text: ' ' + n + ' ' }), el('span', { text: 'nu mai permite încă un dispozitiv conectat în același timp.' })]),
+        here ? el('p', { class: 'muted small', text: 'Poți folosi contul aici în locul dispozitivului folosit cel mai rar: acela se deconectează imediat, iar datele lui rămân în cont.' })
+          : el('p', { class: 'muted small', text: 'Deconectează un dispozitiv din Setări › Dispozitive sau alege un abonament cu mai multe dispozitive.' }),
+        el('div', { class: 'actions col' }, [
+          here ? el('button', { class: 'btn primary', type: 'button', text: 'Folosește contul aici', onclick: () => close('replace') }) : null,
+          el('button', { class: 'btn' + (here ? '' : ' primary'), type: 'button', text: 'Vezi abonamentele', onclick: () => close('plans') }),
+          el('button', { class: 'btn', type: 'button', text: 'Anulează', onclick: () => close(null) }),
+        ]),
+      );
+    });
+    if (act === 'plans' && typeof Plan !== 'undefined') { if (!here) Plan.show(); else UI.toast(I18n.t('Abonamentele se aleg după conectare, din Setări › Abonament.'), { duration: 6000 }); }
+    return act === 'replace';
+  }
+
+  /** Another device took this one's place (the plan's number of devices): out, keys kept nowhere. */
+  async function replacedHere() {
+    const u = uid();
+    forget(u);
+    if (typeof Sync !== 'undefined') await Sync.forgetAccount(u);
+    try { await Host.secureDelete('words.' + u); await Host.secureDelete('keys.' + u); } catch (e) {}
+    try { await Account.signOut(); } catch (e) {}
+    await UI.confirm('Contul a fost deschis pe alt dispozitiv', 'Planul contului permite un număr limitat de dispozitive, iar alt dispozitiv a luat locul acestuia. Pentru a folosi contul aici, conectează-te din nou sau alege un abonament cu mai multe dispozitive.', 'Am înțeles', 'Închide');
+    return 'removed';
   }
 
   async function wipeBlocked() {
@@ -333,7 +376,11 @@ const Devices = (() => {
       await Account.call('pairApprove', { pid, fp, sealed: Host.toB64(sealed) });
       UI.busy();
       UI.toast('Dispozitivul nou a fost conectat.');
-    } catch (e) { UI.busy(); if (String(e && e.message) !== 'cancel') UI.toast(Account.say(e), { error: true }); }
+    } catch (e) {
+      UI.busy();
+      if (/device limit/.test(e.server || '')) return deviceLimit(false);
+      if (String(e && e.message) !== 'cancel') UI.toast(Account.say(e), { error: true });
+    }
   }
 
   // ---------------------------------------------------------------- QR: the new device

@@ -55,6 +55,7 @@
 .qi.blue { background: linear-gradient(160deg, #3a9bff, #007aff); }
 .qi.green { background: linear-gradient(160deg, #4cd471, #28b14c); }
 .qi.gray { background: linear-gradient(160deg, #a1a1a8, #7c7c84); }
+.qi.pdf { background: linear-gradient(160deg, #ff5f57, #e0352b); }
 .qi.word { background: linear-gradient(160deg, #3d7bd6, #2b579a); }
 .qi.sheet { background: linear-gradient(160deg, #2e9a5e, #1d7044); }
 .qi.slides { background: linear-gradient(160deg, #e8673e, #c43e1c); }
@@ -610,3 +611,7 @@ select.in { padding: 0 10px; appearance: auto; }
   .sc-top .tb .lbl { display: none; }
   .sc-top .tb { padding: 0 9px; }
 }
+
+/* the document's language (invoice preview, Aspect, phone top bar) */
+.lang-sel { width: auto; max-width: 190px; padding: 5px 26px 5px 10px; font-size: 13px; min-height: 0; height: auto; border-radius: 9px; }
+.inv-lang-top .lang-sel { max-width: 60vw; }

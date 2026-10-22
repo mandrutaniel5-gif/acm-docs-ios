@@ -1,15 +1,52 @@
 {
   "indexes": [],
   "fieldOverrides": [
-    { "collectionGroup": "pairings", "fieldPath": "expires", "ttl": true, "indexes": [] },
-    { "collectionGroup": "limits", "fieldPath": "expires", "ttl": true, "indexes": [] },
-    { "collectionGroup": "hooks", "fieldPath": "expires", "ttl": true, "indexes": [] },
     {
-      "collectionGroup": "meta", "fieldPath": "until",
+      "collectionGroup": "pairings",
+      "fieldPath": "expires",
+      "ttl": true,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "limits",
+      "fieldPath": "expires",
+      "ttl": true,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "hooks",
+      "fieldPath": "expires",
+      "ttl": true,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "usage",
+      "fieldPath": "expires",
+      "ttl": true,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "refs",
+      "fieldPath": "expires",
+      "ttl": true,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "meta",
+      "fieldPath": "until",
       "indexes": [
-        { "order": "ASCENDING", "queryScope": "COLLECTION" },
-        { "order": "DESCENDING", "queryScope": "COLLECTION" },
-        { "order": "ASCENDING", "queryScope": "COLLECTION_GROUP" }
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "DESCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        }
       ]
     }
   ]

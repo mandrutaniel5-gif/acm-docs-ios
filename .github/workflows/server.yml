@@ -5,7 +5,7 @@ name: Server
 on:
   push:
     branches: [main]
-    paths: ["functions/**", "firestore.rules", "firestore.indexes.json", "storage.rules", "firebase.json", "test/server.test.mjs", "test/plans.test.mjs", "test/prod-smoke.mjs", "test/auth-config.mjs", ".github/workflows/server.yml"]
+    paths: ["functions/**", "site/**", "firestore.rules", "firestore.indexes.json", "storage.rules", "firebase.json", "test/server.test.mjs", "test/plans.test.mjs", "test/prod-smoke.mjs", "test/auth-config.mjs", ".github/workflows/server.yml"]
   workflow_dispatch:
     inputs:
       deploy:
@@ -64,6 +64,9 @@ jobs:
           # function below needs Identity Platform switched on
           node test/auth-config.mjs 2>&1 | tee deploy.txt || true
           firebase deploy --project acm-docs-52280 --only firestore:rules,firestore:indexes,functions --force --non-interactive 2>&1 | tee -a deploy.txt
+          # the public pages (terms, privacy, payment return): acm-docs-52280.web.app, and the custom
+          # domain acmdocs.acmandrut.com once it is connected in the Firebase console (Hosting)
+          firebase deploy --project acm-docs-52280 --only hosting --non-interactive 2>&1 | tee -a deploy.txt || echo "HOSTING NOT DEPLOYED" | tee -a deploy.txt
           # Storage rules (only once Storage is activated in the console)
           firebase deploy --project acm-docs-52280 --only storage --non-interactive 2>&1 | tee -a deploy.txt || echo "STORAGE NOT ACTIVE" | tee -a deploy.txt
           # one real round trip with a throwaway account (created and deleted by the test)

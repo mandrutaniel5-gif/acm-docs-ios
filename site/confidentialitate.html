@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Confidențialitate · ACM Docs</title>
+<meta name="description" content="Politica de confidențialitate a aplicației ACM Docs: ce date prelucrăm, de ce și ce drepturi ai.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://acmdocs.acmandrut.com/confidentialitate">
+<link rel="alternate" hreflang="ro" href="https://acmdocs.acmandrut.com/confidentialitate">
+<link rel="alternate" hreflang="en" href="https://acmdocs.acmandrut.com/confidentialitate#en">
+<meta name="color-scheme" content="light dark">
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --text: #1d1d1f;
+    --muted: #6e6e73;
+    --line: rgba(0, 0, 0, .09);
+    --accent: #0066cc;
+    --accent-soft: rgba(0, 102, 204, .08);
+    --warn-bg: #fff8e6;
+    --warn-line: #f0c36d;
+    --warn-text: #5c4300;
+    --ph-bg: #ffe9a8;
+    --radius: 18px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #000000;
+      --surface: #1c1c1e;
+      --text: #f5f5f7;
+      --muted: #a1a1a6;
+      --line: rgba(255, 255, 255, .12);
+      --accent: #4da3ff;
+      --accent-soft: rgba(77, 163, 255, .12);
+      --warn-bg: #2a2310;
+      --warn-line: #7a6124;
+      --warn-text: #f3dfa6;
+      --ph-bg: #5b4a12;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #1c1c1e; --text: #f5f5f7; --muted: #a1a1a6; --line: rgba(255, 255, 255, .12);
+    --accent: #4da3ff; --accent-soft: rgba(77, 163, 255, .12); --warn-bg: #2a2310; --warn-line: #7a6124; --warn-text: #f3dfa6; --ph-bg: #5b4a12;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 84px; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.6 var(--font); letter-spacing: -.01em; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* top bar */
+  .bar { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 78%, transparent); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); border-bottom: .5px solid var(--line); }
+  .bar-in { max-width: 1120px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 600; font-size: 17px; }
+  .brand:hover { text-decoration: none; }
+  .logo { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(145deg, #3a8dff, #5b5bf0); display: grid; place-items: center; flex: none; }
+  .logo svg { width: 18px; height: 18px; }
+  .spacer { flex: 1; }
+  .seg { display: inline-flex; background: var(--line); border-radius: 10px; padding: 2px; }
+  .seg button { border: 0; background: transparent; color: var(--text); font: 600 13px/1 var(--font); padding: 7px 12px; border-radius: 8px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--surface); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+  .print { border: 0; background: transparent; color: var(--accent); font: 500 14px/1 var(--font); cursor: pointer; padding: 8px 4px; }
+
+  /* layout */
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px 80px; display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 40px; }
+  header.hero { grid-column: 1 / -1; padding: 56px 0 8px; }
+  header.hero h1 { font-size: clamp(34px, 6vw, 52px); line-height: 1.07; letter-spacing: -.03em; margin: 0 0 12px; font-weight: 700; }
+  header.hero p { color: var(--muted); margin: 0; font-size: 19px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 18px; color: var(--muted); font-size: 14px; }
+
+  nav.toc { position: sticky; top: 84px; align-self: start; max-height: calc(100vh - 100px); overflow: auto; padding: 4px 0; }
+  nav.toc h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px 12px; font-weight: 600; }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: t; }
+  nav.toc li { counter-increment: t; }
+  nav.toc a { display: flex; gap: 8px; padding: 6px 12px; border-radius: 10px; color: var(--text); font-size: 14px; line-height: 1.35; }
+  nav.toc a::before { content: counter(t) "."; color: var(--muted); min-width: 20px; font-variant-numeric: tabular-nums; }
+  nav.toc a:hover { background: var(--accent-soft); text-decoration: none; }
+  nav.toc a.on { background: var(--accent-soft); color: var(--accent); }
+
+  main { min-width: 0; }
+  .doc { background: var(--surface); border-radius: var(--radius); padding: 40px 48px; box-shadow: 0 1px 2px rgba(0, 0, 0, .04); }
+  .doc section { padding-top: 8px; }
+  .doc section + section { margin-top: 34px; padding-top: 34px; border-top: .5px solid var(--line); }
+  .doc h2 { font-size: 24px; letter-spacing: -.02em; line-height: 1.25; margin: 0 0 14px; }
+  .doc h2 .n { color: var(--muted); font-weight: 600; margin-right: 8px; }
+  .doc h3 { font-size: 18px; margin: 22px 0 8px; }
+  .doc p { margin: 0 0 12px; }
+  .doc ul, .doc ol { margin: 0 0 12px; padding-left: 22px; }
+  .doc li { margin: 6px 0; }
+  .doc li::marker { color: var(--muted); }
+  .doc strong { font-weight: 600; }
+  .lead { font-size: 18px; color: var(--muted); }
+  .note { border-radius: 14px; padding: 16px 18px; margin: 16px 0; background: var(--accent-soft); }
+  .note.warn { background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-line); }
+  .note p:last-child, .note ul:last-child { margin-bottom: 0; }
+  .note-t { display: block; font-weight: 700; margin-bottom: 6px; }
+  .ph { background: var(--ph-bg); border-radius: 6px; padding: 0 6px; font-weight: 600; white-space: nowrap; }
+  table.id { width: 100%; border-collapse: collapse; margin: 6px 0 12px; font-size: 16px; }
+  table.id th, table.id td { text-align: left; padding: 9px 0; border-bottom: .5px solid var(--line); vertical-align: top; }
+  table.id th { width: 42%; color: var(--muted); font-weight: 500; padding-right: 14px; }
+  dl.defs { margin: 0 0 12px; }
+  dl.defs dt { font-weight: 600; margin-top: 12px; }
+  dl.defs dd { margin: 2px 0 0; }
+  .sal { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+  .sal a { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; color: var(--text); font-size: 15px; font-weight: 500; }
+  .sal a:hover { border-color: var(--accent); text-decoration: none; }
+  footer { grid-column: 1 / -1; color: var(--muted); font-size: 14px; text-align: center; padding-top: 12px; }
+  footer p { margin: 4px 0; }
+
+  [data-l] { display: none; }
+  html[data-lang="ro"] [data-l="ro"], html[data-lang="en"] [data-l="en"] { display: revert; }
+  html[data-lang="ro"] article[data-l="ro"], html[data-lang="en"] article[data-l="en"] { display: block; }
+
+  @media (max-width: 900px) {
+    .wrap { grid-template-columns: 1fr; gap: 0; }
+    nav.toc { position: static; max-height: none; background: var(--surface); border-radius: var(--radius); padding: 18px 8px; margin: 8px 0 20px; }
+    header.hero { padding-top: 32px; }
+  }
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    .doc { padding: 24px 18px; border-radius: 16px; }
+    .doc h2 { font-size: 21px; }
+    .bar-in { padding: 10px 16px; }
+    .brand > span:last-child { display: none; }
+    .print { display: none; }
+    table.id th, table.id td { display: block; width: 100%; padding: 2px 0; border: 0; }
+    table.id tr { display: block; padding: 8px 0; border-bottom: .5px solid var(--line); }
+  }
+  @media print {
+    :root { --bg: #fff; --surface: #fff; --text: #000; --muted: #444; --line: #ccc; }
+    .bar, nav.toc, .seg, .print { display: none !important; }
+    .wrap { display: block; padding: 0; }
+    .doc { box-shadow: none; padding: 0; }
+    .doc section { break-inside: auto; }
+    .doc h2 { break-after: avoid; }
+    a { color: #000; }
+    .ph { background: none; border: 1px solid #000; }
+  }
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="bar-in">
+    <a class="brand" href="/" aria-label="ACM Docs">
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#fff"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v1.6H8V13zm0 3.4h8V18H8v-1.6z"/></svg></span>
+      <span>ACM Docs</span>
+    </a>
+    <div class="spacer"></div>
+    <button class="print" type="button" onclick="window.print()"><span data-l="ro">Tipărește</span><span data-l="en">Print</span></button>
+    <div class="seg" role="group" aria-label="Limba / Language">
+      <button type="button" data-set="ro" aria-pressed="true">RO</button>
+      <button type="button" data-set="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ============================== ROMÂNĂ ============================== -->
+<header class="hero" data-l="ro">
+  <h1>Politica de confidențialitate</h1>
+  <p>Ce date personale prelucrăm când folosești ACM Docs, de ce, și ce drepturi ai.</p>
+  <div class="meta"><span>Versiunea 1.1</span><span>În vigoare de la 22 octombrie 2026</span><span>Ultima actualizare: 22 octombrie 2026</span></div>
+</header>
+
+<nav class="toc" data-l="ro" aria-label="Cuprins">
+  <h2>Cuprins</h2>
+  <ol>
+    <li><a href="#ro-1">Pe scurt</a></li>
+    <li><a href="#ro-2">Operatorul datelor</a></li>
+    <li><a href="#ro-3">Ce date nu putem vedea</a></li>
+    <li><a href="#ro-4">Ce date prelucrăm</a></li>
+    <li><a href="#ro-5">Scopuri și temeiuri legale</a></li>
+    <li><a href="#ro-6">Date folosite doar pe dispozitiv</a></li>
+    <li><a href="#ro-7">Cui transmitem datele</a></li>
+    <li><a href="#ro-8">Unde sunt stocate datele</a></li>
+    <li><a href="#ro-9">Cât timp păstrăm datele</a></li>
+    <li><a href="#ro-10">Securitatea datelor</a></li>
+    <li><a href="#ro-11">Drepturile tale</a></li>
+    <li><a href="#ro-12">Minori</a></li>
+    <li><a href="#ro-13">Cookie-uri și urmărire</a></li>
+    <li><a href="#ro-14">Decizii automate</a></li>
+    <li><a href="#ro-15">Date ale altor persoane</a></li>
+    <li><a href="#ro-16">Modificări</a></li>
+    <li><a href="#ro-17">Contact și plângeri</a></li>
+  </ol>
+</nav>
+
+<main data-l="ro">
+<article class="doc" data-l="ro" lang="ro">
+
+<section id="ro-1">
+  <h2><span class="n">1.</span>Pe scurt</h2>
+  <ul>
+    <li>Documentele, facturile și celelalte date pe care le sincronizezi sunt <strong>criptate pe dispozitivul tău</strong>. Noi nu avem cheile și nu le putem citi.</li>
+    <li>Pe server păstrăm doar ce este necesar pentru ca un cont să funcționeze: adresa de e-mail, @numele, numele afișat, cheile publice și informații tehnice despre dispozitivele contului.</li>
+    <li>Nu vindem date, nu afișăm reclame, nu folosim instrumente de analiză sau de urmărire în aplicație.</li>
+    <li>Serverele sunt în Uniunea Europeană. Plățile abonamentelor le procesează Stripe; noi nu vedem datele cardului.</li>
+  </ul>
+</section>
+
+<section id="ro-2">
+  <h2><span class="n">2.</span>Operatorul datelor</h2>
+  <table class="id">
+    <tr><th>Operator</th><td>ACM CODE S.R.L.</td></tr>
+    <tr><th>Sediul social</th><td>Comuna Avram Iancu, sat Avram Iancu, nr. 344, cod poștal 417035, județul Bihor, România</td></tr>
+    <tr><th>CUI</th><td><span class="ph">[CUI]</span></td></tr>
+    <tr><th>Nr. Registrul Comerțului</th><td><span class="ph">[J05/…/2026]</span></td></tr>
+    <tr><th>Contact pentru date personale</th><td><a href="mailto:mandrutaniel5@gmail.com">mandrutaniel5@gmail.com</a></td></tr>
+  </table>
+  <p>Nu avem obligația legală de a numi un responsabil cu protecția datelor (DPO). Pentru orice întrebare despre datele tale ne poți scrie la adresa de mai sus.</p>
+</section>
+
+<section id="ro-3">
+  <h2><span class="n">3.</span>Ce date nu putem vedea</h2>
+  <p>ACM Docs folosește criptare de la un capăt la altul. Următoarele date sunt criptate pe dispozitivul tău înainte de a ajunge la noi și <strong>nu le putem citi</strong>:</p>
+  <ul>
+    <li>documentele și fișierele sincronizate, inclusiv numele lor;</li>
+    <li>facturile, clienții, produsele, datele firmei și semnăturile;</li>
+    <li>lista de contacte și setările sincronizate;</li>
+    <li>conținutul documentelor .acm trimise între conturi;</li>
+    <li>denumirea și modelul dispozitivelor tale (păstrate criptat, ca să le vezi doar tu în aplicație).</li>
+  </ul>
+  <p>Cheia privată și codul de recuperare (cele 24 de cuvinte) <strong>nu ajung niciodată pe serverele noastre</strong>.</p>
+  <p>Deși nu le putem citi, aceste înregistrări criptate pot fi considerate date personale. De aceea le tratăm și pe ele conform acestei politici (stocare, ștergere, securitate).</p>
+</section>
+
+<section id="ro-4">
+  <h2><span class="n">4.</span>Ce date prelucrăm</h2>
+  <h3>Când creezi și folosești un cont</h3>
+  <ul>
+    <li><strong>Date de cont:</strong> adresa de e-mail, parola (stocată doar sub formă de amprentă criptografică, nu în clar), starea confirmării e-mailului, data creării contului și datele ultimelor conectări.</li>
+    <li><strong>Profil public:</strong> @numele, numele afișat, cheia publică și amprenta ei. Acestea sunt vizibile altor utilizatori ACM Docs, ca să te poată găsi și să îți poată trimite documente criptate.</li>
+    <li><strong>Verificarea în doi pași</strong>, dacă o pornești: informațiile tehnice necesare pentru verificarea codurilor.</li>
+    <li><strong>Dispozitive:</strong> cheia publică a fiecărui dispozitiv, rolul lui (principal sau secundar), starea (activ sau blocat), modul în care a fost adăugat și momentul ultimei activități.</li>
+    <li><strong>Evenimente de securitate:</strong> conectări cu parola, dispozitive noi sau blocate. Pentru conectările cu parola reținem doar o descriere generală a programului (de exemplu „Chrome · Windows”), <strong>nu adresa IP</strong>.</li>
+    <li><strong>Cereri de contact:</strong> faptul că un cont a adăugat alt cont, până când cererea este acceptată sau ignorată.</li>
+  </ul>
+  <h3>Planul și abonamentul</h3>
+  <ul>
+    <li><strong>Contoarele lunare</strong> ale planului: câte documente editate, scanări, facturi și documente criptate ai folosit în luna curentă. Ca același document să nu fie numărat de două ori, păstrăm o amprentă criptografică a lui (un șir de caractere din care documentul nu poate fi refăcut), <strong>nu numele și nici conținutul lui</strong>.</li>
+    <li><strong>Datele abonamentului:</strong> planul, perioada (lunar sau anual), starea abonamentului, data reînnoirii sau a încheierii și identificatorii clientului și ai abonamentului la procesatorul de plăți.</li>
+    <li><strong>Family și Business:</strong> ce conturi fac parte din abonament și invitațiile trimise. Titularul vede doar @numele și numele afișat ale membrilor, nimic din datele lor.</li>
+    <li><strong>Datele de plată</strong> (card, nume, adresa de facturare, eventual codul fiscal) sunt introduse direct pe pagina Stripe și prelucrate de Stripe. Noi nu primim datele cardului; primim doar confirmarea plății, suma și datele necesare facturării.</li>
+  </ul>
+  <h3>Când folosești sincronizarea</h3>
+  <ul>
+    <li>Înregistrări criptate și blocuri criptate de date, cu dimensiunea și data lor (vezi punctul 3).</li>
+  </ul>
+  <h3>Date tehnice prelucrate automat</h3>
+  <ul>
+    <li>Adresa IP și datele tehnice ale cererilor ajung inevitabil la servere când aplicația comunică cu ele. Le folosim temporar pentru a limita abuzurile (de exemplu, numărul de încercări de asociere a unui dispozitiv) și pentru securitate. Pentru această limitare nu păstrăm adresa IP în clar, ci doar o amprentă criptografică a ei. Furnizorul nostru de servere poate păstra jurnale tehnice pe o perioadă scurtă, conform propriilor reguli de securitate.</li>
+  </ul>
+  <h3>Când ne scrii</h3>
+  <ul>
+    <li>Adresa de e-mail și conținutul mesajului, pentru a-ți răspunde.</li>
+  </ul>
+</section>
+
+<section id="ro-5">
+  <h2><span class="n">5.</span>Scopuri și temeiuri legale</h2>
+  <table class="id">
+    <tr><th>Crearea și administrarea contului, conectarea, dispozitivele, sincronizarea, trimiterea documentelor și cererile de contact</th><td>Executarea contractului cu tine — art. 6 alin. (1) lit. b) GDPR</td></tr>
+    <tr><th>Planuri, limite și abonamente: numărarea acțiunilor lunare, încasarea plăților, reînnoirea și anularea</th><td>Executarea contractului — art. 6 alin. (1) lit. b)</td></tr>
+    <tr><th>Evidența contabilă și fiscală a plăților (facturi, încasări)</th><td>Obligația legală — art. 6 alin. (1) lit. c)</td></tr>
+    <tr><th>Protejarea conturilor: anunțuri de securitate, limitarea încercărilor, prevenirea abuzurilor și a fraudei</th><td>Interesul nostru legitim și al utilizatorilor de a avea un serviciu sigur — art. 6 alin. (1) lit. f)</td></tr>
+    <tr><th>E-mailuri de serviciu (confirmarea adresei, resetarea parolei, modificări importante ale termenilor)</th><td>Executarea contractului — art. 6 alin. (1) lit. b)</td></tr>
+    <tr><th>Răspunsul la cererile și reclamațiile tale</th><td>Interesul legitim de a-ți răspunde și, după caz, obligația legală — art. 6 alin. (1) lit. f) și c)</td></tr>
+    <tr><th>Respectarea obligațiilor legale și apărarea în fața instanțelor sau a autorităților</th><td>Obligația legală și interesul legitim — art. 6 alin. (1) lit. c) și f)</td></tr>
+  </table>
+  <p>Nu trimitem mesaje de marketing. Dacă vom dori vreodată să o facem, îți vom cere în prealabil acordul.</p>
+</section>
+
+<section id="ro-6">
+  <h2><span class="n">6.</span>Date folosite doar pe dispozitivul tău</h2>
+  <ul>
+    <li><strong>Camera</strong> este folosită doar când scanezi un document sau un cod QR. Imaginile rămân pe dispozitiv, cu excepția documentelor pe care alegi să le sincronizezi (criptat).</li>
+    <li><strong>Recunoașterea textului (OCR)</strong> se face integral pe dispozitiv. Pozele nu sunt trimise nicăieri pentru asta.</li>
+    <li><strong>Amprenta, Face ID sau Windows Hello</strong> sunt verificate de sistemul de operare. Noi nu primim și nu stocăm date biometrice.</li>
+    <li><strong>Documentele deschise fără cont</strong> sau cu sincronizarea oprită rămân doar pe dispozitiv.</li>
+    <li><strong>Cursul valutar:</strong> aplicația descarcă direct de la Banca Națională a României fișierul public cu cursurile zilei. Banca primește doar o cerere obișnuită de descărcare, fără date despre tine sau despre facturi.</li>
+  </ul>
+</section>
+
+<section id="ro-7">
+  <h2><span class="n">7.</span>Cui transmitem datele</h2>
+  <ul>
+    <li><strong>Google Ireland Limited / Google LLC</strong> (Firebase, Google Cloud, Identity Platform), ca împuternicit care ne furnizează serverele, autentificarea, baza de date, stocarea și trimiterea e-mailurilor de serviciu. Google prelucrează datele doar conform instrucțiunilor noastre și termenilor săi de prelucrare a datelor.</li>
+    <li><strong>Stripe Payments Europe, Limited</strong> (Irlanda) procesează plățile abonamentelor. Pentru datele cardului și prevenirea fraudei la plăți, Stripe acționează ca operator independent, conform propriei politici de confidențialitate (<a href="https://stripe.com/privacy" rel="noopener">stripe.com/privacy</a>).</li>
+    <li><strong>Contabilitatea firmei</strong> (persoana sau firma care ține evidența contabilă a ACM CODE S.R.L.) primește datele de facturare necesare, în baza obligațiilor legale.</li>
+    <li><strong>Alți utilizatori ACM Docs</strong> văd profilul tău public (@nume, nume afișat, cheie publică), iar destinatarii documentelor tale îți văd identitatea de expeditor.</li>
+    <li><strong>Autorități publice</strong>, doar când legea ne obligă. Chiar și atunci putem preda doar datele pe care le avem; conținutul criptat nu îl putem decripta.</li>
+    <li>În cazul unei reorganizări sau al transferului aplicației către altă societate, datele pot fi transferate acesteia, cu aceleași garanții. Te vom anunța în prealabil.</li>
+  </ul>
+  <p>Nu vindem și nu închiriem date personale nimănui.</p>
+</section>
+
+<section id="ro-8">
+  <h2><span class="n">8.</span>Unde sunt stocate datele</h2>
+  <p>Serverele aplicației (baza de date, stocarea și funcțiile de server) sunt găzduite în centre de date Google din <strong>Uniunea Europeană</strong> (funcțiile de server rulează în regiunea europe-west1, Belgia).</p>
+  <p>Unele servicii Google, precum autentificarea, sunt servicii globale, iar datele de cont pot fi prelucrate și în afara Spațiului Economic European, inclusiv în Statele Unite. În aceste cazuri, transferul se face pe baza Cadrului UE–SUA privind protecția datelor (Google LLC este certificată) și/sau a clauzelor contractuale standard aprobate de Comisia Europeană. Ne poți cere o copie a garanțiilor aplicabile.</p>
+</section>
+
+<section id="ro-9">
+  <h2><span class="n">9.</span>Cât timp păstrăm datele</h2>
+  <ul>
+    <li><strong>Datele contului, profilul public, dispozitivele și datele criptate din cloud:</strong> cât timp ai cont. La ștergerea contului le ștergem imediat din baza de date și din stocare. Copiile de siguranță tehnice ale furnizorului dispar automat în cel mult câteva săptămâni.</li>
+    <li><strong>Datele unui dispozitiv blocat</strong> rămân în lista contului, marcate ca blocate, pentru ca ele să nu mai poată fi folosite.</li>
+    <li><strong>Evenimentele de securitate:</strong> cât timp există contul, ca să poți vedea istoricul conectărilor și al dispozitivelor.</li>
+    <li><strong>Cererile de contact:</strong> până când sunt acceptate sau ignorate, și în orice caz cel mult cât există contul.</li>
+    <li><strong>Contoarele lunare ale planului</strong> și amprentele documentelor numărate: se șterg automat după aproximativ 13 luni.</li>
+    <li><strong>Datele abonamentului și ale plăților</strong> (facturi, încasări): cât timp ai abonament și apoi cât cere legea contabilă (în România, de regulă 10 ani pentru documentele financiar-contabile).</li>
+    <li><strong>Datele pentru limitarea abuzurilor</strong> (amprente, nu adrese IP): expiră după 10 minute până la o oră și sunt șterse automat, de regulă în cel mult o zi de la expirare.</li>
+    <li><strong>Corespondența cu noi:</strong> cel mult 3 ani de la ultima comunicare, sau mai mult dacă este necesar pentru apărarea unui drept.</li>
+    <li><strong>Datele de pe dispozitivele tale</strong> rămân acolo până le ștergi tu sau dezinstalezi aplicația.</li>
+  </ul>
+</section>
+
+<section id="ro-10">
+  <h2><span class="n">10.</span>Securitatea datelor</h2>
+  <ul>
+    <li>Criptare de la un capăt la altul, cu algoritmi clasici și post-cuantici, pentru datele sincronizate și pentru documentele .acm.</li>
+    <li>Fiecare dispozitiv are propria cheie; operațiile importante (adăugarea de dispozitive, ștergerea contului) cer semnătura cheilor contului, nu doar parola.</li>
+    <li>Reguli stricte de acces pe server: fiecare cont își poate accesa doar propriile date.</li>
+    <li>Conexiuni criptate (HTTPS) între aplicație și servere, verificarea opțională în doi pași și anunțuri pentru conectări noi.</li>
+    <li>Testăm periodic securitatea aplicației și a serverelor.</li>
+  </ul>
+  <p>Dacă se produce o încălcare a securității datelor care poate pune în pericol drepturile tale, vom anunța autoritatea de supraveghere în cel mult 72 de ore și pe tine fără întârzieri nejustificate, conform GDPR.</p>
+</section>
+
+<section id="ro-11">
+  <h2><span class="n">11.</span>Drepturile tale</h2>
+  <p>Conform GDPR, ai următoarele drepturi:</p>
+  <ul>
+    <li><strong>Dreptul de acces</strong> — să afli ce date prelucrăm despre tine și să primești o copie.</li>
+    <li><strong>Dreptul la rectificare</strong> — să corectezi datele inexacte. Numele afișat și @numele le poți schimba direct din aplicație.</li>
+    <li><strong>Dreptul la ștergere</strong> — poți șterge contul oricând din Setări › Șterge contul. Poți opri sincronizarea pe orice dispozitiv.</li>
+    <li><strong>Dreptul la restricționarea prelucrării.</strong></li>
+    <li><strong>Dreptul la portabilitate</strong> — documentele și facturile tale sunt fișiere obișnuite pe dispozitiv (PDF, Word, Excel etc.), pe care le poți copia oricând. Datele de cont ți le putem transmite într-un format structurat, la cerere.</li>
+    <li><strong>Dreptul la opoziție</strong> față de prelucrările bazate pe interesul legitim.</li>
+    <li><strong>Dreptul de a nu face obiectul unei decizii bazate exclusiv pe prelucrare automată</strong> (vezi punctul 14).</li>
+    <li><strong>Dreptul de a depune plângere</strong> la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (ANSPDCP), B-dul G-ral. Gheorghe Magheru nr. 28-30, Sector 1, București, <a href="https://www.dataprotection.ro" rel="noopener">www.dataprotection.ro</a>, sau la autoritatea din țara ta.</li>
+  </ul>
+  <p>Pentru a-ți exercita drepturile, scrie-ne la <a href="mailto:mandrutaniel5@gmail.com">mandrutaniel5@gmail.com</a> de pe adresa de e-mail a contului. Răspundem în cel mult o lună, termen care poate fi prelungit cu încă două luni pentru cereri complexe, cu informarea ta. Putem cere informații suplimentare pentru a confirma că cererea vine de la tine. Exercitarea drepturilor nu costă nimic, cu excepția cererilor vădit nefondate sau excesive.</p>
+  <p>Reține că nu îți putem furniza conținutul criptat într-o formă citibilă, pentru că nu avem cheile. Îl poți accesa oricând din aplicație, pe dispozitivele tale.</p>
+</section>
+
+<section id="ro-12">
+  <h2><span class="n">12.</span>Minori</h2>
+  <p>Contul ACM Docs este destinat persoanelor de cel puțin 16 ani. Nu colectăm cu bună știință date ale copiilor sub această vârstă. Dacă afli că un copil sub 16 ani și-a creat cont fără acordul părintelui, scrie-ne și vom șterge contul.</p>
+</section>
+
+<section id="ro-13">
+  <h2><span class="n">13.</span>Cookie-uri și urmărire</h2>
+  <p>Aplicația <strong>nu folosește</strong> cookie-uri de publicitate, instrumente de analiză, pixeli de urmărire sau identificatori publicitari. Aplicația păstrează pe dispozitiv doar datele strict necesare funcționării (de exemplu, sesiunea de conectare și setările tale).</p>
+  <p>Această pagină web nu folosește cookie-uri. Ține minte doar limba aleasă, în memoria locală a browserului tău.</p>
+</section>
+
+<section id="ro-14">
+  <h2><span class="n">14.</span>Decizii automate</h2>
+  <p>Nu luăm decizii bazate exclusiv pe prelucrare automată care să producă efecte juridice asupra ta. Singurele mecanisme automate sunt cele de securitate (de exemplu, limitarea temporară a încercărilor repetate), care nu îți afectează drepturile și pot fi contestate scriindu-ne.</p>
+</section>
+
+<section id="ro-15">
+  <h2><span class="n">15.</span>Date ale altor persoane</h2>
+  <p>Dacă introduci în aplicație date ale altor persoane (de exemplu, clienți pe facturi, semnatari, contacte), ești operatorul acelor date și răspunzi pentru legalitatea prelucrării lor. Pentru datele sincronizate prin contul tău, noi acționăm doar ca furnizor tehnic de stocare criptată, fără acces la conținut.</p>
+</section>
+
+<section id="ro-16">
+  <h2><span class="n">16.</span>Modificări ale acestei politici</h2>
+  <p>Putem actualiza această politică atunci când se schimbă aplicația sau legea. Data ultimei actualizări este afișată la începutul paginii. Despre modificările importante te vom anunța în aplicație sau prin e-mail înainte de intrarea lor în vigoare.</p>
+</section>
+
+<section id="ro-17">
+  <h2><span class="n">17.</span>Contact și plângeri</h2>
+  <p>Pentru orice întrebare sau cerere privind datele personale: <a href="mailto:mandrutaniel5@gmail.com">mandrutaniel5@gmail.com</a> sau prin poștă la sediul social de la punctul 2. Vezi și <a href="/termeni">Termenii și condițiile</a>.</p>
+</section>
+
+</article>
+</main>
+
+<!-- ============================== ENGLISH ============================== -->
+<header class="hero" data-l="en">
+  <h1>Privacy Policy</h1>
+  <p>What personal data we process when you use ACM Docs, why, and what rights you have.</p>
+  <div class="meta"><span>Version 1.1</span><span>Effective 22 October 2026</span><span>Last updated: 22 October 2026</span></div>
+</header>
+
+<nav class="toc" data-l="en" aria-label="Contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#en-1">In short</a></li>
+    <li><a href="#en-2">Data controller</a></li>
+    <li><a href="#en-3">Data we cannot see</a></li>
+    <li><a href="#en-4">Data we process</a></li>
+    <li><a href="#en-5">Purposes and legal bases</a></li>
+    <li><a href="#en-6">Data used only on your device</a></li>
+    <li><a href="#en-7">Who we share data with</a></li>
+    <li><a href="#en-8">Where data is stored</a></li>
+    <li><a href="#en-9">How long we keep data</a></li>
+    <li><a href="#en-10">Data security</a></li>
+    <li><a href="#en-11">Your rights</a></li>
+    <li><a href="#en-12">Children</a></li>
+    <li><a href="#en-13">Cookies and tracking</a></li>
+    <li><a href="#en-14">Automated decisions</a></li>
+    <li><a href="#en-15">Other people’s data</a></li>
+    <li><a href="#en-16">Changes</a></li>
+    <li><a href="#en-17">Contact and complaints</a></li>
+  </ol>
+</nav>
+
+<main data-l="en">
+<article class="doc" data-l="en" lang="en">
+
+<p class="note"><span class="note-t">Translation</span>This English version is provided for convenience. If it differs from the Romanian version, the Romanian version prevails, except where the law that protects you requires otherwise.</p>
+
+<section id="en-1">
+  <h2><span class="n">1.</span>In short</h2>
+  <ul>
+    <li>The documents, invoices and other data you sync are <strong>encrypted on your device</strong>. We do not have the keys and cannot read them.</li>
+    <li>On the server we keep only what an account needs to work: your email address, @name, display name, public keys and technical information about the account’s devices.</li>
+    <li>We do not sell data, show ads, or use analytics or tracking tools in the app.</li>
+    <li>The servers are in the European Union. Subscription payments are processed by Stripe; we never see card details.</li>
+  </ul>
+</section>
+
+<section id="en-2">
+  <h2><span class="n">2.</span>Data controller</h2>
+  <table class="id">
+    <tr><th>Controller</th><td>ACM CODE S.R.L.</td></tr>
+    <tr><th>Registered office</th><td>Comuna Avram Iancu, sat Avram Iancu, nr. 344, postcode 417035, Bihor County, Romania</td></tr>
+    <tr><th>Tax ID (CUI)</th><td><span class="ph">[CUI]</span></td></tr>
+    <tr><th>Trade Register number</th><td><span class="ph">[J05/…/2026]</span></td></tr>
+    <tr><th>Privacy contact</th><td><a href="mailto:mandrutaniel5@gmail.com">mandrutaniel5@gmail.com</a></td></tr>
+  </table>
+  <p>We are not legally required to appoint a data protection officer (DPO). For any question about your data, write to the address above.</p>
+</section>
+
+<section id="en-3">
+  <h2><span class="n">3.</span>Data we cannot see</h2>
+  <p>ACM Docs uses end-to-end encryption. The following data is encrypted on your device before it reaches us, and <strong>we cannot read it</strong>:</p>
+  <ul>
+    <li>synced documents and files, including their names;</li>
+    <li>invoices, clients, products, company data and signatures;</li>
+    <li>your contact list and synced settings;</li>
+    <li>the content of .acm documents sent between accounts;</li>
+    <li>the name and model of your devices (kept encrypted so that only you see them in the app).</li>
+  </ul>
+  <p>Your private key and recovery code (the 24 words) <strong>never reach our servers</strong>.</p>
+  <p>Although we cannot read them, these encrypted records may still count as personal data, so we treat them under this policy too (storage, deletion, security).</p>
+</section>
+
+<section id="en-4">
+  <h2><span class="n">4.</span>Data we process</h2>
+  <h3>When you create and use an account</h3>
+  <ul>
+    <li><strong>Account data:</strong> email address, password (stored only as a cryptographic hash, never in plain text), email confirmation status, account creation date and latest sign-in dates.</li>
+    <li><strong>Public profile:</strong> @name, display name, public key and its fingerprint. These are visible to other ACM Docs users so they can find you and send you encrypted documents.</li>
+    <li><strong>Two-step verification</strong>, if you turn it on: the technical information needed to verify codes.</li>
+    <li><strong>Devices:</strong> each device’s public key, its role (primary or secondary), status (active or blocked), how it was added and when it was last active.</li>
+    <li><strong>Security events:</strong> sign-ins with the password, new or blocked devices. For password sign-ins we keep only a general description of the software (for example “Chrome · Windows”), <strong>not the IP address</strong>.</li>
+    <li><strong>Contact requests:</strong> the fact that one account added another, until the request is accepted or ignored.</li>
+  </ul>
+  <h3>Your plan and subscription</h3>
+  <ul>
+    <li><strong>The plan's monthly counters:</strong> how many edited documents, scans, invoices and encrypted documents you used this month. So that the same document is not counted twice, we keep a cryptographic fingerprint of it (a string from which the document cannot be rebuilt), <strong>not its name or content</strong>.</li>
+    <li><strong>Subscription data:</strong> the plan, the period (monthly or yearly), the subscription status, the renewal or end date and the customer and subscription identifiers at the payment processor.</li>
+    <li><strong>Family and Business:</strong> which accounts belong to the subscription and the invitations sent. The holder sees only the members' @name and display name, nothing of their data.</li>
+    <li><strong>Payment data</strong> (card, name, billing address, possibly a tax ID) is entered directly on the Stripe page and processed by Stripe. We never receive card details; we receive only the payment confirmation, the amount and the data needed for invoicing.</li>
+  </ul>
+  <h3>When you use sync</h3>
+  <ul>
+    <li>Encrypted records and encrypted blocks of data, with their size and date (see section 3).</li>
+  </ul>
+  <h3>Technical data processed automatically</h3>
+  <ul>
+    <li>IP addresses and technical request data inevitably reach the servers when the app talks to them. We use them temporarily to limit abuse (for example, the number of device-pairing attempts) and for security. For this limit we do not keep the IP address itself, only a cryptographic hash of it. Our server provider may keep technical logs for a short period under its own security rules.</li>
+  </ul>
+  <h3>When you write to us</h3>
+  <ul>
+    <li>Your email address and the content of your message, so we can reply.</li>
+  </ul>
+</section>
+
+<section id="en-5">
+  <h2><span class="n">5.</span>Purposes and legal bases</h2>
+  <table class="id">
+    <tr><th>Creating and running the account, sign-in, devices, sync, sending documents and contact requests</th><td>Performance of our contract with you — Art. 6(1)(b) GDPR</td></tr>
+    <tr><th>Plans, limits and subscriptions: counting monthly actions, collecting payments, renewal and cancellation</th><td>Performance of the contract — Art. 6(1)(b)</td></tr>
+    <tr><th>Accounting and tax records of payments (invoices, receipts)</th><td>Legal obligation — Art. 6(1)(c)</td></tr>
+    <tr><th>Protecting accounts: security notices, attempt limits, preventing abuse and fraud</th><td>Our and our users’ legitimate interest in a secure service — Art. 6(1)(f)</td></tr>
+    <tr><th>Service emails (address confirmation, password reset, important changes to the terms)</th><td>Performance of the contract — Art. 6(1)(b)</td></tr>
+    <tr><th>Answering your requests and complaints</th><td>Legitimate interest in replying and, where applicable, legal obligation — Art. 6(1)(f) and (c)</td></tr>
+    <tr><th>Meeting legal obligations and defending legal claims</th><td>Legal obligation and legitimate interest — Art. 6(1)(c) and (f)</td></tr>
+  </table>
+  <p>We do not send marketing messages. If we ever wish to, we will ask for your consent first.</p>
+</section>
+
+<section id="en-6">
+  <h2><span class="n">6.</span>Data used only on your device</h2>
+  <ul>
+    <li><strong>The camera</strong> is used only when you scan a document or a QR code. Images stay on the device, except documents you choose to sync (encrypted).</li>
+    <li><strong>Text recognition (OCR)</strong> runs entirely on the device. Photos are not sent anywhere for it.</li>
+    <li><strong>Fingerprint, Face ID or Windows Hello</strong> are checked by the operating system. We never receive or store biometric data.</li>
+    <li><strong>Documents opened without an account</strong> or with sync turned off stay only on the device.</li>
+    <li><strong>Exchange rates:</strong> the app downloads the public daily rates file directly from the National Bank of Romania. The bank receives only an ordinary download request, with no data about you or your invoices.</li>
+  </ul>
+</section>
+
+<section id="en-7">
+  <h2><span class="n">7.</span>Who we share data with</h2>
+  <ul>
+    <li><strong>Google Ireland Limited / Google LLC</strong> (Firebase, Google Cloud, Identity Platform), as the processor providing our servers, authentication, database, storage and the sending of service emails. Google processes the data only on our instructions and under its data processing terms.</li>
+    <li><strong>Stripe Payments Europe, Limited</strong> (Ireland) processes subscription payments. For card data and payment fraud prevention, Stripe acts as an independent controller under its own privacy policy (<a href="https://stripe.com/privacy" rel="noopener">stripe.com/privacy</a>).</li>
+    <li><strong>The company's accountant</strong> (the person or firm keeping ACM CODE S.R.L.'s accounts) receives the billing data needed, under legal obligations.</li>
+    <li><strong>Other ACM Docs users</strong> see your public profile (@name, display name, public key), and the recipients of your documents see you as the sender.</li>
+    <li><strong>Public authorities</strong>, only where the law requires it. Even then we can hand over only the data we hold; we cannot decrypt encrypted content.</li>
+    <li>If the company is reorganised or the app is transferred to another company, the data may be transferred to it with the same safeguards. We will tell you in advance.</li>
+  </ul>
+  <p>We do not sell or rent personal data to anyone.</p>
+</section>
+
+<section id="en-8">
+  <h2><span class="n">8.</span>Where data is stored</h2>
+  <p>The app’s servers (database, storage and server functions) are hosted in Google data centres in the <strong>European Union</strong> (the server functions run in the europe-west1 region, Belgium).</p>
+  <p>Some Google services, such as authentication, are global, and account data may also be processed outside the European Economic Area, including in the United States. In those cases the transfer relies on the EU–US Data Privacy Framework (Google LLC is certified) and/or standard contractual clauses approved by the European Commission. You may ask us for a copy of the applicable safeguards.</p>
+</section>
+
+<section id="en-9">
+  <h2><span class="n">9.</span>How long we keep data</h2>
+  <ul>
+    <li><strong>Account data, public profile, devices and encrypted cloud data:</strong> for as long as you have an account. When you delete the account we delete them immediately from the database and storage. The provider’s technical backups expire automatically within a few weeks at most.</li>
+    <li><strong>A blocked device’s data</strong> stays in the account’s list, marked as blocked, so that it can no longer be used.</li>
+    <li><strong>Security events:</strong> for as long as the account exists, so you can see the history of sign-ins and devices.</li>
+    <li><strong>Contact requests:</strong> until they are accepted or ignored, and in any case no longer than the account exists.</li>
+    <li><strong>The plan's monthly counters</strong> and the fingerprints of counted documents: deleted automatically after about 13 months.</li>
+    <li><strong>Subscription and payment data</strong> (invoices, receipts): while you have a subscription and then as long as accounting law requires (in Romania, usually 10 years for financial and accounting records).</li>
+    <li><strong>Data used to limit abuse</strong> (hashes, not IP addresses): expires after 10 minutes to one hour and is deleted automatically, usually within a day of expiring.</li>
+    <li><strong>Correspondence with us:</strong> up to 3 years after the last exchange, or longer if needed to defend a legal claim.</li>
+    <li><strong>Data on your devices</strong> stays there until you delete it or uninstall the app.</li>
+  </ul>
+</section>
+
+<section id="en-10">
+  <h2><span class="n">10.</span>Data security</h2>
+  <ul>
+    <li>End-to-end encryption, with classic and post-quantum algorithms, for synced data and .acm documents.</li>
+    <li>Each device has its own key; important operations (adding devices, deleting the account) require a signature with the account keys, not just the password.</li>
+    <li>Strict server access rules: each account can reach only its own data.</li>
+    <li>Encrypted connections (HTTPS) between the app and the servers, optional two-step verification and notices for new sign-ins.</li>
+    <li>We regularly test the security of the app and the servers.</li>
+  </ul>
+  <p>If a personal data breach occurs that is likely to put your rights at risk, we will notify the supervisory authority within 72 hours and you without undue delay, as required by the GDPR.</p>
+</section>
+
+<section id="en-11">
+  <h2><span class="n">11.</span>Your rights</h2>
+  <p>Under the GDPR you have the following rights:</p>
+  <ul>
+    <li><strong>Access</strong> — to know what data we process about you and get a copy.</li>
+    <li><strong>Rectification</strong> — to correct inaccurate data. You can change your display name and @name directly in the app.</li>
+    <li><strong>Erasure</strong> — you can delete your account at any time in Settings › Delete account. You can turn sync off on any device.</li>
+    <li><strong>Restriction of processing.</strong></li>
+    <li><strong>Portability</strong> — your documents and invoices are ordinary files on your device (PDF, Word, Excel, etc.) that you can copy at any time. We can send you your account data in a structured format on request.</li>
+    <li><strong>Objection</strong> to processing based on legitimate interest.</li>
+    <li><strong>Not to be subject to a decision based solely on automated processing</strong> (see section 14).</li>
+    <li><strong>Lodging a complaint</strong> with the Romanian supervisory authority (ANSPDCP), B-dul G-ral. Gheorghe Magheru nr. 28-30, Sector 1, Bucharest, <a href="https://www.dataprotection.ro" rel="noopener">www.dataprotection.ro</a>, or with the authority in your country.</li>
+  </ul>
+  <p>To exercise your rights, write to <a href="mailto:mandrutaniel5@gmail.com">mandrutaniel5@gmail.com</a> from your account’s email address. We reply within one month, which may be extended by two further months for complex requests, and we will tell you if so. We may ask for additional information to confirm the request comes from you. Exercising your rights is free, except for manifestly unfounded or excessive requests.</p>
+  <p>Note that we cannot give you encrypted content in readable form, because we do not have the keys. You can access it at any time in the app on your devices.</p>
+</section>
+
+<section id="en-12">
+  <h2><span class="n">12.</span>Children</h2>
+  <p>ACM Docs accounts are for people aged 16 or over. We do not knowingly collect data from children under that age. If you learn that a child under 16 created an account without parental consent, write to us and we will delete the account.</p>
+</section>
+
+<section id="en-13">
+  <h2><span class="n">13.</span>Cookies and tracking</h2>
+  <p>The app <strong>does not use</strong> advertising cookies, analytics tools, tracking pixels or advertising identifiers. It keeps on the device only the data strictly needed to work (for example, your sign-in session and settings).</p>
+  <p>This web page uses no cookies. It only remembers the language you chose, in your browser’s local storage.</p>
+</section>
+
+<section id="en-14">
+  <h2><span class="n">14.</span>Automated decisions</h2>
+  <p>We do not make decisions based solely on automated processing that have legal effects on you. The only automated mechanisms are security ones (for example, temporarily limiting repeated attempts), which do not affect your rights and can be challenged by writing to us.</p>
+</section>
+
+<section id="en-15">
+  <h2><span class="n">15.</span>Other people’s data</h2>
+  <p>If you enter other people’s data in the app (for example, clients on invoices, signatories, contacts), you are the controller of that data and responsible for processing it lawfully. For data synced through your account, we act only as a technical provider of encrypted storage, with no access to the content.</p>
+</section>
+
+<section id="en-16">
+  <h2><span class="n">16.</span>Changes to this policy</h2>
+  <p>We may update this policy when the app or the law changes. The date of the last update is shown at the top of the page. We will tell you about important changes in the app or by email before they take effect.</p>
+</section>
+
+<section id="en-17">
+  <h2><span class="n">17.</span>Contact and complaints</h2>
+  <p>For any question or request about personal data: <a href="mailto:mandrutaniel5@gmail.com">mandrutaniel5@gmail.com</a> or by post to the registered office in section 2. See also the <a href="/termeni">Terms and Conditions</a>.</p>
+</section>
+
+</article>
+</main>
+
+<footer>
+  <p>© 2026 ACM CODE S.R.L. · <a href="/termeni"><span data-l="ro">Termeni și condiții</span><span data-l="en">Terms and Conditions</span></a> · <a href="https://anpc.ro" rel="noopener">ANPC</a></p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var KEY = 'acmdocs.legal.lang';
+  function pick() {
+    if (location.hash.indexOf('#en') === 0) return 'en';
+    if (location.hash.indexOf('#ro') === 0) return 'ro';
+    try { var s = localStorage.getItem(KEY); if (s === 'ro' || s === 'en') return s; } catch (e) {}
+    var l = (navigator.language || 'ro').toLowerCase();
+    return l.indexOf('ro') === 0 ? 'ro' : 'en';
+  }
+  function set(l, remember) {
+    root.setAttribute('data-lang', l);
+    root.setAttribute('lang', l);
+    document.title = l === 'ro' ? 'Confidențialitate · ACM Docs' : 'Privacy Policy · ACM Docs';
+    var b = document.querySelectorAll('.seg button');
+    for (var i = 0; i < b.length; i++) b[i].setAttribute('aria-pressed', String(b[i].getAttribute('data-set') === l));
+    if (remember) { try { localStorage.setItem(KEY, l); } catch (e) {} }
+    watch();
+  }
+  var seg = document.querySelectorAll('.seg button');
+  for (var i = 0; i < seg.length; i++) seg[i].addEventListener('click', function () { set(this.getAttribute('data-set'), true); window.scrollTo(0, 0); });
+
+  // highlight the section being read in the table of contents
+  var obs = null;
+  function watch() {
+    if (obs) obs.disconnect();
+    if (!('IntersectionObserver' in window)) return;
+    var l = root.getAttribute('data-lang');
+    var links = document.querySelectorAll('nav.toc[data-l="' + l + '"] a');
+    var map = {};
+    for (var j = 0; j < links.length; j++) map[links[j].getAttribute('href').slice(1)] = links[j];
+    obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        for (var k in map) map[k].classList.remove('on');
+        var a = map[en.target.id]; if (a) a.classList.add('on');
+      });
+    }, { rootMargin: '-90px 0px -70% 0px' });
+    var secs = document.querySelectorAll('article[data-l="' + l + '"] section');
+    for (var m = 0; m < secs.length; m++) obs.observe(secs[m]);
+  }
+  set(pick(), false);
+})();
+</script>
+</body>
+</html>

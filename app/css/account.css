@@ -298,3 +298,94 @@ html.i18n-wait body { visibility: hidden; }
 .acm-ui .creq-acts { display: flex; gap: 6px; flex-shrink: 0; }
 .acm-ui .btn.sm { padding: 6px 12px; min-height: 32px; font-size: 13px; border-radius: 10px; }
 .acm-ui.creq .crow { pointer-events: none; margin: 4px 0 6px; }
+
+/* ---------------------------------------------------------------- plans (2.3.0) */
+.modal.plans { max-width: 560px; width: 100%; }
+.modal.plans .list-card, .modal.sec-page .list-card { background: var(--surface-2); box-shadow: none; border: .5px solid var(--line); }
+.plan-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.plan-head h2 { margin: 1px 0 2px; font-size: 26px; letter-spacing: -.02em; }
+.plan-head small { display: block; font-size: 13px; }
+.plan-badge { width: 52px; height: 52px; border-radius: 15px; display: grid; place-items: center; color: #fff; flex: none; background: linear-gradient(150deg, #a1a1a8, #7c7c84); }
+.plan-badge svg { width: 28px; height: 28px; fill: currentColor; }
+.plan-badge.personal { background: linear-gradient(150deg, #3a9bff, #007aff); }
+.plan-badge.pro { background: linear-gradient(150deg, #8e7bff, #5856d6); }
+.plan-badge.family { background: linear-gradient(150deg, #4cd471, #28b14c); }
+.plan-badge.business { background: linear-gradient(150deg, #3b3b43, #1c1c1e); }
+.plan-h { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; margin: 20px 4px 8px; }
+.plan-usage { padding: 6px 0; }
+.plan-meter { display: flex; gap: 12px; align-items: center; padding: 9px 14px; }
+.plan-meter .si { width: 30px; height: 30px; border-radius: 8px; }
+.plan-meter .si svg { width: 17px; height: 17px; fill: currentColor; }
+.pm-tx { flex: 1; min-width: 0; }
+.pm-top { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; margin-bottom: 6px; }
+.pm-top b { font-weight: 550; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pm-top span { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.plan-bar { height: 6px; border-radius: 3px; background: var(--fill); overflow: hidden; }
+.plan-bar span { display: block; height: 100%; border-radius: 3px; background: var(--accent); transition: width .4s ease; }
+.plan-bar.high span { background: var(--orange); } .plan-bar.full span { background: var(--red); }
+.plan-seg { display: flex; background: var(--fill); border-radius: 10px; padding: 2px; margin: 0 0 12px; }
+.plan-seg button { flex: 1; border: 0; background: none; color: var(--text); font: 600 13px/1.2 var(--font); padding: 8px 6px; border-radius: 8px; }
+.plan-seg button.on { background: var(--surface); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+.plan-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.plan-card { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 16px 14px 14px; border-radius: 18px; background: var(--surface-2); border: .5px solid var(--line); }
+.plan-card.best { border: 1.5px solid var(--accent-2); }
+.plan-card.mine { border: 1.5px solid var(--green); }
+.plan-tag { position: absolute; top: -9px; right: 12px; background: var(--accent-2); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: .02em; }
+.pc-head b { font-size: 17px; display: block; }
+.pc-head small { font-size: 12.5px; line-height: 1.35; display: block; margin-top: 2px; }
+.pc-price span { font-size: 24px; font-weight: 750; letter-spacing: -.02em; }
+.pc-price small { color: var(--muted); font-size: 13px; margin-left: 4px; }
+.pc-feats { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.pc-feats li { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; line-height: 1.35; }
+.pc-feats li > span:first-child svg { width: 16px; height: 16px; fill: var(--accent); flex: none; margin-top: 1px; }
+.plan-card .btn { width: 100%; margin-top: 4px; }
+.seat-row { display: flex; align-items: center; gap: 8px; font-size: 13px; flex-wrap: wrap; }
+.seat-row .seat-in { width: 74px; padding: 6px 8px; text-align: center; }
+.plan-legal { margin-top: 12px; text-align: center; }
+.plan-legal a { color: var(--accent); }
+.modal.plan-ask { max-width: 420px; text-align: center; }
+.modal.plan-ask .actions { justify-content: center; }
+.plan-ico { width: 60px; height: 60px; border-radius: 18px; margin: 4px auto 12px; display: grid; place-items: center; color: #fff; background: linear-gradient(150deg, #8e7bff, #5856d6); }
+.plan-ico svg { width: 30px; height: 30px; fill: currentColor; }
+.plan-ico.warn { background: linear-gradient(150deg, #ffb340, #ff9500); }
+.plan-incl { text-align: left; background: var(--surface-2); border-radius: 14px; padding: 12px 14px; margin: 12px 0 4px; font-size: 14px; }
+.plan-incl b { display: block; margin-bottom: 6px; font-weight: 600; }
+.plan-li { display: flex; gap: 10px; padding: 3px 0; color: var(--muted); }
+.plan-li .n { min-width: 22px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.plan-li.on { color: var(--text); }
+.plan-up { background: var(--accent-soft); border-radius: 12px; padding: 10px 12px; margin: 12px 0 4px; font-size: 14px; }
+.plan-sum { display: flex; flex-direction: column; align-items: center; margin: 4px 0 12px; }
+.plan-sum b { font-size: 30px; letter-spacing: -.02em; }
+.plan-invite { display: flex; gap: 8px; margin-top: 12px; }
+.plan-invite .in { flex: 1; }
+.pf-av.sm { width: 34px; height: 34px; font-size: 15px; flex: none; }
+.btn.sm { padding: 6px 10px; font-size: 13px; min-height: 0; }
+.auth-legal { text-align: center; margin: 10px 0 0; }
+.auth-legal a { color: var(--accent); }
+@media (max-width: 560px) { .plan-cards { grid-template-columns: 1fr; } .modal.plans { padding-left: 16px; padding-right: 16px; } }
+
+/* ---------------------------------------------------------------- security page */
+.modal.sec-page { max-width: 560px; width: 100%; }
+.sec-hero { text-align: center; padding: 6px 4px 4px; }
+.sec-hero h2 { margin: 12px 0 6px; font-size: 24px; letter-spacing: -.02em; }
+.sec-hero p { margin: 0 auto; max-width: 440px; color: var(--muted); font-size: 15px; line-height: 1.5; }
+.sec-shield { width: 68px; height: 68px; border-radius: 22px; display: inline-grid; place-items: center; color: #fff; background: linear-gradient(150deg, #4cd471, #1f9d45); box-shadow: 0 10px 30px rgba(40, 177, 76, .3); }
+.sec-shield svg { width: 36px; height: 36px; fill: currentColor; }
+.sec-status .srow { min-height: 62px; padding-top: 8px; padding-bottom: 8px; }
+.sec-status .stx small { white-space: normal; }
+.sec-cards { display: flex; flex-direction: column; gap: 10px; }
+.sec-card { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 16px; background: var(--surface-2); border: .5px solid var(--line); }
+.sec-card .si svg { width: 18px; height: 18px; fill: currentColor; }
+.sec-card b { display: block; font-size: 15px; margin: 1px 0 3px; }
+.sec-card p { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+.sec-tech { display: inline-block; margin-top: 6px; font-size: 11.5px; letter-spacing: .01em; background: var(--fill); padding: 2px 7px; border-radius: 6px; }
+
+/* the security note on Home: one line, quiet */
+.sec-tip { width: 100%; display: flex; align-items: center; gap: 10px; margin: 14px 0 0; padding: 11px 14px; border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-1); text-align: left; color: var(--text); }
+.sec-tip .st-i { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; background: rgba(52, 199, 89, .14); color: var(--green); flex: none; }
+.sec-tip .st-i svg { width: 16px; height: 16px; fill: currentColor; }
+.sec-tip .st-t { flex: 1; font-size: 13.5px; line-height: 1.4; color: var(--muted); }
+.sec-tip .st-c svg { width: 16px; height: 16px; fill: var(--faint); }
+.sec-tip:active { transform: scale(.99); }
+.modal.plan-ask .chk { display: flex; gap: 10px; align-items: flex-start; text-align: left; font-size: 13.5px; line-height: 1.45; margin: 8px 0 14px; }
+.modal.plan-ask .chk input { margin-top: 3px; flex: none; width: 18px; height: 18px; }

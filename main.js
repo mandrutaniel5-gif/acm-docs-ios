@@ -131,6 +131,8 @@ handle('dialog-open', async (_e, kind, lang) => {
   const all = [...EXT.pdf, ...EXT.word, ...EXT.sheet, ...EXT.slides, ...EXT.image, 'acm'];
   const filters = kind === 'image' || kind === 'images'
     ? [{ name: en ? 'Images' : 'Imagini', extensions: EXT.image }]
+    : kind === 'pdfonly'
+    ? [{ name: 'PDF', extensions: EXT.pdf }]
     : [
         { name: en ? 'All documents' : 'Toate documentele', extensions: all },
         { name: 'PDF', extensions: EXT.pdf },

@@ -148,6 +148,7 @@ const Host = (() => {
     pdf: ['application/pdf', 'image/*', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'text/csv', 'text/comma-separated-values',
       'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.oasis.opendocument.spreadsheet', 'text/plain', 'application/rtf', 'application/x-acm', 'application/octet-stream'],
+    pdfonly: ['application/pdf'],
     image: ['image/*'],
     word: ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'text/plain', 'application/rtf'],
     sheet: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'text/csv', 'text/comma-separated-values', 'application/vnd.oasis.opendocument.spreadsheet'],

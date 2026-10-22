@@ -175,6 +175,15 @@ await check('Basic: password + 24 words on a new device: refused, unless it take
   // the old device is out at once
   assert.notEqual(await code(a.c.call('planStatus')), 'ok');
   a.c = c; a.dev = r.dev;
+  // "auto": the least recently used device makes room
+  const c2 = client();
+  await signInWithEmailAndPassword(c2.auth, a.email, a.password);
+  const dk2 = A.deriveIdentity(A.generateMnemonic());
+  const ts2 = Date.now();
+  const r2 = await c2.call('registerDevice', { bundle: b64(dk2.bundle), ts: ts2, proof: b64(A.signEd(a.id, `acm-register\n${a.uid}\n${dk2.fingerprint}\n${ts2}`)), replace: 'auto' });
+  await signInWithCustomToken(c2.auth, r2.token);
+  assert.notEqual(await code(a.c.call('planStatus')), 'ok');
+  a.c = c2; a.dev = r2.dev;
 });
 
 await check('Cloud: writes stop at the plan limit (Firestore and Storage)', async () => {
