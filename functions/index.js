@@ -19,7 +19,8 @@ import { onObjectFinalized, onObjectDeleted } from 'firebase-functions/v2/storag
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import Stripe from 'stripe';
 import { PLANS, PRICES, ACTIONS, PAID, GROUP_PLANS, monthOf } from './plans.js';
-import { mailReady, sendSignInCode } from './mail.js';
+import { mailReady, sendSignInCode, sendAdminAlert } from './mail.js';
+import { makeAdmin } from './admin.js';
 import { timingSafeEqual } from 'node:crypto';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
@@ -82,6 +83,7 @@ const token = (uid, dev) => getAuth().createCustomToken(uid, { dev });
  */
 export const registerDevice = onCall(async (req) => {
   const uid = needUser(req);
+  await needOn('newDevice');
   const { bundle, info, ts, proof } = req.data || {};
   const { ed, fp } = parseBundle(bundle);
   // the password alone is not enough: the device must also hold the account keys (24 words)
@@ -97,7 +99,9 @@ export const registerDevice = onCall(async (req) => {
   if (replace != null && (typeof replace !== 'string' || !/^([0-9a-f]{32}|auto)$/.test(replace))) fail('invalid-argument', 'replace');
   const col = devicesOf(uid);
   const id = newId();
-  const cap = Math.min(MAX_DEVICES, (await effective(uid)).devices);
+  const eff = await effective(uid);
+  if (eff.suspended) fail('permission-denied', 'account suspended');
+  const cap = Math.min(MAX_DEVICES, eff.devices);
   let replaced = null, first = false;
   const result = await db.runTransaction(async (tx) => {
     const all = await tx.get(col);
@@ -120,6 +124,7 @@ export const registerDevice = onCall(async (req) => {
   });
   if (replaced) await event(uid, { type: 'replaced', dev: replaced, by: id });
   await event(uid, { type: 'signin', dev: id, via: first ? 'create' : 'password' });
+  await logSignIn(uid, first ? 'device-first' : 'device-new', clientAddress(req), req.rawRequest && req.rawRequest.headers['user-agent'], id);
   await ensureCloud(uid);
   return { dev: id, role: result, token: await token(uid, id) };
 });
@@ -144,6 +149,10 @@ export const deviceSession = onCall(async (req) => {
     return true;
   });
   if (!fresh) fail('permission-denied', 'replayed signature');
+  const sw = await switches();
+  if (sw.all) fail('unavailable', 'paused:all');
+  if ((await billingOf(uid).get()).get('suspended')) fail('permission-denied', 'account suspended');
+  await logSignIn(uid, 'session', clientAddress(req), req.rawRequest && req.rawRequest.headers['user-agent'], dev);
   return { token: await token(uid, dev) };
 });
 
@@ -203,6 +212,7 @@ export const pairGet = onCall(async (req) => {
  */
 export const pairApprove = onCall(async (req) => {
   const { uid, dev } = await needDevice(req);
+  await needOn('newDevice');
   const { pid, fp, sealed } = req.data || {};
   if (typeof sealed !== 'string' || sealed.length > 200000) fail('invalid-argument', 'sealed');
   const cap = Math.min(MAX_DEVICES, (await effective(uid)).devices);
@@ -219,6 +229,7 @@ export const pairApprove = onCall(async (req) => {
     tx.update(pref, { status: 'approved', uid, dev: id, sealed, approvedBy: dev });
   });
   await event(uid, { type: 'signin', dev: id, via: 'qr', by: dev });
+  await logSignIn(uid, 'device-qr', clientAddress(req), req.rawRequest && req.rawRequest.headers['user-agent'], id);
   return { dev: id };
 });
 
@@ -331,7 +342,7 @@ export const wipeAccount = onCall(async (req) => {
   // subscriptions end with the account (nothing is charged again), and it leaves any group
   const bill = (await billingOf(uid).get()).data() || {};
   for (const sid of [bill.sub, bill.groupSub].filter(Boolean)) {
-    try { await stripe().subscriptions.cancel(sid); } catch (e) { console.warn('cancel on wipe', e.message); }
+    try { await (await stripe()).subscriptions.cancel(sid); } catch (e) { console.warn('cancel on wipe', e.message); }
   }
   if (bill.group) {
     const g = (await groupOf(bill.group).get()).data();
@@ -370,8 +381,20 @@ function agentOf(ua) {
 export const beforeSignIn = beforeUserSignedIn(async (ev) => {
   const info = ev.additionalUserInfo || {};
   const provider = info.providerId || (ev.credential && ev.credential.providerId) || '';
-  if (provider !== 'password' || info.isNewUser || !ev.data) return;
+  if (!ev.data) return;
+  const isAdmin = !!(ev.data.customClaims && ev.data.customClaims.admin === true);
+  if (isAdmin) {
+    // the control panel account: every sign-in is mailed to it (and logged)
+    await logSignIn(ev.data.uid, 'admin', ev.ipAddress, ev.userAgent, null);
+    try { if (mailReady()) await sendAdminAlert(ev.data.email, String(ev.ipAddress || ''), agentOf(ev.userAgent)); } catch (e) { console.warn('admin alert', e.message); }
+    return;
+  }
+  // kill switches from the control panel: password sign-ins, or everything (maintenance)
+  const sw = await switches();
+  if (sw.all || (provider === 'password' && sw.off.signin)) throw new HttpsError('unavailable', 'paused:' + (sw.all ? 'all' : 'signin'));
+  if (provider !== 'password' || info.isNewUser) return;
   const uid = ev.data.uid;
+  await logSignIn(uid, 'password', ev.ipAddress, ev.userAgent, null);
   try {
     const active = await devicesOf(uid).where('status', '==', 'active').limit(1).get();
     if (active.empty) return; // no device yet: nobody to warn
@@ -441,7 +464,7 @@ async function effective(uid) {
     }
   }
   const P = PLANS[plan];
-  return { plan, until, source, group, devices: P.devices, cloud: P.cloud, month: P.month, cancelAt: b.cancelAt || null, period: b.period || null, hasStripe: !!b.customer };
+  return { plan, until, source, group, devices: P.devices, cloud: P.cloud, month: P.month, cancelAt: b.cancelAt || null, period: b.period || null, hasStripe: !!b.customer, suspended: !!b.suspended };
 }
 
 /** Writes the plan in effect where the devices (and the cloud limit rules) can read it. */
@@ -497,6 +520,13 @@ export const vaultSize = onDocumentWritten({ document: 'accounts/{uid}/vault/{ri
 export const blobStored = onObjectFinalized({ bucket: BUCKET }, async (ev) => {
   const m = /^accounts\/([A-Za-z0-9]{10,64})\/blobs\/[0-9a-f]{32}$/.exec(ev.data.name || '');
   if (!m) return;
+  // the cloud sync paused from the control panel (the storage rules can read only two documents,
+  // so the pause is applied here): the block is removed at once and never counted
+  const sw = await switches();
+  if (sw.all || sw.off.sync) {
+    try { const f = getStorage().bucket(BUCKET).file(ev.data.name); await f.setMetadata({ metadata: { uncounted: '1' } }); await f.delete(); } catch (e) { console.warn('paused', e.message); }
+    return;
+  }
   const r = await addUsed(m[1], Number(ev.data.size || 0));
   if (!r || r.used > r.limit) {
     try { await getStorage().bucket(BUCKET).file(ev.data.name).delete(); } catch (e) { console.warn('over limit', e.message); }
@@ -504,7 +534,7 @@ export const blobStored = onObjectFinalized({ bucket: BUCKET }, async (ev) => {
 });
 export const blobRemoved = onObjectDeleted({ bucket: BUCKET }, async (ev) => {
   const m = /^accounts\/([A-Za-z0-9]{10,64})\/blobs\/[0-9a-f]{32}$/.exec(ev.data.name || '');
-  if (m) await addUsed(m[1], -Number(ev.data.size || 0));
+  if (m && !(ev.data.metadata && ev.data.metadata.uncounted === '1')) await addUsed(m[1], -Number(ev.data.size || 0));
 });
 
 // ---------------------------------------------------------------- monthly actions
@@ -519,7 +549,9 @@ export const useQuota = onCall({ minInstances: 1 }, async (req) => {
   const { action, ref } = req.data || {};
   if (!ACTIONS.includes(action)) fail('invalid-argument', 'action');
   if (ref != null && (typeof ref !== 'string' || !/^[0-9a-f]{16,64}$/.test(ref))) fail('invalid-argument', 'ref');
+  await needOn(action);
   const e = await effective(uid);
+  if (e.suspended) fail('permission-denied', 'account suspended');
   const limit = e.month[action];
   const month = monthOf();
   const uref = db.collection('accounts').doc(uid).collection('usage').doc(month);
@@ -550,6 +582,8 @@ export const useQuota = onCall({ minInstances: 1 }, async (req) => {
 export const planStatus = onCall(async (req) => {
   const { uid, dev } = await needDevice(req);
   const e = await refresh(uid);
+  if (e.suspended) fail('permission-denied', 'account suspended');
+  const b0 = (await billingOf(uid).get()).data() || {};
   const usage = (await db.collection('accounts').doc(uid).collection('usage').doc(monthOf()).get()).data() || {};
   const cloud = (await metaOf(uid, 'cloud').get()).data() || { used: 0, limit: e.cloud };
   const active = (await devicesOf(uid).where('status', '==', 'active').get()).size;
@@ -557,16 +591,30 @@ export const planStatus = onCall(async (req) => {
     plan: e.plan, until: e.until, source: e.source, group: e.group, cancelAt: e.cancelAt, period: e.period,
     devices: { used: active, limit: e.devices }, cloud: { used: cloud.used, limit: cloud.limit },
     month: monthOf(), usage: Object.fromEntries(ACTIONS.map((a) => [a, { used: usage[a] || 0, limit: e.month[a] }])),
-    plans: PLANS, prices: PRICES, payments: !!process.env.STRIPE_SECRET_KEY, manage: e.hasStripe, mail: mailReady(),
+    plans: PLANS, prices: PRICES, payments: !!(await stripeConf()).key, manage: e.hasStripe, mail: mailReady(),
+    promos: publicPromos(await activePromos(), b0.everSub), switches: await switches(),
     token: e.plan !== 'basic' ? await planToken(uid, dev, e.plan, e.until) : null,
   };
 });
 
 // ---------------------------------------------------------------- Stripe
-let stripeClient = null;
-function stripe() {
-  if (!process.env.STRIPE_SECRET_KEY) fail('unavailable', 'payments not active');
-  if (!stripeClient) stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY);
+// The Stripe keys come from the control panel (server/secrets, closed to every client) or, until they
+// are set there, from the deploy secrets. Read at most once a minute per server instance.
+let stripeClient = null, stripeKeyUsed = null, confCache = null, confAt = 0;
+async function stripeConf() {
+  if (confCache && Date.now() - confAt < 60000) return confCache;
+  const s = (await db.collection('server').doc('secrets').get()).data() || {};
+  const key = s.stripeKey || process.env.STRIPE_SECRET_KEY || '';
+  const hooks = [s.stripeKey ? s.webhookSecret : null, process.env.STRIPE_WEBHOOK_SECRET].filter(Boolean);
+  confCache = { key, hooks, tax: s.stripeKey ? s.tax === true : process.env.STRIPE_TAX === '1', mode: /^(sk|rk)_live_/.test(key) ? 'live' : 'test', source: s.stripeKey ? 'panel' : key ? 'deploy' : 'none' };
+  confAt = Date.now();
+  return confCache;
+}
+function resetStripe() { confCache = null; stripeClient = null; stripeKeyUsed = null; }
+async function stripe() {
+  const c = await stripeConf();
+  if (!c.key) fail('unavailable', 'payments not active');
+  if (!stripeClient || stripeKeyUsed !== c.key) { stripeClient = new Stripe(c.key); stripeKeyUsed = c.key; }
   return stripeClient;
 }
 const NAMES = { personal: 'ACM Docs Personal', pro: 'ACM Docs Pro', family: 'ACM Docs Family', business: 'ACM Docs Business' };
@@ -574,18 +622,20 @@ const NAMES = { personal: 'ACM Docs Personal', pro: 'ACM Docs Pro', family: 'ACM
 async function productOf(plan) {
   const ref = db.collection('server').doc('stripe');
   const s = (await ref.get()).data() || {};
-  if (s.products && s.products[plan]) return s.products[plan];
-  const p = await stripe().products.create({ name: NAMES[plan], metadata: { plan }, tax_code: 'txcd_10103001' });
-  await ref.set({ products: { [plan]: p.id } }, { merge: true });
+  const field = 'products_' + (await stripeConf()).mode;
+  if (s[field] && s[field][plan]) return s[field][plan];
+  const p = await (await stripe()).products.create({ name: NAMES[plan], metadata: { plan }, tax_code: 'txcd_10103001' });
+  await ref.set({ [field]: { [plan]: p.id } }, { merge: true });
   return p.id;
 }
 async function customerOf(uid) {
   const ref = billingOf(uid);
   const b = (await ref.get()).data() || {};
-  if (b.customer) return b.customer;
+  const mode = (await stripeConf()).mode;
+  if (b.customer && (b.customerMode || 'test') === mode) return b.customer;
   const u = await getAuth().getUser(uid);
-  const c = await stripe().customers.create({ email: u.email, metadata: { uid } });
-  await ref.set({ customer: c.id }, { merge: true });
+  const c = await (await stripe()).customers.create({ email: u.email, metadata: { uid } });
+  await ref.set({ customer: c.id, customerMode: mode }, { merge: true });
   return c.id;
 }
 const priceData = async (plan, period) => ({
@@ -596,6 +646,7 @@ const priceData = async (plan, period) => ({
 /** A Stripe payment page for a plan; the app opens it in the browser. */
 export const billingCheckout = onCall(async (req) => {
   const { uid } = await needDevice(req);
+  await needOn('payments');
   const { plan, period, seats, consent } = req.data || {};
   if (!PAID.includes(plan) || !['month', 'year'].includes(period)) fail('invalid-argument', 'plan');
   if (consent !== true) fail('failed-precondition', 'consent');
@@ -610,16 +661,21 @@ export const billingCheckout = onCall(async (req) => {
   // one subscription of each kind: a change of plan goes through billingChange / the portal
   if (!GROUP_PLANS.includes(plan) && b.sub && (b.until || 0) > Date.now()) fail('already-exists', 'subscription exists');
   if (GROUP_PLANS.includes(plan) && e.group && e.group.owner && !e.group.inactive) fail('already-exists', 'group exists');
-  const session = await stripe().checkout.sessions.create({
+  // a promotion running now (set in the control panel): a discount and / or a trial period
+  const conf = await stripeConf();
+  const offer = promoFor(await activePromos(), plan, period, b.everSub);
+  const used = [offer.discount, offer.trial].filter(Boolean).map((x) => x.id);
+  const session = await (await stripe()).checkout.sessions.create({
     mode: 'subscription',
     customer: await customerOf(uid),
     client_reference_id: uid,
     line_items: [{ price_data: await priceData(plan, period), quantity: qty }],
-    subscription_data: { metadata: { uid, plan, period } },
-    metadata: { uid, plan, period, consent: String(Date.now()) },
-    automatic_tax: { enabled: process.env.STRIPE_TAX === '1' },
-    customer_update: process.env.STRIPE_TAX === '1' ? { address: 'auto' } : undefined,
-    allow_promotion_codes: true,
+    subscription_data: { metadata: { uid, plan, period }, ...(offer.trial ? { trial_period_days: offer.trial.trialDays } : {}) },
+    metadata: { uid, plan, period, consent: String(Date.now()), promo: used.join(',') },
+    automatic_tax: { enabled: conf.tax },
+    customer_update: conf.tax ? { address: 'auto' } : undefined,
+    // Stripe takes either a set discount or the customer's own promotion code
+    ...(offer.discount ? { discounts: [{ coupon: await couponOf(offer.discount) }] } : { allow_promotion_codes: true }),
     billing_address_collection: 'auto',
     custom_text: { submit: { message: 'Abonamentul se reînnoiește automat și îl poți anula oricând din aplicație. / The subscription renews automatically; cancel any time in the app.' } },
     success_url: SITE + '/plata?ok=1',
@@ -631,31 +687,33 @@ export const billingCheckout = onCall(async (req) => {
 /** Personal ⇄ Pro, monthly ⇄ yearly: the subscription is changed (Stripe settles the difference). */
 export const billingChange = onCall(async (req) => {
   const { uid } = await needDevice(req);
+  await needOn('payments');
   const { plan, period } = req.data || {};
   if (!['personal', 'pro'].includes(plan) || !['month', 'year'].includes(period)) fail('invalid-argument', 'plan');
   const b = (await billingOf(uid).get()).data() || {};
   if (!b.sub) fail('failed-precondition', 'no subscription');
-  const sub = await stripe().subscriptions.retrieve(b.sub);
-  await stripe().subscriptions.update(b.sub, {
+  const sub = await (await stripe()).subscriptions.retrieve(b.sub);
+  await (await stripe()).subscriptions.update(b.sub, {
     items: [{ id: sub.items.data[0].id, price_data: await priceData(plan, period), quantity: 1 }],
     metadata: { uid, plan, period }, proration_behavior: 'create_prorations', cancel_at_period_end: false,
   });
-  await applySubscription(await stripe().subscriptions.retrieve(b.sub));
+  await applySubscription(await (await stripe()).subscriptions.retrieve(b.sub));
   return { ok: true };
 });
 
 /** Number of accounts of a Business subscription (owner only). */
 export const groupSeats = onCall(async (req) => {
   const { uid } = await needDevice(req);
+  await needOn('payments');
   const n = Number((req.data || {}).seats);
   const e = await effective(uid);
   if (!e.group || !e.group.owner || e.group.plan !== 'business') fail('permission-denied', 'not a business owner');
   if (!Number.isInteger(n) || n < PLANS.business.minSeats || n > PLANS.business.maxSeats) fail('invalid-argument', 'seats');
   if (n < e.group.used) fail('failed-precondition', 'remove accounts first');
   const g = (await groupOf(e.group.id).get()).data();
-  const sub = await stripe().subscriptions.retrieve(g.sub);
-  await stripe().subscriptions.update(g.sub, { items: [{ id: sub.items.data[0].id, quantity: n }], proration_behavior: 'create_prorations' });
-  await applySubscription(await stripe().subscriptions.retrieve(g.sub));
+  const sub = await (await stripe()).subscriptions.retrieve(g.sub);
+  await (await stripe()).subscriptions.update(g.sub, { items: [{ id: sub.items.data[0].id, quantity: n }], proration_behavior: 'create_prorations' });
+  await applySubscription(await (await stripe()).subscriptions.retrieve(g.sub));
   return { ok: true };
 });
 
@@ -665,9 +723,10 @@ export const billingPortal = onCall(async (req) => {
   const b = (await billingOf(uid).get()).data() || {};
   if (!b.customer) fail('failed-precondition', 'no customer');
   const ref = db.collection('server').doc('stripe');
-  let conf = ((await ref.get()).data() || {}).portal;
+  const pfield = 'portal_' + (await stripeConf()).mode;
+  let conf = ((await ref.get()).data() || {})[pfield];
   if (!conf) {
-    const c = await stripe().billingPortal.configurations.create({
+    const c = await (await stripe()).billingPortal.configurations.create({
       business_profile: { headline: 'ACM Docs', privacy_policy_url: SITE + '/confidentialitate', terms_of_service_url: SITE + '/termeni' },
       features: {
         payment_method_update: { enabled: true }, invoice_history: { enabled: true },
@@ -676,9 +735,9 @@ export const billingPortal = onCall(async (req) => {
       },
     });
     conf = c.id;
-    await ref.set({ portal: conf }, { merge: true });
+    await ref.set({ [pfield]: conf }, { merge: true });
   }
-  const s = await stripe().billingPortal.sessions.create({ customer: b.customer, configuration: conf, return_url: SITE + '/plata?ok=portal' });
+  const s = await (await stripe()).billingPortal.sessions.create({ customer: b.customer, configuration: conf, return_url: SITE + '/plata?ok=portal' });
   return { url: s.url };
 });
 
@@ -709,14 +768,14 @@ async function applySubscription(sub, at = Date.now()) {
       return d.members || [];
     });
     if (!members) return;
-    await billingOf(uid).set({ group: gid, groupSub: sub.id }, { merge: true });
+    await billingOf(uid).set({ group: gid, groupSub: sub.id, everSub: true }, { merge: true });
     for (const m of [uid, ...members]) await refresh(m);
     return;
   }
   const late = await db.runTransaction(async (tx) => {
     const b = await tx.get(billingOf(uid));
     if (b.exists && b.data().sub === sub.id && (b.data().subAt || 0) > at) return true;
-    tx.set(billingOf(uid), { plan, until, source: 'stripe', sub: sub.id, status: sub.status, period, cancelAt, customer: sub.customer, subAt: at }, { merge: true });
+    tx.set(billingOf(uid), { plan, until, source: 'stripe', sub: sub.id, status: sub.status, period, cancelAt, customer: sub.customer, customerMode: sub.livemode ? 'live' : 'test', everSub: true, subAt: at }, { merge: true });
     return false;
   });
   if (!late) await refresh(uid);
@@ -724,22 +783,28 @@ async function applySubscription(sub, at = Date.now()) {
 
 /** Stripe → server: payments, renewals, cancellations. Only messages signed by Stripe are believed. */
 export const stripeWebhook = onRequest({ cors: false }, async (req, res) => {
-  if (req.method !== 'POST' || !process.env.STRIPE_WEBHOOK_SECRET) { res.status(404).end(); return; }
-  let ev;
-  try { ev = stripe().webhooks.constructEvent(req.rawBody, req.get('stripe-signature'), process.env.STRIPE_WEBHOOK_SECRET); }
-  catch (e) { res.status(400).send('bad signature'); return; }
+  const conf = await stripeConf();
+  if (req.method !== 'POST' || !conf.hooks.length) { res.status(404).end(); return; }
+  let ev = null;
+  for (const secret of conf.hooks) {
+    try { ev = Stripe.webhooks.constructEvent(req.rawBody, req.get('stripe-signature'), secret); break; } catch (e) { /* next secret */ }
+  }
+  if (!ev) { res.status(400).send('bad signature'); return; }
   try {
     const seen = db.collection('server').doc('stripe').collection('hooks').doc(ev.id);
     if ((await seen.get()).exists) { res.json({ ok: true, again: true }); return; }
     const o = ev.data.object;
     if (ev.type === 'checkout.session.completed' && o.mode === 'subscription' && o.subscription) {
-      await applySubscription(await stripe().subscriptions.retrieve(o.subscription), ev.created * 1000);
+      for (const pid of String((o.metadata && o.metadata.promo) || '').split(',').filter((x) => /^[A-Za-z0-9_-]{1,40}$/.test(x))) {
+        await db.collection('promos').doc(pid).update({ used: FieldValue.increment(1) }).catch(() => {});
+      }
+      await applySubscription(await (await stripe()).subscriptions.retrieve(o.subscription), ev.created * 1000);
     } else if (/^customer\.subscription\.(created|updated|deleted|paused|resumed)$/.test(ev.type)) {
       // the signed message carries the whole subscription as it is now
       await applySubscription(ev.type.endsWith('deleted') ? { ...o, status: 'canceled' } : o, ev.created * 1000);
     } else if ((ev.type === 'invoice.paid' || ev.type === 'invoice.payment_failed') && (o.subscription || (o.parent && o.parent.subscription_details))) {
       const sid = o.subscription || o.parent.subscription_details.subscription;
-      await applySubscription(await stripe().subscriptions.retrieve(sid), ev.created * 1000);
+      await applySubscription(await (await stripe()).subscriptions.retrieve(sid), ev.created * 1000);
     }
     await seen.set({ type: ev.type, at: FieldValue.serverTimestamp(), expires: Timestamp.fromMillis(Date.now() + 30 * DAY) });
     res.json({ ok: true });
@@ -865,6 +930,8 @@ export const expirePlans = onSchedule({ schedule: 'every day 03:17', timeZone: '
 /** New accounts: a few per address and hour, and no throwaway mailboxes. */
 const THROWAWAY = ['mailinator.com', 'guerrillamail.com', 'guerrillamail.net', 'sharklasers.com', '10minutemail.com', 'temp-mail.org', 'tempmail.com', 'yopmail.com', 'trashmail.com', 'getnada.com', 'dispostable.com', 'maildrop.cc', 'throwawaymail.com', 'fakeinbox.com', 'mailnesia.com', 'mintemail.com', 'emailondeck.com', 'tempail.com', 'moakt.com', 'mohmal.com', 'burnermail.io', 'spamgourmet.com', 'mytemp.email', 'tempmailo.com', 'temp-mail.io', 'minuteinbox.com', 'luxusmail.org', 'cock.li', 'grr.la', 'spam4.me'];
 export const beforeCreate = beforeUserCreated(async (ev) => {
+  const sw = await switches();
+  if (sw.all || sw.off.signup) throw new HttpsError('unavailable', 'paused:signup');
   const email = String((ev.data && ev.data.email) || '').toLowerCase();
   const domain = email.split('@')[1] || '';
   if (THROWAWAY.some((d) => domain === d || domain.endsWith('.' + d))) throw new HttpsError('invalid-argument', 'disposable email');
@@ -885,6 +952,7 @@ export const beforeCreate = beforeUserCreated(async (ev) => {
   if (process.env.FUNCTIONS_EMULATOR === 'true') return; // the test accounts all come from one address
   if (await limited('signup|' + ip, 5, 3600 * 1000)) throw new HttpsError('resource-exhausted', 'too many accounts from this network');
   if (await limited('signup-all', 300, 3600 * 1000)) throw new HttpsError('resource-exhausted', 'too many new accounts, try later');
+  if (ev.data && ev.data.uid) await logSignIn(ev.data.uid, 'create', ip, ev.userAgent, null);
 });
 
 // ================================================================== two-step verification by email
@@ -934,4 +1002,130 @@ export const emailCodeSet = onCall(async (req) => {
   await metaOf(uid, 'security').set({ emailCode: on, at: FieldValue.serverTimestamp() }, { merge: true });
   await event(uid, { type: on ? 'twostep-on' : 'twostep-off', method: 'email' });
   return { on, ready: mailReady() };
+});
+
+// ================================================================== control panel: switches, sign-in log, reports, promotions
+//
+//   server/switches            what is paused right now (kill switches) · readable by anyone, written by the panel
+//   server/secrets             Stripe keys set from the panel            · server only
+//   accounts/{uid}/signins     sign-ins with their address, 90 days      · server only (TTL on "expires")
+//   accounts/{uid}/private/devices  last address of each device          · server only
+//   reports/{id}               accounts reported by other accounts        · server only
+//   promos/{id}                discounts and trial periods                · server only (shown through planStatus)
+//   adminLog/{id}              every action taken in the panel            · server only
+const FEATURES = ['signup', 'signin', 'newDevice', 'sync', 'docs', 'scans', 'invoices', 'acmSend', 'acmOpen', 'payments', 'chat'];
+let swCache = null, swAt = 0;
+/** The kill switches (cached for 15 seconds per server instance). */
+async function switches() {
+  if (swCache && Date.now() - swAt < 15000) return swCache;
+  const d = (await db.collection('server').doc('switches').get()).data() || {};
+  const off = {};
+  for (const f of FEATURES) if (d.off && d.off[f] === true) off[f] = true;
+  swCache = { off, all: d.all === true, msg: typeof d.msg === 'string' ? d.msg : '', at: d.at ? d.at.toMillis() : 0 };
+  swAt = Date.now();
+  return swCache;
+}
+const resetSwitches = () => { swCache = null; };
+/** Refuses while the feature (or everything) is paused from the control panel. */
+async function needOn(feature) {
+  const s = await switches();
+  if (s.all || s.off[feature]) fail('unavailable', 'paused:' + (s.all ? 'all' : feature));
+}
+
+// ---------------------------------------------------------------- sign-ins with their address
+// Addresses are kept 90 days (security: spotting stolen passwords and abuse), then deleted by Firestore TTL.
+const IP_KEEP_MS = 90 * DAY;
+const signinsOf = (uid) => db.collection('accounts').doc(uid).collection('signins');
+const privOf = (uid) => db.collection('accounts').doc(uid).collection('private').doc('devices');
+async function logSignIn(uid, kind, ip, ua, dev) {
+  try {
+    ip = String(ip || '').slice(0, 64);
+    const agent = agentOf(ua);
+    if (dev) {
+      // the last address of each device; a session renewed from the same address is not logged again
+      const ref = privOf(uid);
+      const cur = (await ref.get()).data() || {};
+      const keep = {};
+      for (const [k, v] of Object.entries(cur)) if (v && v.at > Date.now() - IP_KEEP_MS) keep[k] = v;
+      const same = keep[dev] && keep[dev].ip === ip;
+      keep[dev] = { ip, agent, at: Date.now() };
+      await ref.set(keep);
+      if (kind === 'session' && same) return;
+    }
+    await signinsOf(uid).add({ kind, ip, agent, dev: dev || null, at: FieldValue.serverTimestamp(), expires: Timestamp.fromMillis(Date.now() + IP_KEEP_MS) });
+  } catch (e) { console.warn('sign-in log', e.message); }
+}
+
+// ---------------------------------------------------------------- reporting an account
+const REASONS = ['spam', 'abuse', 'fraud', 'impersonation', 'illegal', 'other'];
+/** A device reports another account by @name; one report per pair of accounts (a new one replaces it). */
+export const reportAccount = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  const { handle, reason, details } = req.data || {};
+  const h = String(handle || '').toLowerCase().replace(/^@/, '');
+  if (!/^[a-z0-9_]{3,20}$/.test(h)) fail('invalid-argument', 'handle');
+  if (!REASONS.includes(reason)) fail('invalid-argument', 'reason');
+  if (details != null && (typeof details !== 'string' || details.length > 1000)) fail('invalid-argument', 'details');
+  await rateLimit(req, 'report|' + uid, 10, DAY, true);
+  const u = await db.collection('usernames').doc(h).get();
+  if (!u.exists) fail('not-found', 'no such account');
+  const target = u.data().uid;
+  if (target === uid) fail('invalid-argument', 'self');
+  const id = hex(sha256(new TextEncoder().encode(`report\n${uid}\n${target}`))).slice(0, 32);
+  await db.collection('reports').doc(id).set({ from: uid, target, handle: h, reason, details: String(details || '').trim(), status: 'open', at: FieldValue.serverTimestamp(), expires: Timestamp.fromMillis(Date.now() + 730 * DAY) });
+  return { ok: true };
+});
+
+// ---------------------------------------------------------------- promotions
+let promoCache = null, promoAt = 0;
+/** Promotions running now (cached for a minute). */
+async function activePromos() {
+  if (promoCache && Date.now() - promoAt < 60000) return promoCache;
+  const now = Date.now();
+  const qs = await db.collection('promos').where('active', '==', true).get();
+  promoCache = qs.docs.map((d) => ({ id: d.id, ...d.data() }))
+    .filter((p) => (p.start || 0) <= now && (!p.end || p.end > now) && (!p.maxUses || (p.used || 0) < p.maxUses));
+  promoAt = Date.now();
+  return promoCache;
+}
+const resetPromos = () => { promoCache = null; };
+const promoFits = (p, plan, period, everSub) => (p.plans || []).includes(plan) && (p.periods || []).includes(period) && !(p.newOnly && everSub);
+/** The best discount and the longest trial for this plan and period. */
+function promoFor(list, plan, period, everSub) {
+  let discount = null, trial = null;
+  for (const p of list) {
+    if (!promoFits(p, plan, period, everSub)) continue;
+    if (p.kind === 'discount' && (!discount || p.percent > discount.percent)) discount = p;
+    if (p.kind === 'trial' && (!trial || p.trialDays > trial.trialDays)) trial = p;
+  }
+  return { discount, trial };
+}
+/** What the app shows on the plans screen (no internal counters). */
+function publicPromos(list, everSub) {
+  return list.filter((p) => !(p.newOnly && everSub)).map((p) => ({
+    id: p.id, kind: p.kind, title: p.title || '', percent: p.percent || 0, months: p.months || 0, trialDays: p.trialDays || 0,
+    plans: p.plans || [], periods: p.periods || [], end: p.end || null,
+  }));
+}
+/** The Stripe coupon of a discount promotion (made once per Stripe mode). */
+async function couponOf(p) {
+  const field = 'coupon_' + (await stripeConf()).mode;
+  if (p[field]) return p[field];
+  const months = Number(p.months || 0);
+  const c = await (await stripe()).coupons.create({
+    percent_off: p.percent, name: String(p.title || 'ACM Docs').slice(0, 40),
+    ...(months > 0 ? { duration: 'repeating', duration_in_months: months } : { duration: months < 0 ? 'forever' : 'once' }),
+    metadata: { promo: p.id },
+  });
+  await db.collection('promos').doc(p.id).update({ [field]: c.id });
+  resetPromos();
+  return c.id;
+}
+
+// ---------------------------------------------------------------- the control panel's API
+export const admin = makeAdmin({
+  db, fail, onCall, HttpsError, getAuth, FieldValue, Timestamp, Stripe,
+  PLANS, PAID, ACTIONS, FEATURES, REASONS, DAY, SITE, monthOf,
+  effective, refresh, metaOf, billingOf, devicesOf, signinsOf, privOf, event, clientAddress, agentOf,
+  switches, resetSwitches, stripeConf, resetStripe, activePromos, resetPromos,
 });

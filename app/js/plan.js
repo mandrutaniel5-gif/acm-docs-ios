@@ -112,6 +112,7 @@ const Plan = (() => {
    */
   async function allow(action, ref) {
     if (!ACTIONS[action]) return false;
+    if (typeof Service !== 'undefined' && Service.blocked(action)) return false;
     if (!uid()) { await needAccount(action); return false; }
     if (Account.needsVerification()) { AccountUI.show('verify'); return false; }
     if (typeof Devices !== 'undefined' && !Devices.myDevice()) { await AccountUI.route(); return false; }
@@ -142,6 +143,7 @@ const Plan = (() => {
       return true;
     } catch (e) {
       const m = String(e.server || e.message || '');
+      if (typeof Service !== 'undefined' && Service.handle(e)) return false;
       if (/limit:/.test(m)) { await limitReached(action); return false; }
       if (/no device session|device blocked|device removed/.test(m)) { await AccountUI.route(); return false; }
       // no connection: a paid plan carries on with its signed token (up to 7 days)
@@ -196,6 +198,25 @@ const Plan = (() => {
     if (go === 'plans') return show();
     if (go === 'mail') Host.openExternal('mailto:mandrutaniel5@gmail.com?subject=' + encodeURIComponent('ACM Docs ' + NAMES[plan]));
   }
+
+  // ---------------------------------------------------------------- promotions (set by ACM Docs, applied by the server at payment)
+  function offerFor(s, plan, period) {
+    let discount = null, trial = null;
+    for (const p of (s && s.promos) || []) {
+      if (!(p.plans || []).includes(plan) || !(p.periods || []).includes(period)) continue;
+      if (p.kind === 'discount' && (!discount || p.percent > discount.percent)) discount = p;
+      if (p.kind === 'trial' && (!trial || p.trialDays > trial.trialDays)) trial = p;
+    }
+    return { discount, trial };
+  }
+  /** "-30% la prima plată" / "-30% în primele 3 luni" / "-30%" */
+  function discountText(d) {
+    const out = [el('b', { class: 'no-tr', text: `-${d.percent}%` })];
+    if (d.months === 0) out.push(' ', el('span', { text: 'la prima plată' }));
+    else if (d.months > 0) out.push(' ', el('span', { text: 'în primele' }), ' ', el('span', { class: 'no-tr', text: String(d.months) }), ' ', el('span', { text: 'luni' }));
+    return out;
+  }
+  const trialText = (t) => [el('b', { class: 'no-tr', text: String(t.trialDays) }), ' ', el('span', { text: 'zile de probă' })];
 
   // ---------------------------------------------------------------- the Subscription screen
   const money = (cents) => (cents / 100).toLocaleString(I18n.locale(), { style: 'currency', currency: 'EUR', currencyDisplay: 'narrowSymbol', minimumFractionDigits: cents % 100 ? 2 : 0, maximumFractionDigits: 2 });
@@ -298,6 +319,7 @@ const Plan = (() => {
       for (const p of ORDER) {
         const mine = s.plan === p;
         const price = PR[p][period];
+        const offer = mine ? {} : offerFor(s, p, period);
         const per = period === 'year' ? 'an' : 'lună';
         let seats = P.business.minSeats;
         const seatIn = p === 'business' ? el('input', { class: 'in seat-in no-tr', type: 'number', min: String(P.business.minSeats), max: String(P.business.maxSeats), value: String(seats), inputmode: 'numeric' }) : null;
@@ -312,7 +334,15 @@ const Plan = (() => {
         cards.append(el('div', { class: 'plan-card' + (p === 'pro' ? ' best' : '') + (mine ? ' mine' : '') }, [
           p === 'pro' ? el('span', { class: 'plan-tag', text: 'Recomandat' }) : null,
           el('div', { class: 'pc-head' }, [el('b', { class: 'no-tr', text: NAMES[p] }), el('small', { class: 'muted', text: BLURB[p] })]),
-          el('div', { class: 'pc-price' }, [el('span', { class: 'no-tr', text: money(price) }), el('small', { text: p === 'business' ? (period === 'year' ? '/ cont / an' : '/ cont / lună') : period === 'year' ? '/ an' : '/ lună' })]),
+          el('div', { class: 'pc-price' }, [
+            offer.discount ? el('s', { class: 'muted no-tr', text: money(price) }) : null,
+            el('span', { class: 'no-tr', text: money(offer.discount ? Math.round(price * (100 - offer.discount.percent) / 100) : price) }),
+            el('small', { text: p === 'business' ? (period === 'year' ? '/ cont / an' : '/ cont / lună') : period === 'year' ? '/ an' : '/ lună' }),
+          ]),
+          offer.discount || offer.trial ? el('div', { class: 'pc-offer' }, [
+            offer.discount ? el('span', {}, discountText(offer.discount)) : null,
+            offer.trial ? el('span', {}, trialText(offer.trial)) : null,
+          ]) : null,
           seatIn ? el('label', { class: 'seat-row' }, [el('span', { text: 'Conturi' }), seatIn, total]) : null,
           el('ul', { class: 'pc-feats' }, feats(p).map(([ic, t]) => el('li', {}, [el('span', { html: svg(ic) }), el('span', { text: t })]))),
           btn,
@@ -340,6 +370,11 @@ const Plan = (() => {
       el('p', { class: 'muted small' }, [el('span', { text: 'Limitele lunare se reînnoiesc pe' }), el('span', { class: 'no-tr', text: ' ' + resetDay() + '. ' }), el('span', { text: 'Același document salvat de mai multe ori se numără o singură dată.' })]),
       groupRow,
       el('h3', { class: 'plan-h', text: 'Abonamente' }),
+      ...((s.promos || []).length ? [el('div', { class: 'plan-promos' }, s.promos.map((p) => el('div', { class: 'acm-note ok' }, [
+        el('span', { html: svg('star') }),
+        el('span', {}, [el('b', { class: 'no-tr', text: p.title }), ' · ', ...(p.kind === 'trial' ? trialText(p) : discountText(p)),
+          p.end ? el('span', {}, [' · ', el('span', { text: 'până pe' }), el('span', { class: 'no-tr', text: ' ' + new Date(p.end).toLocaleDateString(I18n.locale(), { day: 'numeric', month: 'long' }) })]) : null]),
+      ])))] : []),
       seg,
       cards,
       !s.payments ? el('div', { class: 'acm-note warn', html: `${svg('info')}<span>${escHtml(I18n.t('Plata abonamentelor va fi disponibilă în curând.'))}</span>` }) : null,
@@ -359,8 +394,10 @@ const Plan = (() => {
 
   // ---------------------------------------------------------------- paying
   async function buy(plan, period, seats, s) {
+    if (typeof Service !== 'undefined' && Service.blocked('payments')) return;
     const P = s.plans || FALLBACK.plans, PR = s.prices || FALLBACK.prices;
     const qty = plan === 'business' ? seats : 1;
+    const offer = offerFor(s, plan, period);
     const ok = await UI.modal((box, close) => {
       const chk = el('input', { type: 'checkbox', id: 'plan-consent' });
       const go = el('button', { class: 'btn primary', type: 'button', text: 'Continuă la plată', disabled: true });
@@ -375,6 +412,8 @@ const Plan = (() => {
           el('span', { text: period === 'year' ? '/ an' : '/ lună' }),
           plan === 'business' ? el('small', { class: 'muted' }, [el('span', { class: 'no-tr', text: qty + ' × ' + money(PR[plan][period]) + ' · ' }), el('span', { text: 'conturi' })]) : null,
         ]),
+        offer.discount ? el('div', { class: 'acm-note ok' }, [el('span', { html: svg('star') }), el('span', {}, [...discountText(offer.discount), ' · ', el('span', { text: 'Reducerea se aplică automat la plată.' })])]) : null,
+        offer.trial ? el('div', { class: 'acm-note ok' }, [el('span', { html: svg('star') }), el('span', {}, [...trialText(offer.trial), ' · ', el('span', { text: 'Prima plată se face la sfârșitul perioadei de probă. Poți anula oricând înainte.' })])]) : null,
         el('p', { class: 'muted small', text: 'Plata se face pe pagina securizată Stripe, în browser. ACM Docs nu vede și nu păstrează datele cardului.' }),
         el('label', { class: 'chk' }, [chk, el('span', { text: 'Cer începerea imediată a abonamentului. Știu că, dacă renunț în primele 14 zile, primesc banii înapoi mai puțin partea deja folosită, și că abonamentul se reînnoiește automat până îl anulez.' })]),
         el('div', { class: 'actions col' }, [go, el('button', { class: 'btn', type: 'button', text: 'Anulează', onclick: () => close(false) })]),

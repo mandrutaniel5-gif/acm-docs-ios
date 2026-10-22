@@ -1103,6 +1103,7 @@ const App = (() => {
     try { if (typeof AppLock !== 'undefined') AppLock.start(); } catch (e) { console.error('lock', e); }
     try { if (typeof AccountUI !== 'undefined') AccountUI.start().catch((e) => console.error('account', e)); } catch (e) { console.error('account', e); }
     try { if (typeof Plan !== 'undefined') Plan.start(); } catch (e) { console.error('plan', e); }
+    try { if (typeof Service !== 'undefined') Account.ready().then(() => Service.start()); } catch (e) { console.error('service', e); }
     try { if (typeof Security !== 'undefined') Security.mountHomeTip(); } catch (e) { console.error('tip', e); }
     window.addEventListener('keydown', onKey);
     // The page itself never scrolls (only the panels inside it do).

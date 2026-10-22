@@ -102,7 +102,7 @@ service cloud.firestore {
       // and only while the account's encrypted cloud is under its plan's limit
       match /vault/{rest=**} {
         allow read, delete: if activeDeviceOf(uid);
-        allow create, update: if activeDeviceOf(uid)
+        allow create, update: if activeDeviceOf(uid) && syncOn()
           && request.resource.data.keys().hasOnly(['b', 'v', 'at'])
           && request.resource.data.b is string && request.resource.data.b.size() <= 700000
           && underLimit(uid, request.resource.data.b.size() - (resource == null ? 0 : resource.data.get('b', '').size()));
@@ -120,7 +120,18 @@ service cloud.firestore {
         allow read: if activeDeviceOf(uid);
       }
     }
-    // pairings, rate limits, billing, groups, server keys: only the server functions touch them
+    // what is paused right now (kill switches from the control panel) and the message about it:
+    // public, so the app can say so even before signing in. Written only by the server.
+    match /server/switches {
+      allow get: if true;
+    }
+    function syncOn() {
+      let p = /databases/$(database)/documents/server/switches;
+      return !exists(p) || (get(p).data.get('all', false) != true && get(p).data.get('off', {}).get('sync', false) != true);
+    }
+
+    // pairings, rate limits, billing, groups, server keys and secrets, sign-in addresses, reports,
+    // promotions, the control panel's log: only the server functions touch them
 
     // everything else: closed
     match /{document=**} {

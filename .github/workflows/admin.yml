@@ -1,31 +1,40 @@
 name: Admin
 
-# Gives an account a plan by hand (no payment): for you, testers, partners. Nothing else is touched.
+# Owner tools, run by hand from GitHub:
+#   grant         gives an account a plan without payment (also possible from the control panel)
+#   make-admin    makes an email the control panel's administrator (the account must exist first)
+#   remove-admin  takes the administrator right away
 on:
   workflow_dispatch:
     inputs:
-      handle: { description: "@name or email of the account", required: true, type: string }
+      action:
+        description: "What to do"
+        type: choice
+        options: [grant, make-admin, remove-admin]
+        default: grant
+      handle: { description: "@name or email (grant) · administrator email (make-admin / remove-admin)", required: true, type: string }
       plan:
-        description: "Plan"
+        description: "Plan (grant)"
         type: choice
         options: [pro, personal, basic]
         default: pro
-      days: { description: "For how many days (0 = take it away)", type: number, default: 365 }
+      days: { description: "For how many days (grant; 0 = take it away)", type: number, default: 365 }
 
 permissions:
   contents: read
 
 jobs:
-  grant:
+  run:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with: { node-version: 22 }
-      - name: Grant
+      - name: Run
         env:
           SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          ACTION: ${{ inputs.action }}
           HANDLE: ${{ inputs.handle }}
           PLAN: ${{ inputs.plan }}
           DAYS: ${{ inputs.days }}
@@ -33,5 +42,9 @@ jobs:
           printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
           cd functions && npm ci --no-audit --no-fund >/dev/null
-          node tools/grant.mjs "$HANDLE" "$PLAN" "$DAYS"
+          case "$ACTION" in
+            grant) node tools/grant.mjs "$HANDLE" "$PLAN" "$DAYS" ;;
+            make-admin) node tools/admin-claim.mjs "$HANDLE" on ;;
+            remove-admin) node tools/admin-claim.mjs "$HANDLE" off ;;
+          esac
           rm -f "$RUNNER_TEMP/sa.json"

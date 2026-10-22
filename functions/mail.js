@@ -24,3 +24,18 @@ export async function sendSignInCode(to, code, agent) {
   <p style="font-size:12px;color:#9a9aa2;margin-top:24px">ACM Code S.R.L. · acmdocs.acmandrut.com</p></div>`;
   await tx().sendMail({ from, to, subject: `${code} · cod de conectare ACM Docs`, text, html });
 }
+
+/** Control panel: every sign-in to the admin account is mailed to that account. */
+export async function sendAdminAlert(to, ip, agent) {
+  if (!to) return;
+  const from = process.env.MAIL_FROM || 'ACM Docs <no-reply@acmandrut.com>';
+  const when = new Date().toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' });
+  const text = `Conectare în panoul de control ACM Docs\n\nOra: ${when}\nAdresa IP: ${ip || '-'}\nDispozitiv: ${agent || '-'}\n\nDacă nu ai fost tu, schimbă imediat parola contului de administrator și scoate-i drepturile din GitHub (workflow Admin → remove-admin).\n\nACM Code S.R.L.`;
+  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:460px;margin:0 auto;padding:24px;color:#1c1c1e">
+  <div style="font-weight:700;font-size:16px">ACM Docs · Panou de control</div>
+  <p style="margin:18px 0 10px">A avut loc o conectare în panoul de control.</p>
+  <table style="font-size:14px;line-height:1.7;color:#3a3a40"><tr><td style="padding-right:14px;color:#77777f">Ora</td><td>${esc(when)}</td></tr>
+  <tr><td style="padding-right:14px;color:#77777f">Adresa IP</td><td>${esc(ip || '-')}</td></tr><tr><td style="padding-right:14px;color:#77777f">Dispozitiv</td><td>${esc(agent || '-')}</td></tr></table>
+  <p style="font-size:13px;line-height:1.5;color:#77777f;margin-top:18px">Dacă nu ai fost tu, schimbă imediat parola contului de administrator și scoate-i drepturile din GitHub (workflow Admin → remove-admin).</p></div>`;
+  await tx().sendMail({ from, to, subject: 'Conectare în panoul de control ACM Docs', text, html });
+}
