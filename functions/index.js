@@ -11,9 +11,14 @@
 //  - a new device can join by scanning-free QR pairing: an already signed-in device approves it
 //    (after Face ID / fingerprint) and hands over the account keys, encrypted for the new device
 //  - every sign-in is written as an event, so all devices can show "new sign-in" alerts
-import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import { onCall, onRequest, HttpsError } from 'firebase-functions/v2/https';
 import { setGlobalOptions } from 'firebase-functions/v2';
-import { beforeUserSignedIn } from 'firebase-functions/v2/identity';
+import { beforeUserSignedIn, beforeUserCreated } from 'firebase-functions/v2/identity';
+import { onDocumentWritten } from 'firebase-functions/v2/firestore';
+import { onObjectFinalized, onObjectDeleted } from 'firebase-functions/v2/storage';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
+import Stripe from 'stripe';
+import { PLANS, PRICES, ACTIONS, PAID, GROUP_PLANS, monthOf } from './plans.js';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore';
@@ -83,17 +88,32 @@ export const registerDevice = onCall(async (req) => {
   if (!profile.exists) fail('failed-precondition', 'no profile');
   if (!verify(parseBundle(profile.data().key).ed, `acm-register\n${uid}\n${fp}\n${ts}`, proof)) fail('permission-denied', 'no account keys');
   if (info != null && (typeof info !== 'string' || info.length > 4000)) fail('invalid-argument', 'info');
+  const { replace } = req.data || {};
+  if (replace != null && (typeof replace !== 'string' || !/^[0-9a-f]{32}$/.test(replace))) fail('invalid-argument', 'replace');
   const col = devicesOf(uid);
   const id = newId();
+  const cap = Math.min(MAX_DEVICES, (await effective(uid)).devices);
+  let replaced = null, first = false;
   const result = await db.runTransaction(async (tx) => {
     const all = await tx.get(col);
     const active = all.docs.filter((d) => d.data().status === 'active');
-    if (active.length >= MAX_DEVICES) fail('resource-exhausted', 'too many devices');
-    const role = all.empty ? 'primary' : 'member';
+    // the plan's number of devices: holding the account keys (24 words) lets this device take the
+    // place of an old one (it is signed out at once), never add one more
+    if (!all.empty && active.length >= cap) {
+      const old = replace && active.find((d) => d.id === replace);
+      if (!old || active.length > cap) fail('resource-exhausted', 'device limit');
+      tx.update(old.ref, { status: 'removed', removedAt: FieldValue.serverTimestamp(), replacedBy: id });
+      replaced = old.id;
+    }
+    let role = all.empty ? 'primary' : 'member';
+    if (replaced && active.find((d) => d.id === replaced).data().role === 'primary') role = 'primary';
     tx.set(col.doc(id), { pub: Buffer.from(ed).toString('base64'), fp, role, status: 'active', via: all.empty ? 'create' : 'password', info: info || null, created: FieldValue.serverTimestamp(), lastSeen: FieldValue.serverTimestamp(), addedBy: null });
+    first = all.empty;
     return role;
   });
-  await event(uid, { type: 'signin', dev: id, via: result === 'primary' ? 'create' : 'password' });
+  if (replaced) await event(uid, { type: 'replaced', dev: replaced, by: id });
+  await event(uid, { type: 'signin', dev: id, via: first ? 'create' : 'password' });
+  await ensureCloud(uid);
   return { dev: id, role: result, token: await token(uid, id) };
 });
 
@@ -178,6 +198,7 @@ export const pairApprove = onCall(async (req) => {
   const { uid, dev } = await needDevice(req);
   const { pid, fp, sealed } = req.data || {};
   if (typeof sealed !== 'string' || sealed.length > 200000) fail('invalid-argument', 'sealed');
+  const cap = Math.min(MAX_DEVICES, (await effective(uid)).devices);
   const pref = db.collection('pairings').doc(String(pid || '-'));
   const id = newId();
   await db.runTransaction(async (tx) => {
@@ -185,7 +206,7 @@ export const pairApprove = onCall(async (req) => {
     if (!p.exists || p.data().status !== 'waiting' || p.data().expires.toMillis() < Date.now()) fail('not-found', 'expired');
     if (p.data().fp !== fp) fail('permission-denied', 'key mismatch');
     const all = await tx.get(devicesOf(uid));
-    if (all.docs.filter((d) => d.data().status === 'active').length >= MAX_DEVICES) fail('resource-exhausted', 'too many devices');
+    if (all.docs.filter((d) => d.data().status === 'active').length >= cap) fail('resource-exhausted', 'device limit');
     const { ed } = parseBundle(p.data().bundle);
     tx.set(devicesOf(uid).doc(id), { pub: Buffer.from(ed).toString('base64'), fp, role: 'member', status: 'active', via: 'qr', info: null, created: FieldValue.serverTimestamp(), lastSeen: FieldValue.serverTimestamp(), addedBy: dev });
     tx.update(pref, { status: 'approved', uid, dev: id, sealed, approvedBy: dev });
@@ -300,6 +321,19 @@ export const wipeAccount = onCall(async (req) => {
   if (!profile.exists) fail('failed-precondition', 'no profile');
   if (!verify(parseBundle(profile.data().key).ed, `acm-wipe\n${uid}\n${dev}\n${ts}`, sig)) fail('permission-denied', 'bad signature');
   const handle = profile.data().handle;
+  // subscriptions end with the account (nothing is charged again), and it leaves any group
+  const bill = (await billingOf(uid).get()).data() || {};
+  for (const sid of [bill.sub, bill.groupSub].filter(Boolean)) {
+    try { await stripe().subscriptions.cancel(sid); } catch (e) { console.warn('cancel on wipe', e.message); }
+  }
+  if (bill.group) {
+    const g = (await groupOf(bill.group).get()).data();
+    if (g && g.owner === uid) {
+      await groupOf(bill.group).update({ until: Date.now(), status: 'canceled' });
+      for (const m of g.members || []) { try { await billingOf(m).update({ group: FieldValue.delete() }); await refresh(m); } catch (e) {} }
+    } else await leaveGroup(uid, bill.group);
+  }
+  await billingOf(uid).delete();
   const batch = db.batch();
   if (handle) batch.delete(db.collection('usernames').doc(handle));
   batch.delete(pref);
@@ -336,4 +370,502 @@ export const beforeSignIn = beforeUserSignedIn(async (ev) => {
     if (active.empty) return; // no device yet: nobody to warn
     await event(uid, { type: 'password', agent: agentOf(ev.userAgent) });
   } catch (e) { console.warn('sign-in event', e.message); }
+});
+
+// ================================================================== plans, limits and subscriptions
+//
+// Where things live (only these functions write them; the rules let the owner's devices read some):
+//   billing/{uid}                  the account's own subscription (Stripe) or a manual grant · server only
+//   groups/{gid}                   a Family / Business subscription: owner, seats, members  · server only
+//   accounts/{uid}/meta/plan       the plan in effect, its limits                           · owner reads
+//   accounts/{uid}/meta/cloud      { used, limit } bytes of encrypted cloud data            · owner + rules read
+//   accounts/{uid}/usage/{month}   how much of each monthly action was used                 · owner reads
+//   accounts/{uid}/invites/{gid}   invitations into a Family / Business group               · owner reads
+//   server/keys, server/stripe     the server's signing key, Stripe ids                      · server only
+//
+// Nothing here can be raised from a device: counters move only inside these functions, the cloud limit
+// is checked by the security rules on every write, and the plan comes from Stripe's signed messages.
+const BUCKET = 'acm-docs-52280.firebasestorage.app';
+const DAY = 24 * 3600 * 1000;
+const OFFLINE_MS = 7 * DAY;           // a paid plan works offline for up to a week
+const GRACE_MS = 3 * DAY;             // a failed renewal keeps the plan for 3 more days
+const SITE = 'https://acmdocs.acmandrut.com';
+const metaOf = (uid, m) => db.collection('accounts').doc(uid).collection('meta').doc(m);
+const billingOf = (uid) => db.collection('billing').doc(uid);
+const groupOf = (gid) => db.collection('groups').doc(gid);
+
+// ---------------------------------------------------------------- the server's signing key
+/** Ed25519 key for plan tokens (made once, kept where only these functions can read it). */
+let serverKey = null;
+async function signingKey() {
+  if (serverKey) return serverKey;
+  const ref = db.collection('server').doc('keys');
+  serverKey = await db.runTransaction(async (tx) => {
+    const s = await tx.get(ref);
+    if (s.exists && s.data().planSk) return unb64(s.data().planSk);
+    const sk = randomBytes(32);
+    tx.set(ref, { planSk: Buffer.from(sk).toString('base64'), planPk: Buffer.from(ed25519.getPublicKey(sk)).toString('base64'), created: FieldValue.serverTimestamp() }, { merge: true });
+    return new Uint8Array(sk);
+  });
+  return serverKey;
+}
+/** A plan token for one device: "this device of this account has this plan until exp". */
+async function planToken(uid, dev, plan, until) {
+  const exp = Math.min(until || 0, Date.now() + OFFLINE_MS);
+  const body = Buffer.from(JSON.stringify({ v: 1, u: uid, d: dev, p: plan, e: exp, i: Date.now() })).toString('base64');
+  const sig = Buffer.from(ed25519.sign(new TextEncoder().encode('acm-plan\n' + body), await signingKey())).toString('base64');
+  return body + '.' + sig;
+}
+
+// ---------------------------------------------------------------- the plan in effect
+/** The best plan the account has right now: its own subscription, a group it belongs to, or Basic. */
+async function effective(uid) {
+  const now = Date.now();
+  const b = (await billingOf(uid).get()).data() || {};
+  let plan = 'basic', until = 0, source = null, group = null;
+  if (PAID.includes(b.plan) && !GROUP_PLANS.includes(b.plan) && (b.until || 0) > now) { plan = b.plan; until = b.until; source = b.source || 'stripe'; }
+  if (b.group) {
+    const g = (await groupOf(b.group).get()).data();
+    if (g && (g.until || 0) > now && (g.owner === uid || (g.members || []).includes(uid)) && PLANS[g.plan].rank > PLANS[plan].rank) {
+      plan = g.plan; until = g.until; source = 'group';
+      group = { id: b.group, plan: g.plan, owner: g.owner === uid, seats: g.seats, used: 1 + (g.members || []).length };
+    } else if (g && (g.owner === uid || (g.members || []).includes(uid))) {
+      group = { id: b.group, plan: g.plan, owner: g.owner === uid, seats: g.seats, used: 1 + (g.members || []).length, inactive: (g.until || 0) <= now };
+    }
+  }
+  const P = PLANS[plan];
+  return { plan, until, source, group, devices: P.devices, cloud: P.cloud, month: P.month, cancelAt: b.cancelAt || null, period: b.period || null, hasStripe: !!b.customer };
+}
+
+/** Writes the plan in effect where the devices (and the cloud limit rules) can read it. */
+async function refresh(uid) {
+  const e = await effective(uid);
+  await metaOf(uid, 'plan').set({ plan: e.plan, until: e.until, source: e.source, group: e.group, devices: e.devices, cloud: e.cloud, month: e.month, cancelAt: e.cancelAt, period: e.period, at: FieldValue.serverTimestamp() });
+  await ensureCloud(uid, e.cloud);
+  return e;
+}
+
+/** { used, limit } of the encrypted cloud: made (and measured once) for older accounts. */
+async function ensureCloud(uid, limit) {
+  const ref = metaOf(uid, 'cloud');
+  const snap = await ref.get();
+  if (limit == null) limit = (await effective(uid)).cloud;
+  if (snap.exists) { if (snap.data().limit !== limit) await ref.update({ limit }); return; }
+  // first time: measure what the account already keeps
+  let used = 0;
+  try {
+    const [files] = await getStorage().bucket(BUCKET).getFiles({ prefix: `accounts/${uid}/blobs/` });
+    for (const f of files) used += Number(f.metadata.size || 0);
+  } catch (e) { console.warn('measure storage', e.message); }
+  try {
+    const vs = await db.collection('accounts').doc(uid).collection('vault').get();
+    vs.forEach((d) => { used += String(d.data().b || '').length; });
+  } catch (e) { console.warn('measure vault', e.message); }
+  await db.runTransaction(async (tx) => {
+    const s = await tx.get(ref);
+    if (!s.exists) tx.set(ref, { used, limit });
+  });
+}
+
+/** Moves the cloud counter; never creates the document (a deleted account stays deleted). */
+async function addUsed(uid, delta) {
+  if (!delta) return null;
+  const ref = metaOf(uid, 'cloud');
+  return db.runTransaction(async (tx) => {
+    const s = await tx.get(ref);
+    if (!s.exists) return null;
+    const used = Math.max(0, (s.data().used || 0) + delta);
+    tx.update(ref, { used });
+    return { used, limit: s.data().limit };
+  });
+}
+
+// ---------------------------------------------------------------- the cloud counters
+/** Encrypted records: the size difference of every write. */
+export const vaultSize = onDocumentWritten({ document: 'accounts/{uid}/vault/{rid}' }, async (ev) => {
+  const size = (snap) => (snap && snap.exists ? String(snap.data().b || '').length : 0);
+  await addUsed(ev.params.uid, size(ev.data && ev.data.after) - size(ev.data && ev.data.before));
+});
+/** Encrypted blocks: counted when stored; one that goes over the limit is removed again. */
+export const blobStored = onObjectFinalized({ bucket: BUCKET }, async (ev) => {
+  const m = /^accounts\/([A-Za-z0-9]{10,64})\/blobs\/[0-9a-f]{32}$/.exec(ev.data.name || '');
+  if (!m) return;
+  const r = await addUsed(m[1], Number(ev.data.size || 0));
+  if (!r || r.used > r.limit) {
+    try { await getStorage().bucket(BUCKET).file(ev.data.name).delete(); } catch (e) { console.warn('over limit', e.message); }
+  }
+});
+export const blobRemoved = onObjectDeleted({ bucket: BUCKET }, async (ev) => {
+  const m = /^accounts\/([A-Za-z0-9]{10,64})\/blobs\/[0-9a-f]{32}$/.exec(ev.data.name || '');
+  if (m) await addUsed(m[1], -Number(ev.data.size || 0));
+});
+
+// ---------------------------------------------------------------- monthly actions
+/**
+ * One editing / scanning / invoicing / encrypted-document action. Counted on the server, once per
+ * document (ref) per month; past the plan's number, the action is refused. Returns a plan token the
+ * device keeps for working offline (paid plans only).
+ */
+export const useQuota = onCall(async (req) => {
+  const { uid, dev } = await needDevice(req);
+  const { action, ref } = req.data || {};
+  if (!ACTIONS.includes(action)) fail('invalid-argument', 'action');
+  if (ref != null && (typeof ref !== 'string' || !/^[0-9a-f]{16,64}$/.test(ref))) fail('invalid-argument', 'ref');
+  await rateLimit(req, 'quota|' + uid, 120, 10 * 60 * 1000, true);
+  const e = await effective(uid);
+  const limit = e.month[action];
+  const month = monthOf();
+  const uref = db.collection('accounts').doc(uid).collection('usage').doc(month);
+  const rref = ref ? uref.collection('refs').doc(action + '-' + ref) : null;
+  const used = await db.runTransaction(async (tx) => {
+    const u = await tx.get(uref);
+    const n = (u.exists && u.data()[action]) || 0;
+    if (rref && (await tx.get(rref)).exists) return n; // same document again this month: free
+    if (n >= limit) fail('resource-exhausted', 'limit:' + action);
+    tx.set(uref, { [action]: n + 1, month }, { merge: true });
+    if (rref) tx.set(rref, { at: FieldValue.serverTimestamp() });
+    return n + 1;
+  });
+  return { ok: true, plan: e.plan, used, limit, token: e.plan !== 'basic' ? await planToken(uid, dev, e.plan, e.until) : null };
+});
+
+/** Everything the "Subscription" screen shows, fresh from the server. */
+export const planStatus = onCall(async (req) => {
+  const { uid, dev } = await needDevice(req);
+  const e = await refresh(uid);
+  const usage = (await db.collection('accounts').doc(uid).collection('usage').doc(monthOf()).get()).data() || {};
+  const cloud = (await metaOf(uid, 'cloud').get()).data() || { used: 0, limit: e.cloud };
+  const active = (await devicesOf(uid).where('status', '==', 'active').get()).size;
+  return {
+    plan: e.plan, until: e.until, source: e.source, group: e.group, cancelAt: e.cancelAt, period: e.period,
+    devices: { used: active, limit: e.devices }, cloud: { used: cloud.used, limit: cloud.limit },
+    month: monthOf(), usage: Object.fromEntries(ACTIONS.map((a) => [a, { used: usage[a] || 0, limit: e.month[a] }])),
+    plans: PLANS, prices: PRICES, payments: !!process.env.STRIPE_SECRET_KEY, manage: e.hasStripe,
+    token: e.plan !== 'basic' ? await planToken(uid, dev, e.plan, e.until) : null,
+  };
+});
+
+// ---------------------------------------------------------------- Stripe
+let stripeClient = null;
+function stripe() {
+  if (!process.env.STRIPE_SECRET_KEY) fail('unavailable', 'payments not active');
+  if (!stripeClient) stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY);
+  return stripeClient;
+}
+const NAMES = { personal: 'ACM Docs Personal', pro: 'ACM Docs Pro', family: 'ACM Docs Family', business: 'ACM Docs Business' };
+/** The Stripe product of a plan (made once, remembered). */
+async function productOf(plan) {
+  const ref = db.collection('server').doc('stripe');
+  const s = (await ref.get()).data() || {};
+  if (s.products && s.products[plan]) return s.products[plan];
+  const p = await stripe().products.create({ name: NAMES[plan], metadata: { plan }, tax_code: 'txcd_10103001' });
+  await ref.set({ products: { [plan]: p.id } }, { merge: true });
+  return p.id;
+}
+async function customerOf(uid) {
+  const ref = billingOf(uid);
+  const b = (await ref.get()).data() || {};
+  if (b.customer) return b.customer;
+  const u = await getAuth().getUser(uid);
+  const c = await stripe().customers.create({ email: u.email, metadata: { uid } });
+  await ref.set({ customer: c.id }, { merge: true });
+  return c.id;
+}
+const priceData = async (plan, period) => ({
+  currency: 'eur', unit_amount: PRICES[plan][period], product: await productOf(plan), tax_behavior: 'inclusive',
+  recurring: { interval: period === 'year' ? 'year' : 'month' },
+});
+
+/** A Stripe payment page for a plan; the app opens it in the browser. */
+export const billingCheckout = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  const { plan, period, seats, consent } = req.data || {};
+  if (!PAID.includes(plan) || !['month', 'year'].includes(period)) fail('invalid-argument', 'plan');
+  if (consent !== true) fail('failed-precondition', 'consent');
+  await rateLimit(req, 'checkout|' + uid, 10, 60 * 60 * 1000, true);
+  let qty = 1;
+  if (plan === 'business') {
+    qty = Number(seats);
+    if (!Number.isInteger(qty) || qty < PLANS.business.minSeats || qty > PLANS.business.maxSeats) fail('invalid-argument', 'seats');
+  }
+  const e = await effective(uid);
+  const b = (await billingOf(uid).get()).data() || {};
+  // one subscription of each kind: a change of plan goes through billingChange / the portal
+  if (!GROUP_PLANS.includes(plan) && b.sub && (b.until || 0) > Date.now()) fail('already-exists', 'subscription exists');
+  if (GROUP_PLANS.includes(plan) && e.group && e.group.owner && !e.group.inactive) fail('already-exists', 'group exists');
+  const session = await stripe().checkout.sessions.create({
+    mode: 'subscription',
+    customer: await customerOf(uid),
+    client_reference_id: uid,
+    line_items: [{ price_data: await priceData(plan, period), quantity: qty }],
+    subscription_data: { metadata: { uid, plan, period } },
+    metadata: { uid, plan, period, consent: String(Date.now()) },
+    automatic_tax: { enabled: process.env.STRIPE_TAX === '1' },
+    customer_update: process.env.STRIPE_TAX === '1' ? { address: 'auto' } : undefined,
+    allow_promotion_codes: true,
+    billing_address_collection: 'auto',
+    custom_text: { submit: { message: 'Abonamentul se reînnoiește automat și îl poți anula oricând din aplicație. / The subscription renews automatically; cancel any time in the app.' } },
+    success_url: SITE + '/plata?ok=1',
+    cancel_url: SITE + '/plata?ok=0',
+  });
+  return { url: session.url };
+});
+
+/** Personal ⇄ Pro, monthly ⇄ yearly: the subscription is changed (Stripe settles the difference). */
+export const billingChange = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  const { plan, period } = req.data || {};
+  if (!['personal', 'pro'].includes(plan) || !['month', 'year'].includes(period)) fail('invalid-argument', 'plan');
+  const b = (await billingOf(uid).get()).data() || {};
+  if (!b.sub) fail('failed-precondition', 'no subscription');
+  const sub = await stripe().subscriptions.retrieve(b.sub);
+  await stripe().subscriptions.update(b.sub, {
+    items: [{ id: sub.items.data[0].id, price_data: await priceData(plan, period), quantity: 1 }],
+    metadata: { uid, plan, period }, proration_behavior: 'create_prorations', cancel_at_period_end: false,
+  });
+  await applySubscription(await stripe().subscriptions.retrieve(b.sub));
+  return { ok: true };
+});
+
+/** Number of accounts of a Business subscription (owner only). */
+export const groupSeats = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  const n = Number((req.data || {}).seats);
+  const e = await effective(uid);
+  if (!e.group || !e.group.owner || e.group.plan !== 'business') fail('permission-denied', 'not a business owner');
+  if (!Number.isInteger(n) || n < PLANS.business.minSeats || n > PLANS.business.maxSeats) fail('invalid-argument', 'seats');
+  if (n < e.group.used) fail('failed-precondition', 'remove accounts first');
+  const g = (await groupOf(e.group.id).get()).data();
+  const sub = await stripe().subscriptions.retrieve(g.sub);
+  await stripe().subscriptions.update(g.sub, { items: [{ id: sub.items.data[0].id, quantity: n }], proration_behavior: 'create_prorations' });
+  await applySubscription(await stripe().subscriptions.retrieve(g.sub));
+  return { ok: true };
+});
+
+/** Stripe's own page for card, invoices and cancelling. */
+export const billingPortal = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  const b = (await billingOf(uid).get()).data() || {};
+  if (!b.customer) fail('failed-precondition', 'no customer');
+  const ref = db.collection('server').doc('stripe');
+  let conf = ((await ref.get()).data() || {}).portal;
+  if (!conf) {
+    const c = await stripe().billingPortal.configurations.create({
+      business_profile: { headline: 'ACM Docs', privacy_policy_url: SITE + '/confidentialitate', terms_of_service_url: SITE + '/termeni' },
+      features: {
+        payment_method_update: { enabled: true }, invoice_history: { enabled: true },
+        customer_update: { enabled: true, allowed_updates: ['email', 'address', 'tax_id', 'name'] },
+        subscription_cancel: { enabled: true, mode: 'at_period_end', cancellation_reason: { enabled: true, options: ['too_expensive', 'unused', 'missing_features', 'switched_service', 'other'] } },
+      },
+    });
+    conf = c.id;
+    await ref.set({ portal: conf }, { merge: true });
+  }
+  const s = await stripe().billingPortal.sessions.create({ customer: b.customer, configuration: conf, return_url: SITE + '/plata?ok=portal' });
+  return { url: s.url };
+});
+
+/** Until when a Stripe subscription gives its plan (newer API versions keep the period on the item). */
+function periodEnd(sub) {
+  const it = sub.items && sub.items.data && sub.items.data[0];
+  return 1000 * ((it && it.current_period_end) || sub.current_period_end || 0);
+}
+/** A subscription as Stripe reports it → billing / group documents → plan in effect. */
+async function applySubscription(sub, at = Date.now()) {
+  const uid = sub.metadata && sub.metadata.uid;
+  const plan = sub.metadata && sub.metadata.plan;
+  if (!uid || !PAID.includes(plan)) { console.warn('subscription without uid/plan', sub.id); return; }
+  const end = periodEnd(sub);
+  const live = ['active', 'trialing'].includes(sub.status);
+  const until = live ? end : sub.status === 'past_due' ? end + GRACE_MS : Math.min(end, Date.now());
+  const it = sub.items.data[0];
+  const period = it && it.price && it.price.recurring && it.price.recurring.interval === 'year' ? 'year' : 'month';
+  const cancelAt = sub.cancel_at_period_end || sub.cancel_at ? (sub.cancel_at ? sub.cancel_at * 1000 : end) : null;
+  if (GROUP_PLANS.includes(plan)) {
+    const gid = 'g' + String(sub.id).replace(/[^A-Za-z0-9]/g, '');
+    const seats = plan === 'family' ? PLANS.family.seats : Math.max(PLANS.business.minSeats, it.quantity || 1);
+    const members = await db.runTransaction(async (tx) => {
+      const g = await tx.get(groupOf(gid));
+      if (g.exists && (g.data().subAt || 0) > at) return null; // an older message arriving late
+      const d = g.exists ? g.data() : {};
+      tx.set(groupOf(gid), { owner: uid, plan, seats, sub: sub.id, status: sub.status, until, cancelAt, subAt: at, members: d.members || [], pending: d.pending || [], created: d.created || FieldValue.serverTimestamp() });
+      return d.members || [];
+    });
+    if (!members) return;
+    await billingOf(uid).set({ group: gid, groupSub: sub.id }, { merge: true });
+    for (const m of [uid, ...members]) await refresh(m);
+    return;
+  }
+  const late = await db.runTransaction(async (tx) => {
+    const b = await tx.get(billingOf(uid));
+    if (b.exists && b.data().sub === sub.id && (b.data().subAt || 0) > at) return true;
+    tx.set(billingOf(uid), { plan, until, source: 'stripe', sub: sub.id, status: sub.status, period, cancelAt, customer: sub.customer, subAt: at }, { merge: true });
+    return false;
+  });
+  if (!late) await refresh(uid);
+}
+
+/** Stripe → server: payments, renewals, cancellations. Only messages signed by Stripe are believed. */
+export const stripeWebhook = onRequest({ cors: false }, async (req, res) => {
+  if (req.method !== 'POST' || !process.env.STRIPE_WEBHOOK_SECRET) { res.status(404).end(); return; }
+  let ev;
+  try { ev = stripe().webhooks.constructEvent(req.rawBody, req.get('stripe-signature'), process.env.STRIPE_WEBHOOK_SECRET); }
+  catch (e) { res.status(400).send('bad signature'); return; }
+  try {
+    const seen = db.collection('server').doc('stripe').collection('hooks').doc(ev.id);
+    if ((await seen.get()).exists) { res.json({ ok: true, again: true }); return; }
+    const o = ev.data.object;
+    if (ev.type === 'checkout.session.completed' && o.mode === 'subscription' && o.subscription) {
+      await applySubscription(await stripe().subscriptions.retrieve(o.subscription), ev.created * 1000);
+    } else if (/^customer\.subscription\.(created|updated|deleted|paused|resumed)$/.test(ev.type)) {
+      // the signed message carries the whole subscription as it is now
+      await applySubscription(ev.type.endsWith('deleted') ? { ...o, status: 'canceled' } : o, ev.created * 1000);
+    } else if ((ev.type === 'invoice.paid' || ev.type === 'invoice.payment_failed') && (o.subscription || (o.parent && o.parent.subscription_details))) {
+      const sid = o.subscription || o.parent.subscription_details.subscription;
+      await applySubscription(await stripe().subscriptions.retrieve(sid), ev.created * 1000);
+    }
+    await seen.set({ type: ev.type, at: FieldValue.serverTimestamp(), expires: Timestamp.fromMillis(Date.now() + 30 * DAY) });
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('webhook', ev.type, e);
+    res.status(500).send('retry');
+  }
+});
+
+// ---------------------------------------------------------------- Family / Business groups
+/** Owner: invites an account by @name into the group (it must accept). */
+export const groupInvite = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  const h = String((req.data || {}).handle || '').toLowerCase().replace(/^@/, '');
+  if (!/^[a-z0-9_]{3,20}$/.test(h)) fail('invalid-argument', 'handle');
+  await rateLimit(req, 'ginv|' + uid, 60, 60 * 60 * 1000, true);
+  const e = await effective(uid);
+  if (!e.group || !e.group.owner || e.group.inactive) fail('permission-denied', 'not a group owner');
+  const owned = await db.collection('usernames').doc(h).get();
+  if (!owned.exists) fail('not-found', 'no such account');
+  const to = owned.data().uid;
+  if (to === uid) fail('invalid-argument', 'self');
+  const me = (await db.collection('users').doc(uid).get()).data() || {};
+  await db.runTransaction(async (tx) => {
+    const g = await tx.get(groupOf(e.group.id));
+    const d = g.data();
+    if ((d.members || []).includes(to)) fail('already-exists', 'already a member');
+    const pending = (d.pending || []).filter((x) => x !== to);
+    if (1 + (d.members || []).length + pending.length >= d.seats) fail('resource-exhausted', 'no free seats');
+    tx.update(groupOf(e.group.id), { pending: [...pending, to] });
+    tx.set(db.collection('accounts').doc(to).collection('invites').doc(e.group.id), { plan: d.plan, from: me.handle || '', name: me.name || '', at: FieldValue.serverTimestamp() });
+  });
+  return { ok: true };
+});
+
+/** Invited account: joins (accept) or refuses. */
+export const groupAnswer = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  const { gid, accept } = req.data || {};
+  if (typeof gid !== 'string' || !/^g[A-Za-z0-9]{6,80}$/.test(gid)) fail('invalid-argument', 'gid');
+  const inv = db.collection('accounts').doc(uid).collection('invites').doc(gid);
+  if (!(await inv.get()).exists) fail('not-found', 'no invitation');
+  let before = null;
+  if (accept === true) {
+    const mine = (await billingOf(uid).get()).data() || {};
+    if (mine.group && mine.group !== gid) {
+      const old = (await groupOf(mine.group).get()).data();
+      if (old && old.owner === uid && (old.until || 0) > Date.now()) fail('failed-precondition', 'owner of another group');
+      before = mine.group;
+    }
+    await db.runTransaction(async (tx) => {
+      const g = await tx.get(groupOf(gid));
+      if (!g.exists || (g.data().until || 0) <= Date.now()) fail('failed-precondition', 'group inactive');
+      const d = g.data();
+      if (!(d.pending || []).includes(uid)) fail('not-found', 'no invitation');
+      const members = [...new Set([...(d.members || []), uid])];
+      if (1 + members.length > d.seats) fail('resource-exhausted', 'no free seats');
+      tx.update(groupOf(gid), { members, pending: (d.pending || []).filter((x) => x !== uid) });
+      tx.set(billingOf(uid), { group: gid }, { merge: true });
+      tx.delete(inv);
+    });
+    if (before) await leaveGroup(uid, before);
+  } else {
+    await groupOf(gid).update({ pending: FieldValue.arrayRemove(uid) }).catch(() => {});
+    await inv.delete();
+  }
+  await refresh(uid);
+  return { ok: true };
+});
+
+async function leaveGroup(uid, gid) {
+  await groupOf(gid).update({ members: FieldValue.arrayRemove(uid) }).catch(() => {});
+}
+/** Owner: removes an account (or cancels an invitation). */
+export const groupRemove = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  const who = String((req.data || {}).uid || '');
+  if (!/^[A-Za-z0-9]{10,64}$/.test(who) || who === uid) fail('invalid-argument', 'uid');
+  const e = await effective(uid);
+  if (!e.group || !e.group.owner) fail('permission-denied', 'not a group owner');
+  await groupOf(e.group.id).update({ members: FieldValue.arrayRemove(who), pending: FieldValue.arrayRemove(who) });
+  await db.collection('accounts').doc(who).collection('invites').doc(e.group.id).delete().catch(() => {});
+  const b = (await billingOf(who).get()).data() || {};
+  if (b.group === e.group.id) await billingOf(who).update({ group: FieldValue.delete() });
+  await refresh(who);
+  return { ok: true };
+});
+/** Member: leaves the group. */
+export const groupLeave = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  const b = (await billingOf(uid).get()).data() || {};
+  if (!b.group) return { ok: true };
+  const g = (await groupOf(b.group).get()).data();
+  if (g && g.owner === uid) fail('failed-precondition', 'owner cannot leave');
+  await leaveGroup(uid, b.group);
+  await billingOf(uid).update({ group: FieldValue.delete() });
+  await refresh(uid);
+  return { ok: true };
+});
+/** Owner: who is in the group (by @name). Member: who pays. */
+export const groupInfo = onCall(async (req) => {
+  const { uid } = await needDevice(req);
+  const b = (await billingOf(uid).get()).data() || {};
+  if (!b.group) return { group: null };
+  const g = (await groupOf(b.group).get()).data();
+  if (!g) return { group: null };
+  const who = async (u) => { const p = (await db.collection('users').doc(u).get()).data() || {}; return { uid: u, handle: p.handle || '', name: p.name || '' }; };
+  if (g.owner !== uid) return { group: { id: b.group, plan: g.plan, owner: false, by: await who(g.owner), until: g.until } };
+  return { group: { id: b.group, plan: g.plan, owner: true, seats: g.seats, until: g.until, cancelAt: g.cancelAt || null, members: await Promise.all((g.members || []).map(who)), pending: await Promise.all((g.pending || []).map(who)) } };
+});
+
+// ---------------------------------------------------------------- housekeeping
+/** Once a day: plans that ran out (no message from Stripe needed) go back to Basic everywhere. */
+export const expirePlans = onSchedule({ schedule: 'every day 03:17', timeZone: 'Europe/Bucharest' }, async () => {
+  const now = Date.now();
+  const metas = await db.collectionGroup('meta').where('until', '<', now).where('until', '>', 0).limit(1000).get();
+  for (const d of metas.docs) {
+    const uid = d.ref.parent.parent.id;
+    try { await refresh(uid); } catch (e) { console.warn('expire', uid, e.message); }
+  }
+});
+
+/** New accounts: a few per address and hour, and no throwaway mailboxes. */
+const THROWAWAY = ['mailinator.com', 'guerrillamail.com', 'guerrillamail.net', 'sharklasers.com', '10minutemail.com', 'temp-mail.org', 'tempmail.com', 'yopmail.com', 'trashmail.com', 'getnada.com', 'dispostable.com', 'maildrop.cc', 'throwawaymail.com', 'fakeinbox.com', 'mailnesia.com', 'mintemail.com', 'emailondeck.com', 'tempail.com', 'moakt.com', 'mohmal.com', 'burnermail.io', 'spamgourmet.com', 'mytemp.email', 'tempmailo.com', 'temp-mail.io', 'minuteinbox.com', 'luxusmail.org', 'cock.li', 'grr.la', 'spam4.me'];
+export const beforeCreate = beforeUserCreated(async (ev) => {
+  const email = String((ev.data && ev.data.email) || '').toLowerCase();
+  const domain = email.split('@')[1] || '';
+  if (THROWAWAY.some((d) => domain === d || domain.endsWith('.' + d))) throw new HttpsError('invalid-argument', 'disposable email');
+  const ip = String(ev.ipAddress || 'unknown');
+  const limited = async (bucket, max, windowMs) => {
+    const key = hex(sha256(new TextEncoder().encode(bucket))).slice(0, 40);
+    const ref = db.collection('limits').doc(key);
+    return db.runTransaction(async (tx) => {
+      const s = await tx.get(ref);
+      const now = Date.now();
+      const d = s.exists ? s.data() : null;
+      if (!d || d.start + windowMs < now) { tx.set(ref, { start: now, n: 1, expires: Timestamp.fromMillis(now + windowMs) }); return false; }
+      if (d.n >= max) return true;
+      tx.update(ref, { n: d.n + 1 });
+      return false;
+    });
+  };
+  if (process.env.FUNCTIONS_EMULATOR === 'true') return; // the test accounts all come from one address
+  if (await limited('signup|' + ip, 5, 3600 * 1000)) throw new HttpsError('resource-exhausted', 'too many accounts from this network');
+  if (await limited('signup-all', 300, 3600 * 1000)) throw new HttpsError('resource-exhausted', 'too many new accounts, try later');
 });

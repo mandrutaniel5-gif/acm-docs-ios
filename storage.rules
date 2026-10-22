@@ -17,7 +17,10 @@ service firebase.storage {
       allow create: if id.matches('^[0-9a-f]{32}$') && activeDevice(uid)
         && resource == null
         && request.resource.size <= 110 * 1024 * 1024
-        && request.resource.contentType == 'application/octet-stream';
+        && request.resource.contentType == 'application/octet-stream'
+        // within the plan's encrypted cloud space (counted by the server)
+        && firestore.get(/databases/(default)/documents/accounts/$(uid)/meta/cloud).data.used + request.resource.size
+           <= firestore.get(/databases/(default)/documents/accounts/$(uid)/meta/cloud).data.limit;
       allow list, update: if false;
     }
     match /{all=**} { allow read, write: if false; }

@@ -34,9 +34,19 @@ const phone = device();     // primary
 const laptop = device();    // joins with QR
 const thief = device();     // has the password only
 
+/** Plans (2.3.0): the test accounts get a paid plan (as the console would grant it), so they may add devices. */
+async function grant(uid, plan = 'pro') {
+  const r = await fetch(`http://127.0.0.1:8080/v1/projects/${PROJECT}/databases/(default)/documents/billing/${uid}`, {
+    method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer owner' },
+    body: JSON.stringify({ fields: { plan: { stringValue: plan }, until: { integerValue: String(Date.now() + 30 * 864e5) }, source: { stringValue: 'manual' } } }),
+  });
+  if (!r.ok) throw new Error('grant ' + r.status);
+}
+
 async function makeAccount() {
   const cred = await createUserWithEmailAndPassword(phone.auth, email, 'Parola-test-1');
   uid = cred.user.uid;
+  await grant(uid);
   // verify the email in the emulator (admin REST) and refresh the token
   await fetch(`http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/projects/${PROJECT}/accounts:update`, {
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer owner' }, body: JSON.stringify({ localId: uid, emailVerified: true }),

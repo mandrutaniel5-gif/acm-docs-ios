@@ -79,6 +79,15 @@ try {
   if (!res.ok) throw new Error('storage delete ' + res.status);
   console.log('LIVE OK: cloud sync record + encrypted block (upload, download, delete), other folders closed, no rewrite, no HTML');
 
+  // plans: a new account is on Basic, the server counts its actions and refuses past the limit
+  const st = await call('planStatus', {});
+  if (st.plan !== 'basic' || st.devices.limit !== 1 || !st.cloud.limit) throw new Error('planStatus: ' + JSON.stringify(st).slice(0, 300));
+  for (let i = 0; i < st.usage.invoices.limit; i++) await call('useQuota', { action: 'invoices', ref: 'ab'.repeat(8) + String(i).padStart(4, '0') });
+  let over = false;
+  try { await call('useQuota', { action: 'invoices', ref: 'cd'.repeat(10) }); over = true; } catch (e) { if (!/limit/.test(e.message)) throw e; }
+  if (over) throw new Error('quota: went past the Basic limit');
+  console.log('LIVE OK: plans — Basic in effect, monthly limit counted and enforced by the server');
+
   // email + password only (no device): the profile cannot be changed, the sign-in cannot be deleted
   const app2 = clientApp({ apiKey: 'AIzaSyDsXxKCjxhOeGTZYyYIsm_S6SO6zADe25w', authDomain: `${PROJECT}.firebaseapp.com`, projectId: PROJECT }, 'pw');
   const auth2 = clientAuth(app2), db2 = getFirestore(app2);
@@ -160,6 +169,7 @@ try {
   const store = adminDb();
   await store.recursiveDelete(store.collection('accounts').doc(user.uid)).catch(() => {});
   await store.collection('users').doc(user.uid).delete().catch(() => {});
+  await store.collection('billing').doc(user.uid).delete().catch(() => {});
   await store.collection('usernames').doc(handle).delete().catch(() => {});
   await getStorage().bucket(BUCKET).deleteFiles({ prefix: `accounts/${user.uid}/` }).catch(() => {});
   await admin.deleteUser(user.uid).catch(() => {});

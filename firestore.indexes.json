@@ -2,6 +2,15 @@
   "indexes": [],
   "fieldOverrides": [
     { "collectionGroup": "pairings", "fieldPath": "expires", "ttl": true, "indexes": [] },
-    { "collectionGroup": "limits", "fieldPath": "expires", "ttl": true, "indexes": [] }
+    { "collectionGroup": "limits", "fieldPath": "expires", "ttl": true, "indexes": [] },
+    { "collectionGroup": "hooks", "fieldPath": "expires", "ttl": true, "indexes": [] },
+    {
+      "collectionGroup": "meta", "fieldPath": "until",
+      "indexes": [
+        { "order": "ASCENDING", "queryScope": "COLLECTION" },
+        { "order": "DESCENDING", "queryScope": "COLLECTION" },
+        { "order": "ASCENDING", "queryScope": "COLLECTION_GROUP" }
+      ]
+    }
   ]
 }

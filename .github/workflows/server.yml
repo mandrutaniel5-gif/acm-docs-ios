@@ -5,7 +5,7 @@ name: Server
 on:
   push:
     branches: [main]
-    paths: ["functions/**", "firestore.rules", "storage.rules", "firebase.json", "test/server.test.mjs", "test/prod-smoke.mjs", "test/auth-config.mjs", ".github/workflows/server.yml"]
+    paths: ["functions/**", "firestore.rules", "firestore.indexes.json", "storage.rules", "firebase.json", "test/server.test.mjs", "test/plans.test.mjs", "test/prod-smoke.mjs", "test/auth-config.mjs", ".github/workflows/server.yml"]
   workflow_dispatch:
     inputs:
       deploy:
@@ -36,15 +36,28 @@ jobs:
       - name: Test against the emulators
         run: |
           set -o pipefail
-          firebase emulators:exec --project acm-docs-52280 --only auth,firestore,functions "node --test test/server.test.mjs" 2>&1 | tee server-test.txt
+          # test-only payment keys for the emulator (the real ones are never in the repository)
+          printf 'STRIPE_SECRET_KEY=sk_test_emulator\nSTRIPE_WEBHOOK_SECRET=whsec_test_acmdocs\n' > functions/.env.local
+          firebase emulators:exec --project acm-docs-52280 --only auth,firestore,functions,storage "node --test test/server.test.mjs && node test/plans.test.mjs" 2>&1 | tee server-test.txt
+          rm -f functions/.env.local
 
       - name: Publish rules and functions
         if: github.event_name == 'push' || inputs.deploy
         env:
           SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          STRIPE_TAX: ${{ secrets.STRIPE_TAX }}
         run: |
           if [ -z "$SA" ]; then echo "No deploy key yet (secret FIREBASE_SERVICE_ACCOUNT): tests only." | tee deploy.txt; exit 0; fi
           printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          # payment keys (GitHub secrets STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET; optional STRIPE_TAX=1):
+          # written only for the deploy, never committed
+          : > functions/.env
+          [ -n "$STRIPE_SECRET_KEY" ] && echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" >> functions/.env
+          [ -n "$STRIPE_WEBHOOK_SECRET" ] && echo "STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET" >> functions/.env
+          [ -n "$STRIPE_TAX" ] && echo "STRIPE_TAX=$STRIPE_TAX" >> functions/.env
+          echo "payments: $([ -n "$STRIPE_SECRET_KEY" ] && echo on || echo 'off (no STRIPE_SECRET_KEY secret yet)')" | tee -a deploy.txt
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
           set -o pipefail
           # Auth first (Identity Platform, second factor, no client-side deletion): the sign-in
@@ -55,7 +68,8 @@ jobs:
           firebase deploy --project acm-docs-52280 --only storage --non-interactive 2>&1 | tee -a deploy.txt || echo "STORAGE NOT ACTIVE" | tee -a deploy.txt
           # one real round trip with a throwaway account (created and deleted by the test)
           node test/prod-smoke.mjs 2>&1 | tee -a deploy.txt
-          rm -f "$RUNNER_TEMP/sa.json"
+          (cd functions && node tools/plan-key.mjs && node tools/migrate-cloud.mjs) 2>&1 | tee -a deploy.txt
+          rm -f "$RUNNER_TEMP/sa.json" functions/.env
 
       # results readable with plain git (branch "server-results")
       - name: Publish results

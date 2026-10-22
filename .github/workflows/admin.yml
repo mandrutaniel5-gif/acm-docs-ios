@@ -1,0 +1,37 @@
+name: Admin
+
+# Gives an account a plan by hand (no payment): for you, testers, partners. Nothing else is touched.
+on:
+  workflow_dispatch:
+    inputs:
+      handle: { description: "@name of the account", required: true, type: string }
+      plan:
+        description: "Plan"
+        type: choice
+        options: [pro, personal, basic]
+        default: pro
+      days: { description: "For how many days (0 = take it away)", type: number, default: 365 }
+
+permissions:
+  contents: read
+
+jobs:
+  grant:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with: { node-version: 22 }
+      - name: Grant
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          HANDLE: ${{ inputs.handle }}
+          PLAN: ${{ inputs.plan }}
+          DAYS: ${{ inputs.days }}
+        run: |
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          cd functions && npm ci --no-audit --no-fund >/dev/null
+          node tools/grant.mjs "$HANDLE" "$PLAN" "$DAYS"
+          rm -f "$RUNNER_TEMP/sa.json"

@@ -11,3 +11,5 @@ build/android/keystore.properties
 *.keystore
 *.p12
 *.mobileprovision
+functions/.env
+functions/.env.local

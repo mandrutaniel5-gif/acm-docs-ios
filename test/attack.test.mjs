@@ -27,6 +27,15 @@ async function verify(uid) {
 }
 const ok = async (p) => { try { await p; return true; } catch (e) { return false; } };
 
+/** Plans (2.3.0): the test accounts get a paid plan (as the console would grant it), so they may add devices. */
+async function grant(uid, plan = 'pro') {
+  const r = await fetch(`http://127.0.0.1:8080/v1/projects/${PROJECT}/databases/(default)/documents/billing/${uid}`, {
+    method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer owner' },
+    body: JSON.stringify({ fields: { plan: { stringValue: plan }, until: { integerValue: String(Date.now() + 30 * 864e5) }, source: { stringValue: 'manual' } } }),
+  });
+  if (!r.ok) throw new Error('grant ' + r.status);
+}
+
 /** A full honest account: profile + @name + primary device with a device session. */
 async function makeAccount(tag) {
   const c = client();
@@ -34,7 +43,7 @@ async function makeAccount(tag) {
   const password = 'Parola-' + tag + '-1';
   const cred = await createUserWithEmailAndPassword(c.auth, email, password);
   const uid = cred.user.uid;
-  await verify(uid); await cred.user.getIdToken(true);
+  await verify(uid); await cred.user.getIdToken(true); await grant(uid);
   const id = A.deriveIdentity(A.generateMnemonic());
   const handle = (tag + Date.now().toString(36)).slice(0, 20);
   const b = writeBatch(c.db);

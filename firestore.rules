@@ -21,6 +21,11 @@ service cloud.firestore {
       return request.auth != null && request.auth.token.email_verified == true
         && (devId() == null || deviceDoc(request.auth.uid, devId()).data.status == 'active');
     }
+    // the plan's encrypted cloud space: growth only while used + growth stays within the limit
+    function underLimit(uid, grow) {
+      let c = get(/databases/$(database)/documents/accounts/$(uid)/meta/cloud).data;
+      return grow <= 0 || c.used + grow <= c.limit;
+    }
     function validHandle(h) {
       return h is string && h.matches('^[a-z0-9_]{3,20}$')
         && !(h in ['admin', 'administrator', 'acm', 'acmdocs', 'acm_docs', 'acmcode', 'acm_code', 'support', 'suport', 'help', 'ajutor', 'root', 'system', 'official', 'oficial', 'security', 'securitate']);
@@ -93,15 +98,29 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
           && request.resource.data.status in ['done', 'ignored'];
       }
-      // encrypted records: { b: base64 ciphertext, v: version, at: time }, at most ~500 KB each
+      // encrypted records: { b: base64 ciphertext, v: version, at: time }, at most ~500 KB each,
+      // and only while the account's encrypted cloud is under its plan's limit
       match /vault/{rest=**} {
         allow read, delete: if activeDeviceOf(uid);
         allow create, update: if activeDeviceOf(uid)
           && request.resource.data.keys().hasOnly(['b', 'v', 'at'])
-          && request.resource.data.b is string && request.resource.data.b.size() <= 700000;
+          && request.resource.data.b is string && request.resource.data.b.size() <= 700000
+          && underLimit(uid, request.resource.data.b.size() - (resource == null ? 0 : resource.data.get('b', '').size()));
+      }
+      // the plan in effect and the cloud counter (written only by the server functions)
+      match /meta/{m} {
+        allow read: if activeDeviceOf(uid);
+      }
+      // this month's counters (server only; the per-document marks stay private)
+      match /usage/{month} {
+        allow read: if activeDeviceOf(uid);
+      }
+      // invitations into a Family / Business group (answered through the server)
+      match /invites/{g} {
+        allow read: if activeDeviceOf(uid);
       }
     }
-    // pairings, rate limits: only the server functions touch them
+    // pairings, rate limits, billing, groups, server keys: only the server functions touch them
 
     // everything else: closed
     match /{document=**} {
