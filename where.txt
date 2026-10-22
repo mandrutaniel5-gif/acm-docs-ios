@@ -1,0 +1,20 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'google-auth-library' imported from /home/runner/work/acm-docs-ios/acm-docs-ios/[eval1]
+Did you mean to import "google-auth-library/build/src/index.js"?
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)
+    at packageResolve (node:internal/modules/esm/resolve:772:81)
+    at moduleResolve (node:internal/modules/esm/resolve:859:18)
+    at defaultResolve (node:internal/modules/esm/resolve:989:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v22.23.3
+https://firestore.googleapis.com/v1/projects/acm-docs-52280/databases/(default) → eur3 FIRESTORE_NATIVE
+https://storage.googleapis.com/storage/v1/b/acm-docs-52280.firebasestorage.app → EUROPE-WEST1 region
