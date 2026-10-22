@@ -1,0 +1,24 @@
+appId: ro.acmandrut.acmdocs.control
+productName: ACM Docs Control
+copyright: © 2026 ACM Code SRL
+electronVersion: 44.9.0
+directories:
+  output: ../dist/control
+files:
+  - main.js
+  - offline.html
+asar: true
+# Hardening: the binary cannot be run as plain Node.js, inspected with debugger switches or made to
+# load code from outside its own package.
+electronFuses:
+  runAsNode: false
+  enableCookieEncryption: true
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  onlyLoadAppFromAsar: true
+win:
+  target:
+    - target: dir
+      arch: [x64]
+  icon: build/icon.ico
+  signAndEditExecutable: false
