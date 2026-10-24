@@ -1817,5 +1817,6 @@
 "Ți-am trimis un cod nou.":"Yeni bir kod gönderdik.",
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"Bulamıyor musunuz? Spam klasörünü de kontrol edin. Kod 15 dakika geçerlidir.",
 "Încă nu văd confirmarea. Încearcă din nou.":"Henüz onaylanmadı. Lütfen yeniden deneyin.",
-"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"Kodun süresi doldu veya çok fazla denendi. Yeni bir kod isteyin."
+"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"Kodun süresi doldu veya çok fazla denendi. Yeni bir kod isteyin.",
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"Gruptan ayrılan biri yeniden eklenemez."
 };

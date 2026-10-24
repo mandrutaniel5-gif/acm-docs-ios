@@ -274,7 +274,7 @@ const Chat = (() => {
       return;
     }
     const m = String((e && (e.server || e.message)) || '');
-    UI.toast(/group full/.test(m) ? I18n.t('Grupul are deja numărul maxim de membri.') : /permission|blocked/i.test(m) ? I18n.t('Mesajul nu a putut fi trimis în această conversație.') : Account.say(e), { error: true });
+    UI.toast(/left the group/.test(m) ? I18n.t('Cine a ieșit din grup nu poate fi adăugat din nou.') : /group full/.test(m) ? I18n.t('Grupul are deja numărul maxim de membri.') : /permission|blocked/i.test(m) ? I18n.t('Mesajul nu a putut fi trimis în această conversație.') : Account.say(e), { error: true });
   }
 
   // ---------------------------------------------------------------- one conversation
@@ -442,8 +442,7 @@ const Chat = (() => {
           }
           if (act === 'leave') {
             if (!(await UI.confirm(I18n.t('Ieși din grup?'), I18n.t('Nu vei mai primi mesajele grupului.'), I18n.t('Ieși')))) return;
-            const rest = cur.members.filter((u) => u !== me());
-            await Account.call('chatGroup', { op: 'leave', cid, title: rest.length ? await sealTitleFor(rest, cid) : undefined });
+            await Account.call('chatGroup', { op: 'leave', cid });
             return show();
           }
         } catch (e) { failSay(e); }
@@ -522,7 +521,10 @@ const Chat = (() => {
         const r = A().open(Host.fromB64(m.box), id);
         const sender = await person(m.from);
         // the signature must be the sender's own padlock (not just any valid one)
-        const ok = m.from === me() ? r.sender.fingerprint === Account.fingerprint() : sender.fp ? r.sender.fingerprint === sender.fp : false;
+        // a contact's padlock is the one pinned on this device (verified by QR or accepted), never just
+        // what the server says now: a server that swapped someone's key cannot pass messages as theirs
+        const pinned = sender.contact && !sender.contact.pending ? sender.contact.fp : null;
+        const ok = m.from === me() ? r.sender.fingerprint === Account.fingerprint() : (pinned || sender.fp) ? r.sender.fingerprint === (pinned || sender.fp) : false;
         got = { obj: JSON.parse(new TextDecoder().decode(r.bytes)), ok, sender };
       } catch (e) {
         got = { err: e && e.code === 'NOT_FOR_YOU' ? 'Trimis înainte să faci parte din conversație.' : 'Mesajul nu poate fi deschis.', sender: await person(m.from) };
