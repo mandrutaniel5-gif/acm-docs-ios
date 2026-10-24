@@ -238,66 +238,75 @@ const Feel = (() => {
 
 
   // ---------------------------------------------------------------- the money card, under liquid glass
-  // The blue card lies under a layer of clear liquid glass. Slow, even rings come from the bottom-right
-  // corner and travel across; through them the card's floor shows the light they gather (caustics), and
-  // their crests catch a soft highlight. Nothing random, nothing fast. Drawn on a small grid that the
-  // screen smooths, about 24 times a second, only while the card is visible and the app is in front.
+  // The blue card lies under clear liquid glass. Rings rise from a point inside the card, right and a
+  // little low, and travel out over it; they are not perfect circles (real water never is). On the card's
+  // floor the waves draw what light does in a pool: thin sharp bright lines where they focus it, deep
+  // navy where they take it away; the crests catch a narrow glint. Slow, even, nothing random.
+  // A grid a little finer than the card's CSS size, ~24 frames a second, only while visible.
   function water(card) {
     if (!card || card.querySelector('.water')) return;
-    const W = 160, H = 66;
+    const box = card.getBoundingClientRect();
+    const W = Math.max(200, Math.min(320, Math.round(box.width * 0.85) || 300)), H = Math.round(W * Math.max(0.3, Math.min(0.6, (box.height || 150) / (box.width || 362))));
     const cv = el('canvas', { class: 'water', width: W, height: H, 'aria-hidden': 'true' });
     card.prepend(cv);
     const ctx = cv.getContext('2d', { alpha: false });
     const img = ctx.createImageData(W, H), px = img.data;
-    // the floor: the card's blue, deeper towards the edges (it lies below the surface)
-    const floor = new Float32Array(W * H * 3), dist = new Float32Array(W * H), fall = new Float32Array(W * H);
-    const C = [[22, 140, 255], [0, 98, 222], [54, 60, 210]];
-    const SX = W + 6, SY = H + 8; // the source sits just outside the bottom-right corner
+    const N = W * H;
+    const floor = new Float32Array(N * 3), dist = new Float32Array(N), ux = new Float32Array(N), uy = new Float32Array(N), amp = new Float32Array(N), warp = new Float32Array(N);
+    const C = [[24, 142, 255], [0, 98, 222], [52, 58, 206]];
+    const SX = W * 0.79, SY = H * 0.6; // where the rings rise
+    const K = (2 * Math.PI) / (W * 0.16); // ring spacing: about 6 rings across the card
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const i = y * W + x;
       const t = Math.min(1, (x / W) * 0.6 + (y / H) * 0.4);
       const [p, q, k] = t < 0.55 ? [C[0], C[1], t / 0.55] : [C[1], C[2], (t - 0.55) / 0.45];
       const ex = Math.min(x, W - 1 - x) / (W * 0.5), ey = Math.min(y, H - 1 - y) / (H * 0.5);
-      const depth = 0.84 + 0.16 * Math.min(1, Math.min(ex * 3.2, ey * 2.4)); // edges sink into shadow
+      const depth = 0.8 + 0.2 * Math.min(1, Math.min(ex * 3.4, ey * 2.6));
       for (let c = 0; c < 3; c++) floor[i * 3 + c] = (p[c] + (q[c] - p[c]) * k) * depth;
-      const r = Math.hypot(x - SX, y - SY);
-      dist[i] = r;
-      fall[i] = 1 / (1 + r / 120); // even: the rings fade only a little as they travel
+      const dx = x - SX, dy = y - SY, r = Math.hypot(dx, dy) || 1;
+      dist[i] = r; ux[i] = dx / r; uy[i] = dy / r;
+      // rings are born small at the source, strongest a little away, and keep going to the far side
+      amp[i] = Math.min(1, r / (W * 0.05)) / (1 + r / (W * 0.9));
+      // fixed, gentle irregularity so the rings are organic, not drawn with a compass
+      warp[i] = 0.24 * Math.sin(x * 0.04 + y * 0.065) + 0.13 * Math.sin(x * 0.09 - y * 0.05 + 1.3) + 0.06 * Math.sin((x + y) * 0.17);
     }
-    const K = (2 * Math.PI) / 34; // one ring every 34 grid cells (about 80 px on screen)
-    const SPEED = 0.052;           // radians per frame at 24 fps: a new ring about every 5 s, calm
     let visible = false, running = false, last = 0, phase = 0;
+    const SPEED = 0.05; // per frame at 24 fps: a new ring about every 5 s
     const reduce = reduced();
     function paint() {
-      for (let y = 0; y < H; y++) {
-        for (let x = 0; x < W; x++) {
-          const i = y * W + x, r = dist[i], f = fall[i];
-          const th = K * r - phase;
-          const slope = Math.cos(th) * f;          // how steep the surface is here
-          const curve = -Math.sin(th) * f;         // where it bends light together (caustic)
-          // the light from the top-left meets slopes that face it; crests catch a narrow highlight
-          const dx = (x - SX) / r, dy = (y - SY) / r;
-          const face = -(dx * 0.7 + dy * 0.72) * slope;
-          const hi = face > 0.32 ? (face - 0.32) * (face - 0.32) * 300 : 0;
-          // light gathers on one side of each ring and leaves a shadow on the other, like on a pool floor
-          const caustic = curve > 0 ? curve * curve * curve * 52 : 0;
-          const shadow = (curve < 0 ? Math.pow(-curve, 1.6) * 0.26 : 0) + (face < -0.25 ? (-face - 0.25) * 0.22 : 0);
-          const dim = 1 - Math.min(0.34, shadow);
-          // refraction: the floor seen through the moving glass shifts a little along the slope
-          const sx = Math.min(W - 1, Math.max(0, Math.round(x + dx * slope * 3))), sy = Math.min(H - 1, Math.max(0, Math.round(y + dy * slope * 3)));
-          const k = (sy * W + sx) * 3, o = i * 4;
-          // the shadow is a deeper navy, not grey: blue keeps more of itself than red and green
-          px[o] = Math.min(255, floor[k] * dim * dim + caustic + hi);
-          px[o + 1] = Math.min(255, floor[k + 1] * dim * dim + caustic * 1.05 + hi);
-          px[o + 2] = Math.min(255, floor[k + 2] * dim + caustic * 0.7 + hi);
-          px[o + 3] = 255;
-        }
+      for (let i = 0, o = 0; i < N; i++, o += 4) {
+        const f = amp[i];
+        const th = K * dist[i] + warp[i] - phase;
+        const c = Math.cos(th), sn = Math.sin(th);
+        const slope = c * f;
+        // light focused by the wave into a thin sharp line, and the broad shade beside it
+        const focus = sn > 0 ? sn : 0;
+        const f2 = focus * focus, f4 = f2 * f2, f8 = f4 * f4, f16 = f8 * f8;
+        const line = (f16 * 135 + f4 * 20) * f;
+        const shade = sn < 0 ? sn * sn * 0.42 * f : 0;
+        // the crest that faces the light (top-left) glints; the slope away from it darkens
+        const face = -(ux[i] * 0.7 + uy[i] * 0.72) * slope;
+        const fg = face > 0 ? face : 0, g2 = fg * fg, g4 = g2 * g2;
+        const glint = g4 * g4 * 160;
+        const back = face < 0 ? -face * 0.16 : 0;
+        const dim = 1 - Math.min(0.5, shade + back);
+        // refraction: the floor seen through the moving glass shifts along the slope
+        const x = i % W, y = (i - x) / W;
+        let sx = (x + ux[i] * slope * 3.4) | 0, sy = (y + uy[i] * slope * 3.4) | 0;
+        if (sx < 0) sx = 0; else if (sx >= W) sx = W - 1;
+        if (sy < 0) sy = 0; else if (sy >= H) sy = H - 1;
+        const k = (sy * W + sx) * 3;
+        const d2 = dim * dim;
+        px[o] = Math.min(255, floor[k] * d2 * dim + line * 0.92 + glint);
+        px[o + 1] = Math.min(255, floor[k + 1] * d2 + line + glint);
+        px[o + 2] = Math.min(255, floor[k + 2] * dim + line * 0.75 + glint);
+        px[o + 3] = 255;
       }
       ctx.putImageData(img, 0, 0);
     }
     function frame(t) {
       if (!running) return;
-      if (t - last >= 41) { // ~24 frames a second: the water moves slowly, more would be wasted
+      if (t - last >= 41) {
         const dt = last ? Math.min(3, (t - last) / 41) : 1;
         last = t;
         phase += SPEED * dt;
