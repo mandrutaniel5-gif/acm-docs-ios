@@ -1,0 +1,886 @@
+[33m[1m⚠  emulators:[22m[39m You are not currently authenticated so some features may not work correctly. Please run [1mfirebase login[22m to authenticate the CLI.
+[36m[1mi  emulators:[22m[39m Starting emulators: auth, functions, firestore, storage
+[33m[1m⚠  functions:[22m[39m The following emulators are not running, calls to these services from the Functions emulator will affect production: [1mapphosting, database, hosting, pubsub, dataconnect[22m
+[33m[1m⚠  functions:[22m[39m Unable to fetch project Admin SDK configuration, Admin SDK behavior in Cloud Functions emulator may be incorrect.
+[33m[1m⚠ [22m[39m It appears you are running in a CI environment. You can avoid downloading the Firestore Emulator repeatedly by caching the /home/runner/.cache/firebase/emulators directory.
+[36m[1mi  firestore:[22m[39m downloading cloud-firestore-emulator-v1.19.8.jar...
+
+[36m[1mi  firestore:[22m[39m Firestore Emulator logging to [1mfirestore-debug.log[22m
+[32m[1m✔  firestore:[22m[39m Firestore Emulator UI websocket is running on 9150.
+[33m[1m⚠ [22m[39m It appears you are running in a CI environment. You can avoid downloading the Storage Emulator repeatedly by caching the /home/runner/.cache/firebase/emulators directory.
+[36m[1mi  storage:[22m[39m downloading cloud-storage-rules-runtime-v1.1.3.jar...
+
+[36m[1mi  functions:[22m[39m Watching "/home/runner/work/acm-docs-ios/acm-docs-ios/functions" for Cloud Functions...
+[32m[1m✔  functions:[22m[39m Using node@22 from host.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+Serving at port 8092
+
+[32m[1m✔  functions:[22m[39m Loaded functions definitions from source: admin, beforeCreate, beforeSignIn, billingChange, billingCheckout, billingPortal, blobRemoved, blobStored, blockDevice, chatBlock, chatDirect, chatGroup, chatMsgCreated, chatMsgDeleted, claimPrimary, contactRequest, deviceSession, emailCodeSend, emailCodeSet, emailVerifyCheck, emailVerifySend, expirePlans, groupAnswer, groupInfo, groupInvite, groupLeave, groupRemove, groupSeats, leaveDevice, pairApprove, pairGet, pairPoll, pairStart, planStatus, registerDevice, reportAccount, stripeWebhook, useQuota, vaultSize, wipeAccount.
+[32m[1m✔  functions[europe-west1-admin]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/admin).
+[32m[1m✔  functions[europe-west1-beforeCreate]:[22m[39m [1mproviders/cloud.auth/eventTypes/user.beforeCreate[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/beforeCreate).
+[32m[1m✔  functions[europe-west1-beforeSignIn]:[22m[39m [1mproviders/cloud.auth/eventTypes/user.beforeSignIn[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/beforeSignIn).
+[32m[1m✔  functions[europe-west1-billingChange]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/billingChange).
+[32m[1m✔  functions[europe-west1-billingCheckout]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/billingCheckout).
+[32m[1m✔  functions[europe-west1-billingPortal]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/billingPortal).
+[32m[1m✔  functions[europe-west1-blobRemoved]:[22m[39m [1mstorage[22m function initialized.
+[32m[1m✔  functions[europe-west1-blobStored]:[22m[39m [1mstorage[22m function initialized.
+[32m[1m✔  functions[europe-west1-blockDevice]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/blockDevice).
+[32m[1m✔  functions[europe-west1-chatBlock]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/chatBlock).
+[32m[1m✔  functions[europe-west1-chatDirect]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/chatDirect).
+[32m[1m✔  functions[europe-west1-chatGroup]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/chatGroup).
+[32m[1m✔  functions[europe-west1-chatMsgCreated]:[22m[39m [1mfirestore[22m function initialized.
+[32m[1m✔  functions[europe-west1-chatMsgDeleted]:[22m[39m [1mfirestore[22m function initialized.
+[32m[1m✔  functions[europe-west1-claimPrimary]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/claimPrimary).
+[32m[1m✔  functions[europe-west1-contactRequest]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/contactRequest).
+[32m[1m✔  functions[europe-west1-deviceSession]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/deviceSession).
+[32m[1m✔  functions[europe-west1-emailCodeSend]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/emailCodeSend).
+[32m[1m✔  functions[europe-west1-emailCodeSet]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/emailCodeSet).
+[32m[1m✔  functions[europe-west1-emailVerifyCheck]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/emailVerifyCheck).
+[32m[1m✔  functions[europe-west1-emailVerifySend]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/emailVerifySend).
+[36m[1mi  functions[europe-west1-expirePlans]:[22m[39m function ignored because the pubsub emulator does not exist or is not running.
+[32m[1m✔  functions[europe-west1-groupAnswer]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/groupAnswer).
+[32m[1m✔  functions[europe-west1-groupInfo]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/groupInfo).
+[32m[1m✔  functions[europe-west1-groupInvite]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/groupInvite).
+[32m[1m✔  functions[europe-west1-groupLeave]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/groupLeave).
+[32m[1m✔  functions[europe-west1-groupRemove]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/groupRemove).
+[32m[1m✔  functions[europe-west1-groupSeats]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/groupSeats).
+[32m[1m✔  functions[europe-west1-leaveDevice]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/leaveDevice).
+[32m[1m✔  functions[europe-west1-pairApprove]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/pairApprove).
+[32m[1m✔  functions[europe-west1-pairGet]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/pairGet).
+[32m[1m✔  functions[europe-west1-pairPoll]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/pairPoll).
+[32m[1m✔  functions[europe-west1-pairStart]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/pairStart).
+[32m[1m✔  functions[europe-west1-planStatus]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/planStatus).
+[32m[1m✔  functions[europe-west1-registerDevice]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/registerDevice).
+[32m[1m✔  functions[europe-west1-reportAccount]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/reportAccount).
+[32m[1m✔  functions[europe-west1-stripeWebhook]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/stripeWebhook).
+[32m[1m✔  functions[europe-west1-useQuota]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/useQuota).
+[32m[1m✔  functions[europe-west1-vaultSize]:[22m[39m [1mfirestore[22m function initialized.
+[32m[1m✔  functions[europe-west1-wipeAccount]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/wipeAccount).
+[36m[1mi [22m[39m Running script: [1mnode --test test/server.test.mjs && node test/plans.test.mjs && node test/admin.test.mjs && node test/chat.test.mjs && node test/verify.test.mjs[22m
+TAP version 13
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 119.843462ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 284.180099ms
+# Subtest: setup: account with profile
+ok 1 - setup: account with profile
+  ---
+  duration_ms: 2421.57564
+  type: 'test'
+  ...
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 123.012929ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 118.061118ms
+# Subtest: register needs the account keys, not just the password
+ok 2 - register needs the account keys, not just the password
+  ---
+  duration_ms: 874.142597
+  type: 'test'
+  ...
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 18.644459ms
+# [2026-10-24T12:46:39.423Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x187ee673 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+# false for 'create' @ L105, false for 'create' @ L169, false for 'update' @ L105, false for 'update' @ L169
+# Subtest: rules: the device session reads devices and events; a plain password session does not
+ok 3 - rules: the device session reads devices and events; a plain password session does not
+  ---
+  duration_ms: 174.985743
+  type: 'test'
+  ...
+# [2026-10-24T12:46:39.459Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x187ee674 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+# evaluation error at L86:26 for 'update' @ L86, false for 'update' @ L169, false for 'update' @ L86, false for 'update' @ L169
+# [2026-10-24T12:46:39.480Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x187ee675 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+# evaluation error at L86:26 for 'update' @ L86, false for 'update' @ L169, false for 'update' @ L86, false for 'update' @ L169
+# Subtest: device updates only its own encrypted description
+ok 4 - device updates only its own encrypted description
+  ---
+  duration_ms: 69.994959
+  type: 'test'
+  ...
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 131.670285ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairPoll"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairPoll" in 109.417928ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairPoll"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairPoll" in 13.994431ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairGet"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairGet" in 113.281065ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairApprove"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairApprove" in 102.726621ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairApprove"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairApprove" in 57.982964ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairPoll"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairPoll" in 18.040805ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairPoll"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairPoll" in 7.191744ms
+# Subtest: QR pairing: the laptop gets the account keys and a session
+ok 5 - QR pairing: the laptop gets the account keys and a session
+  ---
+  duration_ms: 3269.721697
+  type: 'test'
+  ...
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-deviceSession"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-deviceSession" in 103.449126ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-deviceSession"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-deviceSession" in 39.719216ms
+# Subtest: session for a registered device needs its key
+ok 6 - session for a registered device needs its key
+  ---
+  duration_ms: 763.430842
+  type: 'test'
+  ...
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-blockDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-blockDevice" in 91.070749ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-blockDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-blockDevice" in 21.555132ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-deviceSession"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-deviceSession" in 6.866652ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-deviceSession"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-deviceSession" in 29.073689ms
+# Subtest: levels: a member cannot block the primary; the primary blocks the member for good
+ok 7 - levels: a member cannot block the primary; the primary blocks the member for good
+  ---
+  duration_ms: 810.673065
+  type: 'test'
+  ...
+# Subtest: cleanup
+ok 8 - cleanup
+  ---
+  duration_ms: 1.9874
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8628.114371
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 2.793927ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 18.252578ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 54.857784ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 1.674147ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 10.747671ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 49.22335ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 1.380213ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 9.085072ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 50.911188ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 126.366251ms
+✓ Basic: plan, 1 device, no offline token
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 121.774687ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 26.740586ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 20.448312ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 15.407083ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 11.874822ms
+✓ Basic: 3 edited documents a month, the 4th is refused
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 18.934846ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 18.425469ms
+✓ The same document twice in a month counts once
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 5.831401ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 5.761957ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 4.734251ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 14.601027ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 1.659455ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 2.340302ms
+✓ Scripts: unknown actions, odd refs, other accounts — refused
+[2026-10-24T12:46:46.855Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x7ca33bcc error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L169, false for 'update' @ L169
+[2026-10-24T12:46:46.862Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x7ca33bcd error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'delete' @ L169
+[2026-10-24T12:46:46.871Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x7ca33bce error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L169, false for 'update' @ L169
+[2026-10-24T12:46:46.879Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x7ca33bcf error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'update' @ L169
+[2026-10-24T12:46:46.886Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x7ca33bd0 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L169, false for 'update' @ L169
+[2026-10-24T12:46:46.894Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x7ca33bd1 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L169, false for 'update' @ L169
+✓ Rules: a device cannot touch its counters, plan, cloud limit, billing or groups
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 33.332116ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairApprove"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairApprove" in 19.941797ms
+✓ Basic: a second device is refused (QR)
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 13.737173ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 13.670461ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailCodeSend"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailCodeSend" in 151.238978ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 37.020848ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 12.771957ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailCodeSend"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailCodeSend" in 29.99288ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 25.163256ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 9.624206ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailCodeSend"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailCodeSend" in 22.459674ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 49.496415ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 5.887226ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 12.732678ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 13.905592ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailCodeSend"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailCodeSend" in 22.3428ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 46.409318ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 5.097264ms
+✓ Basic: password + 24 words on a new device: refused, unless it takes the old one's place
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 12.762712ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 12.620178ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailCodeSend"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailCodeSend" in 39.480656ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 17.612674ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 17.540935ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 16.402247ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 16.055955ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 16.927577ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 14.224159ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 16.034966ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailCodeSet"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailCodeSet" in 111.310182ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 42.745606ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailCodeSet"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailCodeSet" in 13.527438ms
+✓ Two-step by email: a new device needs the emailed code; wrong codes run out
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[2026-10-24T12:46:49.451Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x7ca33bd5 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L105:34 for 'create' @ L105, false for 'create' @ L169, evaluation error at L105:34 for 'update' @ L105, false for 'update' @ L169, false for 'create' @ L105, false for 'create' @ L169
+✓ Cloud: writes stop at the plan limit (Firestore and Storage)
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-blobStored"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-vaultSize"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-blobStored" in 171.150651ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-vaultSize" in 157.961339ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-vaultSize"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-vaultSize" in 23.229672ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-blobStored"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-blobStored" in 27.136745ms
+✓ Cloud: stored blocks are counted by the server
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 73.609912ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 24.706631ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairApprove"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairApprove" in 30.389894ms
+✓ Pro (granted): limits up, signed offline token that cannot be edited
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 25.707332ms
+✓ Expired grant: back to Basic
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-stripeWebhook"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-stripeWebhook" in 100.355441ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-stripeWebhook"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-stripeWebhook" in 1.862261ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-stripeWebhook"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-stripeWebhook" in 0.775501ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 25.539939ms
+✓ Stripe: unsigned or wrongly signed messages are ignored
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-stripeWebhook"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-stripeWebhook" in 45.669131ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 28.060444ms
+✓ Stripe: a signed Family payment → Family for the owner
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-stripeWebhook"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-stripeWebhook" in 13.78682ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 30.401327ms
+✓ Stripe: the same message twice / an older message arriving late change nothing
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-groupInvite"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-groupInvite" in 136.265368ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-groupAnswer"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-groupAnswer" in 126.039022ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-groupAnswer"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-groupAnswer" in 44.059057ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 27.769356ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-groupInfo"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-groupInfo" in 94.103077ms
+✓ Family: the owner invites by @name; the member joins and gets the plan
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-groupInvite"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-groupInvite" in 18.702739ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-groupRemove"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-groupRemove" in 96.08811ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-groupSeats"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-groupSeats" in 99.044814ms
+✓ Family: a member cannot invite, remove or change seats
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-groupRemove"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-groupRemove" in 39.592798ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 21.942151ms
+✓ Family: removed member goes back to Basic
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-stripeWebhook"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-stripeWebhook" in 26.738262ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 27.720394ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 7.00287ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 21.017446ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 48.367319ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 1.60321ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 8.689457ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 44.882836ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-groupInvite"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-groupInvite" in 31.92885ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-groupInvite"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-groupInvite" in 29.335551ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-groupInvite"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+✓ Business: seats are a hard limit (3 = owner + 2)
+[36m[1mi  functions:[22m[39m Finished "europe-west1-groupInvite" in 58.30104ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-stripeWebhook"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-stripeWebhook" in 37.361777ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 25.631631ms
+✓ Cancelled subscription: the owner and the group lose the plan
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-billingCheckout"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-billingCheckout" in 95.028889ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-billingCheckout"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-billingCheckout" in 5.169423ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-billingCheckout"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-billingCheckout" in 16.705827ms
+✓ Checkout needs the consent for immediate start
+
+all passed
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 2.075293ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 10.182921ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 55.555526ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 2.352655ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 11.68642ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 54.292837ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 2.239386ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 10.216762ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 4.529377ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 8.540731ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 1.824514ms
+✓ Panel: an app account (even with a device session) is refused
+[2026-10-24T12:46:58.472Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x52fbc9a0 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L169, false for 'update' @ L169
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 1.922568ms
+✓ Panel: an account cannot give itself the admin right
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 119.316464ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 10.723927ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 25.145747ms
+✓ Panel: overview, search by email and by @name
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 22.028806ms
+✓ Sign-ins are logged with the address; devices carry their last address
+✓ Sign-in addresses, reports, promotions, secrets and the panel log are closed to devices
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 25.655617ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 21.830302ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 19.857341ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 19.535682ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 1.445802ms
+✓ Panel: manual plan for family / friends (and back to Basic)
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-reportAccount"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-reportAccount" in 101.107153ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-reportAccount"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-reportAccount" in 5.008851ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-reportAccount"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-reportAccount" in 20.360404ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 7.262543ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 6.09539ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 13.117042ms
+✓ Reports: an account reports another by @name; the panel sees and closes it
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 2.978647ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 2.036274ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 14.407965ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 12.431314ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 36.59723ms
+✓ Promotions: saved in the panel, shown to the app, bad ones refused
+[2026-10-24T12:48:00.691Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x52fbc9a3 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L169, false for 'update' @ L169
+✓ Kill switches: readable by anyone, written only by the panel
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 19.946871ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 11.805263ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 8.617105ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 15.293161ms
+[2026-10-24T12:48:16.767Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x52fbc9a4 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L105:34 for 'create' @ L105, false for 'create' @ L169, evaluation error at L105:34 for 'update' @ L105, false for 'update' @ L169, false for 'create' @ L105, false for 'create' @ L169
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-planStatus"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-planStatus" in 29.026276ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 8.89182ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 20.543538ms
+✓ Kill switches: a paused action and the paused cloud sync are refused on the server
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-vaultSize"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-vaultSize" in 12.173343ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 13.218347ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 8.589294ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 5.303434ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 23.173439ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 9.040877ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 12.696329ms
+✓ Kill switches: new accounts and password sign-ins can be paused
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 14.713775ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 9.696583ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 10.290225ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 9.638746ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 2.797478ms
+✓ Suspension: the account can no longer sign in or use its plan; lifting it restores everything
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 4.625549ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 1.264769ms
+✓ Stripe: status without secrets; malformed keys refused
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-admin"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-admin" in 6.550806ms
+✓ Panel log: every change is written, without keys
+all passed
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 7.702584ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 10.546435ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 40.309048ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 1.572453ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 8.142689ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 39.502099ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 1.236075ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 6.719441ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 38.740878ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatDirect"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatDirect" in 123.987541ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatDirect"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatDirect" in 19.33546ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatDirect"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatDirect" in 5.305287ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatDirect"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatDirect" in 6.289241ms
+✓ Direct chat: the same conversation for both, visible only to its two members
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+✓ Messages: sealed on the device, opened only by the members, signed by the sender
+[2026-10-24T12:49:06.520Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x2cd6185b error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L138:26 for 'create' @ L138, false for 'create' @ L169, false for 'create' @ L138, false for 'create' @ L169
+[2026-10-24T12:49:06.531Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x2cd6185c error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L138:26 for 'create' @ L138, false for 'create' @ L169, false for 'create' @ L138, false for 'create' @ L169
+[2026-10-24T12:49:06.544Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x2cd6185d error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L138:26 for 'create' @ L138, false for 'create' @ L169, false for 'create' @ L138, false for 'create' @ L169
+[2026-10-24T12:49:06.557Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x2cd6185e error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L138:26 for 'create' @ L138, false for 'create' @ L169, false for 'create' @ L138, false for 'create' @ L169
+[2026-10-24T12:49:06.567Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x2cd6185f error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L138, false for 'create' @ L169
+[2026-10-24T12:49:06.585Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x2cd61860 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L138:26 for 'create' @ L138, false for 'create' @ L169, Property fid is undefined on object. for 'create' @ L138, false for 'create' @ L169
+[2026-10-24T12:49:06.603Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x2cd61861 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L133:24 for 'update' @ L133, false for 'update' @ L169, false for 'update' @ L133, false for 'update' @ L169
+✓ Messages: no writing as someone else, into others' chats, or with extra fields
+[2026-10-24T12:49:06.650Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x2cd61863 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L150:26 for 'delete' @ L150, false for 'delete' @ L169, false for 'delete' @ L150, false for 'delete' @ L169
+✓ Messages: only the sender deletes its own message
+✓ Conversation list: each account sees only its own conversations
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgCreated"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgCreated" in 106.435543ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgCreated"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgCreated" in 15.749232ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatGroup"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatGroup" in 170.56281ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatGroup"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatGroup" in 22.395216ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatGroup"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatGroup" in 26.634106ms
+[2026-10-24T12:49:07.781Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x2cd61864 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L138:26 for 'create' @ L138, false for 'create' @ L169, false for 'create' @ L138, false for 'create' @ L169
+✓ Groups: created with a sealed name; only admins add or remove; a removed member reads nothing new
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatGroup"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatGroup" in 28.111342ms
+✓ Groups: leaving; the last admin hands over to a remaining member
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatGroup"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatGroup" in 28.991974ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatGroup"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatGroup" in 24.787287ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatGroup"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatGroup" in 23.71597ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatGroup"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatGroup" in 47.849066ms
+✓ Groups: whoever left cannot be added back; the last one out deletes the conversation
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgDeleted"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgDeleted" in 11.231949ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgCreated"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgCreated" in 2.94231ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgCreated"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgCreated" in 15.392154ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgCreated"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgCreated" in 2.498931ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgCreated"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgCreated" in 1.646024ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgCreated"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgCreated" in 1.393963ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgCreated"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgCreated" in 1.437519ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgCreated"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgCreated" in 12.542248ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgDeleted"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgDeleted" in 3.678481ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgDeleted"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgDeleted" in 1.899317ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgDeleted"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgDeleted" in 1.886798ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatBlock"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatBlock" in 90.044925ms
+[2026-10-24T12:49:09.012Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x2cd61862 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L138:26 for 'create' @ L138, false for 'create' @ L169, false for 'create' @ L138, false for 'create' @ L169
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatBlock"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatBlock" in 12.240663ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgCreated"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatBlock"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatBlock" in 9.549153ms
+✓ Blocking: a blocked direct conversation takes no new messages either way
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgCreated" in 11.959945ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-blobStored"
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Finished "europe-west1-blobStored" in 52.837589ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-blobRemoved"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-blobRemoved" in 3.603618ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-useQuota"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-useQuota" in 15.253903ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-blobStored"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-blobStored" in 9.72414ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgCreated"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgCreated" in 10.233726ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgDeleted"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-blobRemoved"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgDeleted" in 32.439381ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-blobRemoved" in 2.45121ms
+✓ Documents: stored only by members and only after the plan counted them
+[2026-10-24T12:49:40.424Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x2cd61866 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L138:26 for 'create' @ L138, false for 'create' @ L169, false for 'create' @ L138, false for 'create' @ L169
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatDirect"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatDirect" in 9.425424ms
+✓ Kill switch: chat paused from the control panel stops new conversations and messages
+all passed
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-chatMsgCreated"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-chatMsgCreated" in 13.783037ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 6.288656ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 12.531912ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailVerifySend"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailVerifySend" in 116.483841ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailVerifyCheck"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailVerifyCheck" in 99.18044ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailVerifyCheck"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailVerifyCheck" in 1.867348ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailVerifyCheck"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailVerifyCheck" in 14.774562ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailVerifyCheck"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailVerifyCheck" in 7.316191ms
+✓ Email code: sent by the server, wrong codes refused, the right one confirms the account
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 1.436157ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 7.084467ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailVerifySend"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailVerifySend" in 29.700529ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailVerifyCheck"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailVerifyCheck" in 9.978028ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailVerifyCheck"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailVerifyCheck" in 10.861447ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailVerifyCheck"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailVerifyCheck" in 9.36938ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailVerifyCheck"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailVerifyCheck" in 8.598757ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailVerifyCheck"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailVerifyCheck" in 8.17035ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-emailVerifyCheck"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-emailVerifyCheck" in 8.956156ms
+✓ Email code: five wrong tries end the code
+all passed
+[32m[1m✔ [22m[39m Script exited successfully (code 0)
+[36m[1mi  emulators:[22m[39m Shutting down emulators.
+[36m[1mi  functions:[22m[39m Stopping Functions Emulator
+[36m[1mi  firestore:[22m[39m Stopping Firestore Emulator
+[36m[1mi  auth:[22m[39m Stopping Authentication Emulator
+[36m[1mi  storage:[22m[39m Stopping Storage Emulator
+[36m[1mi  eventarc:[22m[39m Stopping Eventarc Emulator
+[36m[1mi  tasks:[22m[39m Stopping Cloud Tasks Emulator
+[36m[1mi  hub:[22m[39m Stopping emulator hub
+[36m[1mi  logging:[22m[39m Stopping Logging Emulator
