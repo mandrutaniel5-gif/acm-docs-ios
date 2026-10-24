@@ -161,7 +161,7 @@ const App = (() => {
     // invoices card
     const s = Invoice.summary();
     $('mc-amount').innerHTML = s ? `${Invoice.money(s.month)}<small>${escapeHtml(s.currency)}</small>` : `0,00<small>lei</small>`;
-    $('mc-sub').textContent = !s ? 'Configurează firma și emite prima factură' : s.unpaidCount ? `${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} · clienții îți datorează ${Invoice.money(s.unpaid)} ${s.currency}` : `${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} luna aceasta · toate plătite`;
+    $('mc-sub').textContent = !s ? 'Configurează firma și emite prima factură' : !s.monthCount ? (s.unpaidCount ? `Clienții îți datorează ${Invoice.money(s.unpaid)} ${s.currency}` : 'Nicio factură luna aceasta') : s.unpaidCount ? `${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} · clienții îți datorează ${Invoice.money(s.unpaid)} ${s.currency}` : `${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} luna aceasta · toate plătite`;
     $('act-invoice-sub').textContent = s && s.last ? `${I18n.t('Ultima:')} ${s.last.series}-${String(s.last.number).padStart(4, '0')}` : 'Nouă';
     // business card
     const bc = $('home-biz');
@@ -1137,7 +1137,7 @@ const App = (() => {
   document.addEventListener('DOMContentLoaded', boot);
 
   return {
-    chooseTool, pickImage, openPath, recentFiles: () => files().filter((f) => Host.exists(f.path)), renderView, ensureClosed: async () => (await ensureSaved()) && (await Office.ensureSaved()), quietScanHint, save, saveAs, closeDoc, addPdf, showScreen, showHome, showView, rememberFile, forgetPath, scan, back,
+    chooseTool, pickImage, openPath, newBlank, openDialog, renderHome, recentFiles: () => files().filter((f) => Host.exists(f.path)), renderView, ensureClosed: async () => (await ensureSaved()) && (await Office.ensureSaved()), quietScanHint, save, saveAs, closeDoc, addPdf, showScreen, showHome, showView, rememberFile, forgetPath, scan, back,
     get copyPath() { return copyPath; },
   };
 })();

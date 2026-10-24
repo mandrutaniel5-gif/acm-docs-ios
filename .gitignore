@@ -13,3 +13,5 @@ build/android/keystore.properties
 *.mobileprovision
 functions/.env
 functions/.env.local
+test/ui/out/
+test/ui/out-fn/

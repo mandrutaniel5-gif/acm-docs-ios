@@ -1,0 +1,200 @@
+/* ACM Docs 2.6 — the iOS 26 / 27 inspired look ("v26" on <html>).
+   One idea carries it: light passing through glass. A calm grouped background with one soft light at
+   the top, content on clean surfaces, and glass only where it floats above the content (bars, the
+   Create button, sheets). Motion is spring-based and always answers a touch. */
+
+html.v26 {
+  --spring: linear(0, 0.0667, 0.2048, 0.3577, 0.4991, 0.6189, 0.7154, 0.7905, 0.8475, 0.89, 0.9213, 0.9441, 0.9605, 0.9722, 0.9805, 0.9864, 0.9905, 0.9934, 0.9955, 0.9969, 0.9978, 0.9985, 0.999, 0.9995, 1);
+  --spring-bounce: linear(0, 0.034, 0.1184, 0.2311, 0.3555, 0.4799, 0.5962, 0.6998, 0.7883, 0.8609, 0.9184, 0.962, 0.9937, 1.0152, 1.0287, 1.0358, 1.0383, 1.0376, 1.0347, 1.0305, 1.0258, 1.021, 1.0164, 1.0123, 1.0088, 1.0059, 1.0036, 1.0018, 1.0005, 0.9996, 0.999, 0.9987, 0.9985, 0.9986, 0.9988, 0.9994, 1);
+  --glass: rgba(255, 255, 255, .64);
+  --glass-bar: rgba(250, 250, 252, .88);
+  --glass-edge: rgba(255, 255, 255, .9);
+  --glass-rim: rgba(0, 0, 0, .06);
+  --glass-blur: blur(26px) saturate(185%);
+  --glass-lift: 0 8px 28px rgba(15, 23, 42, .10), 0 1px 3px rgba(15, 23, 42, .06);
+  --ink: #1d1d1f;
+  --r-group: 22px;
+}
+html.v26[data-theme="dark"] {
+  --glass: rgba(44, 44, 48, .58);
+  --glass-bar: rgba(38, 38, 42, .88);
+  --glass-edge: rgba(255, 255, 255, .16);
+  --glass-rim: rgba(255, 255, 255, .08);
+  --glass-lift: 0 8px 28px rgba(0, 0, 0, .5), 0 1px 3px rgba(0, 0, 0, .4);
+  --ink: #f5f5f7;
+}
+/* Apple's own typeface where the system has it (iPhone, iPad, Mac); Inter elsewhere */
+html.v26.ios { --font: -apple-system, 'SF Pro Text', 'Inter', system-ui, sans-serif; }
+
+/* ---------------------------------------------------------------- the light behind the glass */
+html.v26 #v-home .vscroll {
+  background:
+    radial-gradient(120% 60% at 18% -8%, rgba(0, 122, 255, .10), transparent 60%),
+    radial-gradient(90% 50% at 92% -4%, rgba(88, 86, 214, .08), transparent 62%),
+    var(--bg);
+}
+html.v26[data-theme="dark"] #v-home .vscroll {
+  background:
+    radial-gradient(120% 60% at 18% -8%, rgba(10, 132, 255, .20), transparent 60%),
+    radial-gradient(90% 50% at 92% -4%, rgba(94, 92, 230, .16), transparent 62%),
+    var(--bg);
+}
+
+/* ---------------------------------------------------------------- pressing things */
+html.v26 :is(.q, .row, .pill, .btn, .money-card, .fs-step, .cs-tile, #tabbar button, .srow) {
+  transition: transform .42s var(--spring-bounce), background-color .2s, box-shadow .2s, opacity .2s;
+}
+html.v26 :is(.q, .money-card, .cs-tile, .pill, .btn):active { transform: scale(.955); transition-duration: .12s; transition-timing-function: ease-out; }
+html.v26 :is(.row, .fs-step, .srow):active { transform: scale(.985); transition-duration: .12s; }
+
+/* ================================================================= phone */
+@media (max-width: 720px) {
+  html.v26 .vwrap { padding: 8px 20px 28px; }
+
+  /* large title, like the system apps: the name of the place you are in */
+  html.v26 .hero { margin: 4px 0 18px; }
+  html.v26 .hero-top { display: flex; align-items: flex-end; justify-content: space-between; min-height: 52px; }
+  html.v26 .hero-brand { margin: 0; gap: 0; }
+  html.v26 .hero-brand img, html.v26 .hero-brand small { display: none; }
+  html.v26 .hero-brand span { font-size: 34px; font-weight: 700; letter-spacing: -.026em; line-height: 1.1; color: var(--ink); }
+  html.v26 .vhead h1 { font-size: 34px; font-weight: 700; letter-spacing: -.026em; }
+  html.v26 .hero-acts .ib, html.v26 .hero-acts button {
+    background: var(--glass); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+    box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 0 0 .5px var(--glass-rim), 0 2px 8px rgba(15, 23, 42, .06);
+  }
+
+  /* the six ways to start: app icons on one glass shelf, no repeated captions */
+  html.v26 .quick {
+    grid-template-columns: repeat(3, 1fr); gap: 18px 6px; padding: 20px 10px 16px; border-radius: 28px;
+    background: var(--glass); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+    box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 0 0 .5px var(--glass-rim), var(--glass-lift);
+  }
+  html.v26 .q { background: none; box-shadow: none; padding: 0; gap: 0; border-radius: 16px; }
+  html.v26 .q small { display: none; }
+  html.v26 .q b { font-size: 12.5px; font-weight: 550; margin-top: 8px; letter-spacing: 0; color: var(--ink); }
+  /* squircle icons with the light coming from above, like the ones on the Home Screen */
+  html.v26 .qi { width: 58px; height: 58px; border-radius: 15px; position: relative;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), inset 0 -1px 0 rgba(0, 0, 0, .12), 0 4px 10px -2px rgba(15, 23, 42, .22); }
+  html.v26 .qi::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, 0) 52%); pointer-events: none; }
+  html.v26 .qi svg { width: 28px; height: 28px; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .18)); }
+
+  /* first steps (only until they are done) */
+  html.v26 .first-steps { margin-top: 18px; border-radius: var(--r-group); background: var(--surface); box-shadow: var(--shadow-1); overflow: hidden; }
+  html.v26 .fs-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 4px; }
+  html.v26 .fs-head b { font-size: 17px; font-weight: 650; letter-spacing: -.012em; }
+  html.v26 .fs-head small { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  html.v26 .fs-bar { margin: 8px 18px 6px; height: 4px; border-radius: 2px; background: var(--fill); overflow: hidden; }
+  html.v26 .fs-bar i { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width .8s var(--spring); }
+  html.v26 .fs-step { width: 100%; display: flex; align-items: center; gap: 14px; padding: 12px 18px; text-align: left; position: relative; }
+  html.v26 .fs-step:not(:last-child)::after { content: ''; position: absolute; left: 58px; right: 0; bottom: 0; height: .5px; background: var(--line); }
+  html.v26 .fs-n { width: 26px; height: 26px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 13px; font-weight: 650; color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
+  html.v26 .fs-step.done .fs-n { background: var(--green); color: #fff; box-shadow: none; }
+  html.v26 .fs-step.done .fs-n svg { width: 15px; height: 15px; }
+  html.v26 .fs-t { flex: 1; min-width: 0; }
+  html.v26 .fs-t b { display: block; font-size: 15px; font-weight: 600; }
+  html.v26 .fs-t small { display: block; font-size: 13px; color: var(--muted); line-height: 1.35; margin-top: 1px; }
+  html.v26 .fs-step.done .fs-t b { color: var(--muted); font-weight: 500; }
+  html.v26 .fs-step.done .fs-t small { display: none; }
+  html.v26 .fs-step .chev { color: var(--faint); }
+  html.v26 .fs-step.next { background: linear-gradient(90deg, var(--accent-soft), transparent 70%); }
+
+  /* money: one calm accent surface, the number is the design */
+  html.v26 .cards2 { margin-top: 18px; gap: 12px; }
+  html.v26 .money-card { border-radius: var(--r-group); padding: 18px 20px 20px; background: linear-gradient(180deg, #1a8cff, #006be6); box-shadow: 0 10px 26px -8px rgba(0, 107, 230, .55), inset 0 1px 0 rgba(255, 255, 255, .28); }
+  html.v26 .money-card::after { display: none; }
+  html.v26 .mc-amount { font-size: 40px; font-weight: 700; letter-spacing: -.03em; }
+  /* a new person sees only how to start; the rest appears once there is something to show */
+  html.v26 .first-run :is(.money-card, .biz-card.empty, .sec-tip, .sect-h, #recent-list) { display: none; }
+  html.v26 .biz-card { border-radius: var(--r-group); box-shadow: var(--shadow-1); }
+
+  /* inset grouped lists */
+  html.v26 .sect-h { margin: 28px 4px 8px; }
+  html.v26 .sect-h h2 { font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+  html.v26 .list-card { border-radius: var(--r-group); }
+  html.v26 .row:not(:last-child)::after { height: .5px; }
+  html.v26 .sec-tip { border-radius: var(--r-group); }
+
+  /* the bar: a floating glass capsule for the places, and Create apart from it, on the right */
+  html.v26 .vscroll { padding-bottom: calc(104px + var(--safe-b)); }
+  html.v26 #tabbar {
+    height: calc(64px + var(--safe-b)); padding: 0 16px calc(var(--safe-b) + 6px) 16px; gap: 0; background: none; border: 0;
+    -webkit-backdrop-filter: none; backdrop-filter: none; pointer-events: none;
+  }
+  html.v26 #tabbar::before {
+    content: ''; position: absolute; left: 16px; right: 90px; bottom: calc(var(--safe-b) + 6px); height: 62px; border-radius: 31px; pointer-events: auto;
+    background: var(--glass-bar); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+    box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 rgba(255, 255, 255, .25), inset 0 0 0 .5px var(--glass-rim), var(--glass-lift);
+  }
+  html.v26 #tabbar button { pointer-events: auto; position: relative; z-index: 1; height: 62px; flex: 1; max-width: calc((100% - 74px) / 4); border-radius: 26px; }
+  html.v26 #tabbar button:not(.tb-plus) small { font-size: 10px; font-weight: 600; letter-spacing: .01em; }
+  html.v26 #tabbar button:not(.tb-plus) svg { width: 24px; height: 24px; }
+  html.v26 #tabbar button.on:not(.tb-plus) { color: var(--accent); }
+  /* the selected place sits in a small lens */
+  html.v26 #tabbar button.on:not(.tb-plus)::before { content: ''; position: absolute; inset: 5px 3px; border-radius: 24px; background: rgba(0, 122, 255, .10); z-index: -1; }
+  html.v26 #tabbar .tb-plus {
+    order: 9; position: absolute; right: 16px; bottom: calc(var(--safe-b) + 6px); width: 62px; height: 62px; max-width: none; margin: 0; border-radius: 50%;
+    background: radial-gradient(120% 120% at 30% 15%, #49a6ff, #0a7cff 45%, #0062d6); color: #fff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -2px 4px rgba(0, 40, 120, .25), 0 10px 24px -6px rgba(0, 98, 214, .6);
+  }
+  html.v26 #tabbar .tb-plus svg { width: 28px; height: 28px; transition: transform .5s var(--spring-bounce); }
+  html.v26.create-open #tabbar .tb-plus svg { transform: rotate(45deg); }
+  html.v26 #toasts { bottom: calc(86px + var(--safe-b)); }
+
+  /* ---------------------------------------------------------------- Create: grows out of the button */
+  html.v26 .create-sheet {
+    position: fixed; z-index: 210; left: 12px; right: 12px; bottom: calc(var(--safe-b) + 80px); border-radius: 30px; padding: 14px 12px 8px;
+    background: var(--glass-bar); -webkit-backdrop-filter: blur(34px) saturate(190%); backdrop-filter: blur(34px) saturate(190%);
+    box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 0 0 .5px var(--glass-rim), 0 24px 60px -12px rgba(15, 23, 42, .35);
+    transform-origin: calc(100% - 19px) calc(100% + 37px);
+    animation: cs-grow .55s var(--spring-bounce) both;
+  }
+  html.v26 .create-sheet.closing { animation: cs-shrink .26s cubic-bezier(.4, 0, .9, .6) both; }
+  html.v26 .create-sheet > * { animation: cs-in .45s var(--spring) both; animation-delay: .07s; }
+  html.v26 .create-sheet .cs-list { animation-delay: .11s; }
+  html.v26 .cs-title { font-size: 13px; font-weight: 600; color: var(--muted); padding: 2px 8px 10px; }
+  html.v26 .cs-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  html.v26 .cs-tile { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 4px 12px; border-radius: 20px; background: rgba(255, 255, 255, .55); box-shadow: inset 0 0 0 .5px var(--glass-rim); font-size: 13px; font-weight: 600; color: var(--ink); }
+  html.v26[data-theme="dark"] .cs-tile { background: rgba(255, 255, 255, .07); }
+  html.v26 .cs-tile .qi { width: 44px; height: 44px; border-radius: 12px; }
+  html.v26 .cs-tile .qi svg { width: 22px; height: 22px; }
+  html.v26 .cs-list { margin-top: 8px; }
+  html.v26 .cs-list button { display: flex; align-items: center; gap: 14px; width: 100%; height: 50px; padding: 0 10px; border-radius: 14px; font-size: 16px; color: var(--ink); text-align: left; }
+  html.v26 .cs-list button:active { background: var(--press); }
+  html.v26 .cs-list button svg { width: 22px; height: 22px; color: var(--muted); fill: currentColor; }
+  html.v26 .cs-list hr { border: 0; height: .5px; background: var(--line); margin: 4px 10px; }
+  html.v26 .cs-back { position: fixed; inset: 0; z-index: 205; background: rgba(15, 23, 42, .16); animation: fadein .3s; }
+  html.v26 .cs-back.closing { animation: fadeout .22s both; }
+  @keyframes cs-grow { from { transform: scale(.16, .13); opacity: 0; } 25% { opacity: 1; } to { transform: none; } }
+  @keyframes cs-shrink { to { transform: scale(.12, .07); opacity: 0; } }
+  @keyframes cs-in { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
+  @keyframes fadeout { to { opacity: 0; } }
+
+  /* sheets and dialogs: glass, a deeper radius, spring in */
+  html.v26 .modal { border-radius: 32px 32px 0 0; animation: sheetin .5s var(--spring); }
+  html.v26 .sheet-grip { width: 36px; height: 5px; background: rgba(120, 120, 128, .3); }
+
+  /* one message at a time, as a floating glass pill */
+  html.v26 .toast { border-radius: 22px; padding: 13px 18px; background: rgba(30, 30, 32, .82); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); box-shadow: 0 12px 30px -8px rgba(0, 0, 0, .35); animation: toastin .5s var(--spring-bounce) both; }
+  html.v26 .toast.leaving { animation: fadeout .2s both; }
+  @keyframes toastin { from { opacity: 0; transform: translateY(14px) scale(.94); } to { opacity: 1; transform: none; } }
+
+  /* editors: the top bar floats over the page */
+  html.v26 .otop, html.v26 #topbar { background: transparent; border-bottom: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.v26 *, html.v26 *::before, html.v26 *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* ---------------------------------------------------------------- editors on the phone */
+@media (max-width: 720px) {
+  /* the document reads like a page of its own: real text size, soft edge, no grey frame around it */
+  html.v26 #wr-scroll { background: var(--bg); }
+  html.v26 #wr-page.screen-view { border-radius: 18px; box-shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 8px 30px -10px rgba(15, 23, 42, .14); margin: 6px auto 0; }
+  /* the formatting tools float as one glass capsule above the keyboard area */
+  html.v26 .otools {
+    margin: 0 10px calc(8px + var(--safe-b)); padding: 5px 8px; min-height: 54px; border-radius: 27px; border: 0;
+    background: var(--glass-bar); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+    box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 0 0 .5px var(--glass-rim), var(--glass-lift);
+  }
+}
