@@ -173,7 +173,7 @@ html.v26 :is(.row, .srow):active { transform: scale(.985); transition-duration: 
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, .95), inset 0 -8px 14px -6px rgba(255, 255, 255, .8), 0 10px 26px -8px rgba(15, 23, 42, .3); }
   html.v26[data-theme="dark"] #tab-lens.moving { background: linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .08)); }
   html.v26 #tabbar button { pointer-events: auto; position: relative; z-index: 2; height: 62px; flex: 1; border-radius: 26px; background: none; transition: color .25s; }
-  html.v26 #tabbar button:not(.tb-plus) small { font-size: 10px; font-weight: 600; letter-spacing: .01em; }
+  html.v26 #tabbar button:not(.tb-plus) small { font-size: 10.5px; font-weight: 600; letter-spacing: 0; }
   html.v26 #tabbar button:not(.tb-plus) svg { width: 24px; height: 24px; transition: transform .5s var(--spring-bounce); }
   html.v26 #tabbar button.on:not(.tb-plus) { color: var(--accent); }
   html.v26 #tabbar button.on:not(.tb-plus) svg { transform: scale(1.06); }
@@ -287,3 +287,66 @@ html.v26[data-theme="dark"] .pill:not(.primary) { background: rgba(255, 255, 255
 
 /* the money card sits in the same family: a little calmer glow under it */
 html.v26 .money-card { box-shadow: 0 14px 30px -16px rgba(0, 80, 200, .55), 0 2px 5px rgba(0, 40, 120, .14); }
+
+/* ================================================================= editors and screens on the phone */
+@media (max-width: 720px) {
+  /* PDF editor: the name keeps its room; the page number floats over the pages as a small glass pill */
+  html.v26 #topbar #btn-redo, html.v26 #topbar #btn-search, html.v26 #topbar #btn-prev, html.v26 #topbar #btn-next, html.v26 #topbar .vdiv { display: none; }
+  html.v26 #page-ind {
+    position: absolute; z-index: 6; top: 70px; left: 50%; transform: translateX(-50%); min-width: 0; padding: 5px 12px; border-radius: 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--ink); pointer-events: none;
+    background: var(--lg-solid); -webkit-backdrop-filter: var(--lg-blur); backdrop-filter: var(--lg-blur); box-shadow: var(--lg-depth);
+  }
+  html.v26 #doc-title { flex: 1 1 auto; max-width: none; }
+  html.v26 #editor { position: absolute; }
+  html.v26 #toolbar {
+    margin: 0 10px calc(8px + var(--safe-b)); min-height: 56px; padding: 4px 8px; border-radius: 28px; border: 0;
+    background: var(--lg-solid); -webkit-backdrop-filter: var(--lg-blur); backdrop-filter: var(--lg-blur); box-shadow: var(--meniscus), var(--lg-depth);
+  }
+  html.v26 #toolbar .tool { border-radius: 20px; }
+  html.v26 #toolbar .tool.active, html.v26 #toolbar .tool.on { background: rgba(0, 122, 255, .12); }
+
+  /* the sheet tabs and small links get room for a finger */
+  html.v26 #sh-tabs .stab { min-height: 34px; padding: 0 14px; border-radius: 17px; }
+  html.v26 :is(.auth-link, .auth-legal a) { display: inline-block; padding: 8px 2px; margin: -8px 0; }
+
+  /* account screens: the card floats as glass over the blue */
+  html.v26 #auth-card { border-radius: 30px; box-shadow: var(--meniscus), 0 20px 50px -20px rgba(15, 23, 42, .35); }
+  html.v26 .auth :is(input.in, .in) { border-radius: 14px; }
+
+  /* lists in Files, Invoices, Settings: grouped glass, large titles */
+  html.v26 :is(.set-card, .inv-card, .file-card, .fcard, .stat) { border-radius: 22px; }
+  html.v26 .seg { border-radius: 14px; padding: 3px; background: rgba(118, 118, 128, .12); }
+  html.v26 .seg button { border-radius: 11px; }
+  html.v26 .seg button.on { background: var(--surface); box-shadow: 0 3px 8px -2px rgba(15, 23, 42, .16), inset 0 1px 0 rgba(255, 255, 255, .9); }
+  html.v26[data-theme="dark"] .seg button.on { background: rgba(255, 255, 255, .16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15); }
+  html.v26 .search { border-radius: 14px; }
+}
+
+/* ================================================================= tablets and computers */
+@media (min-width: 721px) {
+  html.v26 .quick { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; padding: 22px 16px 18px; border-radius: 30px; }
+  html.v26 .q { background: none; box-shadow: none; align-items: center; text-align: center; padding: 6px 4px; gap: 0; }
+  html.v26 .q small { display: none; }
+  html.v26 .q b { font-size: 13.5px; font-weight: 550; margin-top: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  html.v26 .qi { width: 60px; height: 60px; border-radius: 16px; position: relative; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), inset 0 -1px 0 rgba(0, 0, 0, .12), 0 6px 14px -4px rgba(15, 23, 42, .3); }
+  html.v26 .qi::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, 0) 50%); pointer-events: none; }
+  html.v26 .qi svg { width: 29px; height: 29px; }
+  html.v26 .money-card { border-radius: 26px; overflow: hidden; background: linear-gradient(160deg, #0a84ff 0%, #0063e0 55%, #3a3fd8 100%); }
+  html.v26 .money-card .water { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; border-radius: inherit; }
+  html.v26 .money-card > :not(.water) { position: relative; z-index: 2; }
+  html.v26 .money-card::after { content: none; }
+  html.v26 :is(.biz-card, .list-card, .sec-tip) { border-radius: 24px; }
+  html.v26 #side { background: var(--lg-solid); -webkit-backdrop-filter: var(--lg-blur); backdrop-filter: var(--lg-blur); border-right: 0; box-shadow: inset -1px 0 0 rgba(0, 0, 0, .05); }
+  html.v26 #side .new-btn { border-radius: 16px; background: linear-gradient(180deg, #2b95ff, #0a7aff 55%, #006ee6); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 8px 18px -8px rgba(0, 110, 230, .6); }
+  html.v26 #side .nav button { border-radius: 12px; }
+  /* iPad: a business card that is too narrow keeps its button on one line */
+  html.v26 .biz-card .pill { white-space: nowrap; }
+}
+/* iPad portrait: the side bar takes less room */
+@media (min-width: 721px) and (max-width: 900px) {
+  html.v26 #side { width: 210px; }
+  html.v26 .quick { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 8px; padding: 20px 12px 16px; }
+  html.v26 .cards2 { grid-template-columns: 1fr; }
+  html.v26 .vwrap { padding: 26px 24px 48px; }
+}

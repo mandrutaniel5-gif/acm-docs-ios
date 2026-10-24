@@ -1818,5 +1818,20 @@
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"見つからない場合は迷惑メールフォルダーも確認してください。コードの有効期限は 15 分です。",
 "Încă nu văd confirmarea. Încearcă din nou.":"まだ確認されていません。もう一度お試しください。",
 "Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"コードの有効期限が切れたか、試行回数が多すぎます。新しいコードをリクエストしてください。",
-"Cine a ieșit din grup nu poate fi adăugat din nou.":"グループを退出した人は再び追加できません。"
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"グループを退出した人は再び追加できません。",
+"PDF gol":"空白のPDF",
+"Nicio factură luna aceasta":"今月の請求書はありません",
+"Atinge orice din pagină ca să-l selectezi · trage ca să-l muți · colțurile îl redimensionează · atinge de două ori un text ca să-l editezi":"ページ上の項目をタップして選択 · ドラッグで移動 · 角でサイズ変更 · テキストをダブルタップして編集",
+"Atinge un text ca să-l modifici sau oriunde în pagină ca să scrii text nou (fontul și mărimea se potrivesc automat)":"テキストをタップして変更、またはページのどこかをタップして新しいテキストを入力（フォントとサイズは自動で合わせます）",
+"Desenează cu degetul":"指で描く",
+"Atinge unde vrei bifa":"チェックマークを付ける場所をタップ",
+"Atinge unde vrei X-ul":"Xを付ける場所をタップ",
+"Atinge pagina ca să pui imaginea (sau trage un dreptunghi pentru mărime)":"ページをタップして画像を配置（またはドラッグしてサイズを指定）",
+"Text pe lățimea ecranului":"画面の幅でテキストを表示",
+"Pagina întreagă":"ページ全体",
+"Atinge pentru titlu":"タップしてタイトルを追加",
+"Atinge pentru text":"タップしてテキストを追加",
+"Atinge pentru subtitlu":"タップしてサブタイトルを追加",
+"Atinge pentru titlul secțiunii":"タップしてセクションタイトルを追加",
+"Caută în document":"書類内を検索"
 };

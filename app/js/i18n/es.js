@@ -1818,5 +1818,20 @@
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"¿No lo encuentras? Revisa también la carpeta de spam. El código es válido durante 15 minutos.",
 "Încă nu văd confirmarea. Încearcă din nou.":"Aún no está confirmado. Inténtalo de nuevo.",
 "Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"El código ha caducado o se ha intentado demasiadas veces. Pide un código nuevo.",
-"Cine a ieșit din grup nu poate fi adăugat din nou.":"Quien ha salido del grupo no puede volver a ser añadido."
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"Quien ha salido del grupo no puede volver a ser añadido.",
+"PDF gol":"PDF en blanco",
+"Nicio factură luna aceasta":"Ninguna factura este mes",
+"Atinge orice din pagină ca să-l selectezi · trage ca să-l muți · colțurile îl redimensionează · atinge de două ori un text ca să-l editezi":"Toca cualquier elemento de la página para seleccionarlo · arrastra para moverlo · las esquinas cambian su tamaño · toca dos veces un texto para editarlo",
+"Atinge un text ca să-l modifici sau oriunde în pagină ca să scrii text nou (fontul și mărimea se potrivesc automat)":"Toca un texto para cambiarlo o en cualquier lugar de la página para escribir texto nuevo (la fuente y el tamaño se ajustan automáticamente)",
+"Desenează cu degetul":"Dibuja con el dedo",
+"Atinge unde vrei bifa":"Toca donde quieras la marca",
+"Atinge unde vrei X-ul":"Toca donde quieras la X",
+"Atinge pagina ca să pui imaginea (sau trage un dreptunghi pentru mărime)":"Toca la página para colocar la imagen (o arrastra un rectángulo para el tamaño)",
+"Text pe lățimea ecranului":"Texto al ancho de la pantalla",
+"Pagina întreagă":"Página completa",
+"Atinge pentru titlu":"Toca para añadir un título",
+"Atinge pentru text":"Toca para añadir texto",
+"Atinge pentru subtitlu":"Toca para añadir un subtítulo",
+"Atinge pentru titlul secțiunii":"Toca para añadir un título de sección",
+"Caută în document":"Buscar en el documento"
 };

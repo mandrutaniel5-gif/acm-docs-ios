@@ -23,6 +23,7 @@ import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Base64;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.Window;
 import android.webkit.ConsoleMessage;
@@ -838,6 +839,27 @@ public class MainActivity extends Activity {
         public void setTheme(final boolean dark, final String color) {
             ui.post(new Runnable() {
                 @Override public void run() { setBars(dark, color); }
+            });
+        }
+
+        /** A short touch in the hand: light, selection, medium, heavy, success, warning, error. */
+        @JavascriptInterface
+        public void haptic(final String kind) {
+            ui.post(new Runnable() {
+                @Override public void run() {
+                    if (web == null) return;
+                    int c;
+                    switch (kind == null ? "" : kind) {
+                        case "selection": c = HapticFeedbackConstants.CLOCK_TICK; break;
+                        case "medium": c = HapticFeedbackConstants.VIRTUAL_KEY; break;
+                        case "heavy": c = HapticFeedbackConstants.LONG_PRESS; break;
+                        case "success": c = Build.VERSION.SDK_INT >= 30 ? HapticFeedbackConstants.CONFIRM : HapticFeedbackConstants.VIRTUAL_KEY; break;
+                        case "warning":
+                        case "error": c = Build.VERSION.SDK_INT >= 30 ? HapticFeedbackConstants.REJECT : HapticFeedbackConstants.LONG_PRESS; break;
+                        default: c = HapticFeedbackConstants.KEYBOARD_TAP;
+                    }
+                    web.performHapticFeedback(c);
+                }
             });
         }
 

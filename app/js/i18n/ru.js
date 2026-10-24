@@ -1818,5 +1818,20 @@
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"Не можете найти? Проверьте также папку «Спам». Код действует 15 минут.",
 "Încă nu văd confirmarea. Încearcă din nou.":"Ещё не подтверждено. Попробуйте снова.",
 "Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"Срок действия кода истёк или было слишком много попыток. Запросите новый код.",
-"Cine a ieșit din grup nu poate fi adăugat din nou.":"Того, кто вышел из группы, нельзя добавить снова."
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"Того, кто вышел из группы, нельзя добавить снова.",
+"PDF gol":"Пустой PDF",
+"Nicio factură luna aceasta":"В этом месяце счетов нет",
+"Atinge orice din pagină ca să-l selectezi · trage ca să-l muți · colțurile îl redimensionează · atinge de două ori un text ca să-l editezi":"Коснитесь любого элемента страницы, чтобы выбрать его · перетащите, чтобы переместить · углы меняют размер · коснитесь текста дважды, чтобы изменить его",
+"Atinge un text ca să-l modifici sau oriunde în pagină ca să scrii text nou (fontul și mărimea se potrivesc automat)":"Коснитесь текста, чтобы изменить его, или любого места страницы, чтобы написать новый текст (шрифт и размер подбираются автоматически)",
+"Desenează cu degetul":"Рисуйте пальцем",
+"Atinge unde vrei bifa":"Коснитесь места, где нужна галочка",
+"Atinge unde vrei X-ul":"Коснитесь места, где нужен X",
+"Atinge pagina ca să pui imaginea (sau trage un dreptunghi pentru mărime)":"Коснитесь страницы, чтобы разместить изображение (или нарисуйте прямоугольник для размера)",
+"Text pe lățimea ecranului":"Текст по ширине экрана",
+"Pagina întreagă":"Вся страница",
+"Atinge pentru titlu":"Коснитесь, чтобы добавить заголовок",
+"Atinge pentru text":"Коснитесь, чтобы добавить текст",
+"Atinge pentru subtitlu":"Коснитесь, чтобы добавить подзаголовок",
+"Atinge pentru titlul secțiunii":"Коснитесь, чтобы добавить заголовок раздела",
+"Caută în document":"Поиск в документе"
 };

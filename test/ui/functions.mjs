@@ -98,7 +98,15 @@ await check('Navigare: Fișiere, Facturi, Setări, înapoi la Acasă (bara de jo
   }
 });
 
-await check('Factură: firmă nouă (2 pași), client, produs, PDF creat', async () => {
+await check('Factură: fără cont cere contul înainte, apoi firmă nouă (2 pași), client, produs, PDF creat', async () => {
+  await pg.click('#act-invoice');
+  await sleep(500);
+  // without an account the app asks for one first (invoices are kept in the account)
+  const sheet = await modal().innerText().catch(() => '');
+  if (!/cont/i.test(sheet)) throw new Error('fără cont nu cere contul înainte de factură');
+  await modal().getByRole('button', { name: 'Nu acum' }).click();
+  await sleep(300);
+  await pg.evaluate(signIn);
   await pg.click('#act-invoice');
   await sleep(500);
   // company setup on first invoice
@@ -122,16 +130,6 @@ await check('Factură: firmă nouă (2 pași), client, produs, PDF creat', async
   await sleep(300);
   const total = (await pg.textContent('#inv-total')).trim();
   if (!/450/.test(total)) throw new Error('totalul nu e 450 (e „' + total + '”)');
-  await pg.click('#inv-create');
-  await sleep(400);
-  await modal().getByRole('button', { name: 'Creează PDF' }).click();
-  await sleep(600);
-  // without an account the app asks for one (documents count against the plan) — then we sign in
-  const sheet = await modal().innerText().catch(() => '');
-  if (!/cont/i.test(sheet)) throw new Error('fără cont nu cere crearea contului');
-  await modal().getByRole('button', { name: 'Nu acum' }).click();
-  await sleep(300);
-  await pg.evaluate(signIn);
   await pg.click('#inv-create');
   await sleep(400);
   await modal().getByRole('button', { name: 'Creează PDF' }).click();

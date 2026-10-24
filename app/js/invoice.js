@@ -1402,6 +1402,11 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
 
   /** Opens the program. opts: {type, from: issued doc to copy, as: type for the copy}. */
   async function open(opts = {}) {
+    // invoices are kept and numbered in the account: ask for it before the form, not after filling it in
+    if (typeof Account !== 'undefined' && Account.current && !Account.current() && typeof Plan !== 'undefined' && Plan.needAccount) {
+      await Plan.needAccount('invoices');
+      return;
+    }
     Biz.migrate();
     biz = Biz.active();
     if (!biz) {

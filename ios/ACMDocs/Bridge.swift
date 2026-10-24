@@ -42,6 +42,7 @@ final class Bridge: NSObject, WKScriptMessageHandler {
         fonts: function () { return S('fonts'); },
         setTheme: function (d, c) { try { S('setTheme', [!!d, c || '']); } catch (e) {} },
         setLang: function (l) { try { S('setLang', [l]); } catch (e) {} },
+        haptic: function (k) { try { window.webkit.messageHandlers.acm.postMessage({ op: 'haptic', kind: String(k || 'light') }); } catch (e) {} },
         exit: function () {},
         request: function (id, op, args) {
           window.webkit.messageHandlers.acm.postMessage({ id: id, op: op, args: args || '{}' });
@@ -167,11 +168,29 @@ final class Bridge: NSObject, WKScriptMessageHandler {
             DispatchQueue.main.async { self.controller?.updateTabbar(visible: visible, active: active) }
             return
         }
+        // a short touch in the hand (the Taptic Engine), answering what the finger just did
+        if let body = message.body as? [String: Any], body["op"] as? String == "haptic" {
+            let kind = body["kind"] as? String ?? "light"
+            DispatchQueue.main.async { Bridge.haptic(kind) }
+            return
+        }
         guard let body = message.body as? [String: Any], let id = (body["id"] as? NSNumber)?.intValue,
               let op = body["op"] as? String else { return }
         let argsText = body["args"] as? String ?? "{}"
         let args = (try? JSONSerialization.jsonObject(with: Data(argsText.utf8))) as? [String: Any] ?? [:]
         handle(id, op, args)
+    }
+
+    static func haptic(_ kind: String) {
+        switch kind {
+        case "selection": UISelectionFeedbackGenerator().selectionChanged()
+        case "medium": UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        case "heavy": UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+        case "success": UINotificationFeedbackGenerator().notificationOccurred(.success)
+        case "warning": UINotificationFeedbackGenerator().notificationOccurred(.warning)
+        case "error": UINotificationFeedbackGenerator().notificationOccurred(.error)
+        default: UIImpactFeedbackGenerator(style: .soft).impactOccurred(intensity: 0.7)
+        }
     }
 
     private func handle(_ id: Int, _ op: String, _ a: [String: Any]) {

@@ -27,6 +27,7 @@ const DEVICES = [
   { id: 'android-large', label: 'Android mare', w: 412, h: 915, dpr: 2.625, platform: 'android', glass: false, touch: true },
   { id: 'ipad-mini', label: 'iPad mini', w: 744, h: 1133, dpr: 2, platform: 'ios', glass: true, touch: true },
   { id: 'ipad-landscape', label: 'iPad 11" orizontal', w: 1194, h: 834, dpr: 2, platform: 'ios', glass: true, touch: true },
+  { id: 'desktop', label: 'Calculator (fereastră 1366×800)', w: 1366, h: 800, dpr: 1, platform: 'android', glass: false, touch: false },
 ];
 const LANGS = ['ro', 'en', 'de', 'ja'];
 
@@ -136,7 +137,19 @@ function audit() {
   // measured on the actual lines of text (not the element box), only between texts of the same
   // layer: content scrolling under a floating bar or a sheet is intended, not a defect
   const layer = (el) => { for (let e = el; e; e = e.parentElement) { const cs = getComputedStyle(e), p = cs.position; if (p === 'fixed' || p === 'sticky' || (p === 'absolute' && (cs.backdropFilter !== 'none' || Number(cs.zIndex) >= 10))) return e; } return null; };
-  const lines = (el) => { const rs = []; for (const n of el.childNodes) if (n.nodeType === 3 && n.textContent.trim()) { const g = document.createRange(); g.selectNodeContents(n); rs.push(...[...g.getClientRects()].filter((q) => q.width > 1 && q.height > 1)); } return rs; };
+  // the visible part of each line: text cut with "…" (overflow hidden) is clipped to its box
+  const lines = (el) => {
+    const rs = [], cs = getComputedStyle(el), clip = cs.overflowX !== 'visible' ? el.getBoundingClientRect() : null;
+    for (const n of el.childNodes) if (n.nodeType === 3 && n.textContent.trim()) {
+      const g = document.createRange(); g.selectNodeContents(n);
+      for (const q of g.getClientRects()) {
+        const r = clip ? { left: Math.max(q.left, clip.left), right: Math.min(q.right, clip.right), top: q.top, bottom: q.bottom } : { left: q.left, right: q.right, top: q.top, bottom: q.bottom };
+        r.width = r.right - r.left; r.height = r.bottom - r.top;
+        if (r.width > 1 && r.height > 1) rs.push(r);
+      }
+    }
+    return rs;
+  };
   for (const t of texts) { t.lines = lines(t.el); t.layer = layer(t.el); }
   const visibleAt = (x, y, a, b) => { const top = document.elementFromPoint(x, y); return top && (a.contains(top) || b.contains(top) || top.contains(a) || top.contains(b)); };
   for (let i = 0; i < texts.length; i++) for (let j = i + 1; j < texts.length; j++) {
@@ -188,15 +201,15 @@ fs.mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch({ executablePath: CHROME });
 const results = [];
 async function runJob({ lang, d, s }) {
-  const ctx = await browser.newContext({ viewport: { width: d.w, height: d.h }, deviceScaleFactor: d.dpr, isMobile: d.w < 700, hasTouch: d.touch, colorScheme: 'light', bypassCSP: true });
+  const ctx = await browser.newContext({ viewport: { width: d.w, height: d.h }, deviceScaleFactor: d.dpr, isMobile: d.w < 700, hasTouch: d.touch, colorScheme: process.env.THEME === 'dark' ? 'dark' : 'light', bypassCSP: true });
   const pg = await ctx.newPage();
   const errors = [];
   pg.on('pageerror', (e) => errors.push(String(e.message || e)));
-  await pg.addInitScript(({ lang, platform, glass, pdf }) => {
+  await pg.addInitScript(({ lang, platform, glass, pdf, theme, look }) => {
     window.__ACM_TEST = { platform, files: { '/docs/Contract.pdf': pdf }, openPick: '/docs/Contract.pdf' };
-    try { localStorage.setItem('acm.lang', lang); localStorage.setItem('acm.lang.chosen', '1'); } catch (e) {}
+    try { localStorage.setItem('acm.lang', lang); localStorage.setItem('acm.lang.chosen', '1'); if (theme) localStorage.setItem('acm.theme', theme); if (look) localStorage.setItem('acm.look', look); } catch (e) {}
     if (glass) document.addEventListener('DOMContentLoaded', () => document.documentElement.classList.add('ios-glass'));
-  }, { lang, platform: d.platform, glass: d.glass, pdf });
+  }, { lang, platform: d.platform, glass: d.glass, pdf, theme: process.env.THEME || '', look: process.env.LOOK || '' });
   await pg.addInitScript(bridge);
   await pg.goto(`http://127.0.0.1:${PORT}/index.html`);
   await pg.waitForFunction(() => { const s = document.getElementById('splash'); return !s || s.classList.contains('hidden') || getComputedStyle(s).opacity === '0' || s.style.display === 'none'; }, null, { timeout: 15000 }).catch(() => {});

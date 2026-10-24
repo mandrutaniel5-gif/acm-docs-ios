@@ -1818,5 +1818,20 @@
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"Nie możesz go znaleźć? Sprawdź też folder Spam. Kod jest ważny 15 minut.",
 "Încă nu văd confirmarea. Încearcă din nou.":"Jeszcze nie potwierdzono. Spróbuj ponownie.",
 "Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"Kod wygasł lub był próbowany zbyt wiele razy. Poproś o nowy kod.",
-"Cine a ieșit din grup nu poate fi adăugat din nou.":"Osoby, która opuściła grupę, nie można dodać ponownie."
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"Osoby, która opuściła grupę, nie można dodać ponownie.",
+"PDF gol":"Pusty PDF",
+"Nicio factură luna aceasta":"Brak faktur w tym miesiącu",
+"Atinge orice din pagină ca să-l selectezi · trage ca să-l muți · colțurile îl redimensionează · atinge de două ori un text ca să-l editezi":"Dotknij dowolnego elementu strony, aby go zaznaczyć · przeciągnij, aby przesunąć · narożniki zmieniają rozmiar · dotknij dwukrotnie tekstu, aby go edytować",
+"Atinge un text ca să-l modifici sau oriunde în pagină ca să scrii text nou (fontul și mărimea se potrivesc automat)":"Dotknij tekstu, aby go zmienić, lub dowolnego miejsca na stronie, aby napisać nowy tekst (czcionka i rozmiar dopasują się automatycznie)",
+"Desenează cu degetul":"Rysuj palcem",
+"Atinge unde vrei bifa":"Dotknij miejsca, w którym ma być znacznik",
+"Atinge unde vrei X-ul":"Dotknij miejsca, w którym ma być X",
+"Atinge pagina ca să pui imaginea (sau trage un dreptunghi pentru mărime)":"Dotknij strony, aby umieścić obraz (lub przeciągnij prostokąt, aby ustawić rozmiar)",
+"Text pe lățimea ecranului":"Tekst na szerokość ekranu",
+"Pagina întreagă":"Cała strona",
+"Atinge pentru titlu":"Dotknij, aby dodać tytuł",
+"Atinge pentru text":"Dotknij, aby dodać tekst",
+"Atinge pentru subtitlu":"Dotknij, aby dodać podtytuł",
+"Atinge pentru titlul secțiunii":"Dotknij, aby dodać tytuł sekcji",
+"Caută în document":"Szukaj w dokumencie"
 };

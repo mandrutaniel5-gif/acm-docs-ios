@@ -246,7 +246,7 @@ const Feel = (() => {
   function water(card) {
     if (!card || card.querySelector('.water')) return;
     const box = card.getBoundingClientRect();
-    const W = Math.round(Math.min(420, Math.max(240, box.width || 362))), H = Math.round(W * Math.max(0.3, Math.min(0.6, (box.height || 150) / (box.width || 362))));
+    const W = Math.round(Math.min(640, Math.max(240, box.width || 362))), H = Math.round(W * Math.max(0.3, Math.min(0.6, (box.height || 150) / (box.width || 362))));
     const cv = el('canvas', { class: 'water', width: W, height: H, 'aria-hidden': 'true' });
     card.prepend(cv);
     const ctx = cv.getContext('2d', { alpha: false });
@@ -352,7 +352,10 @@ const Feel = (() => {
 
   // ---------------------------------------------------------------- wiring
   function init() {
-    try { if (localStorage.getItem('acm.look') === 'v26') root.classList.add('v26'); } catch (e) {}
+    // the 2.6 look is the default; "classic" keeps the previous one
+    let look = null;
+    try { look = localStorage.getItem('acm.look'); } catch (e) {}
+    if (look !== 'classic') root.classList.add('v26');
     try { if (Host.info && Host.info.platform === 'ios') root.classList.add('ios'); } catch (e) {}
     // Create: on the phone it grows out of its button
     const plus = document.getElementById('tab-new');

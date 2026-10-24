@@ -318,7 +318,7 @@ html.i18n-wait body { visibility: hidden; }
 .plan-meter .si svg { width: 17px; height: 17px; fill: currentColor; }
 .pm-tx { flex: 1; min-width: 0; }
 .pm-top { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; margin-bottom: 6px; }
-.pm-top b { font-weight: 550; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pm-top b { font-weight: 550; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pm-top span { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .plan-bar { height: 6px; border-radius: 3px; background: var(--fill); overflow: hidden; }
 .plan-bar span { display: block; height: 100%; border-radius: 3px; background: var(--accent); transition: width .4s ease; }
