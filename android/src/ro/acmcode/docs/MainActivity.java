@@ -853,9 +853,9 @@ public class MainActivity extends Activity {
                         case "selection": c = HapticFeedbackConstants.CLOCK_TICK; break;
                         case "medium": c = HapticFeedbackConstants.VIRTUAL_KEY; break;
                         case "heavy": c = HapticFeedbackConstants.LONG_PRESS; break;
-                        case "success": c = Build.VERSION.SDK_INT >= 30 ? HapticFeedbackConstants.CONFIRM : HapticFeedbackConstants.VIRTUAL_KEY; break;
+                        case "success": c = Build.VERSION.SDK_INT >= 30 ? 16 /* CONFIRM, Android 11+ */ : HapticFeedbackConstants.VIRTUAL_KEY; break;
                         case "warning":
-                        case "error": c = Build.VERSION.SDK_INT >= 30 ? HapticFeedbackConstants.REJECT : HapticFeedbackConstants.LONG_PRESS; break;
+                        case "error": c = Build.VERSION.SDK_INT >= 30 ? 17 /* REJECT, Android 11+ */ : HapticFeedbackConstants.LONG_PRESS; break;
                         default: c = HapticFeedbackConstants.KEYBOARD_TAP;
                     }
                     web.performHapticFeedback(c);
