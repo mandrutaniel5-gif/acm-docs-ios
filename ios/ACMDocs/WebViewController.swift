@@ -279,8 +279,8 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
         if url.scheme == "blob" || url.scheme == "data" || url.scheme == "javascript" || url.scheme == "file" {
             return decisionHandler(.cancel)
         }
-        // links to the web, e-mail, phone: in their own apps
-        UIApplication.shared.open(url)
+        // links to the web, e-mail, phone: in their own apps; any other scheme (other apps' links) is ignored
+        if ["http", "https", "mailto", "tel"].contains(url.scheme?.lowercased() ?? "") { UIApplication.shared.open(url) }
         decisionHandler(.cancel)
     }
 

@@ -33,6 +33,25 @@ try {
     data: { client: { permissions: { disabledUserDeletion: true } }, emailPrivacyConfig: { enableImprovedEmailPrivacy: true } },
   })).data;
   console.log('AUTH OK:', show(after));
+  // passwords: at least 8 characters, enforced by the server too (Firebase alone accepts 6 through its
+  // API, so a script could create accounts with weaker passwords than the app allows)
+  const pol = (await client.request({
+    url: url + '?updateMask=passwordPolicyConfig', method: 'PATCH',
+    data: { passwordPolicyConfig: { passwordPolicyEnforcementState: 'ENFORCE', forceUpgradeOnSignin: false, passwordPolicyVersions: [{ customStrengthOptions: { minPasswordLength: 8, maxPasswordLength: 4096 } }] } },
+  })).data;
+  console.log('PASSWORD POLICY:', JSON.stringify(pol.passwordPolicyConfig || {}).slice(0, 200));
+  // live check: a 6-character password through the public API is refused
+  const API_KEY = 'AIzaSyDsXxKCjxhOeGTZYyYIsm_S6SO6zADe25w';
+  const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: `policy-check-${Date.now()}@acmandrut.com`, password: 'abc123', returnSecureToken: true }),
+  });
+  const j = await r.json();
+  if (r.ok) {
+    console.log('LIVE FAIL: a 6-character password was accepted');
+    await client.request({ url: `https://identitytoolkit.googleapis.com/v1/projects/${PROJECT}/accounts:delete`, method: 'POST', data: { localId: j.localId } });
+    process.exitCode = 1;
+  } else console.log('LIVE OK: short passwords refused by the server (' + ((j.error && j.error.message) || r.status).toString().slice(0, 60) + ')');
 } catch (e) {
   console.log('AUTH CONFIG FAILED:', e.response ? e.response.status + ' ' + JSON.stringify(e.response.data).slice(0, 400) : e.message);
   process.exitCode = 1;

@@ -587,6 +587,8 @@ public class MainActivity extends Activity {
             }).start();
         } else if ("external".equals(op)) {
             String url = a.getString("url");
+            String low = url.toLowerCase(java.util.Locale.ROOT);
+            if (!low.startsWith("https://") && !low.startsWith("http://") && !low.startsWith("mailto:")) { reply(id, "blocked", null); return; }
             Intent i = url.startsWith("mailto:") ? new Intent(Intent.ACTION_SENDTO, Uri.parse(url)) : new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             try {
                 startActivity(i);
@@ -903,6 +905,9 @@ public class MainActivity extends Activity {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Uri u = Uri.parse(url);
             if (HOST.equals(u.getHost())) return false;
+            // only web links and e-mail leave the app; intent:, content:, file: and other apps' links are ignored
+            String sc = u.getScheme() == null ? "" : u.getScheme().toLowerCase(java.util.Locale.ROOT);
+            if (!sc.equals("https") && !sc.equals("http") && !sc.equals("mailto")) return true;
             try { startActivity(new Intent(Intent.ACTION_VIEW, u)); } catch (Exception e) { /* nothing to open it */ }
             return true;
         }

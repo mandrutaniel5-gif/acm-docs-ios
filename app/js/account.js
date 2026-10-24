@@ -93,6 +93,7 @@ const Account = (() => {
       'auth/wrong-password': 'Parola nu este corectă.',
       'auth/user-not-found': 'Nu există niciun cont cu acest email.',
       'auth/weak-password': 'Parola este prea slabă: folosește cel puțin 8 caractere.',
+      'auth/password-does-not-meet-requirements': 'Parola este prea slabă: folosește cel puțin 8 caractere.',
       'auth/too-many-requests': 'Prea multe încercări. Mai încearcă peste câteva minute.',
       'auth/network-request-failed': 'Nu există conexiune la internet.',
       'auth/requires-recent-login': 'Din motive de siguranță, intră din nou în cont și reîncearcă.',

@@ -27,7 +27,7 @@ import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 import { ed25519 } from '@noble/curves/ed25519.js';
 import { sha256 } from '@noble/hashes/sha2.js';
-import { randomBytes } from 'node:crypto';
+import { randomBytes, randomInt } from 'node:crypto';
 
 setGlobalOptions({ region: 'europe-west1', maxInstances: 10, memory: '256MiB' });
 initializeApp();
@@ -973,6 +973,10 @@ export const beforeCreate = beforeUserCreated({ minInstances: 1 }, async (ev) =>
 
 // ================================================================== two-step verification by email
 const challengeOf = (uid) => db.collection('challenges').doc(uid); // closed to every device by the rules
+/** A uniformly random 6-digit code (crypto.randomInt: no modulo bias). */
+const sixDigits = () => String(randomInt(0, 1000000)).padStart(6, '0');
+/** Only the emulator keeps the plain code next to its hash (so the tests can read it). Never in production. */
+const testCode = (code) => (process.env.MAIL_TEST === '1' && process.env.FUNCTIONS_EMULATOR === 'true' ? { test: code } : {});
 const codeHash = (uid, code) => Buffer.from(sha256(new TextEncoder().encode(`acm-email-code\n${uid}\n${code}`)));
 /** The very first device of a new account needs no code (the email was just confirmed). */
 async function emailFirstDevice(uid) { return (await devicesOf(uid).limit(1).get()).empty; }
@@ -1003,9 +1007,11 @@ export const emailCodeSend = onCall(async (req) => {
   const uid = needUser(req);
   if (!(await emailCodeRequired(uid))) return { needed: false };
   await rateLimit(req, 'mailcode|' + uid, 5, 60 * 60 * 1000, true);
-  const code = String(randomBytes(4).readUInt32BE(0) % 1000000).padStart(6, '0');
+  // and at most 10 codes a day: guessing would need ~100 years at 50 tries a day
+  await rateLimit(req, 'mailcode-day|' + uid, 10, DAY, true);
+  const code = sixDigits();
   const user = await getAuth().getUser(uid);
-  await challengeOf(uid).set({ h: codeHash(uid, code).toString('base64'), tries: 0, expires: Timestamp.fromMillis(Date.now() + 10 * 60 * 1000), ...(process.env.MAIL_TEST === '1' ? { test: code } : {}) });
+  await challengeOf(uid).set({ h: codeHash(uid, code).toString('base64'), tries: 0, expires: Timestamp.fromMillis(Date.now() + 10 * 60 * 1000), ...(testCode(code)) });
   if (mailReady()) await sendSignInCode(user.email, code, agentOf(req.rawRequest && req.rawRequest.headers['user-agent']));
   const [name, dom] = String(user.email || '').split('@');
   return { needed: true, to: name ? name.slice(0, 2) + '•••@' + dom : '' };
@@ -1322,9 +1328,10 @@ export const emailVerifySend = onCall(async (req) => {
   // without a mail server (or in tests without one) the app falls back to Firebase's link
   if (!mailReady() && process.env.MAIL_TEST !== '1') return { fallback: true };
   await rateLimit(req, 'verifymail|' + uid, 6, 60 * 60 * 1000, true);
+  await rateLimit(req, 'verifymail-day|' + uid, 12, DAY, true);
   await rateLimit(req, 'verifymail-ip', 30, 60 * 60 * 1000, false);
-  const code = String(randomBytes(4).readUInt32BE(0) % 1000000).padStart(6, '0');
-  await verifyOf(uid).set({ h: codeHash(uid, 'verify:' + code).toString('base64'), tries: 0, expires: Timestamp.fromMillis(Date.now() + 15 * 60 * 1000), ...(process.env.MAIL_TEST === '1' ? { test: code } : {}) });
+  const code = sixDigits();
+  await verifyOf(uid).set({ h: codeHash(uid, 'verify:' + code).toString('base64'), tries: 0, expires: Timestamp.fromMillis(Date.now() + 15 * 60 * 1000), ...(testCode(code)) });
   if (mailReady()) await sendVerifyCode(user.email, code);
   return { sent: true };
 });

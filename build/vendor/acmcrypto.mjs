@@ -242,7 +242,8 @@ export function open(file, id, opts = {}) {
     try { pwKey = passwordKey(opts.password, unb64(header.pw.s), header.pw); } catch (e) { throw new AcmError('TAMPERED', 'Fișierul este deteriorat.'); }
   }
   let dek = null;
-  const mine = header.r.some((e) => e && e.t) ? envelopeTag(id.fingerprint, unb64(header.n)) : null;
+  let mine = null;
+  try { if (header.r.some((e) => e && e.t)) mine = envelopeTag(id.fingerprint, unb64(header.n)); } catch (e) { throw new AcmError('TAMPERED', 'Fișierul este deteriorat.'); }
   for (const entry of header.r) { if (mine && entry.t && entry.t !== mine) continue; dek = unwrapKey(entry, id, pwKey); if (dek) break; }
   if (!dek && mine) for (const entry of header.r) { dek = unwrapKey(entry, id, pwKey); if (dek) break; }
   if (!dek) throw new AcmError(header.pw ? 'BAD_PASSWORD_OR_NOT_FOR_YOU' : 'NOT_FOR_YOU', header.pw ? 'Parola este greșită sau documentul nu îți este adresat.' : 'Documentul nu îți este adresat.');
