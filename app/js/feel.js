@@ -238,80 +238,89 @@ const Feel = (() => {
 
 
   // ---------------------------------------------------------------- the money card, under liquid glass
-  // The blue card lies under clear liquid glass. Rings rise from a point inside the card, right and a
-  // little low, and travel out over it; they are not perfect circles (real water never is). On the card's
-  // floor the waves draw what light does in a pool: thin sharp bright lines where they focus it, deep
-  // navy where they take it away; the crests catch a narrow glint. Slow, even, nothing random.
-  // A grid a little finer than the card's CSS size, ~24 frames a second, only while visible.
+  // A layer of water rests on the blue card the way a drop rests on a water-repellent surface: surface
+  // tension holds it, so it has thickness and a rounded edge all around and does not spread. Light from
+  // the top-left catches a fine line along that edge, comes out softly on the opposite side, and the card
+  // is seen slightly bent through it. From a point inside the card (right, a little low) perfect, even
+  // rings travel slowly across the surface; only their side that faces the light shows, as a thin line.
+  // Everything is computed from one height field (the layer + the rings): normals, light, refraction.
   function water(card) {
     if (!card || card.querySelector('.water')) return;
     const box = card.getBoundingClientRect();
-    const W = Math.max(200, Math.min(320, Math.round(box.width * 0.85) || 300)), H = Math.round(W * Math.max(0.3, Math.min(0.6, (box.height || 150) / (box.width || 362))));
+    const W = Math.round(Math.min(420, Math.max(240, box.width || 362))), H = Math.round(W * Math.max(0.3, Math.min(0.6, (box.height || 150) / (box.width || 362))));
     const cv = el('canvas', { class: 'water', width: W, height: H, 'aria-hidden': 'true' });
     card.prepend(cv);
     const ctx = cv.getContext('2d', { alpha: false });
     const img = ctx.createImageData(W, H), px = img.data;
     const N = W * H;
-    const floor = new Float32Array(N * 3), dist = new Float32Array(N), ux = new Float32Array(N), uy = new Float32Array(N), amp = new Float32Array(N), warp = new Float32Array(N);
-    const C = [[24, 142, 255], [0, 98, 222], [52, 58, 206]];
-    const SX = W * 0.79, SY = H * 0.6; // where the rings rise
-    const K = (2 * Math.PI) / (W * 0.16); // ring spacing: about 6 rings across the card
+    const floor = new Float32Array(N * 3);
+    const dgx = new Float32Array(N), dgy = new Float32Array(N), rim = new Float32Array(N);
+    const dist = new Float32Array(N), ux = new Float32Array(N), uy = new Float32Array(N), fall = new Float32Array(N);
+    // the card under the water
+    const C = [[20, 136, 255], [0, 100, 226], [50, 62, 214]];
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = y * W + x, t = Math.min(1, (x / W) * 0.6 + (y / H) * 0.4);
+      const [p, q, k] = t < 0.55 ? [C[0], C[1], t / 0.55] : [C[1], C[2], (t - 0.55) / 0.45];
+      for (let c = 0; c < 3; c++) floor[i * 3 + c] = p[c] + (q[c] - p[c]) * k;
+    }
+    // the water layer: flat on top, rounding down to the card at the edge (a rounded rectangle)
+    const R = 26 * (W / (box.width || W)), E = 16 * (W / (box.width || W)); // corner radius, width of the rounded edge
+    const height = new Float32Array(N);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const qx = Math.abs(x + 0.5 - W / 2) - (W / 2 - R), qy = Math.abs(y + 0.5 - H / 2) - (H / 2 - R);
+      const out = Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - R; // < 0 inside
+      const d = Math.min(1, Math.max(0, -out / E));           // 0 at the edge, 1 where the top is flat
+      height[y * W + x] = Math.sqrt(1 - (1 - d) * (1 - d));     // a circular profile: the meniscus
+    }
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const i = y * W + x;
-      const t = Math.min(1, (x / W) * 0.6 + (y / H) * 0.4);
-      const [p, q, k] = t < 0.55 ? [C[0], C[1], t / 0.55] : [C[1], C[2], (t - 0.55) / 0.45];
-      const ex = Math.min(x, W - 1 - x) / (W * 0.5), ey = Math.min(y, H - 1 - y) / (H * 0.5);
-      const depth = 0.8 + 0.2 * Math.min(1, Math.min(ex * 3.4, ey * 2.6));
-      for (let c = 0; c < 3; c++) floor[i * 3 + c] = (p[c] + (q[c] - p[c]) * k) * depth;
-      const dx = x - SX, dy = y - SY, r = Math.hypot(dx, dy) || 1;
-      dist[i] = r; ux[i] = dx / r; uy[i] = dy / r;
-      // rings are born small at the source, strongest a little away, and keep going to the far side
-      amp[i] = Math.min(1, r / (W * 0.05)) / (1 + r / (W * 0.9));
-      // fixed, gentle irregularity so the rings are organic, not drawn with a compass
-      warp[i] = 0.24 * Math.sin(x * 0.04 + y * 0.065) + 0.13 * Math.sin(x * 0.09 - y * 0.05 + 1.3) + 0.06 * Math.sin((x + y) * 0.17);
+      const l = height[x > 0 ? i - 1 : i], r = height[x < W - 1 ? i + 1 : i], u = height[y > 0 ? i - W : i], d = height[y < H - 1 ? i + W : i];
+      dgx[i] = (r - l) * 0.5 * E * 0.55; dgy[i] = (d - u) * 0.5 * E * 0.55; // slope of the layer
+      rim[i] = 1 - height[i];
     }
+    // the rings
+    const SX = W * 0.8, SY = H * 0.62, K = (2 * Math.PI) / (W * 0.12), A = 0.2;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = y * W + x, dx = x - SX, dy = y - SY, r = Math.hypot(dx, dy) || 1;
+      dist[i] = r; ux[i] = dx / r; uy[i] = dy / r;
+      const flat = Math.min(1, Math.max(0, (height[i] - 0.96) / 0.04)); fall[i] = Math.min(1, r / (W * 0.03)) * flat * flat * (3 - 2 * flat) / (1 + r / (W * 0.9)); // calm at the source and at the edge
+    }
+    // light from the top-left and above; the eye straight above
+    const L = [-0.42, -0.5, 0.76], Ln = Math.hypot(...L); L[0] /= Ln; L[1] /= Ln; L[2] /= Ln;
+    const Hv = [L[0], L[1], L[2] + 1], Hn = Math.hypot(...Hv); Hv[0] /= Hn; Hv[1] /= Hn; Hv[2] /= Hn;
     let visible = false, running = false, last = 0, phase = 0;
-    const SPEED = 0.05; // per frame at 24 fps: a new ring about every 5 s
+    const SPEED = 0.045; // per frame at 24 fps: a ring about every 6 s
     const reduce = reduced();
     function paint() {
       for (let i = 0, o = 0; i < N; i++, o += 4) {
-        const f = amp[i];
-        const th = K * dist[i] + warp[i] - phase;
-        const c = Math.cos(th), sn = Math.sin(th);
-        const slope = c * f;
-        // light focused by the wave into a thin sharp line, and the broad shade beside it
-        const focus = sn > 0 ? sn : 0;
-        const f2 = focus * focus, f4 = f2 * f2, f8 = f4 * f4, f16 = f8 * f8;
-        const line = (f16 * 135 + f4 * 20) * f;
-        const shade = sn < 0 ? sn * sn * 0.42 * f : 0;
-        // the crest that faces the light (top-left) glints; the slope away from it darkens
-        const face = -(ux[i] * 0.7 + uy[i] * 0.72) * slope;
-        const fg = face > 0 ? face : 0, g2 = fg * fg, g4 = g2 * g2;
-        const glint = g4 * g4 * 160;
-        const back = face < 0 ? -face * 0.16 : 0;
-        const dim = 1 - Math.min(0.5, shade + back);
-        // refraction: the floor seen through the moving glass shifts along the slope
+        const s = -A * Math.sin(K * dist[i] - phase) * fall[i];
+        const gx = dgx[i] + s * ux[i], gy = dgy[i] + s * uy[i];
+        const inv = 1 / Math.sqrt(gx * gx + gy * gy + 1);
+        const nx = -gx * inv, ny = -gy * inv, nz = inv;
+        // a fine highlight where the surface turns to the light
+        let sp = nx * Hv[0] + ny * Hv[1] + nz * Hv[2];
+        sp = sp > 0 ? sp : 0; sp *= sp; sp *= sp; sp *= sp; sp *= sp; sp *= sp; sp *= sp; // ^64
+        // the side turned away is a little darker, the side towards the light a little brighter
+        const lit = (nx * L[0] + ny * L[1] + nz * L[2]) / L[2];
+        // light leaving the layer on the far side of its edge: a soft glow inside the rim
+        const exitGlow = rim[i] * Math.max(0, gx * 0.6 + gy * 0.75) * 34;
+        // refraction: the card seen through the curved water shifts toward the slope
         const x = i % W, y = (i - x) / W;
-        let sx = (x + ux[i] * slope * 3.4) | 0, sy = (y + uy[i] * slope * 3.4) | 0;
+        let sx = (x - gx * 5) | 0, sy = (y - gy * 5) | 0;
         if (sx < 0) sx = 0; else if (sx >= W) sx = W - 1;
         if (sy < 0) sy = 0; else if (sy >= H) sy = H - 1;
         const k = (sy * W + sx) * 3;
-        const d2 = dim * dim;
-        px[o] = Math.min(255, floor[k] * d2 * dim + line * 0.92 + glint);
-        px[o + 1] = Math.min(255, floor[k + 1] * d2 + line + glint);
-        px[o + 2] = Math.min(255, floor[k + 2] * dim + line * 0.75 + glint);
+        const m = 0.86 + 0.14 * lit;
+        px[o] = Math.min(255, floor[k] * m + sp * 235 + exitGlow * 0.7);
+        px[o + 1] = Math.min(255, floor[k + 1] * m + sp * 240 + exitGlow * 0.9);
+        px[o + 2] = Math.min(255, floor[k + 2] * m + sp * 245 + exitGlow);
         px[o + 3] = 255;
       }
       ctx.putImageData(img, 0, 0);
     }
     function frame(t) {
       if (!running) return;
-      if (t - last >= 41) {
-        const dt = last ? Math.min(3, (t - last) / 41) : 1;
-        last = t;
-        phase += SPEED * dt;
-        paint();
-      }
+      if (t - last >= 41) { const dt = last ? Math.min(3, (t - last) / 41) : 1; last = t; phase += SPEED * dt; paint(); }
       requestAnimationFrame(frame);
     }
     function start() { if (running || !visible || reduce || document.hidden) return; running = true; last = 0; requestAnimationFrame(frame); }
