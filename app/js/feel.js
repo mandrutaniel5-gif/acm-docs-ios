@@ -264,7 +264,7 @@ const Feel = (() => {
       for (let c = 0; c < 3; c++) floor[i * 3 + c] = p[c] + (q[c] - p[c]) * k;
     }
     // the water layer: flat on top, rounding down to the card at the edge (a rounded rectangle)
-    const R = 26 * (W / (box.width || W)), E = 16 * (W / (box.width || W)); // corner radius, width of the rounded edge
+    const R = 26 * (W / (box.width || W)), E = 12 * (W / (box.width || W)); // corner radius, width of the rounded edge
     const height = new Float32Array(N);
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const qx = Math.abs(x + 0.5 - W / 2) - (W / 2 - R), qy = Math.abs(y + 0.5 - H / 2) - (H / 2 - R);
@@ -279,7 +279,7 @@ const Feel = (() => {
       rim[i] = 1 - height[i];
     }
     // the rings
-    const SX = W * 0.8, SY = H * 0.62, K = (2 * Math.PI) / (W * 0.12), A = 0.2;
+    const SX = W * 0.8, SY = H * 0.62, K = (2 * Math.PI) / (W * 0.12), A = 0.12;
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const i = y * W + x, dx = x - SX, dy = y - SY, r = Math.hypot(dx, dy) || 1;
       dist[i] = r; ux[i] = dx / r; uy[i] = dy / r;
@@ -303,17 +303,17 @@ const Feel = (() => {
         // the side turned away is a little darker, the side towards the light a little brighter
         const lit = (nx * L[0] + ny * L[1] + nz * L[2]) / L[2];
         // light leaving the layer on the far side of its edge: a soft glow inside the rim
-        const exitGlow = rim[i] * Math.max(0, gx * 0.6 + gy * 0.75) * 34;
+        const exitGlow = rim[i] * Math.max(0, gx * 0.6 + gy * 0.75) * 20;
         // refraction: the card seen through the curved water shifts toward the slope
         const x = i % W, y = (i - x) / W;
         let sx = (x - gx * 5) | 0, sy = (y - gy * 5) | 0;
         if (sx < 0) sx = 0; else if (sx >= W) sx = W - 1;
         if (sy < 0) sy = 0; else if (sy >= H) sy = H - 1;
         const k = (sy * W + sx) * 3;
-        const m = 0.86 + 0.14 * lit;
-        px[o] = Math.min(255, floor[k] * m + sp * 235 + exitGlow * 0.7);
-        px[o + 1] = Math.min(255, floor[k + 1] * m + sp * 240 + exitGlow * 0.9);
-        px[o + 2] = Math.min(255, floor[k + 2] * m + sp * 245 + exitGlow);
+        const m = 0.92 + 0.08 * lit;
+        px[o] = Math.min(255, floor[k] * m + sp * 150 + exitGlow * 0.7);
+        px[o + 1] = Math.min(255, floor[k + 1] * m + sp * 155 + exitGlow * 0.9);
+        px[o + 2] = Math.min(255, floor[k + 2] * m + sp * 160 + exitGlow);
         px[o + 3] = 255;
       }
       ctx.putImageData(img, 0, 0);

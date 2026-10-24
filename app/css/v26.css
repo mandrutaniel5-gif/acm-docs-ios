@@ -255,3 +255,54 @@ html.v26 :is(.row, .srow):active { transform: scale(.985); transition-duration: 
 @media (prefers-reduced-motion: reduce) {
   html.v26 *, html.v26 *::before, html.v26 *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ================================================================= one material everywhere
+   The same water-glass as the money card, quieter: every raised surface has a thickness, so light from
+   the top-left catches its top-left edge, leaves through the bottom-right one, and its top carries a
+   soft gloss. The icons are small drops of coloured glass. */
+html.v26 {
+  --meniscus: inset 1px 1.5px 0 rgba(255, 255, 255, .85), inset -1px -1px 0 rgba(255, 255, 255, .22), inset 0 -12px 20px -14px rgba(255, 255, 255, .55), inset 0 12px 18px -16px rgba(255, 255, 255, .7);
+}
+html.v26[data-theme="dark"] { --meniscus: inset 1px 1.5px 0 rgba(255, 255, 255, .16), inset -1px -1px 0 rgba(255, 255, 255, .05), inset 0 -12px 20px -14px rgba(255, 255, 255, .08); }
+
+/* cards and lists: a little depth at the edge, the same light */
+html.v26 :is(.biz-card, .list-card, .sec-tip) {
+  box-shadow: var(--meniscus), inset 0 0 0 .5px rgba(0, 0, 0, .05), 0 10px 26px -14px rgba(15, 23, 42, .2), 0 1px 3px rgba(15, 23, 42, .05);
+}
+html.v26 .quick { box-shadow: var(--meniscus), var(--lg-depth); }
+
+/* icons: coloured glass drops — a curved gloss on top, light gathering at the bottom, a fine rim */
+html.v26 .qi {
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -2px 3px rgba(0, 0, 0, .14), inset 0 -10px 14px -8px rgba(255, 255, 255, .32), 0 1px 1px rgba(15, 23, 42, .12), 0 6px 14px -5px rgba(15, 23, 42, .32);
+}
+html.v26 .qi::before {
+  content: ''; position: absolute; left: 7%; right: 7%; top: 4%; height: 46%; border-radius: 50% 50% 46% 46% / 62% 62% 38% 38%; pointer-events: none; z-index: 1;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .34), rgba(255, 255, 255, .03));
+}
+html.v26 .qi::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2;
+  background: radial-gradient(70% 45% at 50% 108%, rgba(255, 255, 255, .34), transparent 70%);
+  box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .28);
+}
+html.v26 .qi svg { position: relative; z-index: 3; filter: drop-shadow(0 1px .5px rgba(0, 0, 0, .22)) drop-shadow(0 0 1px rgba(255, 255, 255, .15)); }
+/* the gloss slides a little under the finger, as on a real drop */
+html.v26 .qi::before { transition: transform .5s var(--spring-bounce); }
+html.v26 .q:active .qi::before, html.v26 .cs-tile:active .qi::before { transform: translateY(6%) scaleX(.92); }
+
+/* the business badge, the avatars and the round buttons: the same small glass */
+html.v26 :is(.biz-card .bl, .biz-card .badge, .hero-acts .av, .row .rth) {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -8px 12px -8px rgba(255, 255, 255, .35), 0 4px 10px -4px rgba(15, 23, 42, .25);
+}
+html.v26 .pill.primary, html.v26 .btn.primary {
+  background: linear-gradient(180deg, #2b95ff, #0a7aff 55%, #006ee6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -8px 12px -8px rgba(160, 210, 255, .55), 0 6px 14px -6px rgba(0, 110, 230, .55);
+}
+html.v26 .pill:not(.primary) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .95), rgba(244, 245, 250, .9));
+  box-shadow: var(--meniscus), inset 0 0 0 .5px rgba(0, 0, 0, .08), 0 2px 6px -3px rgba(15, 23, 42, .18);
+}
+html.v26[data-theme="dark"] .pill:not(.primary) { background: rgba(255, 255, 255, .1); }
+
+/* the money card sits in the same family: a little calmer glow under it */
+html.v26 .money-card { box-shadow: 0 14px 30px -16px rgba(0, 80, 200, .55), 0 2px 5px rgba(0, 40, 120, .14); }
