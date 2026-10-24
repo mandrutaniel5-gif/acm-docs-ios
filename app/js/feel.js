@@ -238,9 +238,10 @@ const Feel = (() => {
 
 
   // ---------------------------------------------------------------- water on the money card
-  // Water seen from above: a drop falls now and then (or where a finger touches), its rings spread,
-  // bounce off the edges and calm down; light from the top-left glints on the slopes. The surface is a
-  // small grid (the screen smooths it), it runs only while the card is visible and stops when calm.
+  // Water seen from above: from the bottom-right corner (where the old circle sat) rings keep coming,
+  // as if something kept falling there; they spread over the whole card and fade out on the far side
+  // without bouncing back. A finger adds a drop of its own. The surface is a small grid (the screen
+  // smooths it) and it runs only while the card is on screen and the app is in front.
   function water(card) {
     if (!card || card.querySelector('.water')) return;
     const W = 150, H = 62;
@@ -258,33 +259,36 @@ const Feel = (() => {
       const i = (y * W + x) * 3;
       for (let c = 0; c < 3; c++) base[i + c] = p[c] + (q[c] - p[c]) * k;
     }
-    let visible = false, running = false, last = 0, timer = 0, energy = 0;
+    let visible = false, running = false, last = 0, tick = 0;
     const reduce = reduced();
-    function drop(x, y, strength) {
-      const r = 2.6, cx = Math.round(x), cy = Math.round(y);
-      for (let j = -3; j <= 3; j++) for (let i = -3; i <= 3; i++) {
+    // the far edges swallow the waves (no echo); near the corner the water stays free
+    const keep = new Float32Array(W * H);
+    const SX = W - 3, SY = H - 3, EDGE = 14;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const dl = x / EDGE, dt = y / EDGE, dr = (W - 1 - x) / 5, db = (H - 1 - y) / 5;
+      const m = Math.min(1, dl, dt, Math.max(dr, (W - x) < 30 ? 1 : 0), Math.max(db, (H - y) < 30 ? 1 : 0));
+      keep[y * W + x] = 0.998 - (1 - Math.max(0, m)) * 0.09;
+    }
+    function drop(x, y, strength, r = 2.6) {
+      const cx = Math.round(x), cy = Math.round(y), R = Math.ceil(r);
+      for (let j = -R; j <= R; j++) for (let i = -R; i <= R; i++) {
         const d = Math.hypot(i, j);
         if (d > r) continue;
         const X = cx + i, Y = cy + j;
         if (X < 1 || Y < 1 || X >= W - 1 || Y >= H - 1) continue;
         a[Y * W + X] -= strength * (0.5 + 0.5 * Math.cos((Math.PI * d) / r));
       }
-      energy = 1;
-      start();
     }
     function step() {
-      let e = 0;
+      // the corner: a steady pulse, about one ring every 0.8 s
+      tick++;
+      const ph = (tick % 48) / 48;
+      if (ph < 0.25) drop(SX, SY, 12 * Math.sin(ph * 4 * Math.PI), 4.2);
       for (let y = 1; y < H - 1; y++) {
         let i = y * W + 1;
-        for (let x = 1; x < W - 1; x++, i++) {
-          const v = ((a[i - 1] + a[i + 1] + a[i - W] + a[i + W]) * 0.5 - b[i]) * 0.979;
-          b[i] = v;
-          const av = v < 0 ? -v : v;
-          if (av > e) e = av;
-        }
+        for (let x = 1; x < W - 1; x++, i++) b[i] = ((a[i - 1] + a[i + 1] + a[i - W] + a[i + W]) * 0.5 - b[i]) * keep[i];
       }
       const t = a; a = b; b = t;
-      energy = e;
     }
     function paint() {
       for (let y = 0; y < H; y++) {
@@ -309,12 +313,7 @@ const Feel = (() => {
     }
     function frame(t) {
       if (!running) return;
-      if (t - last >= 32) { // ~30 frames a second is plenty for water
-        last = t;
-        step(); step();
-        paint();
-        if (energy < 0.25) { running = false; a.fill(0); b.fill(0); paint(); schedule(); return; }
-      }
+      if (t - last >= 32) { last = t; step(); step(); paint(); } // ~30 frames a second is plenty for water
       requestAnimationFrame(frame);
     }
     function start() {
@@ -322,17 +321,15 @@ const Feel = (() => {
       running = true;
       requestAnimationFrame(frame);
     }
-    function schedule() {
-      clearTimeout(timer);
-      if (!visible || reduce || document.hidden) return;
-      timer = setTimeout(() => drop(8 + Math.random() * (W - 16), 6 + Math.random() * (H - 12), 34 + Math.random() * 26), 2200 + Math.random() * 3600);
-    }
+    function stop() { running = false; }
+    // let the water settle into its rhythm before it is first seen
+    for (let k = 0; k < 220; k++) step();
     paint();
-    new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) { schedule(); } else { running = false; clearTimeout(timer); } }).observe(card);
-    document.addEventListener('visibilitychange', () => { if (document.hidden) { running = false; clearTimeout(timer); } else schedule(); });
+    new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) start(); else stop(); }).observe(card);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else start(); });
     card.addEventListener('pointerdown', (e) => {
       const r = card.getBoundingClientRect();
-      drop(((e.clientX - r.left) / r.width) * W, ((e.clientY - r.top) / r.height) * H, 70);
+      drop(((e.clientX - r.left) / r.width) * W, ((e.clientY - r.top) / r.height) * H, 60);
     });
     return { drop };
   }
