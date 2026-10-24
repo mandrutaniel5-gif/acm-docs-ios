@@ -131,6 +131,20 @@ await check('Groups: leaving; the last admin hands over to a remaining member', 
   assert.deepEqual(g.admins, [b.uid]);
 });
 
+await check('Groups: whoever left cannot be added back; the last one out deletes the conversation', async () => {
+  const g2 = (await a.c.call('chatGroup', { op: 'create', uids: [b.uid], title: seal(a, [a, b], { title: 'Proiect' }) })).id;
+  await b.c.call('chatGroup', { op: 'leave', cid: g2, title: seal(b, [a], { title: 'Altceva' }) });
+  // the name was not changed by the one who left
+  const g = (await getDoc(doc(a.c.db, 'chats', g2))).data();
+  assert.equal(JSON.parse(new TextDecoder().decode(A.open(A.fromB64(g.title), a.id).bytes)).title, 'Proiect');
+  assert.match(await code(a.c.call('chatGroup', { op: 'add', cid: g2, uids: [b.uid], title: seal(a, [a, b], { title: 'Proiect' }) })), /left the group/);
+  await post(a, g2, seal(a, [a], { t: 'text', text: 'ultimul' }));
+  await a.c.call('chatGroup', { op: 'leave', cid: g2 });
+  const left = await fetch(`${FS}/chats/${g2}/msgs`, { headers: { Authorization: 'Bearer owner' } });
+  const j = await left.json();
+  assert.ok(!j.documents || !j.documents.length, 'messages deleted with the conversation');
+});
+
 await check('Blocking: a blocked direct conversation takes no new messages either way', async () => {
   await b.c.call('chatBlock', { cid: direct, on: true });
   assert.notEqual(await code(post(a, direct, seal(a, [a, b], { t: 'text', text: 'mai ești?' }))), 'ok');
@@ -164,7 +178,11 @@ await check('Documents: stored only by members and only after the plan counted t
   await sleep(5000);
   assert.equal(await get(b, fid), 200);
   assert.equal(await get(c, fid), 403);
-  await post(a, direct, seal(a, [a, b], { t: 'file', name: 'contract.pdf', size: 13 }), { kind: 'file', fid });
+  const msg = await post(a, direct, seal(a, [a, b], { t: 'file', name: 'contract.pdf', size: 13 }), { kind: 'file', fid });
+  // the sender deletes the message: the document goes with it
+  await deleteDoc(msg);
+  await sleep(5000);
+  assert.equal(await get(b, fid), 404);
 });
 
 await check('Kill switch: chat paused from the control panel stops new conversations and messages', async () => {

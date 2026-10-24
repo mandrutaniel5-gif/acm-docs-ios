@@ -14,7 +14,7 @@
 import { onCall, onRequest, HttpsError } from 'firebase-functions/v2/https';
 import { setGlobalOptions } from 'firebase-functions/v2';
 import { beforeUserSignedIn, beforeUserCreated } from 'firebase-functions/v2/identity';
-import { onDocumentWritten } from 'firebase-functions/v2/firestore';
+import { onDocumentWritten, onDocumentDeleted, onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { onObjectFinalized, onObjectDeleted } from 'firebase-functions/v2/storage';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { PLANS, PRICES, ACTIONS, PAID, GROUP_PLANS, monthOf } from './plans.js';
@@ -1195,6 +1195,8 @@ export const chatGroup = onCall(async (req) => {
   await needOn('chat');
   const { op, cid, uids, title } = req.data || {};
   await rateLimit(req, 'chatgrp|' + uid, 120, 60 * 60 * 1000, true);
+  // new groups and new members are what spam would use: a much lower ceiling
+  if (op === 'create' || op === 'add') await rateLimit(req, 'chatgrpnew|' + uid, 15, 60 * 60 * 1000, true);
   if (op === 'create') {
     const list = [...new Set(Array.isArray(uids) ? uids : [])].filter((u) => u !== uid);
     if (!list.length || list.length > MAX_GROUP - 1 || !list.every(isUidStr)) fail('invalid-argument', 'members');
@@ -1216,16 +1218,18 @@ export const chatGroup = onCall(async (req) => {
     if (op === 'leave') {
       const members = g.members.filter((m) => m !== uid);
       let admins = g.admins.filter((m) => m !== uid);
-      if (!members.length) { tx.delete(ref); return { gone: true }; }
+      if (!members.length) return { gone: true };
       if (!admins.length) admins = [members[0]];
-      // the remaining members get the name sealed again without the one who left (sent by the app)
-      tx.update(ref, { members, admins, ...(validTitle(title) ? { title } : {}) });
+      // whoever leaves cannot be added back by an admin (no re-adding someone who walked out), and
+      // cannot change the group's name on the way out (the name is not taken from this request)
+      tx.update(ref, { members, admins, left: FieldValue.arrayUnion(uid) });
       return { sys: { type: 'left', by: uid } };
     }
     if (!admin) fail('permission-denied', 'admins only');
     if (op === 'add') {
       const add = [...new Set(Array.isArray(uids) ? uids : [])].filter((u) => isUidStr(u) && !g.members.includes(u));
       if (!add.length) fail('invalid-argument', 'members');
+      if (add.some((u) => (g.left || []).includes(u))) fail('failed-precondition', 'left the group');
       if (g.members.length + add.length > MAX_GROUP) fail('resource-exhausted', 'group full');
       if (!validTitle(title)) fail('invalid-argument', 'title');
       tx.update(ref, { members: [...g.members, ...add], title });
@@ -1254,8 +1258,10 @@ export const chatGroup = onCall(async (req) => {
     await ref.update({ members: FieldValue.arrayRemove(...res.add) });
     fail('not-found', 'no such account');
   }
+  // the last member left: the conversation and its messages go (their documents with them, see below)
+  if (res.gone) { await db.recursiveDelete(ref); return { ok: true, gone: true }; }
   if (res.sys) await sysMsg(cid, res.sys);
-  return { ok: true, gone: !!res.gone };
+  return { ok: true, gone: false };
 });
 
 /** A conversation between two accounts: one of them stops it (no new messages either way) or allows it again. */
@@ -1340,4 +1346,30 @@ export const emailVerifyCheck = onCall(async (req) => {
   if (res === 'expired') fail('deadline-exceeded', 'code expired');
   await getAuth().updateUser(uid, { emailVerified: true });
   return { verified: true };
+});
+
+/** A message deleted (by its sender, or with its conversation): its document is removed from storage too. */
+export const chatMsgDeleted = onDocumentDeleted({ document: 'chats/{cid}/msgs/{mid}' }, async (ev) => {
+  const d = ev.data && ev.data.data();
+  if (!d || typeof d.fid !== 'string' || !/^[0-9a-f]{32}$/.test(d.fid)) return;
+  try { await getStorage().bucket(BUCKET).file(`chats/${ev.params.cid}/files/${d.fid}`).delete(); } catch (e) { /* already gone */ }
+});
+
+/**
+ * Messages are written straight to the database (fast), so a script could flood a conversation: past
+ * 300 messages in 10 minutes from one account, the extra ones are removed at once.
+ */
+export const chatMsgCreated = onDocumentCreated({ document: 'chats/{cid}/msgs/{mid}' }, async (ev) => {
+  const d = ev.data && ev.data.data();
+  if (!d || !isUidStr(d.from)) return;
+  const ref = db.collection('limits').doc(hex(sha256(new TextEncoder().encode('chatmsg|' + d.from))).slice(0, 40));
+  const over = await db.runTransaction(async (tx) => {
+    const s = await tx.get(ref);
+    const now = Date.now();
+    const x = s.exists ? s.data() : null;
+    if (!x || x.start + 600000 < now) { tx.set(ref, { start: now, n: 1, expires: Timestamp.fromMillis(now + 600000) }); return false; }
+    tx.update(ref, { n: x.n + 1 });
+    return x.n + 1 > 300;
+  });
+  if (over) await ev.data.ref.delete();
 });

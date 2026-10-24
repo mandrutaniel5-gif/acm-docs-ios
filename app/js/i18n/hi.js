@@ -1817,5 +1817,6 @@
 "Ți-am trimis un cod nou.":"हमने आपको नया कोड भेजा है।",
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"नहीं मिल रहा? स्पैम फ़ोल्डर भी देखें। कोड 15 मिनट तक मान्य है।",
 "Încă nu văd confirmarea. Încearcă din nou.":"अभी पुष्टि नहीं हुई। फिर से प्रयास करें।",
-"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"कोड की समय-सीमा समाप्त हो गई या बहुत बार आज़माया गया। नया कोड माँगें।"
+"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"कोड की समय-सीमा समाप्त हो गई या बहुत बार आज़माया गया। नया कोड माँगें।",
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"जिसने समूह छोड़ दिया है, उसे फिर से नहीं जोड़ा जा सकता।"
 };

@@ -1866,5 +1866,6 @@ window.I18N_EN = {"ACM Docs":"ACM Docs",
 "Ți-am trimis un cod nou.":"We sent you a new code.",
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"Can't find it? Check your Spam folder too. The code is valid for 15 minutes.",
 "Încă nu văd confirmarea. Încearcă din nou.":"Not confirmed yet. Please try again.",
-"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"The code has expired or was tried too many times. Ask for a new code."
+"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"The code has expired or was tried too many times. Ask for a new code.",
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"Someone who left the group cannot be added again."
 };

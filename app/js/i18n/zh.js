@@ -1817,5 +1817,6 @@
 "Ți-am trimis un cod nou.":"我们已向你发送新的验证码。",
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"找不到？请同时检查垃圾邮件文件夹。验证码 15 分钟内有效。",
 "Încă nu văd confirmarea. Încearcă din nou.":"尚未确认，请重试。",
-"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"验证码已过期或尝试次数过多，请重新获取验证码。"
+"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"验证码已过期或尝试次数过多，请重新获取验证码。",
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"已退出群组的人无法再次被添加。"
 };

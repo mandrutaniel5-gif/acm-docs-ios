@@ -1817,5 +1817,6 @@
 "Ți-am trimis un cod nou.":"Te hemos enviado un código nuevo.",
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"¿No lo encuentras? Revisa también la carpeta de spam. El código es válido durante 15 minutos.",
 "Încă nu văd confirmarea. Încearcă din nou.":"Aún no está confirmado. Inténtalo de nuevo.",
-"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"El código ha caducado o se ha intentado demasiadas veces. Pide un código nuevo."
+"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"El código ha caducado o se ha intentado demasiadas veces. Pide un código nuevo.",
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"Quien ha salido del grupo no puede volver a ser añadido."
 };
