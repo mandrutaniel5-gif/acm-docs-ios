@@ -1811,5 +1811,11 @@
 "membri":"名成员",
 "Grup":"群组",
 "Mesaje":"消息",
-"Admin":"Admin"
+"Admin":"Admin",
+"Codul de 6 cifre":"6 位验证码",
+"Retrimite codul":"重新发送验证码",
+"Ți-am trimis un cod nou.":"我们已向你发送新的验证码。",
+"Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"找不到？请同时检查垃圾邮件文件夹。验证码 15 分钟内有效。",
+"Încă nu văd confirmarea. Încearcă din nou.":"尚未确认，请重试。",
+"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"验证码已过期或尝试次数过多，请重新获取验证码。"
 };
