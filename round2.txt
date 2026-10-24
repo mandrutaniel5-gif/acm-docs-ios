@@ -1,0 +1,934 @@
+[33m[1m⚠  emulators:[22m[39m You are not currently authenticated so some features may not work correctly. Please run [1mfirebase login[22m to authenticate the CLI.
+[36m[1mi  emulators:[22m[39m Starting emulators: auth, functions, firestore
+[33m[1m⚠  functions:[22m[39m The following emulators are not running, calls to these services from the Functions emulator will affect production: [1mapphosting, database, hosting, pubsub, storage, dataconnect[22m
+[33m[1m⚠  functions:[22m[39m Unable to fetch project Admin SDK configuration, Admin SDK behavior in Cloud Functions emulator may be incorrect.
+[36m[1mi  firestore:[22m[39m Firestore Emulator logging to [1mfirestore-debug.log[22m
+[32m[1m✔  firestore:[22m[39m Firestore Emulator UI websocket is running on 9150.
+[36m[1mi  functions:[22m[39m Watching "/home/runner/work/acm-docs-ios/acm-docs-ios/functions" for Cloud Functions...
+[32m[1m✔  functions:[22m[39m Using node@22 from host.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+Serving at port 8010
+
+[32m[1m✔  functions:[22m[39m Loaded functions definitions from source: admin, beforeCreate, beforeSignIn, billingChange, billingCheckout, billingPortal, blobRemoved, blobStored, blockDevice, chatBlock, chatDirect, chatGroup, chatMsgCreated, chatMsgDeleted, claimPrimary, contactRequest, deviceSession, emailCodeSend, emailCodeSet, emailVerifyCheck, emailVerifySend, expirePlans, groupAnswer, groupInfo, groupInvite, groupLeave, groupRemove, groupSeats, leaveDevice, pairApprove, pairGet, pairPoll, pairStart, planStatus, registerDevice, reportAccount, stripeWebhook, useQuota, vaultSize, wipeAccount.
+[32m[1m✔  functions[europe-west1-admin]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/admin).
+[32m[1m✔  functions[europe-west1-beforeCreate]:[22m[39m [1mproviders/cloud.auth/eventTypes/user.beforeCreate[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/beforeCreate).
+[32m[1m✔  functions[europe-west1-beforeSignIn]:[22m[39m [1mproviders/cloud.auth/eventTypes/user.beforeSignIn[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/beforeSignIn).
+[32m[1m✔  functions[europe-west1-billingChange]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/billingChange).
+[32m[1m✔  functions[europe-west1-billingCheckout]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/billingCheckout).
+[32m[1m✔  functions[europe-west1-billingPortal]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/billingPortal).
+[32m[1m✔  functions[europe-west1-blobRemoved]:[22m[39m [1mstorage[22m function initialized.
+[32m[1m✔  functions[europe-west1-blobStored]:[22m[39m [1mstorage[22m function initialized.
+[32m[1m✔  functions[europe-west1-blockDevice]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/blockDevice).
+[32m[1m✔  functions[europe-west1-chatBlock]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/chatBlock).
+[32m[1m✔  functions[europe-west1-chatDirect]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/chatDirect).
+[32m[1m✔  functions[europe-west1-chatGroup]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/chatGroup).
+[32m[1m✔  functions[europe-west1-chatMsgCreated]:[22m[39m [1mfirestore[22m function initialized.
+[32m[1m✔  functions[europe-west1-chatMsgDeleted]:[22m[39m [1mfirestore[22m function initialized.
+[32m[1m✔  functions[europe-west1-claimPrimary]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/claimPrimary).
+[32m[1m✔  functions[europe-west1-contactRequest]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/contactRequest).
+[32m[1m✔  functions[europe-west1-deviceSession]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/deviceSession).
+[32m[1m✔  functions[europe-west1-emailCodeSend]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/emailCodeSend).
+[32m[1m✔  functions[europe-west1-emailCodeSet]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/emailCodeSet).
+[32m[1m✔  functions[europe-west1-emailVerifyCheck]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/emailVerifyCheck).
+[32m[1m✔  functions[europe-west1-emailVerifySend]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/emailVerifySend).
+[36m[1mi  functions[europe-west1-expirePlans]:[22m[39m function ignored because the pubsub emulator does not exist or is not running.
+[32m[1m✔  functions[europe-west1-groupAnswer]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/groupAnswer).
+[32m[1m✔  functions[europe-west1-groupInfo]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/groupInfo).
+[32m[1m✔  functions[europe-west1-groupInvite]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/groupInvite).
+[32m[1m✔  functions[europe-west1-groupLeave]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/groupLeave).
+[32m[1m✔  functions[europe-west1-groupRemove]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/groupRemove).
+[32m[1m✔  functions[europe-west1-groupSeats]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/groupSeats).
+[32m[1m✔  functions[europe-west1-leaveDevice]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/leaveDevice).
+[32m[1m✔  functions[europe-west1-pairApprove]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/pairApprove).
+[32m[1m✔  functions[europe-west1-pairGet]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/pairGet).
+[32m[1m✔  functions[europe-west1-pairPoll]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/pairPoll).
+[32m[1m✔  functions[europe-west1-pairStart]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/pairStart).
+[32m[1m✔  functions[europe-west1-planStatus]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/planStatus).
+[32m[1m✔  functions[europe-west1-registerDevice]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/registerDevice).
+[32m[1m✔  functions[europe-west1-reportAccount]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/reportAccount).
+[32m[1m✔  functions[europe-west1-stripeWebhook]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/stripeWebhook).
+[32m[1m✔  functions[europe-west1-useQuota]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/useQuota).
+[32m[1m✔  functions[europe-west1-vaultSize]:[22m[39m [1mfirestore[22m function initialized.
+[32m[1m✔  functions[europe-west1-wipeAccount]:[22m[39m [1mhttp[22m function initialized (http://127.0.0.1:5001/acm-docs-52280/europe-west1/wipeAccount).
+[36m[1mi [22m[39m Running script: [1mnode test/attack.test.mjs[22m
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 100.590597ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 183.603892ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[33m[1m⚠ [22m[39m Google API requested!
+   - URL: "http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/token?scopes=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fiam%2Chttps%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform%2Chttps%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdevstorage.full_control"
+   - Be careful, this may be a production service.
+[90m> [39m measure storage Could not refresh access token: A Not Found error was returned while attempting to retrieve an accesstoken for the Compute Engine built-in service account. This may be because the Compute Engine instance does not have any permission scopes specified: Could not refresh access token: <?xml version="1.0" encoding="utf-8"?>
+[90m> [39m <Error xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+[90m> [39m     <Code>ResourceNotFound</Code>
+[90m> [39m     <Message>The specified resource does not exist.</Message>
+[90m> [39m     <Details>'computeMetadata' isn't a valid resource name.</Details>
+[90m> [39m </Error>
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 220.075423ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 2.053309ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 13.295046ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m measure storage Could not refresh access token: A Not Found error was returned while attempting to retrieve an accesstoken for the Compute Engine built-in service account. This may be because the Compute Engine instance does not have any permission scopes specified: Could not refresh access token: <?xml version="1.0" encoding="utf-8"?>
+[90m> [39m <Error xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+[90m> [39m     <Code>ResourceNotFound</Code>
+[90m> [39m     <Message>The specified resource does not exist.</Message>
+[90m> [39m     <Details>'computeMetadata' isn't a valid resource name.</Details>
+[90m> [39m </Error>
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 69.503597ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 22.59275ms
+[2026-10-24T12:42:08.542Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d835b error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L49:24 for 'create' @ L49, false for 'create' @ L169, evaluation error at L55:24 for 'update' @ L55, false for 'update' @ L169, false for 'update' @ L55, false for 'update' @ L169
+✓ blocat      [CRITIC] S01 Cu parola furată: înlocuiește cheia publică a victimei (atac man-in-the-middle pentru contactele noi)
+[2026-10-24T12:42:08.559Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d835c error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'delete' @ L63, false for 'delete' @ L169
+✓ blocat      [CRITIC] S02 Cu parola furată: șterge profilul și îl recreează cu cheia atacatorului
+[2026-10-24T12:42:08.586Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d835d error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L49:24 for 'create' @ L49, false for 'create' @ L169, evaluation error at L55:24 for 'update' @ L55, false for 'update' @ L169, false for 'update' @ L55, false for 'update' @ L169
+✓ blocat      [CRITIC] S03 Cu parola furată: înregistrează un dispozitiv al atacatorului în contul victimei (după S01)  — cheia nu a putut fi înlocuită
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 16.112814ms
+✓ blocat      [MARE] S04 Cu parola furată, fără dispozitiv: citește dispozitivele / evenimentele / seiful victimei  — devices:false events:false vault:false
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 8.030109ms
+✓ blocat      [MARE] S05 Cu parola furată: înregistrare dispozitiv cu o semnătură falsă (fără cheile contului)
+✓ blocat      [CRITIC] S10 Alt utilizator citește dispozitivele / evenimentele / seiful victimei  — devices:false events:false vault:false
+[2026-10-24T12:42:08.714Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d8360 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L105, false for 'create' @ L169, false for 'update' @ L105, false for 'update' @ L169
+✓ blocat      [CRITIC] S11 Alt utilizator scrie în seiful victimei
+[2026-10-24T12:42:08.725Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d8361 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'update' @ L55, false for 'update' @ L169
+✓ blocat      [CRITIC] S12 Alt utilizator modifică profilul / cheia victimei
+[2026-10-24T12:42:08.735Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d8362 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L69:24 for 'create' @ L69, false for 'create' @ L169, false for 'update' @ L169, false for 'update' @ L169
+✓ blocat      [MARE] S13 Alt utilizator fură @numele victimei (suprascrie usernames/{handle})
+[2026-10-24T12:42:08.747Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d8363 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L74:24 for 'delete' @ L74, false for 'delete' @ L169, false for 'delete' @ L74, false for 'delete' @ L169
+✓ blocat      [MARE] S14 Alt utilizator șterge @numele victimei
+✓ blocat      [MEDIU] S15 Enumerare: listează toți utilizatorii (colecția users)
+✓ blocat      [MEDIU] S16 Enumerare: listează toate @numele (colecția usernames)
+✓ blocat      [MEDIU] S17 Căutare după email (users where emailLower == ...)
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-blockDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-blockDevice" in 95.773316ms
+✓ blocat      [MARE] S18 Alt utilizator blochează un dispozitiv al victimei
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-deviceSession"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-deviceSession" in 92.775169ms
+✓ blocat      [MARE] S19 Alt utilizator cere o sesiune pentru dispozitivul victimei (fără cheia dispozitivului)
+[2026-10-24T12:42:10.188Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d8364 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L169, false for 'update' @ L169
+✓ blocat      [MARE] S20 Alt utilizator scrie evenimente false („conectare nouă”) în contul victimei
+[2026-10-24T12:42:10.196Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d8365 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L169, false for 'update' @ L169
+✓ blocat      [MEDIU] S21 Clientul scrie direct un eveniment fals în propriul cont
+[2026-10-24T12:42:10.210Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d8366 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L86:26 for 'update' @ L86, false for 'update' @ L169, false for 'update' @ L86, false for 'update' @ L169
+✓ blocat      [MARE] S22 Dispozitivul își ridică singur rolul la „primary”
+[2026-10-24T12:42:10.217Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d8367 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L169, false for 'update' @ L86, false for 'update' @ L169
+✓ blocat      [MARE] S23 Dispozitivul își adaugă singur un dispozitiv nou (scriere directă în devices)
+✓ blocat      [MEDIU] S24 Pairing: citește direct colecția pairings
+[2026-10-24T12:42:10.237Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d8368 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L69, false for 'create' @ L169, false for 'update' @ L169
+✓ blocat      [MARE] S30 Rezervă un @nume interzis (admin)
+[2026-10-24T12:42:10.246Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d8369 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L69:24 for 'create' @ L69, false for 'create' @ L169, false for 'update' @ L169, false for 'create' @ L69, false for 'create' @ L169
+✓ blocat      [MEDIU] S31 Rezervă mai multe @nume deodată (squatting)
+[2026-10-24T12:42:10.261Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d836a error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L49, false for 'create' @ L169, false for 'update' @ L55, false for 'update' @ L169
+✓ blocat      [MEDIU] S32 Pune HTML/script în numele afișat (stored XSS)
+[2026-10-24T12:42:10.280Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d836b error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L49, false for 'create' @ L169, false for 'update' @ L55, false for 'update' @ L169
+✓ blocat      [MEDIU] S33 Profil cu cheie publică invalidă / amprentă care nu corespunde
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 1.937344ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 13.238591ms
+[2026-10-24T12:42:10.345Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d836c error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L69, false for 'create' @ L169, false for 'update' @ L169
+✓ blocat      [MEDIU] S34 Cont cu email neconfirmat își creează profil
+✓ blocat      [MIC] S35 Neautentificat: citește un profil
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 104.754235ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairGet"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairGet" in 85.88489ms
+✗ VULNERABIL  [MARE] S40 Pairing: alt cont aprobă codul QR al victimei (victima ar intra în contul atacatorului)  — pid-ul (128 biți) trebuie văzut fizic pe ecranul victimei; riscul e de phishing
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairPoll"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairPoll" in 98.625385ms
+✓ blocat      [MARE] S41 Pairing: preia cheile cu altă cheie decât cea din QR (poll cu semnătură falsă)
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-deviceSession"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-deviceSession" in 43.818068ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-deviceSession"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-deviceSession" in 19.166473ms
+✓ blocat      [MIC] S43 Replay: aceeași semnătură de sesiune folosită de două ori în 5 minute  — o semnătură interceptată (în afara TLS) ar fi refolosibilă 5 minute
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-deviceSession"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-deviceSession" in 1.8397ms
+✓ blocat      [MIC] S44 Replay: semnătură de sesiune veche (10 minute)
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 29.784874ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairApprove"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairApprove" in 132.994152ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairPoll"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairPoll" in 17.960327ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-blockDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-blockDevice" in 11.947502ms
+✓ blocat      [MARE] S50 Dispozitiv membru blochează dispozitivul principal
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-claimPrimary"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-claimPrimary" in 98.382449ms
+✓ blocat      [MARE] S51 Dispozitiv membru își dă singur rolul de principal (claimPrimary fără cheile contului)
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeCreate"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeCreate" in 1.594201ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 10.309896ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m measure storage Could not refresh access token: A Not Found error was returned while attempting to retrieve an accesstoken for the Compute Engine built-in service account. This may be because the Compute Engine instance does not have any permission scopes specified: Could not refresh access token: <?xml version="1.0" encoding="utf-8"?>
+[90m> [39m <Error xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+[90m> [39m     <Code>ResourceNotFound</Code>
+[90m> [39m     <Message>The specified resource does not exist.</Message>
+[90m> [39m     <Details>'computeMetadata' isn't a valid resource name.</Details>
+[90m> [39m </Error>
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 53.504525ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 21.503913ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairApprove"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairApprove" in 39.312211ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairPoll"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairPoll" in 13.767323ms
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-wipeAccount"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-wipeAccount" in 87.800533ms
+✓ blocat      [MARE] S52 Dispozitiv membru șterge contul (wipeAccount) fără semnătura cheilor contului
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-wipeAccount"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-wipeAccount" in 24.823012ms
+✓ blocat      [CRITIC] S54 Sesiune de dispozitiv furată: șterge contul semnând cu cheia dispozitivului (nu a contului)
+[2026-10-24T12:42:15.173Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d836f error. Code: 7 Message: 7 PERMISSION_DENIED: 
+false for 'create' @ L105, false for 'create' @ L169, false for 'update' @ L105, false for 'update' @ L169
+✓ blocat      [MEDIU] S53 Seif: un dispozitiv scrie 900 KB într-un singur document (abuz de spațiu / cost)
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-blockDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-blockDevice" in 27.420274ms
+✓ blocat      [CRITIC] S60 Dispozitiv blocat: citește în continuare datele contului cu sesiunea pe care o avea  — devices:false vault:false
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-deviceSession"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-deviceSession" in 8.16741ms
+✓ blocat      [CRITIC] S61 Dispozitiv blocat: cere o sesiune nouă
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-beforeSignIn"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-beforeSignIn" in 18.589745ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 9.1906ms
+✓ blocat      [MARE] S62 Dispozitiv blocat: se reînregistrează cu parola (fără cheile contului)
+[2026-10-24T12:42:15.303Z]  @firebase/firestore: Firestore (13.1.0): GrpcConnection RPC 'Write' stream 0x8c7d8371 error. Code: 7 Message: 7 PERMISSION_DENIED: 
+evaluation error at L86:26 for 'update' @ L86, false for 'update' @ L169, false for 'update' @ L86, false for 'update' @ L169
+✓ blocat      [MARE] S63 Dispozitiv blocat: își schimbă singur statusul înapoi în „active”
+✓ blocat      [MEDIU] S64 Dispozitiv blocat: citește în continuare profilurile publice și @numele (sesiunea Firebase rămâne validă)
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 3.28055ms
+✓ blocat      [MEDIU] S70 Funcții: cheie publică uriașă / malformată în registerDevice
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-registerDevice"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-registerDevice" in 12.546715ms
+✓ blocat      [MEDIU] S71 Funcții: info de dispozitiv de 4 MB
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 29.758926ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairApprove"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"VALID"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairApprove" in 19.169999ms
+✓ blocat      [MIC] S72 Funcții: pairApprove cu „sealed” de 10 MB
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[36m[1mi [22m[39m [36m[1mfunctions: [22m[39mLoaded environment variables from .env.local.
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 3110.473857ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 478.429504ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 521.869241ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 518.610813ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 418.608086ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 267.593788ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 149.408519ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 238.751945ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 325.267161ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 188.551246ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 167.90213ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 209.980817ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 411.523607ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 594.762832ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 123.277079ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 171.807533ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 215.203939ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 152.467227ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 141.283614ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 213.549988ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 123.360652ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 131.837037ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 121.185386ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 132.665305ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 135.43757ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 107.758986ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 326.593292ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 174.84613ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 162.606156ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 107.571594ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 145.311911ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 133.782137ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 188.151068ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 253.48438ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 196.434632ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 173.581165ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 146.994445ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 139.967182ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 197.171222ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 112.814429ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 121.252126ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2243.16753ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 314.330605ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 333.942871ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 173.351529ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 263.564761ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 243.534985ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 242.139995ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 194.371074ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 191.911721ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 283.488877ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 237.357842ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2467.213635ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 325.667698ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 291.859803ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 238.048453ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 217.881711ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2697.978819ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 239.178825ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 198.247062ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 168.705773ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 217.939138ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 220.616741ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 275.117459ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 204.067217ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 229.408081ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 262.108177ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2718.6607169999997ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 253.679624ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 397.947823ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 252.673879ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 253.701487ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 3018.91344ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 371.66476ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 371.089343ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2652.052504ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 367.717024ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 314.943368ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 367.703725ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2707.589062ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 247.406065ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 249.311305ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 290.259604ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 282.016889ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 363.103276ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 306.351788ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 267.316481ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2751.348914ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2593.60466ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 274.299366ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 367.330672ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 328.857251ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 149.184563ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 476.748358ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 371.698915ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 353.691169ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 356.299418ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 421.52121ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 340.119879ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 339.991776ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 369.055921ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 381.781452ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2836.7977570000003ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2764.323681ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 311.720924ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 224.329185ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 322.415543ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 314.416666ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 315.695502ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 276.32137ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 277.679896ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 246.99359ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 339.840787ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 271.738478ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 3108.981386ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2912.7622380000003ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 310.230662ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 271.874503ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 272.986749ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2865.801499ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2772.902869ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 334.595808ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 240.5673ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 424.066851ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 432.825001ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 386.427332ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 386.374643ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 433.256401ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 436.505405ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 3030.21585ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 240.384806ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 252.367063ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 243.382411ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 242.84456ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 243.004681ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 579.972343ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 669.25322ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 671.717631ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 631.382492ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 675.435241ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 614.54945ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 616.028477ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 729.161478ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 727.714259ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 327.475695ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 333.085284ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 302.529464ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 302.193918ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 366.306117ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 284.185093ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 254.222726ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 253.792078ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 253.60123ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 633.44683ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 3232.741283ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 582.455622ms
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 573.113642ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2636.360735ms
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2636.2600629999997ms
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 358.651719ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 357.948959ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 357.421785ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 357.042504ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 292.334468ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 291.719491ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 270.668226ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2823.733132ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 504.844941ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 503.523822ms
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 504.543327ms
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 451.963727ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 453.09471ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2889.688463ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 63.353237ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 63.248229ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 85.793945ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2298.439622ms
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 1655.1448599999999ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 87.409539ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 138.763173ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 117.376071ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 121.410117ms
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 67.556207ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 67.287723ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 91.697256ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 64.8887ms
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 1874.452952ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 79.271382ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 84.165713ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 83.611608ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 83.709466ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 1819.057059ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 34.540041ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 1624.015165ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 1965.164254ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 2020.130818ms
+[36m[1mi  functions:[22m[39m Beginning execution of "europe-west1-pairStart"
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 1692.474602ms
+[90m> [39m {"verifications":{"app":"MISSING","auth":"MISSING"},"logging.googleapis.com/labels":{"firebase-log-type":"callable-request-verification"},"severity":"DEBUG","message":"Callable request verification passed"}
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 20.228095ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 966.967879ms
+[36m[1mi  functions:[22m[39m Finished "europe-west1-pairStart" in 1062.500441ms
+✓ blocat      [MEDIU] S42 Pairing: flood de coduri QR fără cont (200 cereri)  — 6/200 create
+
+TOTAL 44 atacuri · blocate 43 · reușite 1
+[32m[1m✔ [22m[39m Script exited successfully (code 0)
+[36m[1mi  emulators:[22m[39m Shutting down emulators.
+[36m[1mi  functions:[22m[39m Stopping Functions Emulator
+[36m[1mi  firestore:[22m[39m Stopping Firestore Emulator
+[36m[1mi  auth:[22m[39m Stopping Authentication Emulator
+[36m[1mi  eventarc:[22m[39m Stopping Eventarc Emulator
+[36m[1mi  tasks:[22m[39m Stopping Cloud Tasks Emulator
+[36m[1mi  hub:[22m[39m Stopping emulator hub
+[36m[1mi  logging:[22m[39m Stopping Logging Emulator
