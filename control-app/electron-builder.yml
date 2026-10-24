@@ -1,7 +1,7 @@
 appId: ro.acmandrut.acmdocs.control
 productName: ACM Docs Control
 copyright: © 2026 ACM Code SRL
-electronVersion: 44.9.0
+electronVersion: 44.9.3
 directories:
   output: ../dist/control
 files:

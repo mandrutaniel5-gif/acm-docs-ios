@@ -30,8 +30,8 @@
   },
   "devDependencies": {
     "buffer": "^6.0.3",
-    "electron": "44.9.0",
-    "electron-builder": "26.0.12",
+    "electron": "44.9.3",
+    "electron-builder": "26.18.0",
     "esbuild": "^0.24.2",
     "events": "^3.3.0",
     "playwright-core": "^1.47.2",
