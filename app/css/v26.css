@@ -130,28 +130,16 @@ html.v26 :is(.row, .srow):active { transform: scale(.985); transition-duration: 
   html.v26 .qi svg { width: 28px; height: 28px; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .2)); }
   html.v26 .q:active .qi { transform: scale(.9); transition-duration: .1s; }
 
-  /* ---------------------------------------------------------------- money: liquid sapphire
-     deep blue glass with light moving slowly through it, a fine grain and a bright rim */
-  html.v26 .cards2 { margin-top: 18px; gap: 12px; }
+  /* ---------------------------------------------------------------- money: water seen from above
+     deep blue water; now and then a drop falls and its rings spread, meet the edges and calm down
+     (drawn by feel.js on a small canvas, only while the card is on screen) */
   html.v26 .money-card {
     border-radius: 26px; padding: 18px 20px 20px; overflow: hidden;
-    background:
-      radial-gradient(60% 80% at var(--cx, 20%) var(--cy, 0%), rgba(140, 200, 255, .55), transparent 60%),
-      radial-gradient(70% 90% at 100% 100%, rgba(94, 92, 230, .85), transparent 65%),
-      linear-gradient(160deg, #0a84ff 0%, #0060df 55%, #3a3fd8 100%);
-    box-shadow: 0 16px 34px -12px rgba(0, 96, 223, .65), inset 0 1px 0 rgba(255, 255, 255, .4), inset 0 -18px 30px -18px rgba(255, 255, 255, .35);
-    animation: sapphire 14s ease-in-out infinite alternate;
+    background: linear-gradient(160deg, #0a84ff 0%, #0063e0 55%, #3a3fd8 100%);
+    box-shadow: 0 16px 34px -12px rgba(0, 96, 223, .65), inset 0 1px 0 rgba(255, 255, 255, .4), inset 0 -18px 30px -18px rgba(255, 255, 255, .3);
   }
-  html.v26 .money-card::before {
-    content: ''; position: absolute; inset: -40%; z-index: 0; pointer-events: none; opacity: .5; mix-blend-mode: soft-light;
-    background:
-      conic-gradient(from 210deg at 70% 40%, transparent 0 20%, rgba(255, 255, 255, .55) 26%, transparent 34% 62%, rgba(255, 255, 255, .35) 70%, transparent 78%),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    animation: caustic 22s linear infinite;
-  }
-  html.v26 .money-card > * { position: relative; z-index: 1; }
-  @keyframes sapphire { 0% { --cx: 12%; --cy: -10%; } 100% { --cx: 88%; --cy: 30%; } }
-  @keyframes caustic { to { transform: rotate(360deg); } }
+  html.v26 .money-card .water { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; border-radius: inherit; }
+  html.v26 .money-card > :not(.water) { position: relative; z-index: 1; }
   html.v26 .mc-amount { font-size: 42px; font-weight: 700; letter-spacing: -.03em; text-shadow: 0 1px 12px rgba(0, 30, 90, .25); }
 
   html.v26 .biz-card, html.v26 .list-card, html.v26 .sec-tip { border-radius: 24px; }
@@ -254,8 +242,6 @@ html.v26 :is(.row, .srow):active { transform: scale(.985); transition-duration: 
 }
 
 /* the properties the light animates */
-@property --cx { syntax: '<percentage>'; inherits: false; initial-value: 20%; }
-@property --cy { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
 
 @media (prefers-reduced-motion: reduce) {
   html.v26 *, html.v26 *::before, html.v26 *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }

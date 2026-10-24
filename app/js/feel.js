@@ -236,6 +236,107 @@ const Feel = (() => {
     }).observe(n, { childList: true, characterData: true, subtree: true });
   }
 
+
+  // ---------------------------------------------------------------- water on the money card
+  // Water seen from above: a drop falls now and then (or where a finger touches), its rings spread,
+  // bounce off the edges and calm down; light from the top-left glints on the slopes. The surface is a
+  // small grid (the screen smooths it), it runs only while the card is visible and stops when calm.
+  function water(card) {
+    if (!card || card.querySelector('.water')) return;
+    const W = 150, H = 62;
+    const cv = el('canvas', { class: 'water', width: W, height: H, 'aria-hidden': 'true' });
+    card.prepend(cv);
+    const ctx = cv.getContext('2d', { alpha: false });
+    const img = ctx.createImageData(W, H), px = img.data;
+    let a = new Float32Array(W * H), b = new Float32Array(W * H);
+    // the colour of still water at each point (deep blue to indigo, lighter top-left)
+    const base = new Float32Array(W * H * 3);
+    const C = [[18, 140, 255], [0, 99, 224], [58, 63, 216]];
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const t = Math.min(1, (x / W) * 0.62 + (y / H) * 0.38);
+      const [p, q, k] = t < 0.55 ? [C[0], C[1], t / 0.55] : [C[1], C[2], (t - 0.55) / 0.45];
+      const i = (y * W + x) * 3;
+      for (let c = 0; c < 3; c++) base[i + c] = p[c] + (q[c] - p[c]) * k;
+    }
+    let visible = false, running = false, last = 0, timer = 0, energy = 0;
+    const reduce = reduced();
+    function drop(x, y, strength) {
+      const r = 2.6, cx = Math.round(x), cy = Math.round(y);
+      for (let j = -3; j <= 3; j++) for (let i = -3; i <= 3; i++) {
+        const d = Math.hypot(i, j);
+        if (d > r) continue;
+        const X = cx + i, Y = cy + j;
+        if (X < 1 || Y < 1 || X >= W - 1 || Y >= H - 1) continue;
+        a[Y * W + X] -= strength * (0.5 + 0.5 * Math.cos((Math.PI * d) / r));
+      }
+      energy = 1;
+      start();
+    }
+    function step() {
+      let e = 0;
+      for (let y = 1; y < H - 1; y++) {
+        let i = y * W + 1;
+        for (let x = 1; x < W - 1; x++, i++) {
+          const v = ((a[i - 1] + a[i + 1] + a[i - W] + a[i + W]) * 0.5 - b[i]) * 0.979;
+          b[i] = v;
+          const av = v < 0 ? -v : v;
+          if (av > e) e = av;
+        }
+      }
+      const t = a; a = b; b = t;
+      energy = e;
+    }
+    function paint() {
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const i = y * W + x;
+          const l = x > 0 ? a[i - 1] : 0, r = x < W - 1 ? a[i + 1] : 0, u = y > 0 ? a[i - W] : 0, d = y < H - 1 ? a[i + W] : 0;
+          const nx = l - r, ny = u - d;
+          // light from the top-left: slopes that face it glint, the others darken a little
+          const s = (nx * 0.72 + ny * 0.7) * 0.03;
+          const spec = s > 0 ? Math.min(95, s * s * 760) : 0;
+          const shade = Math.max(0.9, Math.min(1.12, 1 + s * 1.4));
+          // the bottom seen through moving water shifts a little (refraction)
+          const sx = Math.min(W - 1, Math.max(0, x + Math.round(nx * 0.05))), sy = Math.min(H - 1, Math.max(0, y + Math.round(ny * 0.05)));
+          const k = (sy * W + sx) * 3, o = i * 4;
+          px[o] = Math.min(255, base[k] * shade + spec);
+          px[o + 1] = Math.min(255, base[k + 1] * shade + spec);
+          px[o + 2] = Math.min(255, base[k + 2] * shade + spec * 0.9);
+          px[o + 3] = 255;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+    }
+    function frame(t) {
+      if (!running) return;
+      if (t - last >= 32) { // ~30 frames a second is plenty for water
+        last = t;
+        step(); step();
+        paint();
+        if (energy < 0.25) { running = false; a.fill(0); b.fill(0); paint(); schedule(); return; }
+      }
+      requestAnimationFrame(frame);
+    }
+    function start() {
+      if (running || !visible || reduce || document.hidden) return;
+      running = true;
+      requestAnimationFrame(frame);
+    }
+    function schedule() {
+      clearTimeout(timer);
+      if (!visible || reduce || document.hidden) return;
+      timer = setTimeout(() => drop(8 + Math.random() * (W - 16), 6 + Math.random() * (H - 12), 34 + Math.random() * 26), 2200 + Math.random() * 3600);
+    }
+    paint();
+    new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) { schedule(); } else { running = false; clearTimeout(timer); } }).observe(card);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) { running = false; clearTimeout(timer); } else schedule(); });
+    card.addEventListener('pointerdown', (e) => {
+      const r = card.getBoundingClientRect();
+      drop(((e.clientX - r.left) / r.width) * W, ((e.clientY - r.top) / r.height) * H, 70);
+    });
+    return { drop };
+  }
+
   // ---------------------------------------------------------------- wiring
   function init() {
     try { if (localStorage.getItem('acm.look') === 'v26') root.classList.add('v26'); } catch (e) {}
@@ -259,7 +360,7 @@ const Feel = (() => {
     };
     // liquid glass
     document.addEventListener('pointerdown', (e) => { if (!on()) return; const t = e.target.closest(LIQUID); if (t && !t.disabled) press(t, e); }, true);
-    if (on()) { buildBar(); scrollHeads(); }
+    if (on()) { buildBar(); scrollHeads(); water(document.getElementById('home-money')); }
     viewEntrances(); countUp();
     // the first moment, once the splash goes
     if (on() && !reduced()) {
