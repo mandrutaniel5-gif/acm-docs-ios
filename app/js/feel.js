@@ -237,75 +237,55 @@ const Feel = (() => {
   }
 
 
-  // ---------------------------------------------------------------- water on the money card
-  // Water seen from above: from the bottom-right corner (where the old circle sat) rings keep coming,
-  // as if something kept falling there; they spread over the whole card and fade out on the far side
-  // without bouncing back. A finger adds a drop of its own. The surface is a small grid (the screen
-  // smooths it) and it runs only while the card is on screen and the app is in front.
+  // ---------------------------------------------------------------- the money card, under liquid glass
+  // The blue card lies under a layer of clear liquid glass. Slow, even rings come from the bottom-right
+  // corner and travel across; through them the card's floor shows the light they gather (caustics), and
+  // their crests catch a soft highlight. Nothing random, nothing fast. Drawn on a small grid that the
+  // screen smooths, about 24 times a second, only while the card is visible and the app is in front.
   function water(card) {
     if (!card || card.querySelector('.water')) return;
-    const W = 150, H = 62;
+    const W = 160, H = 66;
     const cv = el('canvas', { class: 'water', width: W, height: H, 'aria-hidden': 'true' });
     card.prepend(cv);
     const ctx = cv.getContext('2d', { alpha: false });
     const img = ctx.createImageData(W, H), px = img.data;
-    let a = new Float32Array(W * H), b = new Float32Array(W * H);
-    // the colour of still water at each point (deep blue to indigo, lighter top-left)
-    const base = new Float32Array(W * H * 3);
-    const C = [[18, 140, 255], [0, 99, 224], [58, 63, 216]];
+    // the floor: the card's blue, deeper towards the edges (it lies below the surface)
+    const floor = new Float32Array(W * H * 3), dist = new Float32Array(W * H), fall = new Float32Array(W * H);
+    const C = [[22, 140, 255], [0, 98, 222], [54, 60, 210]];
+    const SX = W + 6, SY = H + 8; // the source sits just outside the bottom-right corner
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const t = Math.min(1, (x / W) * 0.62 + (y / H) * 0.38);
+      const i = y * W + x;
+      const t = Math.min(1, (x / W) * 0.6 + (y / H) * 0.4);
       const [p, q, k] = t < 0.55 ? [C[0], C[1], t / 0.55] : [C[1], C[2], (t - 0.55) / 0.45];
-      const i = (y * W + x) * 3;
-      for (let c = 0; c < 3; c++) base[i + c] = p[c] + (q[c] - p[c]) * k;
+      const ex = Math.min(x, W - 1 - x) / (W * 0.5), ey = Math.min(y, H - 1 - y) / (H * 0.5);
+      const depth = 0.84 + 0.16 * Math.min(1, Math.min(ex * 3.2, ey * 2.4)); // edges sink into shadow
+      for (let c = 0; c < 3; c++) floor[i * 3 + c] = (p[c] + (q[c] - p[c]) * k) * depth;
+      const r = Math.hypot(x - SX, y - SY);
+      dist[i] = r;
+      fall[i] = 1 / (1 + r / 120); // even: the rings fade only a little as they travel
     }
-    let visible = false, running = false, last = 0, tick = 0;
+    const K = (2 * Math.PI) / 34; // one ring every 34 grid cells (about 80 px on screen)
+    const SPEED = 0.052;           // radians per frame at 24 fps: a new ring about every 5 s, calm
+    let visible = false, running = false, last = 0, phase = 0;
     const reduce = reduced();
-    // the far edges swallow the waves (no echo); near the corner the water stays free
-    const keep = new Float32Array(W * H);
-    const SX = W - 3, SY = H - 3, EDGE = 14;
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const dl = x / EDGE, dt = y / EDGE, dr = (W - 1 - x) / 5, db = (H - 1 - y) / 5;
-      const m = Math.min(1, dl, dt, Math.max(dr, (W - x) < 30 ? 1 : 0), Math.max(db, (H - y) < 30 ? 1 : 0));
-      keep[y * W + x] = 0.998 - (1 - Math.max(0, m)) * 0.09;
-    }
-    function drop(x, y, strength, r = 2.6) {
-      const cx = Math.round(x), cy = Math.round(y), R = Math.ceil(r);
-      for (let j = -R; j <= R; j++) for (let i = -R; i <= R; i++) {
-        const d = Math.hypot(i, j);
-        if (d > r) continue;
-        const X = cx + i, Y = cy + j;
-        if (X < 1 || Y < 1 || X >= W - 1 || Y >= H - 1) continue;
-        a[Y * W + X] -= strength * (0.5 + 0.5 * Math.cos((Math.PI * d) / r));
-      }
-    }
-    function step() {
-      // the corner: a steady pulse, about one ring every 0.8 s
-      tick++;
-      const ph = (tick % 48) / 48;
-      if (ph < 0.25) drop(SX, SY, 12 * Math.sin(ph * 4 * Math.PI), 4.2);
-      for (let y = 1; y < H - 1; y++) {
-        let i = y * W + 1;
-        for (let x = 1; x < W - 1; x++, i++) b[i] = ((a[i - 1] + a[i + 1] + a[i - W] + a[i + W]) * 0.5 - b[i]) * keep[i];
-      }
-      const t = a; a = b; b = t;
-    }
     function paint() {
       for (let y = 0; y < H; y++) {
         for (let x = 0; x < W; x++) {
-          const i = y * W + x;
-          const l = x > 0 ? a[i - 1] : 0, r = x < W - 1 ? a[i + 1] : 0, u = y > 0 ? a[i - W] : 0, d = y < H - 1 ? a[i + W] : 0;
-          const nx = l - r, ny = u - d;
-          // light from the top-left: slopes that face it glint, the others darken a little
-          const s = (nx * 0.72 + ny * 0.7) * 0.03;
-          const spec = s > 0 ? Math.min(95, s * s * 760) : 0;
-          const shade = Math.max(0.9, Math.min(1.12, 1 + s * 1.4));
-          // the bottom seen through moving water shifts a little (refraction)
-          const sx = Math.min(W - 1, Math.max(0, x + Math.round(nx * 0.05))), sy = Math.min(H - 1, Math.max(0, y + Math.round(ny * 0.05)));
+          const i = y * W + x, r = dist[i], f = fall[i];
+          const th = K * r - phase;
+          const slope = Math.cos(th) * f;          // how steep the surface is here
+          const curve = -Math.sin(th) * f;         // where it bends light together (caustic)
+          // the light from the top-left meets slopes that face it; crests catch a narrow highlight
+          const dx = (x - SX) / r, dy = (y - SY) / r;
+          const face = -(dx * 0.7 + dy * 0.72) * slope;
+          const hi = face > 0.32 ? (face - 0.32) * (face - 0.32) * 300 : 0;
+          const caustic = curve > 0 ? curve * curve * curve * 52 : curve * 9;
+          // refraction: the floor seen through the moving glass shifts a little along the slope
+          const sx = Math.min(W - 1, Math.max(0, Math.round(x + dx * slope * 3))), sy = Math.min(H - 1, Math.max(0, Math.round(y + dy * slope * 3)));
           const k = (sy * W + sx) * 3, o = i * 4;
-          px[o] = Math.min(255, base[k] * shade + spec);
-          px[o + 1] = Math.min(255, base[k + 1] * shade + spec);
-          px[o + 2] = Math.min(255, base[k + 2] * shade + spec * 0.9);
+          px[o] = Math.min(255, floor[k] + caustic + hi);
+          px[o + 1] = Math.min(255, floor[k + 1] + caustic * 1.05 + hi);
+          px[o + 2] = Math.min(255, floor[k + 2] + caustic * 0.7 + hi);
           px[o + 3] = 255;
         }
       }
@@ -313,25 +293,20 @@ const Feel = (() => {
     }
     function frame(t) {
       if (!running) return;
-      if (t - last >= 32) { last = t; step(); step(); paint(); } // ~30 frames a second is plenty for water
+      if (t - last >= 41) { // ~24 frames a second: the water moves slowly, more would be wasted
+        const dt = last ? Math.min(3, (t - last) / 41) : 1;
+        last = t;
+        phase += SPEED * dt;
+        paint();
+      }
       requestAnimationFrame(frame);
     }
-    function start() {
-      if (running || !visible || reduce || document.hidden) return;
-      running = true;
-      requestAnimationFrame(frame);
-    }
+    function start() { if (running || !visible || reduce || document.hidden) return; running = true; last = 0; requestAnimationFrame(frame); }
     function stop() { running = false; }
-    // let the water settle into its rhythm before it is first seen
-    for (let k = 0; k < 220; k++) step();
     paint();
     new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) start(); else stop(); }).observe(card);
     document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else start(); });
-    card.addEventListener('pointerdown', (e) => {
-      const r = card.getBoundingClientRect();
-      drop(((e.clientX - r.left) / r.width) * W, ((e.clientY - r.top) / r.height) * H, 60);
-    });
-    return { drop };
+    return {};
   }
 
   // ---------------------------------------------------------------- wiring

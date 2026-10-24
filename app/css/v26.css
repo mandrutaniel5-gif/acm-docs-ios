@@ -139,7 +139,17 @@ html.v26 :is(.row, .srow):active { transform: scale(.985); transition-duration: 
     box-shadow: 0 16px 34px -12px rgba(0, 96, 223, .65), inset 0 1px 0 rgba(255, 255, 255, .4), inset 0 -18px 30px -18px rgba(255, 255, 255, .3);
   }
   html.v26 .money-card .water { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; border-radius: inherit; }
-  html.v26 .money-card > :not(.water) { position: relative; z-index: 1; }
+  /* the surface of the glass above the card: a clear sheen from the top-left, a thin bright meniscus at
+     the top edge and the shadow the surface casts inside the rim, so the card reads as lying deeper */
+  html.v26 .money-card { box-shadow: 0 18px 36px -14px rgba(0, 80, 200, .6), 0 2px 6px rgba(0, 40, 120, .18); }
+  html.v26 .money-card::before {
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit;
+    background: linear-gradient(155deg, rgba(255, 255, 255, .26) 0%, rgba(255, 255, 255, .06) 30%, rgba(255, 255, 255, 0) 52%, rgba(255, 255, 255, .05) 100%);
+    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .55), inset 0 14px 22px -14px rgba(0, 20, 80, .45), inset 0 -16px 26px -18px rgba(170, 215, 255, .5), inset 0 0 0 1px rgba(255, 255, 255, .12);
+  }
+  html.v26 .money-card > :not(.water) { z-index: 2; }
+  html.v26 .money-card .mc-amount { text-shadow: 0 1px 1px rgba(0, 30, 90, .2), 0 6px 18px rgba(0, 30, 90, .25); }
+  html.v26 .money-card > :not(.water) { position: relative; }
   html.v26 .mc-amount { font-size: 42px; font-weight: 700; letter-spacing: -.03em; text-shadow: 0 1px 12px rgba(0, 30, 90, .25); }
 
   html.v26 .biz-card, html.v26 .list-card, html.v26 .sec-tip { border-radius: 24px; }
