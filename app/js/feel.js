@@ -279,13 +279,17 @@ const Feel = (() => {
           const dx = (x - SX) / r, dy = (y - SY) / r;
           const face = -(dx * 0.7 + dy * 0.72) * slope;
           const hi = face > 0.32 ? (face - 0.32) * (face - 0.32) * 300 : 0;
-          const caustic = curve > 0 ? curve * curve * curve * 52 : curve * 9;
+          // light gathers on one side of each ring and leaves a shadow on the other, like on a pool floor
+          const caustic = curve > 0 ? curve * curve * curve * 52 : 0;
+          const shadow = (curve < 0 ? Math.pow(-curve, 1.6) * 0.26 : 0) + (face < -0.25 ? (-face - 0.25) * 0.22 : 0);
+          const dim = 1 - Math.min(0.34, shadow);
           // refraction: the floor seen through the moving glass shifts a little along the slope
           const sx = Math.min(W - 1, Math.max(0, Math.round(x + dx * slope * 3))), sy = Math.min(H - 1, Math.max(0, Math.round(y + dy * slope * 3)));
           const k = (sy * W + sx) * 3, o = i * 4;
-          px[o] = Math.min(255, floor[k] + caustic + hi);
-          px[o + 1] = Math.min(255, floor[k + 1] + caustic * 1.05 + hi);
-          px[o + 2] = Math.min(255, floor[k + 2] + caustic * 0.7 + hi);
+          // the shadow is a deeper navy, not grey: blue keeps more of itself than red and green
+          px[o] = Math.min(255, floor[k] * dim * dim + caustic + hi);
+          px[o + 1] = Math.min(255, floor[k + 1] * dim * dim + caustic * 1.05 + hi);
+          px[o + 2] = Math.min(255, floor[k + 2] * dim + caustic * 0.7 + hi);
           px[o + 3] = 255;
         }
       }
