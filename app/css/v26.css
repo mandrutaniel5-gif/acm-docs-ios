@@ -26,175 +26,237 @@ html.v26[data-theme="dark"] {
 /* Apple's own typeface where the system has it (iPhone, iPad, Mac); Inter elsewhere */
 html.v26.ios { --font: -apple-system, 'SF Pro Text', 'Inter', system-ui, sans-serif; }
 
-/* ---------------------------------------------------------------- the light behind the glass */
-html.v26 #v-home .vscroll {
-  background:
-    radial-gradient(120% 60% at 18% -8%, rgba(0, 122, 255, .10), transparent 60%),
-    radial-gradient(90% 50% at 92% -4%, rgba(88, 86, 214, .08), transparent 62%),
-    var(--bg);
+/* ================================================================= liquid glass
+   The material: clear glass that bends the light at its edges. Three layers on every glass surface:
+   1) the body: a little white, a strong blur and more colour from what is behind it;
+   2) the rim: a thin edge, bright where the light comes from (top-left) and again on the opposite edge;
+   3) the caustic: the soft brightening inside the lower edge, where light gathers in real glass.
+   A touch adds light where the finger is (--lx / --ly, set by feel.js). */
+html.v26 {
+  --lg-body: linear-gradient(180deg, rgba(255, 255, 255, .58), rgba(255, 255, 255, .34));
+  --lg-blur: blur(18px) saturate(210%) brightness(1.04);
+  --lg-rim: linear-gradient(140deg, rgba(255, 255, 255, .98), rgba(255, 255, 255, .25) 32%, rgba(255, 255, 255, .06) 58%, rgba(255, 255, 255, .62) 92%);
+  --lg-depth: inset 0 1px 1px rgba(255, 255, 255, .7), inset 0 -10px 18px -10px rgba(255, 255, 255, .55), inset 0 10px 16px -12px rgba(255, 255, 255, .6), 0 10px 30px -8px rgba(15, 23, 42, .16), 0 2px 6px rgba(15, 23, 42, .06);
+  --lg-solid: rgba(250, 250, 252, .84);
 }
-html.v26[data-theme="dark"] #v-home .vscroll {
-  background:
-    radial-gradient(120% 60% at 18% -8%, rgba(10, 132, 255, .20), transparent 60%),
-    radial-gradient(90% 50% at 92% -4%, rgba(94, 92, 230, .16), transparent 62%),
-    var(--bg);
+html.v26[data-theme="dark"] {
+  --lg-body: linear-gradient(180deg, rgba(255, 255, 255, .13), rgba(255, 255, 255, .05));
+  --lg-rim: linear-gradient(140deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .08) 32%, rgba(255, 255, 255, .02) 58%, rgba(255, 255, 255, .3) 92%);
+  --lg-depth: inset 0 1px 1px rgba(255, 255, 255, .18), inset 0 -10px 18px -10px rgba(255, 255, 255, .12), 0 10px 30px -8px rgba(0, 0, 0, .55), 0 2px 6px rgba(0, 0, 0, .4);
+  --lg-solid: rgba(36, 36, 40, .84);
 }
 
-/* ---------------------------------------------------------------- pressing things */
-html.v26 :is(.q, .row, .pill, .btn, .money-card, .fs-step, .cs-tile, #tabbar button, .srow) {
-  transition: transform .42s var(--spring-bounce), background-color .2s, box-shadow .2s, opacity .2s;
+/* surfaces that are glass */
+html.v26 :where(.lg, .quick, .hero-acts button, .hero-acts .ib, .cs-tile, .otools, .money-card) { position: relative; }
+html.v26 :where(.lg, .quick, .hero-acts button, .hero-acts .ib, #tab-glass, #tabbar .tb-plus, .create-sheet, .cs-tile, .otools, .money-card, .scroll-head) { isolation: isolate; }
+html.v26 :where(.lg, .quick, .hero-acts button, .hero-acts .ib, #tab-glass, .create-sheet, .otools) {
+  background: var(--lg-body); -webkit-backdrop-filter: var(--lg-blur); backdrop-filter: var(--lg-blur); box-shadow: var(--lg-depth);
 }
-html.v26 :is(.q, .money-card, .cs-tile, .pill, .btn):active { transform: scale(.955); transition-duration: .12s; transition-timing-function: ease-out; }
-html.v26 :is(.row, .fs-step, .srow):active { transform: scale(.985); transition-duration: .12s; }
+/* the rim, drawn as a 1px ring with a gradient (mask keeps only the edge) */
+html.v26 :where(.lg, .quick, .hero-acts button, .hero-acts .ib, #tab-glass, #tab-lens, #tabbar .tb-plus, .create-sheet, .cs-tile, .otools, .money-card, .scroll-head)::after {
+  content: ''; position: absolute; inset: 0; width: auto; height: auto; border-radius: inherit; padding: 1px; pointer-events: none; z-index: 3;
+  background: var(--lg-rim);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+/* light under the finger */
+html.v26 .lit { --lx: 50%; --ly: 50%; }
+html.v26 .lit:not(.money-card)::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2;
+  background: radial-gradient(circle at var(--lx) var(--ly), rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 62%);
+  animation: lit-out .7s ease-out forwards;
+}
+html.v26 .lit.held::before { animation: none; opacity: 1; }
+@keyframes lit-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* ---------------------------------------------------------------- the light behind everything
+   soft colour that drifts very slowly: glass needs something to bend */
+html.v26 #views { background: var(--bg); }
+html.v26 #views::before {
+  content: ''; position: absolute; inset: -20% -20% auto; height: 70vh; pointer-events: none; z-index: 0; opacity: .9;
+  background:
+    radial-gradient(38% 42% at 22% 30%, rgba(0, 122, 255, .16), transparent 70%),
+    radial-gradient(34% 38% at 78% 22%, rgba(175, 82, 222, .12), transparent 70%),
+    radial-gradient(40% 40% at 55% 62%, rgba(48, 176, 199, .10), transparent 70%);
+  animation: drift 38s ease-in-out infinite alternate;
+}
+html.v26[data-theme="dark"] #views::before { opacity: 1.6; }
+html.v26 #views { position: relative; }
+html.v26 #views > .view { z-index: 1; }
+html.v26 .vscroll { background: transparent !important; }
+@keyframes drift { 0% { transform: translate3d(0, 0, 0) rotate(0); } 50% { transform: translate3d(4%, 3%, 0) rotate(4deg); } 100% { transform: translate3d(-3%, 5%, 0) rotate(-3deg); } }
+
+/* ---------------------------------------------------------------- content surfaces (readable, slightly clear) */
+html.v26 :is(.biz-card, .list-card, .sec-tip, .list-card, .stat, .set-card) {
+  background: rgba(255, 255, 255, .78); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), inset 0 0 0 .5px rgba(0, 0, 0, .05), 0 6px 22px -10px rgba(15, 23, 42, .14);
+}
+html.v26[data-theme="dark"] :is(.biz-card, .list-card, .sec-tip, .stat, .set-card) { background: rgba(28, 28, 30, .72); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 6px 22px -10px rgba(0, 0, 0, .6); }
+
+/* ---------------------------------------------------------------- pressing: content shrinks, glass swells */
+html.v26 :is(.row, .srow, .q) { transition: transform .45s var(--spring-bounce), background-color .2s; }
+html.v26 :is(.row, .srow):active { transform: scale(.985); transition-duration: .12s; }
 
 /* ================================================================= phone */
 @media (max-width: 720px) {
   html.v26 .vwrap { padding: 8px 20px 28px; }
 
-  /* large title, like the system apps: the name of the place you are in */
+  /* large title; when the page scrolls it moves into a small glass bar at the top */
   html.v26 .hero { margin: 4px 0 18px; }
   html.v26 .hero-top { display: flex; align-items: flex-end; justify-content: space-between; min-height: 52px; }
-  html.v26 .hero-brand { margin: 0; gap: 0; }
+  html.v26 .hero-brand { margin: 0; gap: 0; transform-origin: left bottom; transition: transform .5s var(--spring), opacity .3s; }
   html.v26 .hero-brand img, html.v26 .hero-brand small { display: none; }
   html.v26 .hero-brand span { font-size: 34px; font-weight: 700; letter-spacing: -.026em; line-height: 1.1; color: var(--ink); }
   html.v26 .vhead h1 { font-size: 34px; font-weight: 700; letter-spacing: -.026em; }
-  html.v26 .hero-acts .ib, html.v26 .hero-acts button {
-    background: var(--glass); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
-    box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 0 0 .5px var(--glass-rim), 0 2px 8px rgba(15, 23, 42, .06);
+  html.v26 .hero-acts { gap: 8px; }
+  html.v26 .hero-acts button, html.v26 .hero-acts .ib { border-radius: 50%; }
+  html.v26 .scroll-head {
+    position: absolute; z-index: 15; left: 50%; top: 8px; height: 40px; padding: 0 18px; border-radius: 20px; display: flex; align-items: center;
+    font-weight: 650; font-size: 15px; color: var(--ink); pointer-events: none; opacity: 0; transform: translate(-50%, -14px) scale(.8);
+    background: var(--lg-solid); -webkit-backdrop-filter: var(--lg-blur); backdrop-filter: var(--lg-blur); box-shadow: var(--lg-depth);
+    transition: opacity .25s, transform .55s var(--spring-bounce);
   }
+  html.v26 .scrolled .scroll-head { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  html.v26 .scrolled .hero-brand { opacity: 0; transform: scale(.86) translateY(-6px); }
 
-  /* the six ways to start: app icons on one glass shelf, no repeated captions */
-  html.v26 .quick {
-    grid-template-columns: repeat(3, 1fr); gap: 18px 6px; padding: 20px 10px 16px; border-radius: 28px;
-    background: var(--glass); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
-    box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 0 0 .5px var(--glass-rim), var(--glass-lift);
-  }
+  /* the six ways to start: app icons on one glass shelf */
+  html.v26 .quick { grid-template-columns: repeat(3, 1fr); gap: 18px 6px; padding: 20px 10px 16px; border-radius: 30px; }
   html.v26 .q { background: none; box-shadow: none; padding: 0; gap: 0; border-radius: 16px; }
   html.v26 .q small { display: none; }
   html.v26 .q b { font-size: 12.5px; font-weight: 550; margin-top: 8px; letter-spacing: 0; color: var(--ink); }
-  /* squircle icons with the light coming from above, like the ones on the Home Screen */
-  html.v26 .qi { width: 58px; height: 58px; border-radius: 15px; position: relative;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), inset 0 -1px 0 rgba(0, 0, 0, .12), 0 4px 10px -2px rgba(15, 23, 42, .22); }
-  html.v26 .qi::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, 0) 52%); pointer-events: none; }
-  html.v26 .qi svg { width: 28px; height: 28px; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .18)); }
+  html.v26 .qi { width: 58px; height: 58px; border-radius: 16px; position: relative; transition: transform .5s var(--spring-bounce);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), inset 0 -1px 0 rgba(0, 0, 0, .12), 0 6px 14px -4px rgba(15, 23, 42, .3); }
+  html.v26 .qi::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, 0) 50%); pointer-events: none; }
+  html.v26 .qi svg { width: 28px; height: 28px; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .2)); }
+  html.v26 .q:active .qi { transform: scale(.9); transition-duration: .1s; }
 
-  /* first steps (only until they are done) */
-  html.v26 .first-steps { margin-top: 18px; border-radius: var(--r-group); background: var(--surface); box-shadow: var(--shadow-1); overflow: hidden; }
-  html.v26 .fs-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px 4px; }
-  html.v26 .fs-head b { font-size: 17px; font-weight: 650; letter-spacing: -.012em; }
-  html.v26 .fs-head small { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
-  html.v26 .fs-bar { margin: 8px 18px 6px; height: 4px; border-radius: 2px; background: var(--fill); overflow: hidden; }
-  html.v26 .fs-bar i { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width .8s var(--spring); }
-  html.v26 .fs-step { width: 100%; display: flex; align-items: center; gap: 14px; padding: 12px 18px; text-align: left; position: relative; }
-  html.v26 .fs-step:not(:last-child)::after { content: ''; position: absolute; left: 58px; right: 0; bottom: 0; height: .5px; background: var(--line); }
-  html.v26 .fs-n { width: 26px; height: 26px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 13px; font-weight: 650; color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
-  html.v26 .fs-step.done .fs-n { background: var(--green); color: #fff; box-shadow: none; }
-  html.v26 .fs-step.done .fs-n svg { width: 15px; height: 15px; }
-  html.v26 .fs-t { flex: 1; min-width: 0; }
-  html.v26 .fs-t b { display: block; font-size: 15px; font-weight: 600; }
-  html.v26 .fs-t small { display: block; font-size: 13px; color: var(--muted); line-height: 1.35; margin-top: 1px; }
-  html.v26 .fs-step.done .fs-t b { color: var(--muted); font-weight: 500; }
-  html.v26 .fs-step.done .fs-t small { display: none; }
-  html.v26 .fs-step .chev { color: var(--faint); }
-  html.v26 .fs-step.next { background: linear-gradient(90deg, var(--accent-soft), transparent 70%); }
-
-  /* money: one calm accent surface, the number is the design */
+  /* ---------------------------------------------------------------- money: liquid sapphire
+     deep blue glass with light moving slowly through it, a fine grain and a bright rim */
   html.v26 .cards2 { margin-top: 18px; gap: 12px; }
-  html.v26 .money-card { border-radius: var(--r-group); padding: 18px 20px 20px; background: linear-gradient(180deg, #1a8cff, #006be6); box-shadow: 0 10px 26px -8px rgba(0, 107, 230, .55), inset 0 1px 0 rgba(255, 255, 255, .28); }
-  html.v26 .money-card::after { display: none; }
-  html.v26 .mc-amount { font-size: 40px; font-weight: 700; letter-spacing: -.03em; }
-  /* a new person sees only how to start; the rest appears once there is something to show */
-  html.v26 .first-run :is(.money-card, .biz-card.empty, .sec-tip, .sect-h, #recent-list) { display: none; }
-  html.v26 .biz-card { border-radius: var(--r-group); box-shadow: var(--shadow-1); }
+  html.v26 .money-card {
+    border-radius: 26px; padding: 18px 20px 20px; overflow: hidden;
+    background:
+      radial-gradient(60% 80% at var(--cx, 20%) var(--cy, 0%), rgba(140, 200, 255, .55), transparent 60%),
+      radial-gradient(70% 90% at 100% 100%, rgba(94, 92, 230, .85), transparent 65%),
+      linear-gradient(160deg, #0a84ff 0%, #0060df 55%, #3a3fd8 100%);
+    box-shadow: 0 16px 34px -12px rgba(0, 96, 223, .65), inset 0 1px 0 rgba(255, 255, 255, .4), inset 0 -18px 30px -18px rgba(255, 255, 255, .35);
+    animation: sapphire 14s ease-in-out infinite alternate;
+  }
+  html.v26 .money-card::before {
+    content: ''; position: absolute; inset: -40%; z-index: 0; pointer-events: none; opacity: .5; mix-blend-mode: soft-light;
+    background:
+      conic-gradient(from 210deg at 70% 40%, transparent 0 20%, rgba(255, 255, 255, .55) 26%, transparent 34% 62%, rgba(255, 255, 255, .35) 70%, transparent 78%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: caustic 22s linear infinite;
+  }
+  html.v26 .money-card > * { position: relative; z-index: 1; }
+  @keyframes sapphire { 0% { --cx: 12%; --cy: -10%; } 100% { --cx: 88%; --cy: 30%; } }
+  @keyframes caustic { to { transform: rotate(360deg); } }
+  html.v26 .mc-amount { font-size: 42px; font-weight: 700; letter-spacing: -.03em; text-shadow: 0 1px 12px rgba(0, 30, 90, .25); }
 
-  /* inset grouped lists */
+  html.v26 .biz-card, html.v26 .list-card, html.v26 .sec-tip { border-radius: 24px; }
   html.v26 .sect-h { margin: 28px 4px 8px; }
   html.v26 .sect-h h2 { font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
-  html.v26 .list-card { border-radius: var(--r-group); }
   html.v26 .row:not(:last-child)::after { height: .5px; }
-  html.v26 .sec-tip { border-radius: var(--r-group); }
 
-  /* the bar: a floating glass capsule for the places, and Create apart from it, on the right */
+  /* ---------------------------------------------------------------- the bar
+     a glass capsule; the selected place is a bubble of glass that flows to the one you touch.
+     Create is apart, on the right, a drop of tinted glass. */
   html.v26 .vscroll { padding-bottom: calc(104px + var(--safe-b)); }
-  html.v26 #tabbar {
-    height: calc(64px + var(--safe-b)); padding: 0 16px calc(var(--safe-b) + 6px) 16px; gap: 0; background: none; border: 0;
-    -webkit-backdrop-filter: none; backdrop-filter: none; pointer-events: none;
+  html.v26 #tabbar { height: calc(70px + var(--safe-b)); padding: 0 92px calc(var(--safe-b) + 8px) 22px; gap: 0; background: none; border: 0; -webkit-backdrop-filter: none; backdrop-filter: none; pointer-events: none; align-items: flex-end; }
+  html.v26 #tabbar::before { content: none; }
+  html.v26 #tab-glass { position: absolute; left: 16px; right: 88px; bottom: calc(var(--safe-b) + 8px); height: 62px; border-radius: 31px; pointer-events: auto; z-index: 0; background: var(--lg-solid); touch-action: none; }
+  html.v26 #tab-lens {
+    position: absolute; z-index: 1; bottom: calc(var(--safe-b) + 12px); height: 54px; border-radius: 27px; pointer-events: none; left: 0; width: 70px;
+    background: linear-gradient(180deg, rgba(0, 122, 255, .14), rgba(0, 122, 255, .08));
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, .8), inset 0 -6px 12px -6px rgba(255, 255, 255, .6), 0 4px 14px -6px rgba(0, 80, 200, .25);
+    transform-origin: center; will-change: transform, left, width;
   }
-  html.v26 #tabbar::before {
-    content: ''; position: absolute; left: 16px; right: 90px; bottom: calc(var(--safe-b) + 6px); height: 62px; border-radius: 31px; pointer-events: auto;
-    background: var(--glass-bar); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
-    box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 rgba(255, 255, 255, .25), inset 0 0 0 .5px var(--glass-rim), var(--glass-lift);
-  }
-  html.v26 #tabbar button { pointer-events: auto; position: relative; z-index: 1; height: 62px; flex: 1; max-width: calc((100% - 74px) / 4); border-radius: 26px; }
+  html.v26 #tab-lens.moving { background: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .25)); -webkit-backdrop-filter: blur(2px) saturate(220%) brightness(1.08); backdrop-filter: blur(2px) saturate(220%) brightness(1.08);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, .95), inset 0 -8px 14px -6px rgba(255, 255, 255, .8), 0 10px 26px -8px rgba(15, 23, 42, .3); }
+  html.v26[data-theme="dark"] #tab-lens.moving { background: linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .08)); }
+  html.v26 #tabbar button { pointer-events: auto; position: relative; z-index: 2; height: 62px; flex: 1; border-radius: 26px; background: none; transition: color .25s; }
   html.v26 #tabbar button:not(.tb-plus) small { font-size: 10px; font-weight: 600; letter-spacing: .01em; }
-  html.v26 #tabbar button:not(.tb-plus) svg { width: 24px; height: 24px; }
+  html.v26 #tabbar button:not(.tb-plus) svg { width: 24px; height: 24px; transition: transform .5s var(--spring-bounce); }
   html.v26 #tabbar button.on:not(.tb-plus) { color: var(--accent); }
-  /* the selected place sits in a small lens */
-  html.v26 #tabbar button.on:not(.tb-plus)::before { content: ''; position: absolute; inset: 5px 3px; border-radius: 24px; background: rgba(0, 122, 255, .10); z-index: -1; }
+  html.v26 #tabbar button.on:not(.tb-plus) svg { transform: scale(1.06); }
   html.v26 #tabbar .tb-plus {
-    order: 9; position: absolute; right: 16px; bottom: calc(var(--safe-b) + 6px); width: 62px; height: 62px; max-width: none; margin: 0; border-radius: 50%;
-    background: radial-gradient(120% 120% at 30% 15%, #49a6ff, #0a7cff 45%, #0062d6); color: #fff;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -2px 4px rgba(0, 40, 120, .25), 0 10px 24px -6px rgba(0, 98, 214, .6);
+    order: 9; position: absolute; right: 16px; bottom: calc(var(--safe-b) + 8px); width: 62px; height: 62px; flex: none; margin: 0; border-radius: 50%; color: #fff;
+    background: radial-gradient(110% 110% at 30% 12%, rgba(120, 190, 255, .95), rgba(10, 124, 255, .92) 45%, rgba(0, 86, 200, .95));
+    -webkit-backdrop-filter: blur(10px) saturate(200%); backdrop-filter: blur(10px) saturate(200%);
+    box-shadow: inset 0 2px 2px rgba(255, 255, 255, .55), inset 0 -10px 16px -8px rgba(160, 215, 255, .7), 0 12px 26px -8px rgba(0, 98, 214, .65);
   }
-  html.v26 #tabbar .tb-plus svg { width: 28px; height: 28px; transition: transform .5s var(--spring-bounce); }
-  html.v26.create-open #tabbar .tb-plus svg { transform: rotate(45deg); }
-  html.v26 #toasts { bottom: calc(86px + var(--safe-b)); }
+  html.v26 #tabbar .tb-plus svg { width: 28px; height: 28px; transition: transform .6s var(--spring-bounce); filter: drop-shadow(0 1px 1px rgba(0, 40, 120, .3)); }
+  html.v26.create-open #tabbar .tb-plus svg { transform: rotate(135deg); }
+  html.v26 #toasts { bottom: calc(90px + var(--safe-b)); }
 
-  /* ---------------------------------------------------------------- Create: grows out of the button */
+  /* ---------------------------------------------------------------- Create: a drop that grows out of the button */
   html.v26 .create-sheet {
-    position: fixed; z-index: 210; left: 12px; right: 12px; bottom: calc(var(--safe-b) + 80px); border-radius: 30px; padding: 14px 12px 8px;
-    background: var(--glass-bar); -webkit-backdrop-filter: blur(34px) saturate(190%); backdrop-filter: blur(34px) saturate(190%);
-    box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 0 0 .5px var(--glass-rim), 0 24px 60px -12px rgba(15, 23, 42, .35);
-    transform-origin: calc(100% - 19px) calc(100% + 37px);
-    animation: cs-grow .55s var(--spring-bounce) both;
+    position: fixed; z-index: 210; left: 12px; right: 12px; bottom: calc(var(--safe-b) + 84px); border-radius: 32px; padding: 14px 12px 8px;
+    background: var(--lg-solid); -webkit-backdrop-filter: blur(30px) saturate(200%); backdrop-filter: blur(30px) saturate(200%);
+    transform-origin: calc(100% - 19px) calc(100% + 39px);
+    animation: cs-grow .62s var(--spring-bounce) both;
   }
-  html.v26 .create-sheet.closing { animation: cs-shrink .26s cubic-bezier(.4, 0, .9, .6) both; }
-  html.v26 .create-sheet > * { animation: cs-in .45s var(--spring) both; animation-delay: .07s; }
-  html.v26 .create-sheet .cs-list { animation-delay: .11s; }
+  html.v26 .create-sheet.closing { animation: cs-shrink .3s cubic-bezier(.5, 0, .8, .4) both; }
+  html.v26 .create-sheet > * { animation: cs-in .5s var(--spring) both; animation-delay: .08s; }
+  html.v26 .create-sheet .cs-list { animation-delay: .13s; }
   html.v26 .cs-title { font-size: 13px; font-weight: 600; color: var(--muted); padding: 2px 8px 10px; }
   html.v26 .cs-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  html.v26 .cs-tile { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 4px 12px; border-radius: 20px; background: rgba(255, 255, 255, .55); box-shadow: inset 0 0 0 .5px var(--glass-rim); font-size: 13px; font-weight: 600; color: var(--ink); }
-  html.v26[data-theme="dark"] .cs-tile { background: rgba(255, 255, 255, .07); }
-  html.v26 .cs-tile .qi { width: 44px; height: 44px; border-radius: 12px; }
+  html.v26 .cs-tile { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 4px 12px; border-radius: 22px; font-size: 13px; font-weight: 600; color: var(--ink);
+    background: linear-gradient(180deg, rgba(255, 255, 255, .7), rgba(255, 255, 255, .4)); box-shadow: inset 0 -8px 14px -10px rgba(255, 255, 255, .8), 0 4px 12px -6px rgba(15, 23, 42, .14); }
+  html.v26[data-theme="dark"] .cs-tile { background: rgba(255, 255, 255, .08); }
+  html.v26 .cs-tile .qi { width: 44px; height: 44px; border-radius: 13px; }
   html.v26 .cs-tile .qi svg { width: 22px; height: 22px; }
+  html.v26 .cs-tiles .cs-tile { animation: pop .6s var(--spring-bounce) both; }
+  html.v26 .cs-tiles .cs-tile:nth-child(2) { animation-delay: .04s; }
+  html.v26 .cs-tiles .cs-tile:nth-child(3) { animation-delay: .08s; }
   html.v26 .cs-list { margin-top: 8px; }
-  html.v26 .cs-list button { display: flex; align-items: center; gap: 14px; width: 100%; height: 50px; padding: 0 10px; border-radius: 14px; font-size: 16px; color: var(--ink); text-align: left; }
-  html.v26 .cs-list button:active { background: var(--press); }
+  html.v26 .cs-list button { display: flex; align-items: center; gap: 14px; width: 100%; height: 50px; padding: 0 10px; border-radius: 16px; font-size: 16px; color: var(--ink); text-align: left; transition: background-color .2s, transform .4s var(--spring-bounce); }
+  html.v26 .cs-list button:active { background: rgba(0, 122, 255, .1); transform: scale(.98); }
   html.v26 .cs-list button svg { width: 22px; height: 22px; color: var(--muted); fill: currentColor; }
   html.v26 .cs-list hr { border: 0; height: .5px; background: var(--line); margin: 4px 10px; }
-  html.v26 .cs-back { position: fixed; inset: 0; z-index: 205; background: rgba(15, 23, 42, .16); animation: fadein .3s; }
-  html.v26 .cs-back.closing { animation: fadeout .22s both; }
-  @keyframes cs-grow { from { transform: scale(.16, .13); opacity: 0; } 25% { opacity: 1; } to { transform: none; } }
-  @keyframes cs-shrink { to { transform: scale(.12, .07); opacity: 0; } }
-  @keyframes cs-in { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
+  html.v26 .cs-back { position: fixed; inset: 0; z-index: 205; background: rgba(15, 23, 42, .14); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); animation: fadein .35s; }
+  html.v26 .cs-back.closing { animation: fadeout .25s both; }
+  @keyframes cs-grow { 0% { transform: scale(.16, .13); opacity: 0; filter: blur(6px); } 22% { opacity: 1; filter: blur(0); } 100% { transform: none; } }
+  @keyframes cs-shrink { to { transform: scale(.16, .13); opacity: 0; filter: blur(4px); } }
+  @keyframes cs-in { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: none; } }
+  @keyframes pop { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
   @keyframes fadeout { to { opacity: 0; } }
 
-  /* sheets and dialogs: glass, a deeper radius, spring in */
-  html.v26 .modal { border-radius: 32px 32px 0 0; animation: sheetin .5s var(--spring); }
+  /* the first moment after opening the app: the shelf rises and the icons settle in, once */
+  html.v26.intro .quick { animation: rise .8s var(--spring-bounce) both; }
+  html.v26.intro .q { animation: pop .7s var(--spring-bounce) both; }
+  html.v26.intro .q:nth-child(1) { animation-delay: .10s; } html.v26.intro .q:nth-child(2) { animation-delay: .14s; } html.v26.intro .q:nth-child(3) { animation-delay: .18s; }
+  html.v26.intro .q:nth-child(4) { animation-delay: .22s; } html.v26.intro .q:nth-child(5) { animation-delay: .26s; } html.v26.intro .q:nth-child(6) { animation-delay: .30s; }
+  html.v26.intro .cards2, html.v26.intro .sec-tip, html.v26.intro .sect-h, html.v26.intro #recent-list { animation: rise .8s var(--spring) both; animation-delay: .28s; }
+  html.v26.intro #tab-glass, html.v26.intro #tabbar .tb-plus { animation: rise-bar .8s var(--spring-bounce) both; animation-delay: .12s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(24px) scale(.97); } to { opacity: 1; transform: none; } }
+  @keyframes rise-bar { from { opacity: 0; transform: translateY(30px) scale(.9); } to { opacity: 1; transform: none; } }
+
+  /* changing place: the new page arrives with a short, soft move */
+  html.v26 .view.enter { animation: view-in .5s var(--spring) both; }
+  @keyframes view-in { from { opacity: 0; transform: translateY(10px) scale(.992); } to { opacity: 1; transform: none; } }
+
+  /* sheets and dialogs */
+  html.v26 .modal { border-radius: 34px 34px 0 0; animation: sheetin .55s var(--spring); }
   html.v26 .sheet-grip { width: 36px; height: 5px; background: rgba(120, 120, 128, .3); }
 
-  /* one message at a time, as a floating glass pill */
-  html.v26 .toast { border-radius: 22px; padding: 13px 18px; background: rgba(30, 30, 32, .82); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); box-shadow: 0 12px 30px -8px rgba(0, 0, 0, .35); animation: toastin .5s var(--spring-bounce) both; }
+  /* one message at a time, a dark glass pill */
+  html.v26 .toast { border-radius: 24px; padding: 13px 18px; background: rgba(30, 30, 32, .78); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 12px 30px -8px rgba(0, 0, 0, .35); animation: toastin .6s var(--spring-bounce) both; }
   html.v26 .toast.leaving { animation: fadeout .2s both; }
-  @keyframes toastin { from { opacity: 0; transform: translateY(14px) scale(.94); } to { opacity: 1; transform: none; } }
+  @keyframes toastin { from { opacity: 0; transform: translateY(18px) scale(.9); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
 
-  /* editors: the top bar floats over the page */
+  /* editors */
   html.v26 .otop, html.v26 #topbar { background: transparent; border-bottom: 0; }
+  html.v26 #wr-scroll { background: transparent; }
+  html.v26 #wr-page.screen-view { border-radius: 20px; box-shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 8px 30px -10px rgba(15, 23, 42, .14); margin: 6px auto 0; }
+  html.v26 .otools { margin: 0 10px calc(8px + var(--safe-b)); padding: 5px 8px; min-height: 54px; border-radius: 27px; border: 0; background: var(--lg-solid); }
 }
+
+/* the properties the light animates */
+@property --cx { syntax: '<percentage>'; inherits: false; initial-value: 20%; }
+@property --cy { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
 
 @media (prefers-reduced-motion: reduce) {
-  html.v26 *, html.v26 *::before, html.v26 *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-}
-
-/* ---------------------------------------------------------------- editors on the phone */
-@media (max-width: 720px) {
-  /* the document reads like a page of its own: real text size, soft edge, no grey frame around it */
-  html.v26 #wr-scroll { background: var(--bg); }
-  html.v26 #wr-page.screen-view { border-radius: 18px; box-shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 8px 30px -10px rgba(15, 23, 42, .14); margin: 6px auto 0; }
-  /* the formatting tools float as one glass capsule above the keyboard area */
-  html.v26 .otools {
-    margin: 0 10px calc(8px + var(--safe-b)); padding: 5px 8px; min-height: 54px; border-radius: 27px; border: 0;
-    background: var(--glass-bar); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
-    box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 0 0 .5px var(--glass-rim), var(--glass-lift);
-  }
+  html.v26 *, html.v26 *::before, html.v26 *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }

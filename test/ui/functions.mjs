@@ -31,11 +31,11 @@ const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, de
 const pg = await ctx.newPage();
 const pageErrors = [];
 pg.on('pageerror', (e) => pageErrors.push(String(e.message || e).split('\n')[0]));
-await pg.addInitScript(({ pdf }) => {
+await pg.addInitScript(({ pdf, look }) => {
   window.__ACM_TEST = { platform: 'ios', files: { '/docs/Contract.pdf': pdf }, openPick: '/docs/Contract.pdf' };
-  try { localStorage.setItem('acm.lang', 'ro'); localStorage.setItem('acm.lang.chosen', '1'); localStorage.setItem('acm.account.later', '1'); } catch (e) {}
+  try { localStorage.setItem('acm.lang', 'ro'); localStorage.setItem('acm.lang.chosen', '1'); localStorage.setItem('acm.account.later', '1'); if (look) localStorage.setItem('acm.look', look); } catch (e) {}
   document.addEventListener('DOMContentLoaded', () => document.documentElement.classList.add('ios-glass'));
-}, { pdf });
+}, { pdf, look: process.env.LOOK || '' });
 await pg.addInitScript(bridge);
 
 // ---------------------------------------------------------------- helpers
@@ -91,8 +91,8 @@ await check('Aplicația pornește și arată ecranul Acasă', async () => {
 });
 
 await check('Navigare: Fișiere, Facturi, Setări, înapoi la Acasă (bara de jos)', async () => {
-  for (const [i, v] of [[2, 'files'], [4, 'invoices'], [5, 'settings'], [1, 'home']]) {
-    await pg.locator(`#tabbar > *:nth-child(${i})`).click();
+  for (const v of ['files', 'invoices', 'settings', 'home']) {
+    await pg.locator(`#tabbar button[data-view="${v}"]`).click();
     await sleep(350);
     if (!(await pg.isVisible(`#v-${v}`))) throw new Error(`ecranul ${v} nu s-a deschis`);
   }
