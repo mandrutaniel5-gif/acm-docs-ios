@@ -1818,5 +1818,20 @@
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"لم تجده؟ تحقق أيضًا من مجلد البريد غير المرغوب فيه. الرمز صالح لمدة 15 دقيقة.",
 "Încă nu văd confirmarea. Încearcă din nou.":"لم يتم التأكيد بعد. حاول مرة أخرى.",
 "Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"انتهت صلاحية الرمز أو جُرّب مرات كثيرة. اطلب رمزًا جديدًا.",
-"Cine a ieșit din grup nu poate fi adăugat din nou.":"لا يمكن إضافة من غادر المجموعة مرة أخرى."
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"لا يمكن إضافة من غادر المجموعة مرة أخرى.",
+"PDF gol":"ملف PDF فارغ",
+"Nicio factură luna aceasta":"لا توجد فواتير هذا الشهر",
+"Atinge orice din pagină ca să-l selectezi · trage ca să-l muți · colțurile îl redimensionează · atinge de două ori un text ca să-l editezi":"اضغط على أي عنصر في الصفحة لتحديده · اسحب لتحريكه · الزوايا تغيّر حجمه · اضغط مرتين على النص لتعديله",
+"Atinge un text ca să-l modifici sau oriunde în pagină ca să scrii text nou (fontul și mărimea se potrivesc automat)":"اضغط على نص لتغييره، أو في أي مكان في الصفحة لكتابة نص جديد (يتطابق الخط والحجم تلقائيًا)",
+"Desenează cu degetul":"ارسم بإصبعك",
+"Atinge unde vrei bifa":"اضغط حيث تريد علامة الصح",
+"Atinge unde vrei X-ul":"اضغط حيث تريد علامة X",
+"Atinge pagina ca să pui imaginea (sau trage un dreptunghi pentru mărime)":"اضغط على الصفحة لوضع الصورة (أو اسحب مستطيلًا لتحديد الحجم)",
+"Text pe lățimea ecranului":"النص بعرض الشاشة",
+"Pagina întreagă":"الصفحة كاملة",
+"Atinge pentru titlu":"اضغط لإضافة عنوان",
+"Atinge pentru text":"اضغط لإضافة نص",
+"Atinge pentru subtitlu":"اضغط لإضافة عنوان فرعي",
+"Atinge pentru titlul secțiunii":"اضغط لإضافة عنوان القسم",
+"Caută în document":"البحث في المستند"
 };

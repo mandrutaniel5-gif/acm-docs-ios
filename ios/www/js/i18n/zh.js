@@ -1818,5 +1818,20 @@
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"找不到？请同时检查垃圾邮件文件夹。验证码 15 分钟内有效。",
 "Încă nu văd confirmarea. Încearcă din nou.":"尚未确认，请重试。",
 "Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"验证码已过期或尝试次数过多，请重新获取验证码。",
-"Cine a ieșit din grup nu poate fi adăugat din nou.":"已退出群组的人无法再次被添加。"
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"已退出群组的人无法再次被添加。",
+"PDF gol":"空白 PDF",
+"Nicio factură luna aceasta":"本月没有发票",
+"Atinge orice din pagină ca să-l selectezi · trage ca să-l muți · colțurile îl redimensionează · atinge de două ori un text ca să-l editezi":"轻点页面上的任何内容即可选中 · 拖动可移动 · 拖动角可调整大小 · 轻点两下文本即可编辑",
+"Atinge un text ca să-l modifici sau oriunde în pagină ca să scrii text nou (fontul și mărimea se potrivesc automat)":"轻点文本即可修改，或轻点页面任意位置书写新文本（字体和字号自动匹配）",
+"Desenează cu degetul":"用手指绘制",
+"Atinge unde vrei bifa":"轻点要放置勾号的位置",
+"Atinge unde vrei X-ul":"轻点要放置 X 的位置",
+"Atinge pagina ca să pui imaginea (sau trage un dreptunghi pentru mărime)":"轻点页面放置图片（或拖出矩形设定大小）",
+"Text pe lățimea ecranului":"文本适应屏幕宽度",
+"Pagina întreagă":"整页",
+"Atinge pentru titlu":"轻点以添加标题",
+"Atinge pentru text":"轻点以添加文本",
+"Atinge pentru subtitlu":"轻点以添加副标题",
+"Atinge pentru titlul secțiunii":"轻点以添加节标题",
+"Caută în document":"在文档中查找"
 };

@@ -218,7 +218,11 @@ const Slides = (() => {
       const inner = document.createElement('div');
       inner.className = 'txi';
       inner.style.cssText = txStyle(e);
-      if (e.ph) inner.dataset.ph = e.ph;
+      if (e.ph) {
+        // touch screens: "Atinge pentru titlu" instead of "Click pentru titlu"
+        const ph = Host.mobile || matchMedia('(pointer: coarse)').matches ? e.ph.replace(/^Click pentru/, 'Atinge pentru') : e.ph;
+        inner.dataset.ph = typeof I18n !== 'undefined' && I18n.t ? I18n.t(ph) : ph;
+      }
       let html = e.html || '';
       if (s.bullets && html && !/<(ul|ol)\b/i.test(html)) html = toBullets(html);
       inner.innerHTML = html;

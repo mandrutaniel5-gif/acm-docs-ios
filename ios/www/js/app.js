@@ -161,7 +161,7 @@ const App = (() => {
     // invoices card
     const s = Invoice.summary();
     $('mc-amount').innerHTML = s ? `${Invoice.money(s.month)}<small>${escapeHtml(s.currency)}</small>` : `0,00<small>lei</small>`;
-    $('mc-sub').textContent = !s ? 'Configurează firma și emite prima factură' : s.unpaidCount ? `${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} · clienții îți datorează ${Invoice.money(s.unpaid)} ${s.currency}` : `${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} luna aceasta · toate plătite`;
+    $('mc-sub').textContent = !s ? 'Configurează firma și emite prima factură' : !s.monthCount ? (s.unpaidCount ? `${I18n.t('Clienții îți datorează')} ${Invoice.money(s.unpaid)} ${s.currency}` : 'Nicio factură luna aceasta') : s.unpaidCount ? `${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} · clienții îți datorează ${Invoice.money(s.unpaid)} ${s.currency}` : `${s.monthCount} ${s.monthCount === 1 ? 'factură' : 'facturi'} luna aceasta · toate plătite`;
     $('act-invoice-sub').textContent = s && s.last ? `${I18n.t('Ultima:')} ${s.last.series}-${String(s.last.number).padStart(4, '0')}` : 'Nouă';
     // business card
     const bc = $('home-biz');
@@ -819,8 +819,18 @@ const App = (() => {
     place: 'Click în pagină ca să pui imaginea (sau trage un dreptunghi pentru mărime) · Esc renunță',
   };
 
+  // on touch screens the hints talk about touching, not clicking
+  const TOUCH_HINTS = {
+    select: 'Atinge orice din pagină ca să-l selectezi · trage ca să-l muți · colțurile îl redimensionează · atinge de două ori un text ca să-l editezi',
+    text: 'Atinge un text ca să-l modifici sau oriunde în pagină ca să scrii text nou (fontul și mărimea se potrivesc automat)',
+    pen: 'Desenează cu degetul',
+    check: 'Atinge unde vrei bifa',
+    cross: 'Atinge unde vrei X-ul',
+    place: 'Atinge pagina ca să pui imaginea (sau trage un dreptunghi pentru mărime)',
+  };
+  const touchScreen = () => Host.mobile || matchMedia('(pointer: coarse)').matches;
   function hint() {
-    $('hint').textContent = HINTS[Editor.tool] || '';
+    $('hint').textContent = (touchScreen() && TOUCH_HINTS[Editor.tool]) || HINTS[Editor.tool] || '';
   }
 
   async function chooseTool(id) {
@@ -869,6 +879,7 @@ const App = (() => {
     const r = $('btn-more').getBoundingClientRect();
     const cur = Pages.current;
     UI.menu(r.right - 260, r.bottom + 6, [
+      UI.phone() && document.documentElement.classList.contains('v26') ? { label: 'Caută în document', icon: 'search', run: () => $('btn-search').click() } : null,
       { label: 'Salvează ca…', icon: 'save', run: () => saveAs() },
       typeof AcmShare !== 'undefined' ? { label: 'Trimite criptat (.acm)…', icon: 'lockfile', run: () => sendEncrypted() } : null,
       { label: 'Fă editabil textul din poze (pagina asta)', icon: 'text', run: () => ImageText.run(cur, null) },
@@ -1137,7 +1148,7 @@ const App = (() => {
   document.addEventListener('DOMContentLoaded', boot);
 
   return {
-    chooseTool, pickImage, openPath, recentFiles: () => files().filter((f) => Host.exists(f.path)), renderView, ensureClosed: async () => (await ensureSaved()) && (await Office.ensureSaved()), quietScanHint, save, saveAs, closeDoc, addPdf, showScreen, showHome, showView, rememberFile, forgetPath, scan, back,
+    chooseTool, pickImage, openPath, newBlank, openDialog, renderHome, recentFiles: () => files().filter((f) => Host.exists(f.path)), renderView, ensureClosed: async () => (await ensureSaved()) && (await Office.ensureSaved()), quietScanHint, save, saveAs, closeDoc, addPdf, showScreen, showHome, showView, rememberFile, forgetPath, scan, back,
     get copyPath() { return copyPath; },
   };
 })();

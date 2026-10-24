@@ -1818,5 +1818,20 @@
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"Bulamıyor musunuz? Spam klasörünü de kontrol edin. Kod 15 dakika geçerlidir.",
 "Încă nu văd confirmarea. Încearcă din nou.":"Henüz onaylanmadı. Lütfen yeniden deneyin.",
 "Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"Kodun süresi doldu veya çok fazla denendi. Yeni bir kod isteyin.",
-"Cine a ieșit din grup nu poate fi adăugat din nou.":"Gruptan ayrılan biri yeniden eklenemez."
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"Gruptan ayrılan biri yeniden eklenemez.",
+"PDF gol":"Boş PDF",
+"Nicio factură luna aceasta":"Bu ay fatura yok",
+"Atinge orice din pagină ca să-l selectezi · trage ca să-l muți · colțurile îl redimensionează · atinge de două ori un text ca să-l editezi":"Seçmek için sayfadaki herhangi bir öğeye dokunun · taşımak için sürükleyin · köşeler boyutlandırır · düzenlemek için metne iki kez dokunun",
+"Atinge un text ca să-l modifici sau oriunde în pagină ca să scrii text nou (fontul și mărimea se potrivesc automat)":"Değiştirmek için bir metne veya yeni metin yazmak için sayfada herhangi bir yere dokunun (yazı tipi ve boyut otomatik uyum sağlar)",
+"Desenează cu degetul":"Parmağınızla çizin",
+"Atinge unde vrei bifa":"Onay işaretini istediğiniz yere dokunun",
+"Atinge unde vrei X-ul":"X işaretini istediğiniz yere dokunun",
+"Atinge pagina ca să pui imaginea (sau trage un dreptunghi pentru mărime)":"Görseli yerleştirmek için sayfaya dokunun (veya boyut için bir dikdörtgen sürükleyin)",
+"Text pe lățimea ecranului":"Ekran genişliğinde metin",
+"Pagina întreagă":"Tam sayfa",
+"Atinge pentru titlu":"Başlık eklemek için dokunun",
+"Atinge pentru text":"Metin eklemek için dokunun",
+"Atinge pentru subtitlu":"Alt başlık eklemek için dokunun",
+"Atinge pentru titlul secțiunii":"Bölüm başlığı eklemek için dokunun",
+"Caută în document":"Belgede ara"
 };

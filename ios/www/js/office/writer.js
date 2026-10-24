@@ -641,8 +641,22 @@ const Writer = (() => {
     s.textContent = css || '';
   }
 
+  // phones (2.6): the text flows to the width of the screen at its real size, like Pages; the page
+  // itself (margins, A4) is unchanged in the file and in the PDF. "Pagina întreagă" shows the sheet.
+  let wholePage = false;
+  const screenView = () => UI.phone() && !wholePage && typeof Feel !== 'undefined' && Feel.on;
   function applyPage() {
     const p = page();
+    p.classList.toggle('screen-view', screenView());
+    if (screenView()) {
+      const w = Math.max(280, $('wr-scroll').clientWidth - 24);
+      p.style.padding = '28px 22px 120px';
+      p.style.width = w + 'px';
+      p.style.minHeight = Math.round(w * 1.3) + 'px';
+      p.style.zoom = 1;
+      $('wr-zoomval').textContent = '100%';
+      return;
+    }
     p.style.padding = `${margins.t}px ${margins.r}px ${margins.b}px ${margins.l}px`;
     p.style.width = PAGE_W + 'px';
     p.style.minHeight = PAGE_H + 'px';
@@ -1059,6 +1073,7 @@ ${css}
     UI.menu(r.right - 260, r.bottom + 6, [
       { label: 'Salvează ca…', icon: 'save', run: () => saveAs() },
       { label: 'Exportă ca PDF', icon: 'pdf', run: () => exportPdf() },
+      UI.phone() && typeof Feel !== 'undefined' && Feel.on ? { label: wholePage ? 'Text pe lățimea ecranului' : 'Pagina întreagă', icon: 'layout', run: () => { wholePage = !wholePage; fitZoom(); } } : null,
       '-',
       { label: 'Margini: normale (2,54 cm)', icon: 'layout', run: () => setMargins(96) },
       { label: 'Margini: înguste (1,27 cm)', icon: 'layout', run: () => setMargins(48) },

@@ -1818,5 +1818,20 @@
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"Vous ne le trouvez pas ? Vérifiez aussi le dossier Spam. Le code est valable 15 minutes.",
 "Încă nu văd confirmarea. Încearcă din nou.":"Pas encore confirmé. Réessayez.",
 "Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"Le code a expiré ou a été essayé trop de fois. Demandez un nouveau code.",
-"Cine a ieșit din grup nu poate fi adăugat din nou.":"Une personne qui a quitté le groupe ne peut pas y être ajoutée à nouveau."
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"Une personne qui a quitté le groupe ne peut pas y être ajoutée à nouveau.",
+"PDF gol":"PDF vierge",
+"Nicio factură luna aceasta":"Aucune facture ce mois-ci",
+"Atinge orice din pagină ca să-l selectezi · trage ca să-l muți · colțurile îl redimensionează · atinge de două ori un text ca să-l editezi":"Touchez un élément de la page pour le sélectionner · faites glisser pour le déplacer · les coins le redimensionnent · touchez deux fois un texte pour le modifier",
+"Atinge un text ca să-l modifici sau oriunde în pagină ca să scrii text nou (fontul și mărimea se potrivesc automat)":"Touchez un texte pour le modifier, ou n’importe où sur la page pour écrire un nouveau texte (police et taille s’ajustent automatiquement)",
+"Desenează cu degetul":"Dessinez avec le doigt",
+"Atinge unde vrei bifa":"Touchez l’endroit où placer la coche",
+"Atinge unde vrei X-ul":"Touchez l’endroit où placer le X",
+"Atinge pagina ca să pui imaginea (sau trage un dreptunghi pentru mărime)":"Touchez la page pour placer l’image (ou tracez un rectangle pour choisir sa taille)",
+"Text pe lățimea ecranului":"Texte à la largeur de l’écran",
+"Pagina întreagă":"Page entière",
+"Atinge pentru titlu":"Touchez pour ajouter un titre",
+"Atinge pentru text":"Touchez pour ajouter du texte",
+"Atinge pentru subtitlu":"Touchez pour ajouter un sous-titre",
+"Atinge pentru titlul secțiunii":"Touchez pour ajouter un titre de section",
+"Caută în document":"Rechercher dans le document"
 };

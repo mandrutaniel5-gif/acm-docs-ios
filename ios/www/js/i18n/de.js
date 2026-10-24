@@ -1818,5 +1818,20 @@
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"Nicht gefunden? Sieh auch im Spam-Ordner nach. Der Code ist 15 Minuten gültig.",
 "Încă nu văd confirmarea. Încearcă din nou.":"Noch nicht bestätigt. Bitte versuche es erneut.",
 "Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"Der Code ist abgelaufen oder wurde zu oft versucht. Fordere einen neuen Code an.",
-"Cine a ieșit din grup nu poate fi adăugat din nou.":"Wer die Gruppe verlassen hat, kann nicht erneut hinzugefügt werden."
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"Wer die Gruppe verlassen hat, kann nicht erneut hinzugefügt werden.",
+"PDF gol":"Leeres PDF",
+"Nicio factură luna aceasta":"Keine Rechnungen in diesem Monat",
+"Atinge orice din pagină ca să-l selectezi · trage ca să-l muți · colțurile îl redimensionează · atinge de două ori un text ca să-l editezi":"Tippe auf etwas auf der Seite, um es auszuwählen · ziehe zum Verschieben · die Ecken ändern die Größe · tippe zweimal auf Text, um ihn zu bearbeiten",
+"Atinge un text ca să-l modifici sau oriunde în pagină ca să scrii text nou (fontul și mărimea se potrivesc automat)":"Tippe auf Text, um ihn zu ändern, oder irgendwo auf die Seite, um neuen Text zu schreiben (Schrift und Größe passen sich automatisch an)",
+"Desenează cu degetul":"Mit dem Finger zeichnen",
+"Atinge unde vrei bifa":"Tippe dorthin, wo das Häkchen hin soll",
+"Atinge unde vrei X-ul":"Tippe dorthin, wo das X hin soll",
+"Atinge pagina ca să pui imaginea (sau trage un dreptunghi pentru mărime)":"Tippe auf die Seite, um das Bild zu platzieren (oder ziehe ein Rechteck für die Größe)",
+"Text pe lățimea ecranului":"Text in Bildschirmbreite",
+"Pagina întreagă":"Ganze Seite",
+"Atinge pentru titlu":"Tippen, um Titel hinzuzufügen",
+"Atinge pentru text":"Tippen, um Text hinzuzufügen",
+"Atinge pentru subtitlu":"Tippen, um Untertitel hinzuzufügen",
+"Atinge pentru titlul secțiunii":"Tippen, um Abschnittstitel hinzuzufügen",
+"Caută în document":"Im Dokument suchen"
 };

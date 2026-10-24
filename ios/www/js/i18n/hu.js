@@ -1818,5 +1818,20 @@
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"Nem találod? Nézd meg a Spam mappát is. A kód 15 percig érvényes.",
 "Încă nu văd confirmarea. Încearcă din nou.":"Még nincs megerősítve. Próbáld újra.",
 "Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"A kód lejárt, vagy túl sokszor próbálták. Kérj új kódot.",
-"Cine a ieșit din grup nu poate fi adăugat din nou.":"Aki kilépett a csoportból, nem adható hozzá újra."
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"Aki kilépett a csoportból, nem adható hozzá újra.",
+"PDF gol":"Üres PDF",
+"Nicio factură luna aceasta":"Ebben a hónapban nincs számla",
+"Atinge orice din pagină ca să-l selectezi · trage ca să-l muți · colțurile îl redimensionează · atinge de două ori un text ca să-l editezi":"Koppints bármire az oldalon a kijelöléshez · húzd az áthelyezéshez · a sarkokkal átméretezheted · koppints kétszer a szövegre a szerkesztéshez",
+"Atinge un text ca să-l modifici sau oriunde în pagină ca să scrii text nou (fontul și mărimea se potrivesc automat)":"Koppints egy szövegre a módosításhoz, vagy bárhová az oldalon új szöveg írásához (a betűtípus és a méret automatikusan igazodik)",
+"Desenează cu degetul":"Rajzolj az ujjaddal",
+"Atinge unde vrei bifa":"Koppints oda, ahová a pipát szeretnéd",
+"Atinge unde vrei X-ul":"Koppints oda, ahová az X-et szeretnéd",
+"Atinge pagina ca să pui imaginea (sau trage un dreptunghi pentru mărime)":"Koppints az oldalra a kép elhelyezéséhez (vagy húzz egy téglalapot a mérethez)",
+"Text pe lățimea ecranului":"Szöveg a képernyő szélességében",
+"Pagina întreagă":"Teljes oldal",
+"Atinge pentru titlu":"Koppints a cím hozzáadásához",
+"Atinge pentru text":"Koppints a szöveg hozzáadásához",
+"Atinge pentru subtitlu":"Koppints az alcím hozzáadásához",
+"Atinge pentru titlul secțiunii":"Koppints a szakaszcím hozzáadásához",
+"Caută în document":"Keresés a dokumentumban"
 };

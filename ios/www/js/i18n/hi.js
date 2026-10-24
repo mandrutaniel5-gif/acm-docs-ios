@@ -1818,5 +1818,20 @@
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"नहीं मिल रहा? स्पैम फ़ोल्डर भी देखें। कोड 15 मिनट तक मान्य है।",
 "Încă nu văd confirmarea. Încearcă din nou.":"अभी पुष्टि नहीं हुई। फिर से प्रयास करें।",
 "Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"कोड की समय-सीमा समाप्त हो गई या बहुत बार आज़माया गया। नया कोड माँगें।",
-"Cine a ieșit din grup nu poate fi adăugat din nou.":"जिसने समूह छोड़ दिया है, उसे फिर से नहीं जोड़ा जा सकता।"
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"जिसने समूह छोड़ दिया है, उसे फिर से नहीं जोड़ा जा सकता।",
+"PDF gol":"खाली PDF",
+"Nicio factură luna aceasta":"इस महीने कोई इनवॉइस नहीं",
+"Atinge orice din pagină ca să-l selectezi · trage ca să-l muți · colțurile îl redimensionează · atinge de două ori un text ca să-l editezi":"पेज पर किसी भी चीज़ को चुनने के लिए टैप करें · खिसकाने के लिए खींचें · कोनों से आकार बदलें · टेक्स्ट बदलने के लिए उस पर दो बार टैप करें",
+"Atinge un text ca să-l modifici sau oriunde în pagină ca să scrii text nou (fontul și mărimea se potrivesc automat)":"टेक्स्ट बदलने के लिए उस पर टैप करें, या नया टेक्स्ट लिखने के लिए पेज पर कहीं भी टैप करें (फ़ॉन्ट और आकार अपने आप मेल खाते हैं)",
+"Desenează cu degetul":"उंगली से बनाएँ",
+"Atinge unde vrei bifa":"जहाँ सही का निशान चाहिए वहाँ टैप करें",
+"Atinge unde vrei X-ul":"जहाँ X चाहिए वहाँ टैप करें",
+"Atinge pagina ca să pui imaginea (sau trage un dreptunghi pentru mărime)":"इमेज रखने के लिए पेज पर टैप करें (या आकार के लिए एक आयत खींचें)",
+"Text pe lățimea ecranului":"स्क्रीन की चौड़ाई पर टेक्स्ट",
+"Pagina întreagă":"पूरा पेज",
+"Atinge pentru titlu":"शीर्षक जोड़ने के लिए टैप करें",
+"Atinge pentru text":"टेक्स्ट जोड़ने के लिए टैप करें",
+"Atinge pentru subtitlu":"उपशीर्षक जोड़ने के लिए टैप करें",
+"Atinge pentru titlul secțiunii":"अनुभाग शीर्षक जोड़ने के लिए टैप करें",
+"Caută în document":"दस्तावेज़ में खोजें"
 };

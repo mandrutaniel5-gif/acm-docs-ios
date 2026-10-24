@@ -1818,5 +1818,20 @@
 "Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"찾을 수 없나요? 스팸 폴더도 확인하세요. 코드는 15분 동안 유효합니다.",
 "Încă nu văd confirmarea. Încearcă din nou.":"아직 확인되지 않았습니다. 다시 시도하세요.",
 "Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"코드가 만료되었거나 너무 많이 시도되었습니다. 새 코드를 요청하세요.",
-"Cine a ieșit din grup nu poate fi adăugat din nou.":"그룹을 나간 사람은 다시 추가할 수 없습니다."
+"Cine a ieșit din grup nu poate fi adăugat din nou.":"그룹을 나간 사람은 다시 추가할 수 없습니다.",
+"PDF gol":"빈 PDF",
+"Nicio factură luna aceasta":"이번 달 청구서 없음",
+"Atinge orice din pagină ca să-l selectezi · trage ca să-l muți · colțurile îl redimensionează · atinge de două ori un text ca să-l editezi":"페이지에서 항목을 탭하여 선택 · 드래그하여 이동 · 모서리로 크기 조절 · 텍스트를 두 번 탭하여 편집",
+"Atinge un text ca să-l modifici sau oriunde în pagină ca să scrii text nou (fontul și mărimea se potrivesc automat)":"텍스트를 탭하여 수정하거나 페이지 아무 곳이나 탭하여 새 텍스트 입력(글꼴과 크기는 자동으로 맞춰짐)",
+"Desenează cu degetul":"손가락으로 그리기",
+"Atinge unde vrei bifa":"체크 표시를 넣을 곳을 탭하세요",
+"Atinge unde vrei X-ul":"X를 넣을 곳을 탭하세요",
+"Atinge pagina ca să pui imaginea (sau trage un dreptunghi pentru mărime)":"페이지를 탭하여 이미지 배치(또는 사각형을 드래그해 크기 지정)",
+"Text pe lățimea ecranului":"화면 너비에 맞춘 텍스트",
+"Pagina întreagă":"페이지 전체",
+"Atinge pentru titlu":"탭하여 제목 추가",
+"Atinge pentru text":"탭하여 텍스트 추가",
+"Atinge pentru subtitlu":"탭하여 부제목 추가",
+"Atinge pentru titlul secțiunii":"탭하여 섹션 제목 추가",
+"Caută în document":"문서에서 찾기"
 };
