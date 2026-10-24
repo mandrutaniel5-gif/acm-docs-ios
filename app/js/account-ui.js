@@ -235,7 +235,7 @@ const AccountUI = (() => {
         el('h2', { text: 'Confirmă emailul' }),
         el('p', { class: 'auth-sub' }, [document.createTextNode(I18n.t('Am trimis un cod de 6 cifre la') + ' '), el('b', { class: 'no-tr', text: u ? u.email : '' }), document.createTextNode('.')]),
         form,
-        el('p', { class: 'auth-hint muted small', text: 'Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.' }),
+        el('p', { class: 'verify-hint muted small', text: 'Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.' }),
         again,
         el('button', { class: 'auth-link', type: 'button', text: 'Folosește alt cont', onclick: async () => { await Account.signOut(); render('signin'); } }),
       );
