@@ -1811,5 +1811,11 @@
 "membri":"tag",
 "Grup":"Csoport",
 "Mesaje":"Üzenetek",
-"Admin":"Admin"
+"Admin":"Admin",
+"Codul de 6 cifre":"6 jegyű kód",
+"Retrimite codul":"Kód újraküldése",
+"Ți-am trimis un cod nou.":"Új kódot küldtünk.",
+"Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"Nem találod? Nézd meg a Spam mappát is. A kód 15 percig érvényes.",
+"Încă nu văd confirmarea. Încearcă din nou.":"Még nincs megerősítve. Próbáld újra.",
+"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"A kód lejárt, vagy túl sokszor próbálták. Kérj új kódot."
 };

@@ -13,7 +13,7 @@ const ADMIN_ORIGINS = ['https://acm-docs-52280.web.app', 'https://acm-docs-52280
 const SESSION_MS = 12 * 3600 * 1000;
 
 export function makeAdmin(d) {
-  const { db, fail, onCall, getAuth, FieldValue, Timestamp, Stripe, PLANS, ACTIONS, FEATURES, REASONS, DAY, monthOf } = d;
+  const { db, fail, onCall, getAuth, FieldValue, Timestamp, loadStripe, PLANS, ACTIONS, FEATURES, REASONS, DAY, monthOf } = d;
   const emulator = process.env.FUNCTIONS_EMULATOR === 'true';
   const ms = (t) => (t && t.toMillis ? t.toMillis() : typeof t === 'number' ? t : null);
   const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
@@ -297,6 +297,7 @@ export function makeAdmin(d) {
   async function stripeSet(key, tax) {
     key = str(key, 300);
     if (!/^(sk|rk)_(test|live)_[A-Za-z0-9]{20,}$/.test(key)) fail('invalid-argument', 'stripe key');
+    const Stripe = await loadStripe();
     const st = new Stripe(key);
     let acct = null;
     try { acct = await st.accounts.retrieve(); } catch (e) {
@@ -328,6 +329,7 @@ export function makeAdmin(d) {
   async function stripeClear() {
     const ref = db.collection('server').doc('secrets');
     const s = (await ref.get()).data() || {};
+    const Stripe = await loadStripe();
     if (s.stripeKey && s.webhookId) { try { await new Stripe(s.stripeKey).webhookEndpoints.del(s.webhookId); } catch (e) { /* already gone */ } }
     await ref.delete();
     d.resetStripe();

@@ -191,20 +191,57 @@ const AccountUI = (() => {
     verify(card) {
       const u = Account.current();
       const box = err();
-      const ok = el('button', { class: 'btn primary auth-main', type: 'button', text: 'Am confirmat' });
-      ok.addEventListener('click', () => busy(ok, async () => {
+      // a 6-digit code sent from the ACM Docs address (Firebase's link only if the server has no mail account)
+      if (Account.verifyMethod() === 'link') {
+        const ok = el('button', { class: 'btn primary auth-main', type: 'button', text: 'Am confirmat' });
+        ok.addEventListener('click', () => busy(ok, async () => {
+          showErr(box, '');
+          try { await Account.refresh(); if (Account.needsVerification()) showErr(box, 'Încă nu văd confirmarea. Deschide linkul din email, apoi apasă din nou.'); else await route(); } catch (x) { showErr(box, x); }
+        }));
+        card.append(el('div', { class: 'auth-icon', html: svg('mail') }), el('h2', { text: 'Confirmă emailul' }),
+          el('p', { class: 'auth-sub' }, [document.createTextNode('Ți-am trimis un link la '), el('b', { class: 'no-tr', text: u ? u.email : '' }), document.createTextNode('. Deschide-l, apoi revino aici.')]),
+          box, ok, el('button', { class: 'auth-link', type: 'button', text: 'Folosește alt cont', onclick: async () => { await Account.signOut(); render('signin'); } }));
+        later(card);
+        return;
+      }
+      const code = el('input', { class: 'in code-in no-tr', type: 'text', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', placeholder: '••••••', id: 'auth-code' });
+      const ok = el('button', { class: 'btn primary auth-main', type: 'submit', text: 'Confirmă' });
+      const again = el('button', { class: 'auth-link', type: 'button', text: 'Retrimite codul' });
+      const form = el('form', { class: 'auth-form', novalidate: true }, [el('label', { class: 'auth-fld' }, [el('span', { text: 'Codul de 6 cifre' }), code]), box, ok]);
+      const submit = () => busy(ok, async () => {
         showErr(box, '');
-        try { await Account.refresh(); if (Account.needsVerification()) showErr(box, 'Încă nu văd confirmarea. Deschide linkul din email, apoi apasă din nou.'); else await route(); } catch (x) { showErr(box, x); }
+        const v = code.value.replace(/\D/g, '');
+        if (v.length !== 6) return showErr(box, 'Scrie codul de 6 cifre primit pe email.');
+        try { if (await Account.verifyCode(v)) await route(); else showErr(box, 'Încă nu văd confirmarea. Încearcă din nou.'); } catch (x) { showErr(box, x); code.select(); }
+      });
+      form.addEventListener('submit', (e) => { e.preventDefault(); submit(); });
+      code.addEventListener('input', () => { const v = code.value.replace(/\D/g, '').slice(0, 6); if (code.value !== v) code.value = v; if (v.length === 6) submit(); });
+      // "send again" waits a minute between codes
+      let timer = null;
+      const tick = () => {
+        const left = Math.ceil((Account.verifySentAt() + 60000 - Date.now()) / 1000);
+        again.disabled = left > 0;
+        again.textContent = left > 0 ? `${I18n.t('Retrimite codul')} (${left})` : I18n.t('Retrimite codul');
+        if (left <= 0) { clearInterval(timer); timer = null; }
+      };
+      const startTick = () => { if (!timer) timer = setInterval(() => { if (!document.body.contains(again)) { clearInterval(timer); timer = null; return; } tick(); }, 1000); tick(); };
+      again.addEventListener('click', () => busy(again, async () => {
+        showErr(box, '');
+        try { await Account.sendVerification(); UI.toast(I18n.t('Ți-am trimis un cod nou.')); if (Account.verifyMethod() === 'link') return render('verify'); } catch (x) { showErr(box, x); }
+        startTick();
       }));
-      const again = el('button', { class: 'auth-link', type: 'button', text: 'Retrimite emailul' });
-      again.addEventListener('click', () => busy(again, async () => { try { await Account.resendVerification(); UI.toast('Email retrimis.'); } catch (x) { showErr(box, x); } }));
       card.append(
         el('div', { class: 'auth-icon', html: svg('mail') }),
         el('h2', { text: 'Confirmă emailul' }),
-        el('p', { class: 'auth-sub' }, [document.createTextNode('Ți-am trimis un link la '), el('b', { class: 'no-tr', text: u ? u.email : '' }), document.createTextNode('. Deschide-l, apoi revino aici.')]),
-        box, ok, again,
+        el('p', { class: 'auth-sub' }, [document.createTextNode(I18n.t('Am trimis un cod de 6 cifre la') + ' '), el('b', { class: 'no-tr', text: u ? u.email : '' }), document.createTextNode('.')]),
+        form,
+        el('p', { class: 'auth-hint muted small', text: 'Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.' }),
+        again,
         el('button', { class: 'auth-link', type: 'button', text: 'Folosește alt cont', onclick: async () => { await Account.signOut(); render('signin'); } }),
       );
+      // an account that opens this screen later (no code sent in the last minute) gets one now
+      if (Date.now() - Account.verifySentAt() > 60000) Account.sendVerification().then(() => { if (Account.verifyMethod() === 'link') render('verify'); }).catch((x) => showErr(box, x)).finally(startTick);
+      else startTick();
       later(card);
     },
 
@@ -235,6 +272,8 @@ const AccountUI = (() => {
             render('keys');
             const t0 = Date.now();
             try { await Account.createKeys(v); } catch (x) { return render('handle', { create: true, value: v, error: x }); }
+            // this device joins the account now (session, cloud sync, plan), not minutes later
+            await afterKeys();
             await new Promise((r) => setTimeout(r, Math.max(0, 900 - (Date.now() - t0))));
             return render('done');
           }

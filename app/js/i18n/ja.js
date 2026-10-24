@@ -1811,5 +1811,11 @@
 "membri":"人のメンバー",
 "Grup":"グループ",
 "Mesaje":"メッセージ",
-"Admin":"Admin"
+"Admin":"Admin",
+"Codul de 6 cifre":"6 桁のコード",
+"Retrimite codul":"コードを再送信",
+"Ți-am trimis un cod nou.":"新しいコードを送信しました。",
+"Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"見つからない場合は迷惑メールフォルダーも確認してください。コードの有効期限は 15 分です。",
+"Încă nu văd confirmarea. Încearcă din nou.":"まだ確認されていません。もう一度お試しください。",
+"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"コードの有効期限が切れたか、試行回数が多すぎます。新しいコードをリクエストしてください。"
 };

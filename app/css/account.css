@@ -402,3 +402,4 @@ html.i18n-wait body { visibility: hidden; }
 .report-form { display: grid; gap: 12px; margin: 14px 0 6px; text-align: left; }
 .report-form textarea.in { height: auto; min-height: 96px; padding: 10px 12px; resize: vertical; font: inherit; }
 .report-form select.in { height: 48px; }
+.auth-card .code-in { font-size: 26px; letter-spacing: .3em; text-align: center; font-variant-numeric: tabular-nums; }

@@ -105,6 +105,8 @@ const Account = (() => {
     }[c];
     if (m) return m;
     const msg = String((e && (e.server || e.message)) || '');
+    if (/bad code/.test(msg)) return 'Codul nu este corect. Verifică ultimul email primit.';
+    if (/code expired/.test(msg)) return 'Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.';
     if (/paused:/.test(msg)) return 'Funcția este oprită temporar de echipa ACM Docs. Reîncearcă în curând.';
     if (/account suspended/.test(msg)) return 'Contul a fost suspendat. Pentru detalii, scrie-ne la mandrutaniel5@gmail.com.';
     if (/disposable email/.test(msg)) return 'Folosește o adresă de email permanentă: adresele temporare nu sunt acceptate.';
@@ -124,7 +126,7 @@ const Account = (() => {
     const { auth: Au } = F();
     const cred = await Au.createUserWithEmailAndPassword(auth, email.trim(), password);
     if (name && name.trim()) await Au.updateProfile(cred.user, { displayName: name.trim() });
-    try { await Au.sendEmailVerification(cred.user); } catch (e) { console.warn(e); }
+    try { await sendVerification(); } catch (e) { console.warn(e); }
     return cred.user;
   }
   async function signIn(email, password) {
@@ -180,7 +182,28 @@ const Account = (() => {
     for (const f of factors()) if (f.factorId === 'totp') await Au.multiFactor(user).unenroll(f);
   }
   async function resetPassword(email) { await ready(); await F().auth.sendPasswordResetEmail(auth, email.trim()); }
-  async function resendVerification() { if (user) await F().auth.sendEmailVerification(user); }
+  /**
+   * The email is confirmed with a 6-digit code sent from the ACM Docs address. Only if the server has
+   * no mail account does it fall back to Firebase's own link.
+   */
+  let verifyMode = 'code';
+  async function sendVerification() {
+    if (!user) return;
+    const r = await call('emailVerifySend', {});
+    if (r && r.fallback) { verifyMode = 'link'; await F().auth.sendEmailVerification(user); }
+    else verifyMode = 'code';
+    store.set('acm.verify.sent.' + user.uid, String(Date.now()));
+    return r;
+  }
+  const resendVerification = sendVerification;
+  const verifyMethod = () => verifyMode;
+  const verifySentAt = () => (user ? Number(store.get('acm.verify.sent.' + user.uid) || 0) : 0);
+  /** The code from the email: the server confirms the address, then the session sees it at once. */
+  async function verifyCode(code) {
+    await call('emailVerifyCheck', { code: String(code || '').trim() });
+    await refresh();
+    return !needsVerification();
+  }
   async function refresh() { if (user) { await F().auth.reload(user); user = auth.currentUser; await user.getIdToken(true); } return user; }
   // set while this device signs out on purpose (otherwise a closed session is resumed with the device key)
   let leaving = false;
@@ -359,7 +382,7 @@ const Account = (() => {
     call, signInWithToken, claims, internals, signingOut,
     setCodePrompt, twoStep, twoStepStart, twoStepFinish, twoStepOff,
     init, ready, onChange, current, needsVerification, isPasswordUser, say,
-    signUp, signIn, resetPassword, resendVerification, refresh, signOut,
+    signUp, signIn, resetPassword, resendVerification, sendVerification, verifyCode, verifyMethod, verifySentAt, refresh, signOut,
     keyState, createKeys, restoreKeys, setHandle, handle, fingerprint, lookup, profileOf, handleProblem, suggestHandle, cleanHandle, unlock, lock, checkPassword, words, wordsSaved, markWordsSaved, deleteAccount,
     skipped, setSkipped,
   };

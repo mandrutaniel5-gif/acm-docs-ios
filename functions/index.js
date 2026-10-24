@@ -17,9 +17,8 @@ import { beforeUserSignedIn, beforeUserCreated } from 'firebase-functions/v2/ide
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { onObjectFinalized, onObjectDeleted } from 'firebase-functions/v2/storage';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
-import Stripe from 'stripe';
 import { PLANS, PRICES, ACTIONS, PAID, GROUP_PLANS, monthOf } from './plans.js';
-import { mailReady, sendSignInCode, sendAdminAlert } from './mail.js';
+import { mailReady, sendSignInCode, sendAdminAlert, sendVerifyCode } from './mail.js';
 import { makeAdmin } from './admin.js';
 import { timingSafeEqual } from 'node:crypto';
 import { initializeApp } from 'firebase-admin/app';
@@ -81,7 +80,7 @@ const token = (uid, dev) => getAuth().createCustomToken(uid, { dev });
  * The first device of the account becomes the primary; any later one is a member, and every
  * other device gets a "new sign-in" alert.
  */
-export const registerDevice = onCall(async (req) => {
+export const registerDevice = onCall({ minInstances: 1 }, async (req) => {
   const uid = needUser(req);
   await needOn('newDevice');
   const { bundle, info, ts, proof } = req.data || {};
@@ -131,7 +130,7 @@ export const registerDevice = onCall(async (req) => {
 
 // ------------------------------------------------------------------ session for a registered device
 /** Signed proof of the device key → a session token that carries the device id. */
-export const deviceSession = onCall(async (req) => {
+export const deviceSession = onCall({ minInstances: 1 }, async (req) => {
   const { uid, dev, ts, sig } = req.data || {};
   if (typeof uid !== 'string' || typeof dev !== 'string' || typeof ts !== 'number') fail('invalid-argument', 'args');
   if (Math.abs(Date.now() - ts) > SESSION_SKEW_MS) fail('deadline-exceeded', 'clock');
@@ -387,7 +386,8 @@ function agentOf(ua) {
  * devices show "someone signed in with your password" (the password alone opens nothing, but the
  * owner should know it is out). Device sessions (custom tokens) are not password sign-ins.
  */
-export const beforeSignIn = beforeUserSignedIn(async (ev) => {
+// sign-up and sign-in wait for these two (Identity Platform gives them 7 seconds): always one warm instance
+export const beforeSignIn = beforeUserSignedIn({ minInstances: 1 }, async (ev) => {
   const info = ev.additionalUserInfo || {};
   const provider = info.providerId || (ev.credential && ev.credential.providerId) || '';
   if (!ev.data) return;
@@ -621,7 +621,12 @@ async function stripeConf() {
   return confCache;
 }
 function resetStripe() { confCache = null; stripeClient = null; stripeKeyUsed = null; }
+// Stripe's library is loaded only when a payment function needs it: sign-up, sign-in and device
+// sessions start faster without it
+let StripeLib = null;
+const loadStripe = async () => (StripeLib ||= (await import('stripe')).default);
 async function stripe() {
+  const Stripe = await loadStripe();
   const c = await stripeConf();
   if (!c.key) fail('unavailable', 'payments not active');
   if (!stripeClient || stripeKeyUsed !== c.key) { stripeClient = new Stripe(c.key); stripeKeyUsed = c.key; }
@@ -796,6 +801,7 @@ export const stripeWebhook = onRequest({ cors: false }, async (req, res) => {
   const conf = await stripeConf();
   if (req.method !== 'POST' || !conf.hooks.length) { res.status(404).end(); return; }
   let ev = null;
+  const Stripe = await loadStripe();
   for (const secret of conf.hooks) {
     try { ev = Stripe.webhooks.constructEvent(req.rawBody, req.get('stripe-signature'), secret); break; } catch (e) { /* next secret */ }
   }
@@ -939,7 +945,7 @@ export const expirePlans = onSchedule({ schedule: 'every day 03:17', timeZone: '
 
 /** New accounts: a few per address and hour, and no throwaway mailboxes. */
 const THROWAWAY = ['mailinator.com', 'guerrillamail.com', 'guerrillamail.net', 'sharklasers.com', '10minutemail.com', 'temp-mail.org', 'tempmail.com', 'yopmail.com', 'trashmail.com', 'getnada.com', 'dispostable.com', 'maildrop.cc', 'throwawaymail.com', 'fakeinbox.com', 'mailnesia.com', 'mintemail.com', 'emailondeck.com', 'tempail.com', 'moakt.com', 'mohmal.com', 'burnermail.io', 'spamgourmet.com', 'mytemp.email', 'tempmailo.com', 'temp-mail.io', 'minuteinbox.com', 'luxusmail.org', 'cock.li', 'grr.la', 'spam4.me'];
-export const beforeCreate = beforeUserCreated(async (ev) => {
+export const beforeCreate = beforeUserCreated({ minInstances: 1 }, async (ev) => {
   const sw = await switches();
   if (sw.all || sw.off.signup) throw new HttpsError('unavailable', 'paused:signup');
   const email = String((ev.data && ev.data.email) || '').toLowerCase();
@@ -1134,7 +1140,7 @@ async function couponOf(p) {
 
 // ---------------------------------------------------------------- the control panel's API
 export const admin = makeAdmin({
-  db, fail, onCall, HttpsError, getAuth, FieldValue, Timestamp, Stripe,
+  db, fail, onCall, HttpsError, getAuth, FieldValue, Timestamp, loadStripe,
   PLANS, PAID, ACTIONS, FEATURES, REASONS, DAY, SITE, monthOf,
   effective, refresh, metaOf, billingOf, devicesOf, signinsOf, privOf, event, clientAddress, agentOf,
   switches, resetSwitches, stripeConf, resetStripe, activePromos, resetPromos,
@@ -1293,3 +1299,45 @@ async function chatFileStored(name, meta, size) {
   if (!ok) { try { await file.delete(); } catch (e) { console.warn('chat file', e.message); } }
   return true;
 }
+
+// ================================================================== confirming the email with our own code
+// A new account confirms its address with a 6-digit code sent from the ACM Docs address (instead of
+// Firebase's link). The code is kept only as a hash, for 15 minutes, with at most 5 attempts.
+const verifyOf = (uid) => db.collection('challenges').doc('v' + uid);
+/** Signed in with the password, email not confirmed yet. */
+function needUnverified(req) {
+  if (!req.auth) fail('unauthenticated', 'sign in first');
+  return req.auth.uid;
+}
+export const emailVerifySend = onCall(async (req) => {
+  const uid = needUnverified(req);
+  const user = await getAuth().getUser(uid);
+  if (user.emailVerified) return { verified: true };
+  // without a mail server (or in tests without one) the app falls back to Firebase's link
+  if (!mailReady() && process.env.MAIL_TEST !== '1') return { fallback: true };
+  await rateLimit(req, 'verifymail|' + uid, 6, 60 * 60 * 1000, true);
+  await rateLimit(req, 'verifymail-ip', 30, 60 * 60 * 1000, false);
+  const code = String(randomBytes(4).readUInt32BE(0) % 1000000).padStart(6, '0');
+  await verifyOf(uid).set({ h: codeHash(uid, 'verify:' + code).toString('base64'), tries: 0, expires: Timestamp.fromMillis(Date.now() + 15 * 60 * 1000), ...(process.env.MAIL_TEST === '1' ? { test: code } : {}) });
+  if (mailReady()) await sendVerifyCode(user.email, code);
+  return { sent: true };
+});
+export const emailVerifyCheck = onCall(async (req) => {
+  const uid = needUnverified(req);
+  const code = (req.data || {}).code;
+  if (typeof code !== 'string' || !/^\d{6}$/.test(code)) fail('invalid-argument', 'bad code');
+  const ref = verifyOf(uid);
+  const res = await db.runTransaction(async (tx) => {
+    const s = await tx.get(ref);
+    if (!s.exists) return 'expired';
+    const d = s.data();
+    if (d.expires.toMillis() < Date.now() || d.tries >= 5) { tx.delete(ref); return 'expired'; }
+    const good = timingSafeEqual(Buffer.from(d.h, 'base64'), codeHash(uid, 'verify:' + code));
+    if (good) tx.delete(ref); else tx.update(ref, { tries: d.tries + 1 });
+    return good ? 'ok' : 'bad';
+  });
+  if (res === 'bad') fail('permission-denied', 'bad code');
+  if (res === 'expired') fail('deadline-exceeded', 'code expired');
+  await getAuth().updateUser(uid, { emailVerified: true });
+  return { verified: true };
+});

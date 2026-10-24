@@ -1811,5 +1811,11 @@
 "membri":"участников",
 "Grup":"Группа",
 "Mesaje":"Сообщения",
-"Admin":"Admin"
+"Admin":"Admin",
+"Codul de 6 cifre":"6-значный код",
+"Retrimite codul":"Отправить код ещё раз",
+"Ți-am trimis un cod nou.":"Мы отправили новый код.",
+"Nu îl găsești? Verifică și dosarul Spam. Codul este valabil 15 minute.":"Не можете найти? Проверьте также папку «Спам». Код действует 15 минут.",
+"Încă nu văd confirmarea. Încearcă din nou.":"Ещё не подтверждено. Попробуйте снова.",
+"Codul a expirat sau a fost încercat de prea multe ori. Cere un cod nou.":"Срок действия кода истёк или было слишком много попыток. Запросите новый код."
 };

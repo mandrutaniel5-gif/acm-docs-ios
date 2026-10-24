@@ -39,3 +39,17 @@ export async function sendAdminAlert(to, ip, agent) {
   <p style="font-size:13px;line-height:1.5;color:#77777f;margin-top:18px">Dacă nu ai fost tu, schimbă imediat parola contului de administrator și scoate-i drepturile din GitHub (workflow Admin → remove-admin).</p></div>`;
   await tx().sendMail({ from, to, subject: 'Conectare în panoul de control ACM Docs', text, html });
 }
+
+/** The 6-digit code that confirms a new account's email, in Romanian and English. */
+export async function sendVerifyCode(to, code) {
+  const from = process.env.MAIL_FROM || 'ACM Docs <no-reply@acmandrut.com>';
+  const text = `Codul de confirmare ACM Docs: ${code}\n\nScrie-l în aplicație ca să confirmi adresa de email. Codul este valabil 15 minute. Dacă nu ai creat tu un cont ACM Docs, ignoră acest email.\n\n—\n\nYour ACM Docs confirmation code: ${code}\n\nEnter it in the app to confirm your email address. The code is valid for 15 minutes. If you did not create an ACM Docs account, ignore this email.\n\nACM Code S.R.L. · acmdocs.acmandrut.com`;
+  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:460px;margin:0 auto;padding:24px;color:#1c1c1e">
+  <div style="font-weight:700;font-size:16px">ACM Docs</div>
+  <p style="color:#55555c;margin:18px 0 6px">Codul de confirmare · Confirmation code</p>
+  <div style="font-size:34px;font-weight:800;letter-spacing:8px;margin:6px 0 18px">${esc(code)}</div>
+  <p style="font-size:14px;line-height:1.5;color:#3a3a40">Scrie-l în aplicație ca să confirmi adresa de email. Codul este valabil 15 minute. Dacă nu ai creat tu un cont ACM Docs, ignoră acest email.</p>
+  <p style="font-size:13px;line-height:1.5;color:#77777f">Enter it in the app to confirm your email address. The code is valid for 15 minutes. If you did not create an ACM Docs account, ignore this email.</p>
+  <p style="font-size:12px;color:#9a9aa2;margin-top:24px">ACM Code S.R.L. · acmdocs.acmandrut.com</p></div>`;
+  await tx().sendMail({ from, to, subject: `${code} · confirmă emailul ACM Docs`, text, html });
+}
