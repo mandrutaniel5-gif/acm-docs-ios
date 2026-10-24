@@ -239,11 +239,10 @@ const Feel = (() => {
 
   // ---------------------------------------------------------------- the money card, under liquid glass
   // A layer of water rests on the blue card the way a drop rests on a water-repellent surface: surface
-  // tension holds it, so it has thickness and a rounded edge all around and does not spread. Light from
-  // the top-left catches a fine line along that edge, comes out softly on the opposite side, and the card
-  // is seen slightly bent through it. From a point inside the card (right, a little low) perfect, even
-  // rings travel slowly across the surface; only their side that faces the light shows, as a thin line.
-  // Everything is computed from one height field (the layer + the rings): normals, light, refraction.
+  // tension holds it, so it has thickness and a rounded edge all around and does not spread. At rest it is
+  // still. Where a finger touches, a few perfect rings rise and travel out slowly, then fade, and the
+  // card opens a moment later. One height field (layer + rings) gives the normals, light and refraction;
+  // it is drawn only while rings are moving.
   function water(card) {
     if (!card || card.querySelector('.water')) return;
     const box = card.getBoundingClientRect();
@@ -278,56 +277,76 @@ const Feel = (() => {
       dgx[i] = (r - l) * 0.5 * E * 0.55; dgy[i] = (d - u) * 0.5 * E * 0.55; // slope of the layer
       rim[i] = 1 - height[i];
     }
-    // the rings
-    const SX = W * 0.8, SY = H * 0.62, K = (2 * Math.PI) / (W * 0.12), A = 0.12;
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const i = y * W + x, dx = x - SX, dy = y - SY, r = Math.hypot(dx, dy) || 1;
-      dist[i] = r; ux[i] = dx / r; uy[i] = dy / r;
-      const flat = Math.min(1, Math.max(0, (height[i] - 0.96) / 0.04)); fall[i] = Math.min(1, r / (W * 0.03)) * flat * flat * (3 - 2 * flat) / (1 + r / (W * 0.9)); // calm at the source and at the edge
-    }
     // light from the top-left and above; the eye straight above
     const L = [-0.42, -0.5, 0.76], Ln = Math.hypot(...L); L[0] /= Ln; L[1] /= Ln; L[2] /= Ln;
     const Hv = [L[0], L[1], L[2] + 1], Hn = Math.hypot(...Hv); Hv[0] /= Hn; Hv[1] /= Hn; Hv[2] /= Hn;
-    let visible = false, running = false, last = 0, phase = 0;
-    const SPEED = 0.045; // per frame at 24 fps: a ring about every 6 s
+    // rings from touches: each spreads at a calm, slowing pace and fades within ~2.6 s
+    const flat = new Float32Array(N);
+    for (let i = 0; i < N; i++) { const f = Math.min(1, Math.max(0, (height[i] - 0.96) / 0.04)); flat[i] = f * f * (3 - 2 * f); }
+    const LAMBDA = W * 0.085, K = (2 * Math.PI) / LAMBDA, LIFE = 4200, A = 0.24;
+    const touches = [];
     const reduce = reduced();
-    function paint() {
+    let running = false;
+    function paint(now) {
+      for (const t of touches) if (t.t0 == null) t.t0 = now;
+      const live = touches.filter((t) => now - t.t0 < LIFE);
+      touches.length = 0; touches.push(...live);
+      const tv = live.map((t) => {
+        const k = (now - t.t0) / LIFE;                       // 0..1
+        const front = LAMBDA * 0.6 + W * 0.5 * (1 - Math.pow(1 - k, 1.5)); // spreads slowly, easing like real water
+        return { x: t.x, y: t.y, front, amp: A * Math.min(1, k * 8) * Math.pow(1 - k, 1.3) };
+      });
       for (let i = 0, o = 0; i < N; i++, o += 4) {
-        const s = -A * Math.sin(K * dist[i] - phase) * fall[i];
-        const gx = dgx[i] + s * ux[i], gy = dgy[i] + s * uy[i];
+        let gx = dgx[i], gy = dgy[i];
+        if (tv.length && flat[i] > 0) {
+          const x0 = i % W, y0 = (i - x0) / W;
+          for (const t of tv) {
+            const dx = x0 - t.x, dy = y0 - t.y, r = Math.sqrt(dx * dx + dy * dy) || 1;
+            const behind = t.front - r;                      // the rings live just behind the front
+            if (behind < 0 || behind > LAMBDA * 3) continue;
+            const env = Math.sin((Math.PI * behind) / (LAMBDA * 3)); // smooth: 0 at the front and at the last ring
+            const s = -t.amp * env * Math.sin(K * behind) * flat[i] / (1 + r / W);
+            gx += (s * dx) / r; gy += (s * dy) / r;
+          }
+        }
         const inv = 1 / Math.sqrt(gx * gx + gy * gy + 1);
         const nx = -gx * inv, ny = -gy * inv, nz = inv;
-        // a fine highlight where the surface turns to the light
         let sp = nx * Hv[0] + ny * Hv[1] + nz * Hv[2];
-        sp = sp > 0 ? sp : 0; sp *= sp; sp *= sp; sp *= sp; sp *= sp; sp *= sp; sp *= sp; // ^64
-        // the side turned away is a little darker, the side towards the light a little brighter
+        sp = sp > 0 ? sp : 0; sp *= sp; sp *= sp; sp *= sp; sp *= sp; sp *= sp; sp *= sp;
         const lit = (nx * L[0] + ny * L[1] + nz * L[2]) / L[2];
-        // light leaving the layer on the far side of its edge: a soft glow inside the rim
         const exitGlow = rim[i] * Math.max(0, gx * 0.6 + gy * 0.75) * 20;
-        // refraction: the card seen through the curved water shifts toward the slope
         const x = i % W, y = (i - x) / W;
         let sx = (x - gx * 5) | 0, sy = (y - gy * 5) | 0;
         if (sx < 0) sx = 0; else if (sx >= W) sx = W - 1;
         if (sy < 0) sy = 0; else if (sy >= H) sy = H - 1;
-        const k = (sy * W + sx) * 3;
-        const m = 0.92 + 0.08 * lit;
+        const k = (sy * W + sx) * 3, m = 0.92 + 0.08 * lit;
         px[o] = Math.min(255, floor[k] * m + sp * 150 + exitGlow * 0.7);
         px[o + 1] = Math.min(255, floor[k + 1] * m + sp * 155 + exitGlow * 0.9);
         px[o + 2] = Math.min(255, floor[k + 2] * m + sp * 160 + exitGlow);
         px[o + 3] = 255;
       }
       ctx.putImageData(img, 0, 0);
+      return live.length > 0;
     }
+    let last = 0;
     function frame(t) {
-      if (!running) return;
-      if (t - last >= 41) { const dt = last ? Math.min(3, (t - last) / 41) : 1; last = t; phase += SPEED * dt; paint(); }
+      if (t - last >= 33) { last = t; if (!paint(t)) { running = false; return; } }
       requestAnimationFrame(frame);
     }
-    function start() { if (running || !visible || reduce || document.hidden) return; running = true; last = 0; requestAnimationFrame(frame); }
-    function stop() { running = false; }
-    paint();
-    new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) start(); else stop(); }).observe(card);
-    document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else start(); });
+    paint(0);
+    card.addEventListener('pointerdown', (e) => {
+      if (reduce) return;
+      const r = card.getBoundingClientRect();
+      touches.push({ x: ((e.clientX - r.left) / r.width) * W, y: ((e.clientY - r.top) / r.height) * H, t0: null });
+      if (touches.length > 3) touches.shift();
+      if (!running) { running = true; last = 0; requestAnimationFrame(frame); }
+    });
+    // the card opens a moment after the touch, so the drop is seen
+    card.addEventListener('click', (e) => {
+      if (card._go || reduce) return;
+      e.stopImmediatePropagation(); e.preventDefault();
+      setTimeout(() => { card._go = true; card.click(); card._go = false; }, 420);
+    }, true);
     return {};
   }
 
