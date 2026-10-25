@@ -224,9 +224,10 @@
     reports: 'M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z',
     promos: 'M21.41 11.58l-9-9A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7c0 .55.22 1.05.59 1.42l9 9a2 2 0 0 0 2.82 0l7-7a2 2 0 0 0 0-2.84zM5.5 7A1.5 1.5 0 1 1 7 5.5 1.5 1.5 0 0 1 5.5 7z',
     stripe: 'M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z',
+    anaf: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v2H8v-2zm0 4h5v2H8v-2z',
     log: 'M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 2.05 4.95l-1.42 1.42A9 9 0 1 0 13 3zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z',
   };
-  const VIEWS = [['overview', 'Prezentare'], ['accounts', 'Conturi'], ['switches', 'Kill switches'], ['reports', 'Rapoarte'], ['promos', 'Promoții'], ['stripe', 'Stripe'], ['log', 'Jurnal']];
+  const VIEWS = [['overview', 'Prezentare'], ['accounts', 'Conturi'], ['switches', 'Kill switches'], ['reports', 'Rapoarte'], ['promos', 'Promoții'], ['stripe', 'Stripe'], ['anaf', 'ANAF e-Factura'], ['log', 'Jurnal']];
   let main, nav, current = 'overview';
   const svg = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
 
@@ -247,7 +248,7 @@
     current = id;
     nav.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.v === id));
     fill(h('div', { class: 'sub', text: 'Se încarcă…' }));
-    const run = { overview, accounts, switches, reports, promos, stripe, log }[id];
+    const run = { overview, accounts, switches, reports, promos, stripe, anaf, log }[id];
     run(arg).catch((e) => { fill(h('div', { class: 'alert bad', text: say(e) })); });
   }
   function head(title, sub, right) {
@@ -532,10 +533,57 @@
     );
   }
 
+  // ---------------------------------------------------------------- ANAF e-Factura
+  async function anaf() {
+    const s = await call('anaf');
+    const id = h('input', { type: 'text', autocomplete: 'off', spellcheck: 'false', placeholder: 'Client ID' });
+    const secret = h('input', { type: 'password', autocomplete: 'off', spellcheck: 'false', placeholder: 'Client Secret' });
+    const env = h('select', {}, [h('option', { value: 'test', text: 'Test (facturi de probă, fără efect fiscal)' }), h('option', { value: 'prod', text: 'Producție (facturi reale)' })]);
+    env.value = s.env || 'test';
+    const save = h('button', { class: 'btn primary', text: 'Salvează și verifică' });
+    save.addEventListener('click', () => act(save, async () => {
+      if (!id.value.trim() || !secret.value.trim()) throw new Error('Completează Client ID și Client Secret din contul de dezvoltator ANAF.');
+      await call('anafSet', { clientId: id.value.trim(), clientSecret: secret.value.trim(), env: env.value });
+      id.value = ''; secret.value = '';
+      toast('ANAF e-Factura este configurat.'); show('anaf');
+    }));
+    const envBtn = h('button', { class: 'btn', text: s.env === 'prod' ? 'Treci pe Test' : 'Treci pe Producție' });
+    envBtn.addEventListener('click', async () => {
+      const toProd = s.env !== 'prod';
+      if (toProd && !(await confirmBox('Treci pe producție?', 'Facturile trimise din aplicație ajung în SPV ca facturi reale, cu efect fiscal.', 'Treci pe producție', false))) return;
+      act(envBtn, async () => { await call('anafEnv', { env: toProd ? 'prod' : 'test' }); show('anaf'); });
+    });
+    const clearBtn = h('button', { class: 'btn danger', text: 'Șterge datele ANAF' });
+    clearBtn.addEventListener('click', async () => {
+      if (!(await confirmBox('Ștergi datele ANAF?', 'Firmele nu se mai pot conecta la SPV din aplicație până setezi din nou Client ID și Client Secret. Conexiunile existente se opresc la următoarea reînnoire.', 'Șterge', true))) return;
+      act(clearBtn, async () => { await call('anafClear'); show('anaf'); });
+    });
+    const cb = h('input', { type: 'text', readonly: true, value: s.callback, class: 'mono' });
+    const copy = h('button', { class: 'btn', text: 'Copiază' });
+    copy.addEventListener('click', async () => { try { await navigator.clipboard.writeText(s.callback); toast('Copiat.'); } catch (e) { cb.select(); } });
+    fill(
+      head('ANAF e-Factura', 'Conectarea firmelor la SPV, ca facturile să se trimită automat'),
+      h('div', { class: 'card' }, [h('h2', { text: 'Stare' }), h('dl', { class: 'kv' }, [
+        h('dt', { text: 'e-Factura' }), h('dd', {}, [s.active ? pill('Configurat', 'ok') : pill('Neconfigurat', 'bad')]),
+        h('dt', { text: 'Mediu' }), h('dd', {}, [s.active ? (s.env === 'prod' ? pill('Producție · facturi reale', 'ok') : pill('Test · fără efect fiscal', 'warn')) : '–']),
+        h('dt', { text: 'Client ID' }), h('dd', { class: 'mono', text: s.clientIdEnd || '–' }),
+        h('dt', { text: 'Verificat la ANAF' }), h('dd', { text: s.checked === 'ok' ? 'Da' : s.checked === 'unreachable' ? 'ANAF nu a răspuns la verificare' : '–' }),
+        h('dt', { text: 'Setat' }), h('dd', { text: s.setAt ? dt(s.setAt) : '–' }),
+      ]), s.active ? h('div', { class: 'row' }, [h('span'), envBtn, clearBtn]) : null]),
+      h('div', { class: 'card' }, [h('h2', { text: 'Adresa de întoarcere (Callback URL)' }),
+        h('p', { class: 'sub', text: 'În contul de dezvoltator ANAF → Profil OAuth, la aplicația ACM Docs, pune exact această adresă.' }),
+        h('div', { class: 'row' }, [cb, copy])]),
+      h('div', { class: 'card' }, [h('h2', { text: s.active ? 'Schimbă datele aplicației' : 'Conectează aplicația la ANAF' }),
+        h('p', { class: 'sub', text: 'anaf.ro → Servicii Online → Înregistrare utilizatori → Dezvoltatori aplicații → Profil OAuth (serviciul E-Factura) → Generare Client ID. Datele se verifică la ANAF și rămân doar pe server: secretul nu mai poate fi citit, nici din acest panou. Facturile firmelor nu trec prin server: aplicația le trimite direct la ANAF.' }),
+        h('label', { text: 'Client ID' }), id, h('label', { text: 'Client Secret' }), secret, h('label', { text: 'Mediu' }), env,
+        h('div', { class: 'row' }, [h('span'), save])]),
+    );
+  }
+
   // ---------------------------------------------------------------- log
   async function log() {
     const rows = await call('log');
-    const OPS = { setPlan: 'Plan manual', suspend: 'Suspendare', blockDevice: 'Dispozitiv blocat', 'switches.set': 'Kill switches', resolveReport: 'Raport închis', savePromo: 'Promoție salvată', deletePromo: 'Promoție ștearsă', stripeSet: 'Cheie Stripe', stripeTax: 'Taxe Stripe', stripeClear: 'Stripe deconectat' };
+    const OPS = { setPlan: 'Plan manual', suspend: 'Suspendare', blockDevice: 'Dispozitiv blocat', 'switches.set': 'Kill switches', resolveReport: 'Raport închis', savePromo: 'Promoție salvată', deletePromo: 'Promoție ștearsă', stripeSet: 'Cheie Stripe', stripeTax: 'Taxe Stripe', stripeClear: 'Stripe deconectat', anafSet: 'Date ANAF', anafEnv: 'Mediu ANAF', anafClear: 'ANAF șters' };
     fill(head('Jurnal', 'Tot ce s-a schimbat din panou (păstrat 2 ani)'), h('div', { class: 'card' }, [table(['Data', 'Acțiune', 'Țintă', 'Detalii', 'Administrator', 'IP'], rows.map((r) => ({
       uid: r.target, cells: [dt(r.at), OPS[r.op] || r.op, r.target ? { node: h('span', { class: 'mono', text: String(r.target).slice(0, 12) }) } : '–', r.detail || '–', r.email, { node: h('span', { class: 'mono', text: r.ip || '–' }) }],
     })))]));

@@ -18,7 +18,7 @@ import { sha256 } from '@noble/hashes/sha2.js';
 import { argon2id } from '@noble/hashes/argon2.js';
 import { hmac } from '@noble/hashes/hmac.js';
 import { randomBytes, concatBytes, utf8ToBytes } from '@noble/hashes/utils.js';
-import { xchacha20poly1305 } from '@noble/ciphers/chacha.js';
+import { xchacha20poly1305, chacha20poly1305 } from '@noble/ciphers/chacha.js';
 import { ml_kem768 } from '@noble/post-quantum/ml-kem.js';
 import { ml_dsa65 } from '@noble/post-quantum/ml-dsa.js';
 import { generateMnemonic as bipGenerate, validateMnemonic as bipValidate, mnemonicToSeedSync } from '@scure/bip39';
@@ -308,3 +308,12 @@ export { b64 as toB64, unb64 as fromB64 };
 
 /** HMAC-SHA256 of a text with a key derived from the vault key (integrity of local records). */
 export function macText(vkey, label, text) { return hex(hmac(sha256, kdf(vkey, undefined, 'acm/mac/' + label, 32), utf8ToBytes(String(text)))); }
+
+/** A one-time key pair for receiving something sealed by the server (X25519). */
+export function boxKeyPair() { const sk = randomBytes(32); return { sk, pub: x25519.getPublicKey(sk) }; }
+/** Opens what the server sealed for a one-time key: X25519 + HKDF-SHA256 + ChaCha20-Poly1305. */
+export function boxOpen(sk, sealed, info) {
+  const epk = unb64(sealed.epk), nonce = unb64(sealed.iv), ct = unb64(sealed.ct);
+  const key = hkdf(sha256, x25519.getSharedSecret(sk, epk), new Uint8Array(0), utf8ToBytes(String(info)), 32);
+  try { return JSON.parse(td.decode(chacha20poly1305(key, nonce).decrypt(ct))); } catch (e) { throw new AcmError('TAMPERED'); }
+}

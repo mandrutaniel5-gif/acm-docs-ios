@@ -4,14 +4,15 @@
 //  - it holds ACM Docs' own OAuth client (Client ID + Client Secret, set from the control panel);
 //  - when someone connects, ANAF sends the browser back to /anaf/callback; the server exchanges the
 //    one-time code for the company's access keys and immediately encrypts them for the device that
-//    asked (a key the device made for this, P-256 + AES-GCM). It keeps only that sealed copy, for at
+//    asked (a one-time key the device made for this: X25519 + ChaCha20-Poly1305). It keeps only that sealed copy, for at
 //    most 10 minutes, until the device picks it up; then it is deleted. The server cannot read it back.
 //  - renewing the keys needs the Client Secret, so the device asks the server once in a while;
 //    the keys pass through and are not stored.
 //  - invoices never pass through the server: the devices send them to ANAF directly.
 import { onCall, onRequest, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore';
-import { randomBytes, createECDH, createCipheriv, hkdfSync } from 'node:crypto';
+import { randomBytes, createCipheriv, hkdfSync } from 'node:crypto';
+import { x25519 } from '@noble/curves/ed25519.js';
 
 const fail = (code, msg) => { throw new HttpsError(code, msg); };
 const AUTHORIZE = 'https://logincert.anaf.ro/anaf-oauth2/v1/authorize';
@@ -23,16 +24,16 @@ export function makeAnaf({ db, needDevice, emulator }) {
   const conf = async () => (await db.collection('server').doc('anaf').get()).data() || {};
   const states = () => db.collection('anafStates');
 
-  /** The device's public key (P-256, raw uncompressed, base64): the sealed keys can only be opened by it. */
+  /** The device's one-time public key (X25519, base64): the sealed keys can only be opened by it. */
   function sealFor(pubB64, obj) {
     const pub = Buffer.from(String(pubB64 || ''), 'base64');
-    if (pub.length !== 65 || pub[0] !== 4) fail('invalid-argument', 'device key');
-    const e = createECDH('prime256v1');
-    const epk = e.generateKeys();
-    const shared = e.computeSecret(pub);
+    if (pub.length !== 32) fail('invalid-argument', 'device key');
+    const sk = randomBytes(32);
+    const epk = Buffer.from(x25519.getPublicKey(sk));
+    const shared = Buffer.from(x25519.getSharedSecret(sk, pub));
     const key = Buffer.from(hkdfSync('sha256', shared, Buffer.alloc(0), Buffer.from('acm-anaf-v1'), 32));
     const iv = randomBytes(12);
-    const c = createCipheriv('aes-256-gcm', key, iv);
+    const c = createCipheriv('chacha20-poly1305', key, iv, { authTagLength: 16 });
     const ct = Buffer.concat([c.update(Buffer.from(JSON.stringify(obj))), c.final(), c.getAuthTag()]);
     return { epk: epk.toString('base64'), iv: iv.toString('base64'), ct: ct.toString('base64') };
   }

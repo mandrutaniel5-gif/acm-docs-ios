@@ -71,18 +71,12 @@ async function check(name, fn) {
 }
 
 // ------------------------------------------------------------------------------------------
-import { createECDH, createDecipheriv, hkdfSync } from 'node:crypto';
+
 const a = await makeAccount('ana');
 const b = await makeAccount('bob');
 const boss = await makeAdmin();
-const open = (priv, sealed) => {
-  const e = createECDH('prime256v1'); e.setPrivateKey(priv);
-  const key = Buffer.from(hkdfSync('sha256', e.computeSecret(Buffer.from(sealed.epk, 'base64')), Buffer.alloc(0), Buffer.from('acm-anaf-v1'), 32));
-  const all = Buffer.from(sealed.ct, 'base64');
-  const d = createDecipheriv('aes-256-gcm', key, Buffer.from(sealed.iv, 'base64'));
-  d.setAuthTag(all.subarray(all.length - 16));
-  return JSON.parse(Buffer.concat([d.update(all.subarray(0, all.length - 16)), d.final()]).toString());
-};
+const kp = () => A.boxKeyPair();
+const open = (k, sealed) => A.boxOpen(k.sk, sealed, 'acm-anaf-v1');
 
 await check('Panel: ANAF client set, environment switched, secret never shown; apps cannot read it', async () => {
   assert.equal((await a.c.call('anafInfo', {})).ready, false);
@@ -97,7 +91,7 @@ await check('Panel: ANAF client set, environment switched, secret never shown; a
 });
 
 await check('Connecting: ANAF page, callback, keys sealed for the asking device only, picked up once', async () => {
-  const e = createECDH('prime256v1'); const pub = e.generateKeys().toString('base64');
+  const e = kp(); const pub = b64(e.pub);
   const s = await a.c.call('anafStart', { pub });
   assert.match(s.url, /^https:\/\/logincert\.anaf\.ro\/anaf-oauth2\/v1\/authorize\?/);
   assert.match(s.url, /client_id=abcdef1234567890/); assert.match(s.url, /redirect_uri=https%3A%2F%2Facm-docs-52280\.web\.app%2Fanaf%2Fcallback/);
@@ -110,15 +104,15 @@ await check('Connecting: ANAF page, callback, keys sealed for the asking device 
   const got = await a.c.call('anafClaim', { state: s.state });
   assert.equal(got.ready, true);
   assert.ok(!JSON.stringify(got).includes('emulator-access'), 'sealed, not readable on the way');
-  assert.equal(open(e.getPrivateKey(), got.sealed).access, 'emulator-access');
+  assert.equal(open(e, got.sealed).access, 'emulator-access');
   assert.match(await code(a.c.call('anafClaim', { state: s.state })), /no such connection/, 'only once');
   assert.equal((await cb(`state=${s.state}&code=emulator-code`)).status, 400, 'a used link does not work again');
 });
 
 await check('Renewing keys: through the server (needs the secret), sealed for the device, nothing kept', async () => {
-  const e = createECDH('prime256v1'); const pub = e.generateKeys().toString('base64');
+  const e = kp(); const pub = b64(e.pub);
   const r = await a.c.call('anafRefresh', { refresh: 'emulator-refresh', pub });
-  assert.equal(open(e.getPrivateKey(), r.sealed).refresh, 'emulator-refresh');
+  assert.equal(open(e, r.sealed).refresh, 'emulator-refresh');
   assert.match(await code(a.c.call('anafRefresh', { refresh: 'x', pub })), /refresh/);
 });
 
@@ -127,7 +121,7 @@ await check('Without a device session nothing starts; panel can clear the client
   assert.notEqual(await code(c.call('anafStart', { pub: 'x' })), 'ok');
   await boss.op('anafClear');
   assert.equal((await a.c.call('anafInfo', {})).ready, false);
-  assert.match(await code(a.c.call('anafStart', { pub: Buffer.alloc(65, 4).toString('base64') })), /not configured/);
+  assert.match(await code(a.c.call('anafStart', { pub: Buffer.alloc(32, 7).toString('base64') })), /not configured/);
 });
 
 console.log(failed ? `\n${failed} failed` : '\nall passed');
