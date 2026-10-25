@@ -155,7 +155,9 @@ await check('Editor PDF: deschide, 3 pagini, caută un cuvânt', async () => {
   await sleep(1500);
   const ind = (await pg.textContent('#page-ind')).trim();
   if (!/3/.test(ind)) throw new Error('indicatorul de pagini arată „' + ind + '”');
-  await pg.click('#btn-search');
+  // on phones the search sits in the ⋮ menu
+  if (await pg.isVisible('#btn-search')) await pg.click('#btn-search');
+  else { await pg.click('#btn-more'); await sleep(300); await pg.locator('.menu button', { hasText: 'Caută în document' }).click(); }
   await sleep(250);
   await pg.fill('#search-input', 'contract');
   await pg.keyboard.press('Enter');

@@ -67,42 +67,51 @@ const Feel = (() => {
   // ---------------------------------------------------------------- liquid glass motion
   const SPRING = 'linear(0, 0.034, 0.1184, 0.2311, 0.3555, 0.4799, 0.5962, 0.6998, 0.7883, 0.8609, 0.9184, 0.962, 0.9937, 1.0152, 1.0287, 1.0358, 1.0383, 1.0376, 1.0347, 1.0305, 1.0258, 1.021, 1.0164, 1.0123, 1.0088, 1.0059, 1.0036, 1.0018, 1.0005, 0.9996, 0.999, 0.9987, 0.9985, 0.9986, 0.9988, 0.9994, 1)';
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // glass controls swell under the finger, light up where it touches and settle back like a gel
-  const LIQUID = '.hero-acts button, .hero-acts .ib, #tabbar .tb-plus, .cs-tile, .otop .ib, .otop .tb, #topbar .ib, #topbar .tb, #inv-top .ib, #inv-top .tb, .vhead .ib, .vhead .pill, .pill, .btn, .modal .ib, .seg button';
-  function lightAt(el, e) {
-    const r = el.getBoundingClientRect();
-    el.style.setProperty('--lx', ((e.clientX - r.left) / r.width) * 100 + '%');
-    el.style.setProperty('--ly', ((e.clientY - r.top) / r.height) * 100 + '%');
+  // Glass controls answer the whole finger, not a point: pressed, the button sinks in; let go, it springs
+  // back with a little liquid wobble and a ring or two runs over its surface. Flat, no glare.
+  const LIQUID = '.q, .hero-acts button, .hero-acts .ib, #tabbar .tb-plus, .cs-tile, .otop .ib, .otop .tb, #topbar .ib, #topbar .tb, #inv-top .ib, #inv-top .tb, .vhead .ib, .vhead .pill, .pill, .btn, .modal .ib, .seg button';
+  const RINGS = '.q, .hero-acts button, .hero-acts .ib, #tabbar .tb-plus, .cs-tile, .otop .ib, #topbar .ib, #inv-top .ib, .vhead .ib, .modal .ib';
+  const surfaceOf = (el) => (el.matches('.q, .cs-tile') && el.querySelector('.qi')) || el;
+  function ripple(el) {
+    const box = el.appendChild(document.createElement('span'));
+    box.className = 'lg-ripple';
+    for (let i = 0; i < 2; i++) {
+      const r = box.appendChild(document.createElement('i'));
+      r.animate([{ transform: 'scale(.12)', opacity: 0 }, { opacity: i ? 0.55 : 0.9, offset: 0.18 }, { transform: 'scale(1.55)', opacity: 0 }],
+        { duration: 620, delay: i * 120, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'both' });
+    }
+    setTimeout(() => box.remove(), 900);
   }
-  function press(el, e) {
+  function press(el) {
     if (reduced()) return;
-    lightAt(el, e);
-    el.classList.add('lit', 'held');
-    if (el._la) el._la.cancel();
-    const big = el.matches('.btn, .pill, .seg button') ? 1.05 : el.matches('.cs-tile') ? 1.06 : 1.14;
-    el._big = big;
-    el._la = el.animate([{ transform: 'scale(1)' }, { transform: `scale(${big})` }], { duration: 260, easing: 'cubic-bezier(.2,.9,.3,1.25)', fill: 'forwards' });
-    const move = (ev) => lightAt(el, ev);
-    const up = () => {
-      el.removeEventListener('pointermove', move);
+    const s = surfaceOf(el);
+    const deep = el.matches('.btn, .pill, .seg button, .otop .tb, #topbar .tb, #inv-top .tb') ? 0.95 : 0.86;
+    if (s._la) s._la.cancel();
+    s._la = s.animate([{ transform: 'scale(1)' }, { transform: `translateY(1px) scale(${deep})` }], { duration: 140, easing: 'cubic-bezier(.3,.7,.4,1)', fill: 'forwards' });
+    const up = (ev) => {
       window.removeEventListener('pointerup', up, true);
       window.removeEventListener('pointercancel', up, true);
-      el.classList.remove('held');
-      setTimeout(() => el.classList.remove('lit'), 700);
-      const b = el._big;
-      if (el._la) el._la.cancel();
-      el._la = el.animate([
-        { transform: `scale(${b})` },
-        { transform: `scale(${1 - (b - 1) * 0.55}, ${1 + (b - 1) * 0.45})`, offset: 0.28 },
-        { transform: `scale(${1 + (b - 1) * 0.3}, ${1 - (b - 1) * 0.22})`, offset: 0.56 },
-        { transform: `scale(${1 - (b - 1) * 0.08}, ${1 + (b - 1) * 0.06})`, offset: 0.8 },
+      if (s._la) s._la.cancel();
+      const k = 1 - deep; // how far it went in decides how far it jumps back
+      s._la = s.animate([
+        { transform: `translateY(1px) scale(${deep})` },
+        { transform: `scale(${1 + k * 0.75}, ${1 + k * 0.45})`, offset: 0.3 },
+        { transform: `scale(${1 - k * 0.25}, ${1 + k * 0.18})`, offset: 0.55 },
+        { transform: `scale(${1 + k * 0.08}, ${1 - k * 0.06})`, offset: 0.78 },
         { transform: 'scale(1)' },
-      ], { duration: 620, easing: 'ease-out' });
+      ], { duration: 560, easing: 'ease-out' });
+      if (ev.type === 'pointerup' && el.matches(RINGS)) ripple(s);
     };
-    el.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up, true);
     window.addEventListener('pointercancel', up, true);
   }
+  // the icons on Home open their screen a moment later, so the jump back is seen
+  document.addEventListener('click', (e) => {
+    const q = on() && !reduced() && e.target.closest('#quick .q');
+    if (!q || q._go) return;
+    e.stopImmediatePropagation(); e.preventDefault();
+    setTimeout(() => { q._go = true; q.click(); q._go = false; }, 200);
+  }, true);
 
   // the bar: a glass capsule and a bubble that flows from place to place (and follows a finger)
   let lens = null, glass = null, lensAt = null;
@@ -283,7 +292,7 @@ const Feel = (() => {
     // rings from touches: each spreads at a calm, slowing pace and fades within ~2.6 s
     const flat = new Float32Array(N);
     for (let i = 0; i < N; i++) { const f = Math.min(1, Math.max(0, (height[i] - 0.96) / 0.04)); flat[i] = f * f * (3 - 2 * f); }
-    const LAMBDA = W * 0.085, K = (2 * Math.PI) / LAMBDA, LIFE = 4200, A = 0.24;
+    const LAMBDA = W * 0.085, K = (2 * Math.PI) / LAMBDA, LIFE = 2400, A = 0.24;
     const touches = [];
     const reduce = reduced();
     let running = false;
@@ -293,8 +302,8 @@ const Feel = (() => {
       touches.length = 0; touches.push(...live);
       const tv = live.map((t) => {
         const k = (now - t.t0) / LIFE;                       // 0..1
-        const front = LAMBDA * 0.6 + W * 0.5 * (1 - Math.pow(1 - k, 1.5)); // spreads slowly, easing like real water
-        return { x: t.x, y: t.y, front, amp: A * Math.min(1, k * 8) * Math.pow(1 - k, 1.3) };
+        const front = LAMBDA * 0.6 + W * 0.62 * (1 - Math.pow(1 - k, 2.4)); // leaves fast, then slows like real water
+        return { x: t.x, y: t.y, front, amp: A * Math.min(1, k * 22) * Math.pow(1 - k, 1.3) };
       });
       for (let i = 0, o = 0; i < N; i++, o += 4) {
         let gx = dgx[i], gy = dgy[i];
@@ -345,7 +354,7 @@ const Feel = (() => {
     card.addEventListener('click', (e) => {
       if (card._go || reduce) return;
       e.stopImmediatePropagation(); e.preventDefault();
-      setTimeout(() => { card._go = true; card.click(); card._go = false; }, 420);
+      setTimeout(() => { card._go = true; card.click(); card._go = false; }, 520);
     }, true);
     return {};
   }
@@ -375,7 +384,7 @@ const Feel = (() => {
       return toast0(msg, opts);
     };
     // liquid glass
-    document.addEventListener('pointerdown', (e) => { if (!on()) return; const t = e.target.closest(LIQUID); if (t && !t.disabled) press(t, e); }, true);
+    document.addEventListener('pointerdown', (e) => { if (!on()) return; const t = e.target.closest(LIQUID); if (t && !t.disabled) press(t); }, true);
     if (on()) { buildBar(); scrollHeads(); water(document.getElementById('home-money')); }
     viewEntrances(); countUp();
     // the first moment, once the splash goes

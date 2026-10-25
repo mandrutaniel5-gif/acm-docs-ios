@@ -59,15 +59,6 @@ html.v26 :where(.lg, .quick, .hero-acts button, .hero-acts .ib, #tab-glass, #tab
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
 }
-/* light under the finger */
-html.v26 .lit { --lx: 50%; --ly: 50%; }
-html.v26 .lit:not(.money-card)::before {
-  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 2;
-  background: radial-gradient(circle at var(--lx) var(--ly), rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 62%);
-  animation: lit-out .7s ease-out forwards;
-}
-html.v26 .lit.held::before { animation: none; opacity: 1; }
-@keyframes lit-out { from { opacity: 1; } to { opacity: 0; } }
 
 /* ---------------------------------------------------------------- the light behind everything
    soft colour that drifts very slowly: glass needs something to bend */
@@ -94,7 +85,7 @@ html.v26 :is(.biz-card, .list-card, .sec-tip, .list-card, .stat, .set-card) {
 html.v26[data-theme="dark"] :is(.biz-card, .list-card, .sec-tip, .stat, .set-card) { background: rgba(28, 28, 30, .72); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 6px 22px -10px rgba(0, 0, 0, .6); }
 
 /* ---------------------------------------------------------------- pressing: content shrinks, glass swells */
-html.v26 :is(.row, .srow, .q) { transition: transform .45s var(--spring-bounce), background-color .2s; }
+html.v26 :is(.row, .srow) { transition: transform .45s var(--spring-bounce), background-color .2s; }
 html.v26 :is(.row, .srow):active { transform: scale(.985); transition-duration: .12s; }
 
 /* ================================================================= phone */
@@ -124,11 +115,10 @@ html.v26 :is(.row, .srow):active { transform: scale(.985); transition-duration: 
   html.v26 .q { background: none; box-shadow: none; padding: 0; gap: 0; border-radius: 16px; }
   html.v26 .q small { display: none; }
   html.v26 .q b { font-size: 12.5px; font-weight: 550; margin-top: 8px; letter-spacing: 0; color: var(--ink); }
-  html.v26 .qi { width: 58px; height: 58px; border-radius: 16px; position: relative; transition: transform .5s var(--spring-bounce);
+  html.v26 .qi { width: 58px; height: 58px; border-radius: 16px; position: relative;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), inset 0 -1px 0 rgba(0, 0, 0, .12), 0 6px 14px -4px rgba(15, 23, 42, .3); }
   html.v26 .qi::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, 0) 50%); pointer-events: none; }
   html.v26 .qi svg { width: 28px; height: 28px; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .2)); }
-  html.v26 .q:active .qi { transform: scale(.9); transition-duration: .1s; }
 
   /* ---------------------------------------------------------------- money: water seen from above
      deep blue water; now and then a drop falls and its rings spread, meet the edges and calm down
@@ -350,3 +340,24 @@ html.v26 .money-card { box-shadow: 0 14px 30px -16px rgba(0, 80, 200, .55), 0 2p
   html.v26 .cards2 { grid-template-columns: 1fr; }
   html.v26 .vwrap { padding: 26px 24px 48px; }
 }
+
+/* ================================================================= pressing: the whole button, flat
+   A pressed button sinks in and springs back (feel.js); a ring or two runs over its surface. The buttons
+   stay flat: a thin edge and a soft shadow, no bulge and no glare. */
+html.v26 .lg-ripple { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 4; }
+html.v26 .lg-ripple i {
+  position: absolute; left: 50%; top: 50%; width: 140%; aspect-ratio: 1; margin: -70% 0 0 -70%; border-radius: 50%;
+  background: radial-gradient(circle, transparent 0 56%, rgba(255, 255, 255, .5) 62%, rgba(0, 0, 0, .05) 66%, transparent 71%);
+}
+html.v26 .hero-acts .lg-ripple i, html.v26 .otop .lg-ripple i, html.v26 #topbar .lg-ripple i, html.v26 #inv-top .lg-ripple i, html.v26 .vhead .lg-ripple i {
+  background: radial-gradient(circle, transparent 0 56%, rgba(0, 122, 255, .16) 62%, rgba(0, 122, 255, .05) 66%, transparent 71%);
+}
+html.v26 :is(.q .qi, .cs-tile .qi, .hero-acts button, .hero-acts .ib, #tabbar .tb-plus) { will-change: transform; }
+/* flat glass: round top buttons and icons without a bulge */
+html.v26 .hero-acts button:not(.avatar.on), html.v26 .hero-acts .ib {
+  background: rgba(255, 255, 255, .72); box-shadow: inset 0 0 0 .5px rgba(0, 0, 0, .06), 0 1px 2px rgba(15, 23, 42, .06), 0 4px 12px -6px rgba(15, 23, 42, .12);
+}
+html.v26[data-theme="dark"] .hero-acts button:not(.avatar.on), html.v26[data-theme="dark"] .hero-acts .ib { background: rgba(255, 255, 255, .1); box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .1); }
+html.v26 .hero-acts button::after, html.v26 .hero-acts .ib::after { opacity: .5; }
+html.v26 .qi { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 1px 2px rgba(15, 23, 42, .1), 0 4px 10px -4px rgba(15, 23, 42, .22) !important; }
+html.v26 .qi::after { background: linear-gradient(180deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, 0) 45%) !important; }
