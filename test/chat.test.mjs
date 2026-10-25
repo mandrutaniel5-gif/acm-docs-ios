@@ -153,6 +153,20 @@ await check('Blocking: a blocked direct conversation takes no new messages eithe
   assert.match(await code(c.c.call('chatBlock', { cid: direct, on: true })), /no such chat/);
 });
 
+await check('Typing: only the time, only by the member itself, read only by members', async () => {
+  const t = (acc, uid) => doc(acc.c.db, 'chats', direct, 'typing', uid);
+  assert.equal(await code(setDoc(t(a, a.uid), { at: serverTimestamp() })), 'ok');
+  assert.ok((await getDoc(t(b, a.uid))).exists(), 'the other member sees it');
+  assert.notEqual(await code(getDoc(t(c, a.uid))), 'ok', 'an outsider does not');
+  assert.notEqual(await code(setDoc(t(a, b.uid), { at: serverTimestamp() })), 'ok', 'not for someone else');
+  assert.notEqual(await code(setDoc(t(a, a.uid), { at: serverTimestamp(), text: 'x' })), 'ok', 'no other fields');
+  assert.notEqual(await code(setDoc(t(c, c.uid), { at: serverTimestamp() })), 'ok', 'not in others\' chats');
+  await b.c.call('chatBlock', { cid: direct, on: true });
+  assert.notEqual(await code(setDoc(t(a, a.uid), { at: serverTimestamp() })), 'ok', 'not in a blocked chat');
+  await b.c.call('chatBlock', { cid: direct, on: false });
+  assert.equal(await code(deleteDoc(t(a, a.uid))), 'ok');
+});
+
 await check('Documents: stored only by members and only after the plan counted them', async () => {
   const sealedDoc = A.seal({ bytes: new TextEncoder().encode('%PDF-1.4 test'), name: 'contract.pdf' }, a.id, [a.id.bundle, b.id.bundle]);
   const upload = async (acc, fid) => {

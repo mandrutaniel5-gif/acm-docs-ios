@@ -162,7 +162,14 @@ const Chat = (() => {
     left, el('div', { class: 'ch-t' }, [el('b', { class: 'no-tr', text: title }), sub ? el('small', { text: sub }) : null]), right || el('span', { class: 'ch-sp' }),
   ]);
   const iconBtn = (icon, label, onclick, cls) => el('button', { class: 'ch-ib ' + (cls || ''), type: 'button', title: label, 'aria-label': label, html: svg(icon), onclick });
-  const avatarOf = (name, group) => el('span', { class: 'ch-av' + (group ? ' grp' : ''), html: group ? svg('group') : '', text: group ? null : ((name || '?').replace(/^@/, '')[0] || '?').toUpperCase() });
+  // every person keeps the same colour (from the name), in the system's own palette
+  const HUES = ['#0a84ff', '#5e5ce6', '#bf5af2', '#ff375f', '#ff9f0a', '#30b0c7', '#34c759', '#64d2ff'];
+  const hueOf = (s) => { let h = 0; for (const ch of String(s || '?')) h = (h * 31 + ch.codePointAt(0)) >>> 0; return HUES[h % HUES.length]; };
+  const avatarOf = (name, group) => {
+    const a = el('span', { class: 'ch-av' + (group ? ' grp' : ''), html: group ? svg('group') : '', text: group ? null : ((name || '?').replace(/^@/, '')[0] || '?').toUpperCase() });
+    if (!group) a.style.setProperty('--av', hueOf(name));
+    return a;
+  };
 
   async function show() {
     if (!(await AcmShare.ensureAccount())) return;
@@ -171,14 +178,20 @@ const Chat = (() => {
     openPage((p) => {
       p.dataset.kind = 'list';
       const list = el('div', { class: 'chat-list' }, [el('div', { class: 'ch-empty muted', text: 'Se încarcă…' })]);
+      const q = el('input', { class: 'ch-q', type: 'search', placeholder: I18n.t('Caută'), spellcheck: 'false' });
       p.append(
-        head('Mesaje', null, iconBtn('back', 'Înapoi', closePage), el('span', { class: 'ch-acts' }, [
+        head('', null, iconBtn('back', 'Înapoi', closePage), el('span', { class: 'ch-acts' }, [
           iconBtn('group', 'Grup nou', () => newGroup()),
           iconBtn('plus', 'Conversație nouă', () => newChat()),
         ])),
-        el('div', { class: 'chat-e2e', html: `${svg('lock')}<span>${escHtml(I18n.t('Mesajele și documentele sunt protejate prin End-to-End Encryption și Post-Quantum Cryptography. Nici ACM Docs nu le poate citi.'))}</span>` }),
-        list,
+        el('div', { class: 'chat-scroll' }, [
+          el('h1', { class: 'ch-title', text: 'Mesaje' }),
+          el('div', { class: 'ch-lock', html: `${svg('lock')}<span>${escHtml(I18n.t('End-to-End Encryption · Post-Quantum Cryptography'))}</span>`, title: I18n.t('Mesajele și documentele sunt protejate prin End-to-End Encryption și Post-Quantum Cryptography. Nici ACM Docs nu le poate citi.') }),
+          el('label', { class: 'ch-search', html: svg('search') }, [q]),
+          list,
+        ]),
       );
+      q.addEventListener('input', () => { const t = q.value.trim().toLowerCase(); for (const r of list.querySelectorAll('.ch-row')) r.hidden = !!t && !r.dataset.name.includes(t); });
       const draw = async () => {
         const hidden = ls.get(hiddenKey()) || {};
         const read = ls.get(readKey()) || {};
@@ -196,7 +209,7 @@ const Chat = (() => {
         for (const c of rows) {
           const name = await chatName(c);
           const unread = c.lastFrom && c.lastFrom !== me() && c.lastFrom !== 'system' && ms(c.lastAt) > (read[c.id] || 0);
-          const r = el('button', { class: 'ch-row' + (unread ? ' unread' : ''), type: 'button' }, [
+          const r = el('button', { class: 'ch-row' + (unread ? ' unread' : ''), type: 'button', 'data-name': String(name || '').toLowerCase() }, [
             avatarOf(name, c.kind === 'group'),
             el('span', { class: 'ch-rt' }, [el('b', { class: 'no-tr', text: name }), el('small', { class: 'muted', text: unread ? 'Mesaj nou' : c.kind === 'group' ? `${c.members.length} ${I18n.t('membri')}` : 'Conversație criptată' })]),
             el('span', { class: 'ch-time no-tr', text: when(ms(c.lastAt)) }),
@@ -305,9 +318,17 @@ const Chat = (() => {
       const attach = iconBtn('attach', 'Trimite un document', () => sendFile());
       const composer = el('div', { class: 'chat-compose' }, [attach, input, sendB]);
       const blockedBar = el('div', { class: 'chat-blocked', hidden: true });
-      scroller.append(more, el('div', { class: 'chat-e2e', html: `${svg('lock')}<span>${escHtml(I18n.t('Mesajele și documentele sunt protejate prin End-to-End Encryption și Post-Quantum Cryptography. Nici ACM Docs nu le poate citi.'))}</span>` }));
-      p.append(head(name, sub, iconBtn('back', 'Înapoi', () => show()), iconBtn('more', 'Opțiuni', () => menu())), warn, scroller, blockedBar, composer);
-      input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = Math.min(140, input.scrollHeight) + 'px'; });
+      scroller.append(more, el('div', { class: 'chat-e2e' }, [el('span', { html: svg('lock') }), el('span', { text: I18n.t('Mesajele și documentele sunt protejate prin End-to-End Encryption și Post-Quantum Cryptography. Nici ACM Docs nu le poate citi.') })]));
+      const subEl = el('small', { text: sub });
+      const convHead = el('header', { class: 'chat-head conv' }, [
+        iconBtn('back', 'Înapoi', () => show()),
+        el('button', { class: 'ch-who', type: 'button', onclick: () => menu() }, [avatarOf(name, c.kind === 'group'), el('span', { class: 'ch-t' }, [el('b', { class: 'no-tr', text: name }), subEl])]),
+        iconBtn('more', 'Opțiuni', () => menu()),
+      ]);
+      p.append(convHead, warn, scroller, blockedBar, composer);
+      const typed = () => composer.classList.toggle('has-text', !!input.value.trim());
+      input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = Math.min(140, input.scrollHeight) + 'px'; typed(); typing(); });
+      input.addEventListener('blur', () => typingStop());
       input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !Host.mobile) { e.preventDefault(); sendText(); } });
 
       const refreshBars = () => {
@@ -337,9 +358,38 @@ const Chat = (() => {
         // keep the order by time
         const t = ms(m.at) || Date.now();
         node.dataset.t = String(t);
-        const after = [...scroller.querySelectorAll('.ch-msg')].find((x) => Number(x.dataset.t) > t);
-        if (after) after.before(node); else scroller.append(node);
+        const after = [...scroller.querySelectorAll('.ch-msg:not(.typing)')].find((x) => Number(x.dataset.t) > t);
+        if (after) after.before(node); else if (typingNode.isConnected) typingNode.before(node); else scroller.append(node);
+        // a message that arrives while the conversation is open comes in with a small spring
+        if (live && !(typeof Feel !== 'undefined' && !Feel.on)) {
+          node.classList.add('arrive');
+          setTimeout(() => node.classList.remove('arrive'), 700);
+          if (typeof Feel !== 'undefined') Feel.haptic(m.from === me() ? 'light' : 'selection');
+        }
+        regroup();
       };
+      // messages of one person close together form a group: one tail, one time, a day label between days
+      const dayKey = (t) => new Date(t).toDateString();
+      const dayLabel = (t) => {
+        const d = new Date(t), today = new Date(), y = new Date(Date.now() - 864e5);
+        if (d.toDateString() === today.toDateString()) return I18n.t('Azi');
+        if (d.toDateString() === y.toDateString()) return I18n.t('Ieri');
+        return d.toLocaleDateString(I18n.locale(), { weekday: 'long', day: 'numeric', month: 'long' });
+      };
+      function regroup() {
+        scroller.querySelectorAll('.ch-day').forEach((x) => x.remove());
+        const list = [...scroller.querySelectorAll('.ch-msg:not(.typing)')];
+        list.forEach((n, i) => {
+          const prev = list[i - 1], next = list[i + 1], t = Number(n.dataset.t);
+          const near = (a, b) => a && b && !a.classList.contains('sys') && !b.classList.contains('sys') && a.dataset.from === b.dataset.from && Math.abs(Number(a.dataset.t) - Number(b.dataset.t)) < 180000 && dayKey(Number(a.dataset.t)) === dayKey(Number(b.dataset.t));
+          n.classList.toggle('first', !near(prev, n));
+          n.classList.toggle('last', !near(n, next));
+          if (!prev || dayKey(Number(prev.dataset.t)) !== dayKey(t)) n.before(el('div', { class: 'ch-day' }, [el('span', { text: dayLabel(t) })]));
+        });
+      }
+      // "is writing": three dots that move like a small wave
+      const typingNode = el('div', { class: 'ch-msg typing first last' }, [el('div', { class: 'ch-bub' }, [el('span', { class: 'ch-dots' }, [el('i'), el('i'), el('i')])])]);
+      let live = false;
       const atBottom = () => scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 80;
       const q = f.firestore.query(col, f.firestore.orderBy('at', 'desc'), f.firestore.limit(PAGE));
       unlisten = f.firestore.onSnapshot(q, async (snap) => {
@@ -354,9 +404,10 @@ const Chat = (() => {
         if (docs.length && (!oldest || ms(docs[0].data().at) < ms(oldest.data().at))) oldest = docs[0];
         for (const d of docs) if (!snap.metadata.hasPendingWrites || d.data().at) await render(d);
         more.hidden = snap.size < PAGE;
-        if (stick) scroller.scrollTop = scroller.scrollHeight;
+        if (stick) scroller.scrollTo({ top: scroller.scrollHeight, behavior: live ? 'smooth' : 'auto' });
         if (document.visibilityState === 'visible') markRead(cid);
         hydrateIcons(scroller);
+        live = true;
       }, (e) => { console.warn('chat msgs', e && e.code); UI.toast(I18n.t('Mesajele nu pot fi încărcate acum.'), { error: true }); });
       more.addEventListener('click', async () => {
         if (!oldest) return;
@@ -370,7 +421,42 @@ const Chat = (() => {
         hydrateIcons(scroller);
       });
 
-      p.__cleanup = () => { if (unlisten) unlisten(); listeners.delete(refreshBars); };
+      // only the time of the last key press is written (no content), at most every 3 s, removed on send
+      const tdoc = () => f.firestore.doc(db, 'chats', cid, 'typing', me());
+      let lastTyping = 0;
+      function typing() {
+        if (!input.value.trim()) return typingStop();
+        if (Date.now() - lastTyping < 3000) return;
+        lastTyping = Date.now();
+        f.firestore.setDoc(tdoc(), { at: f.firestore.serverTimestamp() }).catch(() => {});
+      }
+      function typingStop() {
+        if (!lastTyping) return;
+        lastTyping = 0;
+        f.firestore.deleteDoc(tdoc()).catch(() => {});
+      }
+      let writers = new Map(), tTimer = null;
+      const showTyping = async () => {
+        const now = Date.now();
+        const who = [...writers].filter(([u, t]) => u !== me() && now - t < 7000).map(([u]) => u);
+        const on = who.length > 0;
+        if (on && !typingNode.isConnected) { const stick = atBottom(); scroller.append(typingNode); if (stick) scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' }); }
+        if (!on && typingNode.isConnected) { typingNode.classList.add('leaving'); setTimeout(() => { typingNode.classList.remove('leaving'); if (!writers.size || ![...writers].some(([u, t]) => u !== me() && Date.now() - t < 7000)) typingNode.remove(); }, 220); }
+        if (on) {
+          const names = c.kind === 'group' ? (await Promise.all(who.slice(0, 2).map(async (u) => label(await person(u))))).join(', ') + ' ' : '';
+          subEl.textContent = names + I18n.t('scrie…');
+          subEl.classList.add('writing');
+        } else { subEl.textContent = sub; subEl.classList.remove('writing'); }
+      };
+      let unTyping = null;
+      try {
+        unTyping = f.firestore.onSnapshot(f.firestore.collection(db, 'chats', cid, 'typing'), (snap) => {
+          writers = new Map(snap.docs.map((d) => [d.id, ms(d.data().at) || Date.now()]));
+          showTyping();
+        }, () => {});
+      } catch (e) {}
+      tTimer = setInterval(showTyping, 2000);
+      p.__cleanup = () => { if (unlisten) unlisten(); if (unTyping) unTyping(); clearInterval(tTimer); typingStop(); listeners.delete(refreshBars); };
 
       // ---- sending
       async function post(kind, box, fid) {
@@ -388,7 +474,8 @@ const Chat = (() => {
         try {
           const cur = chats.get(cid) || c;
           const box = await sealFor(cur.members, { t: 'text', text });
-          input.value = ''; input.style.height = 'auto';
+          input.value = ''; input.style.height = 'auto'; composer.classList.remove('has-text');
+          typingStop();
           await post('text', box);
         } catch (e) { failSay(e); } finally { sendB.disabled = false; input.focus(); }
       }
@@ -514,7 +601,7 @@ const Chat = (() => {
   async function bubble(c, mid, m, id) {
     if (m.kind === 'sys') return sysBubble(m);
     const mine = m.from === me();
-    const wrap = el('div', { class: 'ch-msg' + (mine ? ' mine' : '') });
+    const wrap = el('div', { class: 'ch-msg' + (mine ? ' mine' : ''), 'data-from': m.from || '' });
     let got = decrypted.get(mid);
     if (!got) {
       try {
@@ -537,7 +624,8 @@ const Chat = (() => {
     else if (got.obj.t === 'text') body.append(el('div', { class: 'ch-text no-tr', text: String(got.obj.text || '') }));
     else if (got.obj.t === 'file') body.append(fileCard(c, mid, m, got.obj));
     if (got.ok === false && !got.err) body.append(el('small', { class: 'ch-bad', html: `${svg('warn')}<span>${escHtml(I18n.t('Semnătura nu corespunde cheii cunoscute a expeditorului.'))}</span>` }));
-    body.append(el('small', { class: 'ch-at no-tr', text: when(ms(m.at) || Date.now()) }));
+    // the day is shown between days; a message shows only its time
+    body.append(el('small', { class: 'ch-at no-tr', text: new Date(ms(m.at) || Date.now()).toLocaleTimeString(I18n.locale(), { hour: '2-digit', minute: '2-digit' }) }));
     wrap.append(body);
     if (mine) {
       wrap.addEventListener('contextmenu', async (e) => { e.preventDefault(); await deleteMine(c.id, mid); });

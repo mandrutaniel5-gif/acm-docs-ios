@@ -1833,5 +1833,9 @@
 "Atinge pentru text":"Toca para añadir texto",
 "Atinge pentru subtitlu":"Toca para añadir un subtítulo",
 "Atinge pentru titlul secțiunii":"Toca para añadir un título de sección",
-"Caută în document":"Buscar en el documento"
+"Caută în document":"Buscar en el documento",
+"End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
+"Azi":"Hoy",
+"Ieri":"Ayer",
+"scrie…":"escribiendo…"
 };

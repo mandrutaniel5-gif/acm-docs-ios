@@ -1833,5 +1833,9 @@
 "Atinge pentru text":"タップしてテキストを追加",
 "Atinge pentru subtitlu":"タップしてサブタイトルを追加",
 "Atinge pentru titlul secțiunii":"タップしてセクションタイトルを追加",
-"Caută în document":"書類内を検索"
+"Caută în document":"書類内を検索",
+"End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
+"Azi":"今日",
+"Ieri":"昨日",
+"scrie…":"入力中…"
 };

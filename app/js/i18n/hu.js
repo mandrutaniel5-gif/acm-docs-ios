@@ -1833,5 +1833,9 @@
 "Atinge pentru text":"Koppints a szöveg hozzáadásához",
 "Atinge pentru subtitlu":"Koppints az alcím hozzáadásához",
 "Atinge pentru titlul secțiunii":"Koppints a szakaszcím hozzáadásához",
-"Caută în document":"Keresés a dokumentumban"
+"Caută în document":"Keresés a dokumentumban",
+"End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
+"Azi":"Ma",
+"Ieri":"Tegnap",
+"scrie…":"ír…"
 };

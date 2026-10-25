@@ -1833,5 +1833,9 @@
 "Atinge pentru text":"탭하여 텍스트 추가",
 "Atinge pentru subtitlu":"탭하여 부제목 추가",
 "Atinge pentru titlul secțiunii":"탭하여 섹션 제목 추가",
-"Caută în document":"문서에서 찾기"
+"Caută în document":"문서에서 찾기",
+"End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
+"Azi":"오늘",
+"Ieri":"어제",
+"scrie…":"입력 중…"
 };

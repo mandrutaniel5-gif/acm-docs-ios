@@ -1833,5 +1833,9 @@
 "Atinge pentru text":"轻点以添加文本",
 "Atinge pentru subtitlu":"轻点以添加副标题",
 "Atinge pentru titlul secțiunii":"轻点以添加节标题",
-"Caută în document":"在文档中查找"
+"Caută în document":"在文档中查找",
+"End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
+"Azi":"今天",
+"Ieri":"昨天",
+"scrie…":"正在输入…"
 };

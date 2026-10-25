@@ -1833,5 +1833,9 @@
 "Atinge pentru text":"Tippen, um Text hinzuzufügen",
 "Atinge pentru subtitlu":"Tippen, um Untertitel hinzuzufügen",
 "Atinge pentru titlul secțiunii":"Tippen, um Abschnittstitel hinzuzufügen",
-"Caută în document":"Im Dokument suchen"
+"Caută în document":"Im Dokument suchen",
+"End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
+"Azi":"Heute",
+"Ieri":"Gestern",
+"scrie…":"schreibt…"
 };

@@ -1882,5 +1882,9 @@ window.I18N_EN = {"ACM Docs":"ACM Docs",
 "Atinge pentru text":"Tap to add text",
 "Atinge pentru subtitlu":"Tap to add subtitle",
 "Atinge pentru titlul secțiunii":"Tap to add section title",
-"Caută în document":"Find in document"
+"Caută în document":"Find in document",
+"End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
+"Azi":"Today",
+"Ieri":"Yesterday",
+"scrie…":"typing…"
 };

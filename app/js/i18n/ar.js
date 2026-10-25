@@ -1833,5 +1833,9 @@
 "Atinge pentru text":"اضغط لإضافة نص",
 "Atinge pentru subtitlu":"اضغط لإضافة عنوان فرعي",
 "Atinge pentru titlul secțiunii":"اضغط لإضافة عنوان القسم",
-"Caută în document":"البحث في المستند"
+"Caută în document":"البحث في المستند",
+"End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
+"Azi":"اليوم",
+"Ieri":"أمس",
+"scrie…":"يكتب…"
 };

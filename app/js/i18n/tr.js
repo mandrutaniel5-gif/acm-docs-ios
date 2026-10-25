@@ -1833,5 +1833,9 @@
 "Atinge pentru text":"Metin eklemek için dokunun",
 "Atinge pentru subtitlu":"Alt başlık eklemek için dokunun",
 "Atinge pentru titlul secțiunii":"Bölüm başlığı eklemek için dokunun",
-"Caută în document":"Belgede ara"
+"Caută în document":"Belgede ara",
+"End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
+"Azi":"Bugün",
+"Ieri":"Dün",
+"scrie…":"yazıyor…"
 };

@@ -1833,5 +1833,9 @@
 "Atinge pentru text":"Коснитесь, чтобы добавить текст",
 "Atinge pentru subtitlu":"Коснитесь, чтобы добавить подзаголовок",
 "Atinge pentru titlul secțiunii":"Коснитесь, чтобы добавить заголовок раздела",
-"Caută în document":"Поиск в документе"
+"Caută în document":"Поиск в документе",
+"End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
+"Azi":"Сегодня",
+"Ieri":"Вчера",
+"scrie…":"печатает…"
 };

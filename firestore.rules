@@ -149,6 +149,15 @@ service cloud.firestore {
         // a sender may delete its own message (for everyone)
         allow delete: if request.auth != null && activeDeviceOf(request.auth.uid) && resource.data.from == request.auth.uid;
       }
+      // "is writing": one small document per member, only the time of the last key press (no content),
+      // overwritten while writing and removed when the message is sent; members read it
+      match /typing/{uid} {
+        allow read: if request.auth != null && activeDeviceOf(request.auth.uid) && request.auth.uid in chatDoc(cid).members;
+        allow create, update: if request.auth != null && request.auth.uid == uid && activeDeviceOf(uid) && chatOn()
+          && uid in chatDoc(cid).members && chatDoc(cid).get('blocked', []).size() == 0
+          && request.resource.data.keys().hasOnly(['at']) && request.resource.data.at == request.time;
+        allow delete: if request.auth != null && request.auth.uid == uid;
+      }
     }
 
     // what is paused right now (kill switches from the control panel) and the message about it:

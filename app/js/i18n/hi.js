@@ -1833,5 +1833,9 @@
 "Atinge pentru text":"टेक्स्ट जोड़ने के लिए टैप करें",
 "Atinge pentru subtitlu":"उपशीर्षक जोड़ने के लिए टैप करें",
 "Atinge pentru titlul secțiunii":"अनुभाग शीर्षक जोड़ने के लिए टैप करें",
-"Caută în document":"दस्तावेज़ में खोजें"
+"Caută în document":"दस्तावेज़ में खोजें",
+"End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
+"Azi":"आज",
+"Ieri":"कल",
+"scrie…":"लिख रहे हैं…"
 };
