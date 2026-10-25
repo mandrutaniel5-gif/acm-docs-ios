@@ -105,6 +105,15 @@
           }
         ]
       }
+    ],
+    "rewrites": [
+      {
+        "source": "/anaf/callback",
+        "function": {
+          "functionId": "anafCallback",
+          "region": "europe-west1"
+        }
+      }
     ]
   }
 }

@@ -336,8 +336,49 @@ export function makeAdmin(d) {
     return stripeStatus();
   }
 
+  // ---------------------------------------------------------------- ANAF (RO e-Factura)
+  // ACM Docs' own OAuth client at ANAF. Kept in server/anaf, closed to every client; the secret never
+  // leaves the server (the panel sees only its first and last characters).
+  const anafRef = () => db.collection('server').doc('anaf');
+  async function anafStatus() {
+    const a = (await anafRef().get()).data() || {};
+    return {
+      active: !!(a.clientId && a.clientSecret), env: a.env === 'prod' ? 'prod' : 'test',
+      clientIdEnd: a.clientId ? a.clientId.slice(0, 6) + '…' + a.clientId.slice(-4) : null,
+      checked: a.checked || null, setAt: ms(a.setAt), callback: 'https://acm-docs-52280.web.app/anaf/callback',
+    };
+  }
+  /** ANAF answers "invalid_client" to a wrong pair and "invalid_grant" to a right pair with a made-up key. */
+  async function anafCheck(id, secret) {
+    try {
+      const r = await fetch('https://logincert.anaf.ro/anaf-oauth2/v1/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: 'Basic ' + Buffer.from(`${id}:${secret}`).toString('base64') },
+        body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: 'acm-check', token_content_type: 'jwt' }).toString(),
+      });
+      const t = await r.text();
+      if (r.status === 401 || /invalid_client|unauthorized/i.test(t)) return 'refused';
+      return 'ok';
+    } catch (e) { return 'unreachable'; }
+  }
+  async function anafSet(clientId, clientSecret, env) {
+    clientId = str(clientId, 200); clientSecret = str(clientSecret, 300);
+    if (!/^[A-Za-z0-9._-]{8,200}$/.test(clientId)) fail('invalid-argument', 'client id');
+    if (!/^[A-Za-z0-9._-]{8,300}$/.test(clientSecret)) fail('invalid-argument', 'client secret');
+    const checked = emulator ? 'skipped' : await anafCheck(clientId, clientSecret);
+    if (checked === 'refused') fail('invalid-argument', 'anaf refused the client id / secret');
+    await anafRef().set({ clientId, clientSecret, env: env === 'prod' ? 'prod' : 'test', checked, setAt: FieldValue.serverTimestamp() });
+    return anafStatus();
+  }
+  async function anafEnv(env) {
+    if (!(await anafRef().get()).exists) fail('failed-precondition', 'anaf not configured');
+    await anafRef().update({ env: env === 'prod' ? 'prod' : 'test' });
+    return anafStatus();
+  }
+  async function anafClear() { await anafRef().delete(); return anafStatus(); }
+
   // ---------------------------------------------------------------- the callable
-  const WRITE = new Set(['setPlan', 'suspend', 'blockDevice', 'switches.set', 'resolveReport', 'savePromo', 'deletePromo', 'stripeSet', 'stripeTax', 'stripeClear']);
+  const WRITE = new Set(['setPlan', 'suspend', 'blockDevice', 'switches.set', 'resolveReport', 'savePromo', 'deletePromo', 'stripeSet', 'stripeTax', 'stripeClear', 'anafSet', 'anafEnv', 'anafClear']);
   return onCall({ cors: emulator ? true : ADMIN_ORIGINS, memory: '512MiB', timeoutSeconds: 120 }, async (req) => {
     const who = needAdmin(req);
     const v = req.data || {};
@@ -364,6 +405,10 @@ export function makeAdmin(d) {
       case 'stripeSet': out = await stripeSet(v.key, v.tax === true); break;
       case 'stripeTax': out = await stripeTax(v.on === true); break;
       case 'stripeClear': out = await stripeClear(); break;
+      case 'anaf': out = await anafStatus(); break;
+      case 'anafSet': out = await anafSet(v.clientId, v.clientSecret, v.env); break;
+      case 'anafEnv': out = await anafEnv(v.env); break;
+      case 'anafClear': out = await anafClear(); break;
       case 'log': {
         const qs = await db.collection('adminLog').orderBy('at', 'desc').limit(200).get();
         out = qs.docs.map((x) => { const l = x.data(); return { op: l.op, target: l.target, detail: l.detail, email: l.email, ip: l.ip, at: ms(l.at) }; });
@@ -377,7 +422,7 @@ export function makeAdmin(d) {
       const detail = op === 'setPlan' ? `${v.plan} ${v.days || ''}d ${str(v.note, 80)}`.trim()
         : op === 'suspend' ? (v.on ? 'on: ' + str(v.reason, 120) : 'off')
           : op === 'switches.set' ? JSON.stringify({ all: v.all === true, off: Object.keys(v.off || {}).filter((k) => v.off[k] === true) })
-            : op === 'resolveReport' ? v.status : op === 'stripeTax' ? String(v.on === true)
+            : op === 'resolveReport' ? v.status : op === 'stripeTax' ? String(v.on === true) : op === 'anafSet' || op === 'anafEnv' ? (v.env === 'prod' ? 'prod' : 'test')
               : op === 'savePromo' ? str((v.promo || {}).title, 60) : null;
       await log(req, who, op, v.uid || v.id || (v.promo && v.promo.id) || null, detail);
     }

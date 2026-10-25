@@ -38,7 +38,7 @@ jobs:
           set -o pipefail
           # test-only payment keys for the emulator (the real ones are never in the repository)
           printf 'STRIPE_SECRET_KEY=sk_test_emulator\nSTRIPE_WEBHOOK_SECRET=whsec_test_acmdocs\nMAIL_TEST=1\n' > functions/.env.local
-          firebase emulators:exec --project acm-docs-52280 --only auth,firestore,functions,storage "node --test test/server.test.mjs && node test/plans.test.mjs && node test/admin.test.mjs && node test/chat.test.mjs && node test/verify.test.mjs" 2>&1 | tee server-test.txt
+          firebase emulators:exec --project acm-docs-52280 --only auth,firestore,functions,storage "node --test test/server.test.mjs && node test/plans.test.mjs && node test/admin.test.mjs && node test/chat.test.mjs && node test/verify.test.mjs && node test/anaf.test.mjs" 2>&1 | tee server-test.txt
           rm -f functions/.env.local
 
       - name: Publish rules and functions

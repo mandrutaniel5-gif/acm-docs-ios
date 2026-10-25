@@ -13,6 +13,20 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "anafStates",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "uid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": [
@@ -84,6 +98,12 @@
     },
     {
       "collectionGroup": "adminLog",
+      "fieldPath": "expires",
+      "ttl": true,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "anafStates",
       "fieldPath": "expires",
       "ttl": true,
       "indexes": []

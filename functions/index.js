@@ -20,6 +20,7 @@ import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { PLANS, PRICES, ACTIONS, PAID, GROUP_PLANS, monthOf } from './plans.js';
 import { mailReady, sendSignInCode, sendAdminAlert, sendVerifyCode } from './mail.js';
 import { makeAdmin } from './admin.js';
+import { makeAnaf } from './anaf.js';
 import { timingSafeEqual } from 'node:crypto';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
@@ -1380,3 +1381,11 @@ export const chatMsgCreated = onDocumentCreated({ document: 'chats/{cid}/msgs/{m
   });
   if (over) await ev.data.ref.delete();
 });
+
+// ---------------------------------------------------------------- RO e-Factura (connection to ANAF)
+const ANAF = makeAnaf({ db, needDevice, emulator: process.env.FUNCTIONS_EMULATOR === 'true' });
+export const anafStart = ANAF.anafStart;
+export const anafCallback = ANAF.anafCallback;
+export const anafClaim = ANAF.anafClaim;
+export const anafRefresh = ANAF.anafRefresh;
+export const anafInfo = ANAF.anafInfo;
