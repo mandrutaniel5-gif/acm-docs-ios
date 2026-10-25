@@ -1,0 +1,47 @@
+=== Origin: acm://app
+HTTP/2 200 
+access-control-allow-methods: POST, GET, HEAD, DELETE, PATCH
+access-control-allow-headers: Authorization, Content-Type, Range, X-Firebase-Storage-Version, X-Firebase-Storage-XSRF, X-Firebase-AppCheck, X-Firebase-GMPID, X-Goog-AuthUser, X-Goog-Upload-Command, X-Goog-Upload-Header-Content-Length, X-Goog-Upload-Header-Content-Type, X-Goog-Upload-Protocol
+access-control-max-age: 3600
+access-control-expose-headers: Content-Range, X-Firebase-Storage-XSRF
+access-control-allow-origin: *
+HTTP/2 403 
+access-control-expose-headers: Cache-Control, Content-Length, Content-Range, Date, Expires, Server, Transfer-Encoding, X-Firebase-Storage-XSRF, X-GUploader-UploadID, X-Google-Trace
+access-control-allow-origin: *
+=== Origin: app://acm
+HTTP/2 200 
+access-control-allow-methods: POST, GET, HEAD, DELETE, PATCH
+access-control-allow-headers: Authorization, Content-Type, Range, X-Firebase-Storage-Version, X-Firebase-Storage-XSRF, X-Firebase-AppCheck, X-Firebase-GMPID, X-Goog-AuthUser, X-Goog-Upload-Command, X-Goog-Upload-Header-Content-Length, X-Goog-Upload-Header-Content-Type, X-Goog-Upload-Protocol
+access-control-max-age: 3600
+access-control-expose-headers: Content-Range, X-Firebase-Storage-XSRF
+access-control-allow-origin: *
+HTTP/2 403 
+access-control-expose-headers: Cache-Control, Content-Length, Content-Range, Date, Expires, Server, Transfer-Encoding, X-Firebase-Storage-XSRF, X-GUploader-UploadID, X-Google-Trace
+access-control-allow-origin: *
+=== Origin: https://example.com
+HTTP/2 200 
+access-control-allow-methods: POST, GET, HEAD, DELETE, PATCH
+access-control-allow-headers: Authorization, Content-Type, Range, X-Firebase-Storage-Version, X-Firebase-Storage-XSRF, X-Firebase-AppCheck, X-Firebase-GMPID, X-Goog-AuthUser, X-Goog-Upload-Command, X-Goog-Upload-Header-Content-Length, X-Goog-Upload-Header-Content-Type, X-Goog-Upload-Protocol
+access-control-max-age: 3600
+access-control-expose-headers: Content-Range, X-Firebase-Storage-XSRF
+access-control-allow-origin: *
+HTTP/2 403 
+access-control-expose-headers: Cache-Control, Content-Length, Content-Range, Date, Expires, Server, Transfer-Encoding, X-Firebase-Storage-XSRF, X-GUploader-UploadID, X-Google-Trace
+access-control-allow-origin: *
+=== Origin: null
+HTTP/2 200 
+access-control-allow-methods: POST, GET, HEAD, DELETE, PATCH
+access-control-allow-headers: Authorization, Content-Type, Range, X-Firebase-Storage-Version, X-Firebase-Storage-XSRF, X-Firebase-AppCheck, X-Firebase-GMPID, X-Goog-AuthUser, X-Goog-Upload-Command, X-Goog-Upload-Header-Content-Length, X-Goog-Upload-Header-Content-Type, X-Goog-Upload-Protocol
+access-control-max-age: 3600
+access-control-expose-headers: Content-Range, X-Firebase-Storage-XSRF
+access-control-allow-origin: *
+HTTP/2 403 
+access-control-expose-headers: Cache-Control, Content-Length, Content-Range, Date, Expires, Server, Transfer-Encoding, X-Firebase-Storage-XSRF, X-GUploader-UploadID, X-Google-Trace
+access-control-allow-origin: *
+=== firestore preflight acm://app
+HTTP/2 200 
+access-control-allow-origin: acm://app
+access-control-allow-credentials: true
+access-control-allow-methods: DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT
+access-control-allow-headers: authorization
+access-control-max-age: 3600
