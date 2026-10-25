@@ -1833,5 +1833,17 @@
 "Atinge pentru text":"टेक्स्ट जोड़ने के लिए टैप करें",
 "Atinge pentru subtitlu":"उपशीर्षक जोड़ने के लिए टैप करें",
 "Atinge pentru titlul secțiunii":"अनुभाग शीर्षक जोड़ने के लिए टैप करें",
-"Caută în document":"दस्तावेज़ में खोजें"
+"Caută în document":"दस्तावेज़ में खोजें",
+"End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
+"Azi":"आज",
+"Ieri":"कल",
+"scrie…":"लिख रहे हैं…",
+"Trimite documentul":"दस्तावेज़ भेजें",
+"Îl deschid toți membrii grupului, și tu. Rămâne criptat pe drum și pe server.":"समूह के सभी सदस्य इसे खोल सकते हैं, आप भी। यह रास्ते में और सर्वर पर एन्क्रिप्टेड रहता है।",
+"Îl deschideți amândoi, ca pe orice document. Rămâne criptat pe drum și pe server.":"आप दोनों इसे किसी भी दस्तावेज़ की तरह खोलते हैं। यह रास्ते में और सर्वर पर एन्क्रिप्टेड रहता है।",
+"Trimite ca .acm, doar pentru destinatar":".acm के रूप में भेजें, केवल प्राप्तकर्ता के लिए",
+"Blocat pe cheia destinatarului: doar el îl poate deschide, nici tu.":"प्राप्तकर्ता की कुंजी पर लॉक: केवल वही इसे खोल सकते हैं, आप भी नहीं।",
+"doar pentru destinatar":"केवल प्राप्तकर्ता के लिए",
+"Blocat pentru destinatar":"प्राप्तकर्ता के लिए लॉक",
+"Se descarcă documentul…":"दस्तावेज़ डाउनलोड हो रहा है…"
 };

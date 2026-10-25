@@ -67,44 +67,123 @@ const Feel = (() => {
   // ---------------------------------------------------------------- liquid glass motion
   const SPRING = 'linear(0, 0.034, 0.1184, 0.2311, 0.3555, 0.4799, 0.5962, 0.6998, 0.7883, 0.8609, 0.9184, 0.962, 0.9937, 1.0152, 1.0287, 1.0358, 1.0383, 1.0376, 1.0347, 1.0305, 1.0258, 1.021, 1.0164, 1.0123, 1.0088, 1.0059, 1.0036, 1.0018, 1.0005, 0.9996, 0.999, 0.9987, 0.9985, 0.9986, 0.9988, 0.9994, 1)';
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // Glass controls answer the whole finger, not a point: pressed, the button sinks in; let go, it springs
-  // back with a little liquid wobble and a ring or two runs over its surface. Flat, no glare.
+  // Glass controls behave like a piston in a thick liquid: pressed, the button sinks in, slowed by the
+  // liquid; let go, it is pushed back up quickly and settles with one small, damped overshoot. On Home,
+  // an icon coming back up sends waves over the shelf (see shelfWater).
   const LIQUID = '.q, .hero-acts button, .hero-acts .ib, #tabbar .tb-plus, .cs-tile, .otop .ib, .otop .tb, #topbar .ib, #topbar .tb, #inv-top .ib, #inv-top .tb, .vhead .ib, .vhead .pill, .pill, .btn, .modal .ib, .seg button';
-  const RINGS = '.q, .hero-acts button, .hero-acts .ib, #tabbar .tb-plus, .cs-tile, .otop .ib, #topbar .ib, #inv-top .ib, .vhead .ib, .modal .ib';
   const surfaceOf = (el) => (el.matches('.q, .cs-tile') && el.querySelector('.qi')) || el;
-  function ripple(el) {
-    const box = el.appendChild(document.createElement('span'));
-    box.className = 'lg-ripple';
-    for (let i = 0; i < 2; i++) {
-      const r = box.appendChild(document.createElement('i'));
-      r.animate([{ transform: 'scale(.12)', opacity: 0 }, { opacity: i ? 0.55 : 0.9, offset: 0.18 }, { transform: 'scale(1.55)', opacity: 0 }],
-        { duration: 620, delay: i * 120, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'both' });
-    }
-    setTimeout(() => box.remove(), 900);
-  }
+  let shelf = null;
   function press(el) {
     if (reduced()) return;
     const s = surfaceOf(el);
-    const deep = el.matches('.btn, .pill, .seg button, .otop .tb, #topbar .tb, #inv-top .tb') ? 0.95 : 0.86;
+    const deep = el.matches('.btn, .pill, .seg button, .otop .tb, #topbar .tb, #inv-top .tb') ? 0.96 : 0.88;
+    const sink = el.matches('.q, .cs-tile') ? 2 : 1;
     if (s._la) s._la.cancel();
-    s._la = s.animate([{ transform: 'scale(1)' }, { transform: `translateY(1px) scale(${deep})` }], { duration: 140, easing: 'cubic-bezier(.3,.7,.4,1)', fill: 'forwards' });
+    s._la = s.animate([{ transform: 'none' }, { transform: `translateY(${sink}px) scale(${deep})` }], { duration: 190, easing: 'cubic-bezier(.25,.6,.35,1)', fill: 'forwards' });
     const up = (ev) => {
       window.removeEventListener('pointerup', up, true);
       window.removeEventListener('pointercancel', up, true);
       if (s._la) s._la.cancel();
-      const k = 1 - deep; // how far it went in decides how far it jumps back
+      const k = 1 - deep;
       s._la = s.animate([
-        { transform: `translateY(1px) scale(${deep})` },
-        { transform: `scale(${1 + k * 0.75}, ${1 + k * 0.45})`, offset: 0.3 },
-        { transform: `scale(${1 - k * 0.25}, ${1 + k * 0.18})`, offset: 0.55 },
-        { transform: `scale(${1 + k * 0.08}, ${1 - k * 0.06})`, offset: 0.78 },
-        { transform: 'scale(1)' },
-      ], { duration: 560, easing: 'ease-out' });
-      if (ev.type === 'pointerup' && el.matches(RINGS)) ripple(s);
+        { transform: `translateY(${sink}px) scale(${deep})` },
+        { transform: `translateY(${-sink * 0.6}px) scale(${1 + k * 0.32})`, offset: 0.34 },
+        { transform: `translateY(0) scale(${1 - k * 0.06})`, offset: 0.68 },
+        { transform: 'none' },
+      ], { duration: 460, easing: 'cubic-bezier(.2,.8,.3,1)' });
+      if (ev.type === 'pointerup' && shelf && el.matches('#quick .q')) shelf.wave(s);
     };
     window.addEventListener('pointerup', up, true);
     window.addEventListener('pointercancel', up, true);
   }
+
+  // ---------------------------------------------------------------- the icon shelf, same water as the money card
+  // A thin layer of the same liquid glass lies on the shelf. When an icon comes back up, waves leave its
+  // edge: close to it they have its shape (a square with round corners), further out they round off,
+  // because each wave is a line at equal distance from the icon. Only the surface's shading shows them —
+  // a soft shade on the slopes turned from the light, a faint glint on those facing it — over the glass.
+  function shelfWater(box) {
+    if (!box || box.querySelector('.shelf-water')) return null;
+    const cv = el('canvas', { class: 'shelf-water', 'aria-hidden': 'true' });
+    box.prepend(cv);
+    let W = 0, H = 0, ctx = null, img = null, px = null, scale = 1;
+    function size() {
+      const r = box.getBoundingClientRect();
+      if (!r.width) return false;
+      scale = Math.min(1, 380 / r.width);
+      W = Math.round(r.width * scale); H = Math.round(r.height * scale);
+      cv.width = W; cv.height = H;
+      ctx = cv.getContext('2d'); img = ctx.createImageData(W, H); px = img.data;
+      return true;
+    }
+    const L = [-0.42, -0.5, 0.76], Ln = Math.hypot(...L); L[0] /= Ln; L[1] /= Ln; L[2] /= Ln;
+    const Hv = [L[0], L[1], L[2] + 1], Hn = Math.hypot(...Hv); Hv[0] /= Hn; Hv[1] /= Hn; Hv[2] /= Hn;
+    const waves = [];
+    let running = false, last = 0;
+    const LIFE = 2000;
+    function wave(icon) {
+      if (!W && !size()) return;
+      const br = box.getBoundingClientRect(), ir = icon.getBoundingClientRect();
+      const cx = ((ir.left + ir.right) / 2 - br.left) * scale, cy = ((ir.top + ir.bottom) / 2 - br.top) * scale;
+      const hx = (ir.width / 2) * scale, hy = (ir.height / 2) * scale, rr = parseFloat(getComputedStyle(icon).borderRadius) * scale || hx * 0.28;
+      // distance from the icon's rounded-square edge, and the direction away from it, for every point
+      const N = W * H, d = new Float32Array(N), ux = new Float32Array(N), uy = new Float32Array(N);
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+        const i = y * W + x, px0 = x - cx, py0 = y - cy;
+        const qx = Math.abs(px0) - (hx - rr), qy = Math.abs(py0) - (hy - rr);
+        const ox = Math.max(qx, 0), oy = Math.max(qy, 0), o = Math.hypot(ox, oy);
+        d[i] = Math.max(0, o + Math.min(Math.max(qx, qy), 0) - rr);
+        let gx, gy;
+        if (o > 0) { gx = ox / o; gy = oy / o; } else if (qx > qy) { gx = 1; gy = 0; } else { gx = 0; gy = 1; }
+        ux[i] = gx * Math.sign(px0 || 1); uy[i] = gy * Math.sign(py0 || 1);
+      }
+      waves.push({ d, ux, uy, t0: null, reach: Math.hypot(W, H) * 0.75 });
+      if (waves.length > 3) waves.shift();
+      if (!running) { running = true; last = 0; requestAnimationFrame(frame); }
+    }
+    function paint(now) {
+      for (const w of waves) if (w.t0 == null) w.t0 = now;
+      for (let i = waves.length - 1; i >= 0; i--) if (now - waves[i].t0 > LIFE) waves.splice(i, 1);
+      const lam = Math.max(14, W * 0.075), K = (2 * Math.PI) / lam, A = 0.22;
+      const tv = waves.map((w) => {
+        const k = (now - w.t0) / LIFE;
+        return { w, front: lam * 0.4 + w.reach * (1 - Math.pow(1 - k, 2.4)), amp: A * Math.min(1, k * 20) * Math.pow(1 - k, 1.4) };
+      });
+      const N = W * H;
+      for (let i = 0, o = 0; i < N; i++, o += 4) {
+        let gx = 0, gy = 0;
+        for (const t of tv) {
+          const di = t.w.d[i];
+          if (di <= 0) continue;
+          const behind = t.front - di;
+          if (behind < 0 || behind > lam * 3) continue;
+          const env = Math.sin((Math.PI * behind) / (lam * 3));
+          const sl = -t.amp * env * Math.sin(K * behind) / (1 + di / W);
+          gx += sl * t.w.ux[i]; gy += sl * t.w.uy[i];
+        }
+        if (gx === 0 && gy === 0) { px[o + 3] = 0; continue; }
+        const inv = 1 / Math.sqrt(gx * gx + gy * gy + 1);
+        const nx = -gx * inv, ny = -gy * inv, nz = inv;
+        let sp = nx * Hv[0] + ny * Hv[1] + nz * Hv[2];
+        sp = sp > 0 ? sp : 0; sp *= sp; sp *= sp; sp *= sp; sp *= sp; sp *= sp; sp *= sp;
+        const lit = (nx * L[0] + ny * L[1] + nz * L[2]) / L[2] - 1; // <0 turned away, >0 towards the light
+        if (lit < 0) { // a soft, cool shade
+          px[o] = 30; px[o + 1] = 52; px[o + 2] = 96; px[o + 3] = Math.min(150, -lit * 420 + sp * 40);
+        } else {        // a faint glint
+          px[o] = 255; px[o + 1] = 255; px[o + 2] = 255; px[o + 3] = Math.min(170, lit * 480 + sp * 110);
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+      return waves.length > 0;
+    }
+    function frame(t) {
+      if (t - last >= 33) { last = t; if (!paint(t)) { running = false; ctx.clearRect(0, 0, W, H); return; } }
+      requestAnimationFrame(frame);
+    }
+    new ResizeObserver(() => { if (!running) size(); }).observe(box);
+    return { wave };
+  }
+
   // the icons on Home open their screen a moment later, so the jump back is seen
   document.addEventListener('click', (e) => {
     const q = on() && !reduced() && e.target.closest('#quick .q');
@@ -385,7 +464,7 @@ const Feel = (() => {
     };
     // liquid glass
     document.addEventListener('pointerdown', (e) => { if (!on()) return; const t = e.target.closest(LIQUID); if (t && !t.disabled) press(t); }, true);
-    if (on()) { buildBar(); scrollHeads(); water(document.getElementById('home-money')); }
+    if (on()) { buildBar(); scrollHeads(); water(document.getElementById('home-money')); shelf = shelfWater(document.getElementById('quick')); }
     viewEntrances(); countUp();
     // the first moment, once the splash goes
     if (on() && !reduced()) {

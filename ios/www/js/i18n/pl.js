@@ -1833,5 +1833,17 @@
 "Atinge pentru text":"Dotknij, aby dodać tekst",
 "Atinge pentru subtitlu":"Dotknij, aby dodać podtytuł",
 "Atinge pentru titlul secțiunii":"Dotknij, aby dodać tytuł sekcji",
-"Caută în document":"Szukaj w dokumencie"
+"Caută în document":"Szukaj w dokumencie",
+"End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
+"Azi":"Dzisiaj",
+"Ieri":"Wczoraj",
+"scrie…":"pisze…",
+"Trimite documentul":"Wyślij dokument",
+"Îl deschid toți membrii grupului, și tu. Rămâne criptat pe drum și pe server.":"Otworzą go wszyscy członkowie grupy, także ty. Pozostaje zaszyfrowany w drodze i na serwerze.",
+"Îl deschideți amândoi, ca pe orice document. Rămâne criptat pe drum și pe server.":"Otworzycie go oboje, jak każdy dokument. Pozostaje zaszyfrowany w drodze i na serwerze.",
+"Trimite ca .acm, doar pentru destinatar":"Wyślij jako .acm, tylko dla odbiorcy",
+"Blocat pe cheia destinatarului: doar el îl poate deschide, nici tu.":"Zablokowany kluczem odbiorcy: tylko on może go otworzyć, nawet nie ty.",
+"doar pentru destinatar":"tylko dla odbiorcy",
+"Blocat pentru destinatar":"Zablokowany dla odbiorcy",
+"Se descarcă documentul…":"Pobieranie dokumentu…"
 };
