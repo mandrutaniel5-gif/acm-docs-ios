@@ -183,6 +183,21 @@ handle('fetch-text', (_e, url) => new Promise((resolve, reject) => {
   req.on('timeout', () => req.destroy(new Error('timeout')));
   req.on('error', reject);
 }));
+// Requests the page cannot make itself (servers that do not answer web pages): only these hosts.
+const NET_HOSTS = new Set(['api.anaf.ro', 'webservicesp.anaf.ro', 'firebasestorage.googleapis.com']);
+handle('net-request', async (_e, req) => {
+  const u = new URL(String(req && req.url || ''));
+  if (u.protocol !== 'https:' || !NET_HOSTS.has(u.hostname)) throw new Error('blocked');
+  const method = req.method === 'POST' ? 'POST' : 'GET';
+  const headers = {};
+  for (const [k, v] of Object.entries(req.headers || {})) if (/^[A-Za-z0-9-]{1,60}$/.test(k)) headers[k] = String(v).slice(0, 8000);
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), 120000);
+  try {
+    const r = await fetch(u, { method, headers, body: method === 'POST' && req.body ? Buffer.from(req.body) : undefined, signal: ctl.signal, redirect: 'error' });
+    return { status: r.status, body: new Uint8Array(await r.arrayBuffer()) };
+  } finally { clearTimeout(t); }
+});
 handle('open-external', (_e, url) => { if (/^(mailto:|https?:)/i.test(String(url))) shell.openExternal(String(url)); });
 // Opens a document in its own program (Word, Excel, a PDF reader…): never a program or a script.
 handle('open-path', (_e, p) => {

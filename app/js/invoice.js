@@ -123,7 +123,7 @@ const Invoice = (() => {
       series: b ? b.series[type] : Biz.DOC_TYPES[type].series, number: b ? b.next[type] : 1,
       date: today(), due: type !== 'invoice' ? addDays(today(), 30) : paid ? '' : addDays(today(), days),
       pay: habit('pay') || pr.pay, currency: habit('cur') || (b && b.currency) || 'RON', rate: '',
-      client: { kind: habit('kind') || pr.kind, name: '', phone: '', email: '', address: '', cnp: '', cui: '', regcom: '' },
+      client: { kind: habit('kind') || pr.kind, name: '', phone: '', email: '', address: '', city: '', county: '', country: 'România', cnp: '', cui: '', regcom: '' },
       extra: {}, lines: [], discount: 0,
       notes: (b && b.notes) || '',
       lang: habit('lang') || (b && b.docLang) || 'ro',
@@ -287,7 +287,7 @@ const Invoice = (() => {
     if (!t.rows.length) body = `<tr><td colspan="${ncols + 1}" class="empty">${esc(D('Adaugă produse sau servicii'))}</td></tr>`;
 
     const supplierName = c.legal || c.name || 'Numele firmei';
-    const addr = [c.address, c.city, c.county && D('jud.') + ' ' + c.county].filter(Boolean).join(', ');
+    const addr = [c.address, c.city, c.county && !/^bucure/i.test(c.county) ? D('jud.') + ' ' + c.county : ''].filter(Boolean).join(', ');
     const logo = T.logo.show && c.logo ? `<img class="logo" src="${c.logo}">` : '';
     const vis = (s) => !T.hidden.includes(s);
     const band = T.header === 'band';
@@ -302,7 +302,7 @@ const Invoice = (() => {
           ${kv('IBAN:', c.iban)}${kv('Banca:', c.bank)}<div><span>${D(c.vatPayer ? 'Plătitor de TVA' : 'Neplătitor de TVA')}</span></div></div>
         <div class="party"><h3>${esc(L.client)}</h3><div class="nm">${esc(cl.name || '—')}</div>
           ${cl.kind === 'pj' ? kv('CUI:', cl.cui) + kv('Nr. Reg. Com.:', cl.regcom) : kv('CNP:', cl.cnp)}
-          ${kv('Adresă:', cl.address)}${kv('Telefon:', cl.phone)}${kv('Email:', cl.email)}</div></div>`,
+          ${kv('Adresă:', [cl.address, cl.city, cl.county && !/^bucure/i.test(cl.county) ? D('jud.') + ' ' + cl.county : '', cl.country && !/^rom[aâ]nia$/i.test(String(cl.country).trim()) ? cl.country : ''].filter(Boolean).join(', '))}${kv('Telefon:', cl.phone)}${kv('Email:', cl.email)}</div></div>`,
       extra: () => (exFields.length ? `<div class="car">${I.extra.title ? `<b class="et">${esc(D(I.extra.title))}</b>` : ''}${exFields.map((f) => kv(D(f.label) + ':', f.upper ? String(ex[f.key]).toUpperCase() : ex[f.key])).join('')}</div>` : ''),
       table: () => `<table><thead><tr>${cols.nr ? `<th class="c" style="width:8mm">${esc(L.colNr)}</th>` : ''}<th>${esc(L.colDesc)}</th>
           ${cols.um ? `<th class="c" style="width:13mm">${esc(L.colUm)}</th>` : ''}${cols.qty ? `<th class="r" style="width:13mm">${esc(L.colQty)}</th>` : ''}
@@ -458,6 +458,20 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     return el('label', { class: 'fld-l' + (opts.wide ? ' wide' : '') }, [el('span', { text: label }), input]);
   }
 
+  /** County as a list (e-Factura needs the exact county); an old free-text value is kept as it is. */
+  function countyField(o, label = 'Județ') {
+    const list = typeof EFactura !== 'undefined' ? EFactura.COUNTIES : [];
+    const cur = String(o.county || '');
+    const code = typeof EFactura !== 'undefined' ? EFactura.countyCode(cur) : '';
+    const s = el('select', { class: 'in' });
+    s.append(el('option', { value: '', text: '—' }));
+    let matched = false;
+    for (const [c, n] of list) { const on = !!cur && c === code; matched = matched || on; s.append(el('option', { value: n, text: n, selected: on })); }
+    if (cur && !matched) s.append(el('option', { value: cur, text: cur, selected: true }));
+    s.addEventListener('change', () => { o.county = s.value; if (o === (inv && inv.client)) changed(); });
+    return el('label', { class: 'fld-l' }, [el('span', { text: label }), s]);
+  }
+
   function selectField(label, value, options, onPick) {
     const s = el('select', { class: 'in' });
     for (const [v, t] of options) s.append(el('option', { value: v, text: t, selected: v === value }));
@@ -538,7 +552,9 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
       clientGrid.append(
         field(pj ? 'Denumire firmă *' : 'Nume și prenume *', 'client.name', { wide: true, list: 'inv-clients', onInput: (v) => recallClient(v) }),
         ...(pj ? [field('CUI', 'client.cui', { upper: true }), field('Nr. Reg. Com.', 'client.regcom', { upper: true })] : [field('Telefon', 'client.phone', { inputmode: 'tel', type: 'tel' }), field('CNP (opțional)', 'client.cnp', { inputmode: 'numeric' })]),
-        field('Adresă', 'client.address', { wide: true }),
+        field('Adresă', 'client.address', { wide: true, placeholder: 'Str., nr.' }),
+        field('Localitate', 'client.city', { placeholder: 'București: Sector 1…6' }), countyField(inv.client),
+        field('Țara', 'client.country', { placeholder: 'România' }),
         ...(pj ? [field('Telefon', 'client.phone', { inputmode: 'tel', type: 'tel' })] : []),
         field('Email (opțional)', 'client.email', { inputmode: 'email', type: 'email' }),
       );
@@ -992,7 +1008,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
         vatBox, noteBox,
         el('div', { class: 'msec', text: 'Adresă și contact' }),
         el('div', { class: 'grid' }, [
-          f('Adresă', 'address', { wide: true, placeholder: 'Str., nr.' }), f('Localitate', 'city'), f('Județ', 'county'),
+          f('Adresă', 'address', { wide: true, placeholder: 'Str., nr.' }), f('Localitate', 'city', { placeholder: 'ex. Cluj-Napoca · București: Sector 3' }), countyField(draft),
           f('Telefon', 'phone', { inputmode: 'tel' }), f('Email', 'email', { inputmode: 'email' }), f('Site', 'web', { wide: true, placeholder: 'opțional' }),
         ]),
         el('div', { class: 'msec', text: 'Bancă' }),
@@ -1053,6 +1069,20 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     }
     inv.number = Math.max(1, Math.round(num(inv.number)) || 1);
     inv.series = String(inv.series || '').trim().toUpperCase();
+    // e-Factura: what ANAF would refuse, said before the invoice exists (it can still be created)
+    if (inv.docType === 'invoice' && typeof EFactura !== 'undefined' && (await EFactura.connected())) {
+      const problems = EFactura.problemsFor(inv, biz);
+      if (problems.length) {
+        const go = await UI.modal((box, close) => {
+          box.classList.add('acm-ui', 'ef-details');
+          box.append(el('h2', { text: 'Lipsesc date pentru SPV' }),
+            el('p', { class: 'muted', text: 'Fără ele, ANAF nu primește factura. Le poți completa acum, sau creezi factura și o trimiți în SPV după ce le corectezi.' }),
+            el('div', { class: 'ef-msgs' }, problems.map((m) => el('div', { class: 'ef-msg', text: I18n.t(m) }))),
+            el('div', { class: 'actions col' }, [el('button', { class: 'btn primary', type: 'button', text: 'Completez acum', onclick: () => close(false) }), el('button', { class: 'btn', type: 'button', text: 'Creează oricum', onclick: () => close(true) })]));
+        });
+        if (!go) return;
+      }
+    }
     const dir = await folder();
     const suggested = fileNameFor() + '.pdf';
     const label = Biz.docLabel(inv.docType, ind());
@@ -1089,11 +1119,12 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
       Host.writeFile(target, bytes);
       const t = compute();
       const snapshot = clone(inv);
-      Biz.addDoc({
+      const docId = Biz.addDoc({
         bizId: biz.id, type: inv.docType, series: inv.series, number: inv.number, client: inv.client.name.trim(), total: t.total,
         currency: inv.currency, date: inv.date, due: inv.due || '', path: target, paid: inv.docType === 'invoice' ? paidState() : null,
         paidAt: inv.docType === 'invoice' && paidState() ? inv.date : null, lang: inv.lang || 'ro', data: snapshot,
       });
+      if (inv.docType === 'invoice' && typeof EFactura !== 'undefined') EFactura.enqueue(docId);
       rememberClient();
       learn();
       if (inv.series === biz.series[inv.docType]) { Biz.bumpNumber(biz.id, inv.docType, inv.number); biz = Biz.get(biz.id); }
@@ -1127,7 +1158,8 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
       if (e && e.code === 'PRINT_DIALOG') {
         // Saved by the phone's own print screen: keep it in the list and move to the next number.
         const t = compute();
-        Biz.addDoc({ bizId: biz.id, type: inv.docType, series: inv.series, number: inv.number, client: inv.client.name.trim(), total: t.total, currency: inv.currency, date: inv.date, due: inv.due || '', path: '', paid: inv.docType === 'invoice' ? paidState() : null, paidAt: inv.docType === 'invoice' && paidState() ? inv.date : null, lang: inv.lang || 'ro', data: clone(inv) });
+        const docId = Biz.addDoc({ bizId: biz.id, type: inv.docType, series: inv.series, number: inv.number, client: inv.client.name.trim(), total: t.total, currency: inv.currency, date: inv.date, due: inv.due || '', path: '', paid: inv.docType === 'invoice' ? paidState() : null, paidAt: inv.docType === 'invoice' && paidState() ? inv.date : null, lang: inv.lang || 'ro', data: clone(inv) });
+        if (inv.docType === 'invoice' && typeof EFactura !== 'undefined') EFactura.enqueue(docId);
         rememberClient(); learn();
         if (inv.series === biz.series[inv.docType]) { Biz.bumpNumber(biz.id, inv.docType, inv.number); biz = Biz.get(biz.id); }
         const type = inv.docType; inv = blank(type); saveDraft(); buildForm(); changed();
@@ -1758,6 +1790,8 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
       el('span', { class: 'rt' }, [el('b', { text: d.client || '—' }), el('small', { text: `${d.series}-${pad(d.number)} · ${dateRo(d.date)}${stSub ? ' · ' + stSub : ''}` })]),
       el('span', { class: 'rr' }, [el('b', { text: moneyC(d.total || 0, d.currency) }), el('span', { class: 'st ' + st, html: (st === 'paid' ? svg('check') : st === 'late' ? svg('info') : st === 'due' ? svg('calendar') : '') + `<span>${esc(stLabel)}</span>` })]),
     ]);
+    const ef = typeof EFactura !== 'undefined' && EFactura.badge(d);
+    if (ef) row.querySelector('.rt small').after(el('span', { class: 'ef-chip ' + ef[0], title: I18n.t(ef[2]), text: I18n.t(ef[1]) }));
     row.addEventListener('click', () => docMenu(d, row, refresh));
     return row;
   }
@@ -1766,6 +1800,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     const exists = Host.exists(d.path);
     const items = [
       d.type === 'invoice' && d.paid === false ? { label: 'Clientul a plătit — marchează ca plătită', icon: 'paid', run: () => { Biz.updateDoc(d.id, { paid: true, paidAt: today() }); refresh(); UI.toast('Factura e marcată ca plătită.'); } } : null,
+      d.type === 'invoice' && typeof EFactura !== 'undefined' && EFactura.badge(d) ? { label: 'e-Factura (SPV)', icon: 'receipt', run: () => EFactura.details(d).then(() => refresh()) } : null,
       { label: 'Deschide PDF-ul', icon: 'pdf', disabled: !exists, run: () => App.openPath(d.path) },
       Host.mobile ? { label: 'Trimite (WhatsApp, email…)', icon: 'share', disabled: !exists, run: () => Host.share(d.path) } : { label: 'Arată în folder', icon: 'folder', disabled: !exists, run: () => Host.showInFolder(d.path) },
       Host.mobile ? { label: 'Salvează o copie în telefon…', icon: 'download', disabled: !exists, run: () => Host.exportCopy(d.path) } : null,

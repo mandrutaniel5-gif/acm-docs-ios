@@ -288,9 +288,9 @@ final class Bridge: NSObject, WKScriptMessageHandler {
 
         // encrypted chat documents: stored and fetched by the app itself, not by the web view
         // (WebKit refuses these transfers from the app's own page with "Load failed")
-        case "storage":
+        case "storage", "http":
             guard let url = URL(string: a["url"] as? String ?? ""), url.scheme == "https",
-                  url.host == "firebasestorage.googleapis.com" else { return reply(id, "blocked", nil) }
+                  let host = url.host, ["firebasestorage.googleapis.com", "api.anaf.ro", "webservicesp.anaf.ro"].contains(host) else { return reply(id, "blocked", nil) }
             var req = URLRequest(url: url)
             req.httpMethod = (a["method"] as? String) == "POST" ? "POST" : "GET"
             for (k, v) in (a["headers"] as? [String: String] ?? [:]) { req.setValue(v, forHTTPHeaderField: k) }

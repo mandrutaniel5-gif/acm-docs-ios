@@ -118,7 +118,7 @@ export function makeAnaf({ db, needDevice, emulator }) {
   const anafRefresh = onCall(async (req) => {
     await needDevice(req);
     const v = req.data || {};
-    if (typeof v.refresh !== 'string' || v.refresh.length < 20 || v.refresh.length > 8000) fail('invalid-argument', 'refresh');
+    if (typeof v.refresh !== 'string' || v.refresh.length < 8 || v.refresh.length > 8000) fail('invalid-argument', 'refresh');
     if (typeof v.pub !== 'string') fail('invalid-argument', 'device key');
     const t = await tokenCall({ grant_type: 'refresh_token', refresh_token: v.refresh });
     return { sealed: sealFor(v.pub, t) };

@@ -586,6 +586,41 @@ public class MainActivity extends Activity {
                     }
                 }
             }).start();
+        } else if ("http".equals(op)) {
+            // requests the page cannot make itself (e-Factura at ANAF): only these hosts
+            final String url = a.getString("url");
+            final String host = new java.net.URL(url).getHost();
+            if (!url.startsWith("https://") || !(host.equals("api.anaf.ro") || host.equals("webservicesp.anaf.ro") || host.equals("firebasestorage.googleapis.com"))) throw new Exception("blocked");
+            final String method = "POST".equals(a.optString("method")) ? "POST" : "GET";
+            final org.json.JSONObject hdr = a.optJSONObject("headers");
+            final String body = a.optString("body", "");
+            new Thread(new Runnable() {
+                @Override public void run() {
+                    try {
+                        java.net.HttpURLConnection c = (java.net.HttpURLConnection) new java.net.URL(url).openConnection();
+                        c.setInstanceFollowRedirects(false);
+                        c.setConnectTimeout(20000);
+                        c.setReadTimeout(120000);
+                        c.setRequestMethod(method);
+                        if (hdr != null) { java.util.Iterator<String> it = hdr.keys(); while (it.hasNext()) { String k = it.next(); c.setRequestProperty(k, hdr.getString(k)); } }
+                        if ("POST".equals(method)) {
+                            byte[] b = body.isEmpty() ? new byte[0] : android.util.Base64.decode(body, android.util.Base64.DEFAULT);
+                            c.setDoOutput(true);
+                            c.setFixedLengthStreamingMode(b.length);
+                            java.io.OutputStream os = c.getOutputStream(); os.write(b); os.close();
+                        }
+                        int status = c.getResponseCode();
+                        java.io.InputStream in = status >= 400 ? c.getErrorStream() : c.getInputStream();
+                        byte[] out = in == null ? new byte[0] : readAll(in);
+                        org.json.JSONObject r = new org.json.JSONObject();
+                        r.put("status", status);
+                        r.put("b64", android.util.Base64.encodeToString(out, android.util.Base64.NO_WRAP));
+                        reply(id, null, r.toString());
+                    } catch (Exception e) {
+                        reply(id, t("Fără internet", "No internet") + ": " + e.getMessage(), null);
+                    }
+                }
+            }).start();
         } else if ("external".equals(op)) {
             String url = a.getString("url");
             String low = url.toLowerCase(java.util.Locale.ROOT);

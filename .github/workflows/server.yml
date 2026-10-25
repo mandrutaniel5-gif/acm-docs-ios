@@ -5,7 +5,7 @@ name: Server
 on:
   push:
     branches: [main]
-    paths: ["functions/**", "site/**", "firestore.rules", "firestore.indexes.json", "storage.rules", "firebase.json", "test/server.test.mjs", "test/plans.test.mjs", "test/admin.test.mjs", "test/chat.test.mjs", "test/verify.test.mjs", "test/prod-smoke.mjs", "test/auth-config.mjs", ".github/workflows/server.yml"]
+    paths: ["functions/**", "site/**", "firestore.rules", "firestore.indexes.json", "storage.rules", "firebase.json", "test/server.test.mjs", "test/plans.test.mjs", "test/admin.test.mjs", "test/chat.test.mjs", "test/verify.test.mjs", "test/efactura.test.mjs", "app/js/efactura.js", "test/prod-smoke.mjs", "test/auth-config.mjs", ".github/workflows/server.yml"]
   workflow_dispatch:
     inputs:
       deploy:
@@ -32,6 +32,9 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund
           (cd functions && npm ci --no-audit --no-fund)
           npm i -g firebase-tools@14.27.0
+
+      - name: e-Factura XML (checked by ANAF's public validator)
+        run: node test/efactura.test.mjs --anaf --out efactura-xml 2>&1 | tee efactura-test.txt
 
       - name: Test against the emulators
         run: |
@@ -82,7 +85,7 @@ jobs:
       - name: Publish results
         if: always()
         run: |
-          mkdir -p /tmp/out && cp server-test.txt deploy.txt /tmp/out/ 2>/dev/null || true
+          mkdir -p /tmp/out && cp -r server-test.txt deploy.txt efactura-test.txt efactura-xml /tmp/out/ 2>/dev/null || true
           echo "run ${GITHUB_RUN_ID} ${GITHUB_SHA::7}" > /tmp/out/run.txt
           cd /tmp/out && git init -q -b server-results && git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
           git add -A && git commit -qm "server ${GITHUB_SHA::7}" && git push -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" server-results
