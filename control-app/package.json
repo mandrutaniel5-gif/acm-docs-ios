@@ -1,7 +1,7 @@
 {
   "name": "acm-docs-control",
   "productName": "ACM Docs Control",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "ACM Docs Control - panoul de administrare (ACM Code SRL)",
   "author": "ACM Code SRL",
   "main": "main.js",
