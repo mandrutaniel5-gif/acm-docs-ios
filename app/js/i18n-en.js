@@ -1886,5 +1886,13 @@ window.I18N_EN = {"ACM Docs":"ACM Docs",
 "End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
 "Azi":"Today",
 "Ieri":"Yesterday",
-"scrie…":"typing…"
+"scrie…":"typing…",
+"Trimite documentul":"Send the document",
+"Îl deschid toți membrii grupului, și tu. Rămâne criptat pe drum și pe server.":"Every member of the group opens it, you too. It stays encrypted on the way and on the server.",
+"Îl deschideți amândoi, ca pe orice document. Rămâne criptat pe drum și pe server.":"You both open it, like any document. It stays encrypted on the way and on the server.",
+"Trimite ca .acm, doar pentru destinatar":"Send as .acm, for the recipient only",
+"Blocat pe cheia destinatarului: doar el îl poate deschide, nici tu.":"Locked to the recipient’s key: only they can open it, not even you.",
+"doar pentru destinatar":"recipient only",
+"Blocat pentru destinatar":"Locked for the recipient",
+"Se descarcă documentul…":"Downloading the document…"
 };

@@ -1837,5 +1837,13 @@
 "End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
 "Azi":"Сегодня",
 "Ieri":"Вчера",
-"scrie…":"печатает…"
+"scrie…":"печатает…",
+"Trimite documentul":"Отправить документ",
+"Îl deschid toți membrii grupului, și tu. Rămâne criptat pe drum și pe server.":"Его открывают все участники группы, и вы тоже. Он остаётся зашифрованным в пути и на сервере.",
+"Îl deschideți amândoi, ca pe orice document. Rămâne criptat pe drum și pe server.":"Вы оба открываете его, как любой документ. Он остаётся зашифрованным в пути и на сервере.",
+"Trimite ca .acm, doar pentru destinatar":"Отправить как .acm, только для получателя",
+"Blocat pe cheia destinatarului: doar el îl poate deschide, nici tu.":"Заблокирован ключом получателя: открыть может только он, даже не вы.",
+"doar pentru destinatar":"только для получателя",
+"Blocat pentru destinatar":"Заблокирован для получателя",
+"Se descarcă documentul…":"Загрузка документа…"
 };

@@ -1837,5 +1837,13 @@
 "End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
 "Azi":"Ma",
 "Ieri":"Tegnap",
-"scrie…":"ír…"
+"scrie…":"ír…",
+"Trimite documentul":"Dokumentum küldése",
+"Îl deschid toți membrii grupului, și tu. Rămâne criptat pe drum și pe server.":"A csoport minden tagja megnyithatja, te is. Útközben és a szerveren titkosítva marad.",
+"Îl deschideți amândoi, ca pe orice document. Rămâne criptat pe drum și pe server.":"Mindketten megnyithatjátok, mint bármely dokumentumot. Útközben és a szerveren titkosítva marad.",
+"Trimite ca .acm, doar pentru destinatar":"Küldés .acm-ként, csak a címzettnek",
+"Blocat pe cheia destinatarului: doar el îl poate deschide, nici tu.":"A címzett kulcsához kötve: csak ő nyithatja meg, még te sem.",
+"doar pentru destinatar":"csak a címzettnek",
+"Blocat pentru destinatar":"A címzettnek zárolva",
+"Se descarcă documentul…":"A dokumentum letöltése…"
 };

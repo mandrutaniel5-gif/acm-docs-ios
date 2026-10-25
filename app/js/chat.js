@@ -490,7 +490,10 @@ const Chat = (() => {
           bytes = await Host.readFileAsync(path);
         }
         if (bytes.length > MAX_FILE) return UI.toast(I18n.t('Documentul este prea mare (cel mult 100 MB).'), { error: true });
-        await uploadAndPost(chats.get(cid) || c, bytes, fname, post);
+        const cur = chats.get(cid) || c;
+        const mode = fromBytes && fromBytes.mode ? fromBytes.mode : await askMode(fname, cur);
+        if (!mode) return;
+        await uploadAndPost(cur, bytes, fname, post, mode);
       }
       page.__sendFile = sendFile;
 
@@ -647,13 +650,21 @@ const Chat = (() => {
 
   const size = (b) => (b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB');
   function fileCard(c, mid, m, o) {
-    const card = el('div', { class: 'ch-file' }, [
-      el('span', { class: 'ch-fi', html: svg('lockfile') }),
-      el('span', { class: 'ch-ft' }, [el('b', { class: 'no-tr', text: String(o.name || 'document') }), el('small', { class: 'muted no-tr', text: size(Number(o.size) || 0) + ' · .acm' })]),
+    // older messages (before 2.6.1) were always .acm
+    const acm = o.mode !== 'doc';
+    const mine = m.from === me();
+    const ext = (String(o.name || '').match(/\.([a-z0-9]{1,5})$/i) || [])[1] || '';
+    const icon = acm ? 'lockfile' : /^pdf$/i.test(ext) ? 'pdf' : /^(docx?|odt|rtf|txt)$/i.test(ext) ? 'wordapp' : /^(xlsx?|csv|ods)$/i.test(ext) ? 'sheetapp' : /^(pptx?|odp)$/i.test(ext) ? 'slidesapp' : 'doc';
+    const card = el('div', { class: 'ch-file' + (acm ? ' acm' : '') }, [
+      el('span', { class: 'ch-fi', html: svg(icon) }),
+      el('span', { class: 'ch-ft' }, [el('b', { class: 'no-tr', text: String(o.name || 'document') }), el('small', { class: 'muted', text: size(Number(o.size) || 0) + (acm ? ' · .acm · ' + I18n.t('doar pentru destinatar') : ext ? ' · ' + ext.toUpperCase() : '') })]),
     ]);
+    const lockedForMe = acm && mine;
     const acts = el('div', { class: 'ch-fa' }, [
-      el('button', { class: 'btn small primary', type: 'button', text: 'Deschide', onclick: () => openDoc(c.id, m.fid, o, 'open') }),
-      el('button', { class: 'btn small', type: 'button', title: I18n.t('Trimite mai departe'), html: svg('forward'), onclick: () => forward(c.id, m.fid, o) }),
+      lockedForMe
+        ? el('span', { class: 'ch-locked', html: `${svg('lock')}<span>${escHtml(I18n.t('Blocat pentru destinatar'))}</span>` })
+        : el('button', { class: 'btn small primary', type: 'button', text: 'Deschide', onclick: () => (acm ? openDoc(c.id, m.fid, o, 'open') : openPlain(c.id, m.fid, o, m)) }),
+      lockedForMe ? null : el('button', { class: 'btn small', type: 'button', title: I18n.t('Trimite mai departe'), html: svg('forward'), onclick: () => forward(c.id, m.fid, o) }),
     ]);
     return el('div', {}, [card, acts]);
   }
@@ -676,18 +687,39 @@ const Chat = (() => {
     if (!r.ok) throw Object.assign(new Error(r.status === 404 ? 'Documentul nu mai este disponibil.' : 'storage ' + r.status), { status: r.status });
     return new Uint8Array(await r.arrayBuffer());
   }
-  /** Seals a document for the chat's members, stores it, then posts the (sealed) card. */
-  async function uploadAndPost(c, bytes, fname, post) {
+  /** How the document goes: as a normal document every member opens (the sender too), or as a .acm
+   *  document locked to the recipients only (the sender cannot open it either). Both are end-to-end
+   *  encrypted on the way and on the server. */
+  function askMode(fname, c) {
+    return UI.modal((box, close) => {
+      box.classList.add('acm-ui', 'ch-mode');
+      const opt = (mode, icon, title, sub, primary) => {
+        const b = el('button', { class: 'ch-opt' + (primary ? ' on' : ''), type: 'button' }, [el('span', { class: 'ch-opt-i', html: svg(icon) }), el('span', { class: 'ch-opt-t' }, [el('b', { text: title }), el('small', { text: sub })])]);
+        b.addEventListener('click', () => close(mode));
+        return b;
+      };
+      box.append(
+        el('h2', { class: 'no-tr', text: fname }),
+        opt('doc', 'doc', 'Trimite documentul', c.kind === 'group' ? 'Îl deschid toți membrii grupului, și tu. Rămâne criptat pe drum și pe server.' : 'Îl deschideți amândoi, ca pe orice document. Rămâne criptat pe drum și pe server.', true),
+        opt('acm', 'lockfile', 'Trimite ca .acm, doar pentru destinatar', 'Blocat pe cheia destinatarului: doar el îl poate deschide, nici tu.'),
+        el('div', { class: 'actions col' }, [el('button', { class: 'btn', type: 'button', text: 'Anulează', onclick: () => close(null) })]),
+      );
+      hydrateIcons(box);
+    });
+  }
+  /** Seals a document for the chat's members (or only for the others, as .acm), stores it, then posts the card. */
+  async function uploadAndPost(c, bytes, fname, post, mode = 'doc') {
     const fid = Array.from(crypto.getRandomValues(new Uint8Array(16)), (x) => x.toString(16).padStart(2, '0')).join('');
     // one encrypted-document action of the plan, counted by the server BEFORE the upload
     if (typeof Plan !== 'undefined' && !(await Plan.allow('acmSend', fid, { wait: true }))) return;
     UI.busy('Se criptează documentul…');
     try {
       const id = await Account.unlock('Deblochează mesajele');
-      const sealed = A().seal({ bytes, name: fname, mime: 'application/octet-stream' }, id, await bundlesFor(c.members), { hint: c.members.length > 2, handle: Account.handle() || undefined });
+      const to = mode === 'acm' ? c.members.filter((u) => u !== me()) : c.members;
+      const sealed = A().seal({ bytes, name: fname, mime: 'application/octet-stream' }, id, await bundlesFor(to), { hint: to.length > 1, handle: Account.handle() || undefined });
       UI.busy('Se trimite…');
       await upload(c.id, fid, sealed);
-      const card = await sealFor(c.members, { t: 'file', name: fname, size: bytes.length });
+      const card = await sealFor(c.members, { t: 'file', name: fname, size: bytes.length, mode });
       await post('file', card, fid);
       UI.busy();
     } catch (e) { UI.busy(); failSay(e); }
@@ -707,6 +739,32 @@ const Chat = (() => {
     while (Host.exists(path)) path = Host.join(dir, `${safe(o.name)} (${i++}).acm`);
     Host.writeFile(path, bytes);
     return AcmShare.openFile(path, bytes);
+  }
+  /** A normal document: decrypted on this device and opened like any other (PDF, Word, Excel…). */
+  async function openPlain(cid, fid, o, m) {
+    if (typeof Service !== 'undefined' && Service.blocked('acmOpen')) return;
+    if (typeof Plan !== 'undefined' && !(await Plan.allow('acmOpen', fid))) return;
+    UI.busy('Se descarcă documentul…');
+    let res;
+    try {
+      const raw = await download(cid, fid);
+      res = A().open(raw, await Account.unlock('Deblochează mesajele'));
+      // the signature must be the sender's own key, as for messages
+      const sender = await person(m.from);
+      const pinned = sender.contact && !sender.contact.pending ? sender.contact.fp : null;
+      const ok = m.from === me() ? res.sender.fingerprint === Account.fingerprint() : res.sender.fingerprint === (pinned || sender.fp);
+      if (!ok) { UI.busy(); return UI.toast(I18n.t('Semnătura nu corespunde cheii cunoscute a expeditorului.'), { error: true, duration: 7000 }); }
+    } catch (e) { UI.busy(); return UI.toast(e && e.code === 'NOT_FOR_YOU' ? I18n.t('Trimis înainte să faci parte din conversație.') : (e && e.message) || String(e), { error: true }); }
+    UI.busy();
+    const dir = Host.join(await Host.specialDir('documents'), 'Chat');
+    Host.mkdirp(dir);
+    const base = safe(res.name || o.name);
+    const dot = base.lastIndexOf('.');
+    let path = Host.join(dir, base), i = 2;
+    while (Host.exists(path)) path = Host.join(dir, dot > 0 ? `${base.slice(0, dot)} (${i++})${base.slice(dot)}` : `${base} (${i++})`);
+    Host.writeFile(path, res.bytes);
+    closePage();
+    return App.openPath(path);
   }
   const safe = (n) => String(n || 'document').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_').slice(0, 120);
   /** Forward: decrypted on this device, sealed again for the other conversation's members. */
@@ -736,7 +794,9 @@ const Chat = (() => {
         await f.firestore.setDoc(f.firestore.doc(col), { from: me(), at: f.firestore.serverTimestamp(), kind, box: Host.toB64(box), fid: fid2 });
         try { await f.firestore.updateDoc(f.firestore.doc(db, 'chats', target), { lastAt: f.firestore.serverTimestamp(), lastFrom: me() }); } catch (e) {}
       };
-      await uploadAndPost(t, res.bytes, res.name || o.name, post);
+      const mode = await askMode(res.name || o.name, t);
+      if (!mode) return;
+      await uploadAndPost(t, res.bytes, res.name || o.name, post, mode);
       UI.toast(I18n.t('Documentul a fost trimis.'));
     } catch (e) { UI.busy(); failSay(e); }
   }

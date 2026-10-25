@@ -1837,5 +1837,13 @@
 "End-to-End Encryption · Post-Quantum Cryptography":"End-to-End Encryption · Post-Quantum Cryptography",
 "Azi":"Bugün",
 "Ieri":"Dün",
-"scrie…":"yazıyor…"
+"scrie…":"yazıyor…",
+"Trimite documentul":"Belgeyi gönder",
+"Îl deschid toți membrii grupului, și tu. Rămâne criptat pe drum și pe server.":"Grubun tüm üyeleri açar, sen de. Yolda ve sunucuda şifreli kalır.",
+"Îl deschideți amândoi, ca pe orice document. Rămâne criptat pe drum și pe server.":"İkiniz de her belge gibi açarsınız. Yolda ve sunucuda şifreli kalır.",
+"Trimite ca .acm, doar pentru destinatar":".acm olarak gönder, yalnızca alıcı için",
+"Blocat pe cheia destinatarului: doar el îl poate deschide, nici tu.":"Alıcının anahtarına kilitli: yalnızca o açabilir, sen bile açamazsın.",
+"doar pentru destinatar":"yalnızca alıcı için",
+"Blocat pentru destinatar":"Alıcı için kilitli",
+"Se descarcă documentul…":"Belge indiriliyor…"
 };
