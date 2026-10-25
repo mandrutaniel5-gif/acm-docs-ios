@@ -286,6 +286,24 @@ final class Bridge: NSObject, WKScriptMessageHandler {
                 else { self.reply(id, error?.localizedDescription ?? "fetch", nil) }
             }.resume()
 
+        // encrypted chat documents: stored and fetched by the app itself, not by the web view
+        // (WebKit refuses these transfers from the app's own page with "Load failed")
+        case "storage":
+            guard let url = URL(string: a["url"] as? String ?? ""), url.scheme == "https",
+                  url.host == "firebasestorage.googleapis.com" else { return reply(id, "blocked", nil) }
+            var req = URLRequest(url: url)
+            req.httpMethod = (a["method"] as? String) == "POST" ? "POST" : "GET"
+            for (k, v) in (a["headers"] as? [String: String] ?? [:]) { req.setValue(v, forHTTPHeaderField: k) }
+            if let b = a["body"] as? String, let d = Data(base64Encoded: b) { req.httpBody = d }
+            req.timeoutInterval = 120
+            URLSession.shared.dataTask(with: req) { data, resp, error in
+                if let error = error { return self.reply(id, error.localizedDescription, nil) }
+                let status = (resp as? HTTPURLResponse)?.statusCode ?? 0
+                let out: [String: Any] = ["status": status, "b64": (data ?? Data()).base64EncodedString()]
+                let j = (try? JSONSerialization.data(withJSONObject: out)).flatMap { String(data: $0, encoding: .utf8) } ?? "{}"
+                self.reply(id, nil, j)
+            }.resume()
+
         case "pdf":
             let printer = PdfPrinter(html: a["html"] as? String ?? "",
                                      widthMils: (a["width"] as? NSNumber)?.doubleValue ?? 8268,

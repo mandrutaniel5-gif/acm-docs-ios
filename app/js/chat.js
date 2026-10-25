@@ -677,12 +677,21 @@ const Chat = (() => {
     const meta = JSON.stringify({ name: `chats/${cid}/files/${fid}`, contentType: 'application/octet-stream', metadata: { uploader: me() } });
     const enc = new TextEncoder();
     const body = new Blob([enc.encode(`--${boundary}\r\nContent-Type: application/json; charset=utf-8\r\n\r\n${meta}\r\n--${boundary}\r\nContent-Type: application/octet-stream\r\n\r\n`), bytes, enc.encode(`\r\n--${boundary}--`)]);
+    const url = `https://firebasestorage.googleapis.com/v0/b/${BUCKET}/o?name=${encodeURIComponent(`chats/${cid}/files/${fid}`)}`;
+    const headers = { Authorization: 'Firebase ' + (await token()), 'X-Goog-Upload-Protocol': 'multipart', 'Content-Type': `multipart/related; boundary=${boundary}` };
+    const nat = await Host.nativeStorage(url, { method: 'POST', headers, body: new Uint8Array(await body.arrayBuffer()) });
+    if (nat) { if (!nat.ok) throw Object.assign(new Error('storage ' + nat.status), { status: nat.status }); return; }
     const r = await fetch(`https://firebasestorage.googleapis.com/v0/b/${BUCKET}/o?name=${encodeURIComponent(`chats/${cid}/files/${fid}`)}`, {
       method: 'POST', headers: { Authorization: 'Firebase ' + (await token()), 'X-Goog-Upload-Protocol': 'multipart', 'Content-Type': `multipart/related; boundary=${boundary}` }, body,
     });
     if (!r.ok) throw Object.assign(new Error('storage ' + r.status), { status: r.status });
   }
   async function download(cid, fid) {
+    const nat = await Host.nativeStorage(fileUrl(cid, fid) + '?alt=media', { headers: { Authorization: 'Firebase ' + (await token()) } });
+    if (nat) {
+      if (!nat.ok) throw Object.assign(new Error(nat.status === 404 ? 'Documentul nu mai este disponibil.' : 'storage ' + nat.status), { status: nat.status });
+      return nat.bytes;
+    }
     const r = await fetch(fileUrl(cid, fid) + '?alt=media', { headers: { Authorization: 'Firebase ' + (await token()) } });
     if (!r.ok) throw Object.assign(new Error(r.status === 404 ? 'Documentul nu mai este disponibil.' : 'storage ' + r.status), { status: r.status });
     return new Uint8Array(await r.arrayBuffer());

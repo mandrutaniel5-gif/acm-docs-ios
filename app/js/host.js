@@ -458,6 +458,12 @@ const Host = (() => {
     if (AB) { try { AB.setTheme(!!dark, bar || ''); } catch (e) {} }
     else if (ipc) ipc.invoke('set-theme', pref || 'auto').catch(() => {});
   }
+  /** iPhone / iPad: a transfer to the documents store done by the app itself ({status, bytes}); null elsewhere. */
+  async function nativeStorage(url, { method = 'GET', headers = {}, body = null } = {}) {
+    if (!AB || !info || info.platform !== 'ios') return null;
+    const r = JSON.parse(await call('storage', { url, method, headers, body: body ? toB64(body) : null }));
+    return { status: r.status, ok: r.status >= 200 && r.status < 300, bytes: fromB64(r.b64 || '') };
+  }
   /** Text from the internet (only a few trusted addresses, e.g. the BNR exchange rate). */
   async function fetchText(url) {
     if (AB) return call('fetch', { url });
@@ -547,7 +553,7 @@ const Host = (() => {
   return {
     platform, mobile, available, info, readFile, readFileAsync, writeFile, exists, baseName, dirName, openDialog, pickImages, camera, saveDialog, startupFile, onOpenFile, setTitle, wasmBytes, listFonts,
     ocr, ocrWarm, htmlToPdf, capture, ext, showInFolder, openPath, openExternal, fetchText, share, exportCopy, specialDir, listDir, mkdirp, join, mtime, remove, setTheme, exitApp, appVersion, toB64, fromB64,
-    secureSet, secureGet, secureHas, secureDelete, confirmOwner, scanQR, privacy, integrity, biometricsAvailable,
+    secureSet, secureGet, secureHas, secureDelete, confirmOwner, scanQR, privacy, integrity, biometricsAvailable, nativeStorage,
   };
 })();
 
