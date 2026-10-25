@@ -342,16 +342,10 @@ html.v26 .money-card { box-shadow: 0 14px 30px -16px rgba(0, 80, 200, .55), 0 2p
 }
 
 /* ================================================================= pressing: the whole button, flat
-   A pressed button sinks in and springs back (feel.js); a ring or two runs over its surface. The buttons
-   stay flat: a thin edge and a soft shadow, no bulge and no glare. */
-html.v26 .lg-ripple { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 4; }
-html.v26 .lg-ripple i {
-  position: absolute; left: 50%; top: 50%; width: 140%; aspect-ratio: 1; margin: -70% 0 0 -70%; border-radius: 50%;
-  background: radial-gradient(circle, transparent 0 56%, rgba(255, 255, 255, .5) 62%, rgba(0, 0, 0, .05) 66%, transparent 71%);
-}
-html.v26 .hero-acts .lg-ripple i, html.v26 .otop .lg-ripple i, html.v26 #topbar .lg-ripple i, html.v26 #inv-top .lg-ripple i, html.v26 .vhead .lg-ripple i {
-  background: radial-gradient(circle, transparent 0 56%, rgba(0, 122, 255, .16) 62%, rgba(0, 122, 255, .05) 66%, transparent 71%);
-}
+   A pressed button sinks in like a piston in a thick liquid and is pushed back up (feel.js). On Home the
+   shelf carries the waves. The buttons stay flat: a thin edge and a soft shadow, no bulge and no glare. */
+html.v26 .shelf-water { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: inherit; pointer-events: none; z-index: 0; }
+html.v26 #quick > .q { position: relative; z-index: 1; }
 html.v26 :is(.q .qi, .cs-tile .qi, .hero-acts button, .hero-acts .ib, #tabbar .tb-plus) { will-change: transform; }
 /* flat glass: round top buttons and icons without a bulge */
 html.v26 .hero-acts button:not(.avatar.on), html.v26 .hero-acts .ib {
