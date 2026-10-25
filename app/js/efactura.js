@@ -41,6 +41,25 @@ const EFactura = (() => {
   const UNITS = { buc: 'H87', bucata: 'H87', bucati: 'H87', 'serv': 'C62', serviciu: 'C62', servicii: 'C62', ora: 'HUR', ore: 'HUR', h: 'HUR', zi: 'DAY', zile: 'DAY', luna: 'MON', luni: 'MON', an: 'ANN', km: 'KMT', kg: 'KGM', g: 'GRM', t: 'TNE', tona: 'TNE', m: 'MTR', ml: 'MTR', mp: 'MTK', 'm2': 'MTK', mc: 'MTQ', 'm3': 'MTQ', l: 'LTR', litru: 'LTR', litri: 'LTR', set: 'SET', pachet: 'PK', cutie: 'BX', kwh: 'KWH', cursa: 'C62', portie: 'C62', pers: 'C62', persoana: 'C62' };
   function unitCode(um) { const p = plain(um).replace(/ /g, ''); return UNITS[p] || UNITS[p.replace(/\.$/, '')] || 'C62'; }
 
+  /** Romanian CUI/CIF check digit (key 753217532). */
+  function cuiValid(v) {
+    const d = String(v || '').toUpperCase().replace(/^RO/, '').replace(/\s+/g, '');
+    if (!/^\d{2,10}$/.test(d)) return false;
+    const body = d.slice(0, -1).padStart(9, '0');
+    let sum = 0;
+    for (let i = 0; i < 9; i++) sum += +body[i] * +'753217532'[i];
+    return (sum * 10) % 11 % 10 === +d.slice(-1);
+  }
+  /** CNP check digit (key 279146358279). */
+  function cnpValid(v) {
+    const d = String(v || '').replace(/\s+/g, '');
+    if (!/^\d{13}$/.test(d)) return false;
+    let sum = 0;
+    for (let i = 0; i < 12; i++) sum += +d[i] * +'279146358279'[i];
+    const c = sum % 11;
+    return (c === 10 ? 1 : c) === +d[12];
+  }
+
   // ---------------------------------------------------------------- the XML (UBL 2.1, CIUS-RO)
   const x = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
   const amt = (n) => (Math.round((+n || 0) * 100) / 100).toFixed(2);
@@ -74,6 +93,7 @@ const EFactura = (() => {
     // seller
     const sCui = digits(b.cui);
     if (!sCui) problems.push('Completează CUI-ul firmei (Date firmă).');
+    else if (!cuiValid(sCui)) problems.push('CUI-ul firmei nu este corect. Verifică cifrele (Date firmă).');
     const sp = placeOf(b.address, b.city, b.county, b.country || 'România');
     if (!sp.city) problems.push(sp.county === 'RO-B' ? 'Pentru București, scrie sectorul la localitatea firmei (de exemplu „Sector 3”).' : 'Completează localitatea firmei (Date firmă).');
     if (sp.country === 'RO' && !sp.county) problems.push('Alege județul firmei (Date firmă).');
@@ -84,6 +104,8 @@ const EFactura = (() => {
     const cp = placeOf(c.address, c.city, c.county, c.country || 'România');
     if (!c.name) problems.push('Completează numele clientului.');
     if (pj && !digits(c.cui) && cp.country === 'RO') problems.push('Completează CUI-ul clientului.');
+    else if (pj && cp.country === 'RO' && !cuiValid(c.cui)) problems.push('CUI-ul clientului nu este corect. Verifică cifrele.');
+    if (!pj && digits(c.cnp) && !cnpValid(c.cnp)) problems.push('CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.');
     if (!String(c.address || '').trim()) problems.push('Completează adresa clientului (stradă, număr).');
     if (!cp.city) problems.push(cp.county === 'RO-B' ? 'Pentru un client din București, scrie sectorul la localitate (de exemplu „Sector 1”).' : 'Completează localitatea clientului.');
     if (cp.country === 'RO' && !cp.county) problems.push('Alege județul clientului.');
@@ -392,7 +414,7 @@ const EFactura = (() => {
     return UI.modal((box, close) => {
       box.classList.add('acm-ui', 'ef-details');
       box.append(el('h2', { text: `${idOf(d)} · e-Factura` }), el('p', { class: 'muted', text: `${I18n.t(label || '')} · ${I18n.t(sub || '')}` }));
-      if (e.msg && e.msg.length) box.append(el('div', { class: 'ef-msgs' }, e.msg.map((m) => el('div', { class: 'ef-msg', text: m }))));
+      if (e.msg && e.msg.length) box.append(el('div', { class: 'ef-msgs' }, e.msg.map((m) => el('div', { class: 'ef-msg', text: I18n.t(m) }))));
       if (e.index) box.append(el('p', { class: 'muted small', text: `${I18n.t('Index încărcare')}: ${e.index}${e.env === 'test' ? ' · ' + I18n.t('mediu de test') : ''}` }));
       box.append(el('div', { class: 'actions col' }, [
         e.status !== 'ok' && e.status !== 'sent' ? el('button', { class: 'btn primary', type: 'button', text: 'Trimite în SPV', onclick: () => { close(); sendNow(d.id); } }) : null,
@@ -439,5 +461,5 @@ const EFactura = (() => {
   }
   document.addEventListener('DOMContentLoaded', init);
 
-  return { build, problemsFor, enqueue, process, send, check, sendNow, connect, disconnect, connected, badge, details, settingsRow, countyCode, countryCode, COUNTIES, onChange: (f) => listeners.add(f), _idOf: idOf };
+  return { build, problemsFor, enqueue, process, send, check, sendNow, connect, disconnect, connected, badge, details, settingsRow, countyCode, countryCode, cuiValid, cnpValid, COUNTIES, onChange: (f) => listeners.add(f), _idOf: idOf };
 })();

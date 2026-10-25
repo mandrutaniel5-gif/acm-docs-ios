@@ -50,7 +50,7 @@
         case 'images': return reply(id, null, '[]');
         case 'fetch': return reply(id, 'offline (UI test)', null);
         case 'pdf': return reply(id, 'no native printing in the UI test', null);
-        case 'storage': {
+        case 'storage': case 'http': {
           const body = a.body ? Uint8Array.from(atob(a.body), (c) => c.charCodeAt(0)) : undefined;
           fetch(a.url, { method: a.method || 'GET', headers: a.headers || {}, body: body ? new Blob([body]) : undefined })
             .then(async (r) => { const b = new Uint8Array(await r.arrayBuffer()); let s = ''; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); reply(id, null, JSON.stringify({ status: r.status, b64: btoa(s) })); })

@@ -21,15 +21,15 @@ vm.runInContext(`var Biz = { get: () => __b, active: () => __b, industry: (i) =>
 vm.runInContext(ef.replace('const EFactura =', 'var EFactura ='), ctx);
 const EF = ctx.EFactura;
 
-const base = { id: 'b1', industry: 'general', name: 'Test SRL', legal: 'TEST SOFTWARE SRL', cui: 'RO24255660', regcom: 'J05/123/2026', address: 'Str. Republicii nr. 10', city: 'Oradea', county: 'Bihor', country: 'România', phone: '0722000000', email: 'office@test.ro', iban: 'RO49AAAA1B31007593840000', bank: 'Banca Test', vatPayer: true, vatRate: 21, pricesInclVat: true, nonVatNote: 'Furnizor neplătitor de TVA (regim special de scutire, art. 310 Cod fiscal).', currency: 'RON' };
-const pjClient = { kind: 'pj', name: 'CLIENT FIRMA SRL', cui: 'RO16337544', regcom: 'J40/1/2000', address: 'Bd. Unirii 1', city: 'Sector 3', county: 'București', country: 'România' };
+const base = { id: 'b1', industry: 'general', name: 'Test SRL', legal: 'TEST SOFTWARE SRL', cui: 'RO14255667', regcom: 'J05/123/2026', address: 'Str. Republicii nr. 10', city: 'Oradea', county: 'Bihor', country: 'România', phone: '0722000000', email: 'office@test.ro', iban: 'RO49AAAA1B31007593840000', bank: 'Banca Test', vatPayer: true, vatRate: 21, pricesInclVat: true, nonVatNote: 'Furnizor neplătitor de TVA (regim special de scutire, art. 310 Cod fiscal).', currency: 'RON' };
+const pjClient = { kind: 'pj', name: 'CLIENT FIRMA SRL', cui: 'RO15900825', regcom: 'J40/1/2000', address: 'Bd. Unirii 1', city: 'Sector 3', county: 'București', country: 'România' };
 const pfClient = { kind: 'pf', name: 'Ion Popescu', cnp: '', address: 'Str. Mare 5', city: 'Cluj-Napoca', county: 'Cluj', country: 'România' };
 const lines = [{ type: 'serv', desc: 'Reparație instalație sanitară', qty: 2, price: 150 }, { type: 'prod', desc: 'Robinet baterie', qty: 3, price: 89.99 }, { type: 'prod', desc: 'Garnituri (set)', qty: 1.5, price: 12.4 }];
 const cases = {
   'tva-incl-pj-bucuresti': [{ ...base }, { client: pjClient, lines, discount: 0, pay: 'Ordin de plată' }],
   'tva-excl-discount-pf': [{ ...base, pricesInclVat: false }, { client: pfClient, lines, discount: 10, pay: 'Card' }],
-  'neplatitor-pf-numerar': [{ ...base, vatPayer: false, cui: '24255660' }, { client: pfClient, lines, discount: 5, pay: 'Numerar' }],
-  'neplatitor-pj': [{ ...base, vatPayer: false, cui: '24255660' }, { client: pjClient, lines, discount: 0, pay: 'Transfer bancar' }],
+  'neplatitor-pf-numerar': [{ ...base, vatPayer: false, cui: '14255667' }, { client: pfClient, lines, discount: 5, pay: 'Numerar' }],
+  'neplatitor-pj': [{ ...base, vatPayer: false, cui: '14255667' }, { client: pjClient, lines, discount: 0, pay: 'Transfer bancar' }],
   'tva-eur-extern': [{ ...base }, { client: { kind: 'pj', name: 'Kunde GmbH', cui: 'DE123456789', address: 'Hauptstr. 1', city: 'Berlin', county: '', country: 'Germania' }, lines, currency: 'EUR', rate: '4.9771', discount: 0, pay: 'Ordin de plată' }],
 };
 
@@ -59,6 +59,7 @@ ok(built['tva-eur-extern'].xml.includes('<cbc:TaxAmount currencyID="RON">'), 'EU
 ctx.__b = { ...base, county: '', city: '' };
 const bad = EF.build({ id: 'x', bizId: 'b1', series: 'TST', number: 9, date: '2026-10-20', data: { client: { kind: 'pj', name: '', cui: '' }, lines: [], currency: 'RON', date: '2026-10-20' } });
 ok(bad.problems.length >= 5, 'missing data is listed: ' + bad.problems.length);
+ok(EF.cuiValid('RO14255667') && !EF.cuiValid('RO14255668') && EF.cnpValid('1960229410015') === EF.cnpValid('1960229410015'), 'CUI check digit');
 ok(EF.countyCode('jud. Mureș') === 'MS' && EF.countyCode('Municipiul București') === 'B' && EF.countyCode('Satu-Mare') === 'SM', 'county names → codes');
 
 if (process.argv.includes('--anaf')) {
