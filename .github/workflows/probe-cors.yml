@@ -2,11 +2,15 @@ name: probe-cors
 on:
   push:
     branches: [probe-cors]
+permissions:
+  contents: write
 jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - run: |
+          exec > probe.txt 2>&1
           U="https://firebasestorage.googleapis.com/v0/b/acm-docs-52280.firebasestorage.app/o/chats%2Fx%2Ffiles%2Fy?alt=media"
           for O in "acm://app" "app://acm" "https://example.com" "null"; do
             echo "=== Origin: $O"
@@ -15,3 +19,6 @@ jobs:
           done
           echo "=== firestore preflight acm://app"
           curl -s -o /dev/null -D - -X OPTIONS "https://firestore.googleapis.com/v1/projects/acm-docs-52280/databases/(default)/documents/x/y" -H "Origin: acm://app" -H "Access-Control-Request-Method: GET" -H "Access-Control-Request-Headers: authorization" | grep -i "^HTTP\|access-control"
+      - run: |
+          git config user.name ci; git config user.email ci@example.com
+          git add probe.txt; git commit -m "probe result [skip ci]" || true; git push
