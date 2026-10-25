@@ -332,6 +332,7 @@ const App = (() => {
       return r;
     });
     bizRows.push(srow('plus', 'blue', Biz.list().length ? 'Adaugă altă firmă' : 'Configurează firma ta', 'Facturi pentru orice activitate', chev(), async () => { await Invoice.onboarding(); renderSettings(); }));
+    if (typeof EFactura !== 'undefined' && Biz.list().length) bizRows.push(EFactura.settingsRow(srow, chev));
     root.append(group('Firme', bizRows, 'Documentele se emit pe firma bifată. Poți ține mai multe firme (ex. SRL și PFA).'));
 
     // Documents

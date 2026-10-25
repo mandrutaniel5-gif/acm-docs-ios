@@ -235,9 +235,11 @@ const Biz = (() => {
   function docs() { const l = load(KEY_DOCS, []); return Array.isArray(l) ? l.map(cleanDoc).filter(Boolean) : []; }
   function saveDocs(d) { store(KEY_DOCS, d.slice(0, 2000)); emit(); }
   function addDoc(entry) {
-    const d = docs().filter((x) => x.path !== entry.path || x.id === entry.id);
-    d.unshift({ id: uid(), time: Date.now(), ...entry });
+    const d = docs().filter((x) => !entry.path || x.path !== entry.path || x.id === entry.id);
+    const id = entry.id || uid();
+    d.unshift({ id, time: Date.now(), ...entry });
     saveDocs(d);
+    return id;
   }
   function updateDoc(id, patch) {
     saveDocs(docs().map((x) => (x.id === id ? { ...x, ...patch } : x)));

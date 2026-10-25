@@ -464,6 +464,21 @@ const Host = (() => {
     const r = JSON.parse(await call('storage', { url, method, headers, body: body ? toB64(body) : null }));
     return { status: r.status, ok: r.status >= 200 && r.status < 300, bytes: fromB64(r.b64 || '') };
   }
+  /** A request made by the app itself, outside the page (e-Factura at ANAF): {status, ok, bytes, text()}. */
+  async function nativeHttp(url, { method = 'GET', headers = {}, body = null } = {}) {
+    let status, bytes;
+    if (AB) {
+      const r = JSON.parse(await call('http', { url, method, headers, body: body ? toB64(typeof body === 'string' ? new TextEncoder().encode(body) : body) : null }));
+      status = r.status; bytes = fromB64(r.b64 || '');
+    } else if (ipc) {
+      const r = await ipc.invoke('net-request', { url, method, headers, body: body ? (typeof body === 'string' ? new TextEncoder().encode(body) : body) : null });
+      status = r.status; bytes = r.body instanceof Uint8Array ? r.body : new Uint8Array(r.body || []);
+    } else {
+      const r = await fetch(url, { method, headers, body });
+      status = r.status; bytes = new Uint8Array(await r.arrayBuffer());
+    }
+    return { status, ok: status >= 200 && status < 300, bytes, text: () => new TextDecoder().decode(bytes) };
+  }
   /** Text from the internet (only a few trusted addresses, e.g. the BNR exchange rate). */
   async function fetchText(url) {
     if (AB) return call('fetch', { url });
@@ -553,7 +568,7 @@ const Host = (() => {
   return {
     platform, mobile, available, info, readFile, readFileAsync, writeFile, exists, baseName, dirName, openDialog, pickImages, camera, saveDialog, startupFile, onOpenFile, setTitle, wasmBytes, listFonts,
     ocr, ocrWarm, htmlToPdf, capture, ext, showInFolder, openPath, openExternal, fetchText, share, exportCopy, specialDir, listDir, mkdirp, join, mtime, remove, setTheme, exitApp, appVersion, toB64, fromB64,
-    secureSet, secureGet, secureHas, secureDelete, confirmOwner, scanQR, privacy, integrity, biometricsAvailable, nativeStorage,
+    secureSet, secureGet, secureHas, secureDelete, confirmOwner, scanQR, privacy, integrity, biometricsAvailable, nativeStorage, nativeHttp,
   };
 })();
 
