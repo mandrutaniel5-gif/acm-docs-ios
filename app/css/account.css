@@ -10,7 +10,7 @@
   radial-gradient(closest-side at 30% 35%, rgba(255, 255, 255, .28), transparent 70%),
   radial-gradient(closest-side at 72% 60%, rgba(100, 210, 255, .35), transparent 70%),
   radial-gradient(closest-side at 50% 90%, rgba(175, 82, 222, .30), transparent 70%);
-  animation: authGlow 18s ease-in-out infinite alternate; }
+  animation: authGlow 18s ease-in-out infinite alternate; will-change: transform; }
 @keyframes authGlow { from { transform: translate(-4%, -2%) rotate(0deg); } to { transform: translate(4%, 3%) rotate(8deg); } }
 .auth-brand { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: -28px; text-align: center; padding: 0 20px; }
 .auth-brand img { width: 64px; height: 64px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, .22); margin-bottom: 6px; }
@@ -19,7 +19,7 @@
 
 /* waves: each layer is a 200%-wide repeating wave sliding left forever */
 .wave { position: absolute; left: 0; right: 0; bottom: -1px; overflow: hidden; pointer-events: none; }
-.wave svg { display: block; width: 200%; height: 100%; animation: waveMove 16s linear infinite; }
+.wave svg { display: block; width: 200%; height: 100%; animation: waveMove 16s linear infinite; will-change: transform; }
 .wave.w1 { height: 96px; z-index: 1; }
 .wave.w1 path { fill: rgba(255, 255, 255, .14); }
 .wave.w2 { height: 74px; z-index: 1; }

@@ -69,7 +69,8 @@ html.v26 #views::before {
     radial-gradient(38% 42% at 22% 30%, rgba(0, 122, 255, .16), transparent 70%),
     radial-gradient(34% 38% at 78% 22%, rgba(175, 82, 222, .12), transparent 70%),
     radial-gradient(40% 40% at 55% 62%, rgba(48, 176, 199, .10), transparent 70%);
-  animation: drift 38s ease-in-out infinite alternate;
+  /* still: a moving light here made every glass surface redraw its blur all the time (a full processor
+     core on laptops, even with nothing happening on screen) */
 }
 html.v26[data-theme="dark"] #views::before { opacity: 1.6; }
 html.v26 #views { position: relative; }
@@ -370,3 +371,5 @@ html.v26 .qi::after { background: linear-gradient(180deg, rgba(255, 255, 255, .1
   --bar: rgba(22, 22, 24, .98);
 }
 :root.lowfx *, :root.lowfx *::before, :root.lowfx *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+/* the sign-in screen's moving sky: still in light mode (it kept a third of a processor core busy) */
+:root.lowfx .auth-glow, :root.lowfx .wave svg { animation: none !important; }
