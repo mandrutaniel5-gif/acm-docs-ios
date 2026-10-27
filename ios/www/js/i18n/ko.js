@@ -1907,5 +1907,14 @@
 "Fără ele, ANAF nu primește factura. Le poți completa acum, sau creezi factura și o trimiți în SPV după ce le corectezi.":"이 정보가 없으면 ANAF가 청구서를 받지 않습니다. 지금 입력하거나, 청구서를 만들고 수정한 뒤 SPV로 보낼 수 있습니다.",
 "CUI-ul firmei nu este corect. Verifică cifrele (Date firmă).":"회사의 세금 번호(CUI)가 올바르지 않습니다. 숫자를 확인하세요(회사 정보).",
 "CUI-ul clientului nu este corect. Verifică cifrele.":"고객의 세금 번호(CUI)가 올바르지 않습니다. 숫자를 확인하세요.",
-"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"고객의 개인 번호(CNP)가 올바르지 않습니다. 숫자를 확인하거나 칸을 비워 두세요."
+"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"고객의 개인 번호(CNP)가 올바르지 않습니다. 숫자를 확인하거나 칸을 비워 두세요.",
+"Pregătesc textul pentru editare…":"편집할 텍스트를 준비하는 중…",
+"Citesc textul din scanare…":"스캔한 글자를 읽는 중…",
+"Poți edita textul scanat: atinge de două ori un rând.":"스캔한 텍스트를 편집할 수 있습니다: 줄을 두 번 탭하세요.",
+"Poți edita textul scanat: dublu-click pe un rând.":"스캔한 텍스트를 편집할 수 있습니다: 줄을 두 번 클릭하세요.",
+"Citește textul din pozele paginii":"이 페이지 이미지의 글자 읽기",
+"Citește textul din poză: apoi editezi orice rând":"이미지의 글자를 읽습니다: 그다음 아무 줄이나 편집하세요",
+"Nu mai găsesc poza din care e textul.":"텍스트가 있던 이미지를 더 이상 찾을 수 없습니다.",
+"Nu am putut șterge rândul":"줄을 삭제하지 못했습니다",
+"Nu am putut scrie textul":"텍스트를 쓰지 못했습니다"
 };

@@ -1907,5 +1907,14 @@
 "Fără ele, ANAF nu primește factura. Le poți completa acum, sau creezi factura și o trimiți în SPV după ce le corectezi.":"इनके बिना ANAF इनवॉइस स्वीकार नहीं करता। आप इन्हें अभी पूरा कर सकते हैं, या इनवॉइस बनाकर सुधार के बाद SPV में भेज सकते हैं।",
 "CUI-ul firmei nu este corect. Verifică cifrele (Date firmă).":"कंपनी का टैक्स आईडी (CUI) सही नहीं है। अंक जाँचें (कंपनी का विवरण)।",
 "CUI-ul clientului nu este corect. Verifică cifrele.":"ग्राहक का टैक्स आईडी (CUI) सही नहीं है। अंक जाँचें।",
-"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"ग्राहक का व्यक्तिगत कोड (CNP) सही नहीं है। अंक जाँचें या फ़ील्ड खाली छोड़ें।"
+"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"ग्राहक का व्यक्तिगत कोड (CNP) सही नहीं है। अंक जाँचें या फ़ील्ड खाली छोड़ें।",
+"Pregătesc textul pentru editare…":"संपादन के लिए टेक्स्ट तैयार हो रहा है…",
+"Citesc textul din scanare…":"स्कैन का टेक्स्ट पढ़ा जा रहा है…",
+"Poți edita textul scanat: atinge de două ori un rând.":"आप स्कैन किया टेक्स्ट बदल सकते हैं: किसी पंक्ति पर दो बार टैप करें।",
+"Poți edita textul scanat: dublu-click pe un rând.":"आप स्कैन किया टेक्स्ट बदल सकते हैं: किसी पंक्ति पर डबल-क्लिक करें।",
+"Citește textul din pozele paginii":"इस पेज की तस्वीरों का टेक्स्ट पढ़ें",
+"Citește textul din poză: apoi editezi orice rând":"तस्वीर का टेक्स्ट पढ़ता है: फिर आप कोई भी पंक्ति बदलते हैं",
+"Nu mai găsesc poza din care e textul.":"जिस तस्वीर से टेक्स्ट आया था, वह अब नहीं मिल रही।",
+"Nu am putut șterge rândul":"पंक्ति हटाई नहीं जा सकी",
+"Nu am putut scrie textul":"टेक्स्ट लिखा नहीं जा सका"
 };

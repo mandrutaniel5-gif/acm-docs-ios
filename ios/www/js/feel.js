@@ -66,7 +66,7 @@ const Feel = (() => {
 
   // ---------------------------------------------------------------- liquid glass motion
   const SPRING = 'linear(0, 0.034, 0.1184, 0.2311, 0.3555, 0.4799, 0.5962, 0.6998, 0.7883, 0.8609, 0.9184, 0.962, 0.9937, 1.0152, 1.0287, 1.0358, 1.0383, 1.0376, 1.0347, 1.0305, 1.0258, 1.021, 1.0164, 1.0123, 1.0088, 1.0059, 1.0036, 1.0018, 1.0005, 0.9996, 0.999, 0.9987, 0.9985, 0.9986, 0.9988, 0.9994, 1)';
-  const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced = () => root.classList.contains('lowfx') || matchMedia('(prefers-reduced-motion: reduce)').matches;
   // Glass controls behave like a piston in a thick liquid: pressed, the button sinks in, slowed by the
   // liquid; let go, it is pushed back up quickly and settles with one small, damped overshoot. On Home,
   // an icon coming back up sends waves over the shelf (see shelfWater).
@@ -373,7 +373,6 @@ const Feel = (() => {
     for (let i = 0; i < N; i++) { const f = Math.min(1, Math.max(0, (height[i] - 0.96) / 0.04)); flat[i] = f * f * (3 - 2 * f); }
     const LAMBDA = W * 0.085, K = (2 * Math.PI) / LAMBDA, LIFE = 2400, A = 0.24;
     const touches = [];
-    const reduce = reduced();
     let running = false;
     function paint(now) {
       for (const t of touches) if (t.t0 == null) t.t0 = now;
@@ -423,7 +422,7 @@ const Feel = (() => {
     }
     paint(0);
     card.addEventListener('pointerdown', (e) => {
-      if (reduce) return;
+      if (reduced()) return;
       const r = card.getBoundingClientRect();
       touches.push({ x: ((e.clientX - r.left) / r.width) * W, y: ((e.clientY - r.top) / r.height) * H, t0: null });
       if (touches.length > 3) touches.shift();
@@ -431,15 +430,50 @@ const Feel = (() => {
     });
     // the card opens a moment after the touch, so the drop is seen
     card.addEventListener('click', (e) => {
-      if (card._go || reduce) return;
+      if (card._go || reduced()) return;
       e.stopImmediatePropagation(); e.preventDefault();
       setTimeout(() => { card._go = true; card.click(); card._go = false; }, 520);
     }, true);
     return {};
   }
 
+  // ---------------------------------------------------------------- light mode
+  // On a computer that draws without a graphics card (or cannot keep up), the glass blur and the water
+  // animations make everything slow: they are turned off there, the rest looks the same.
+  function lightMode() {
+    const set = (why) => { root.classList.add('lowfx'); try { localStorage.setItem('acm.lowfx', why); } catch (e) {} };
+    let saved = null;
+    try { saved = localStorage.getItem('acm.lowfx'); } catch (e) {}
+    if (saved === 'gpu' || saved === 'slow') root.classList.add('lowfx');
+    if (window.ElectronHost && window.ElectronHost.invoke) {
+      window.ElectronHost.invoke('gpu-info').then((g) => {
+        if (g && (g.off || /disabled|software/.test(String(g.compositing || '')))) set('gpu');
+        else if (saved === 'gpu') { root.classList.remove('lowfx'); try { localStorage.removeItem('acm.lowfx'); } catch (e) {} }
+      }).catch(() => {});
+    }
+    if (saved === 'slow') return;
+    // a short measurement after start: frames that take far too long mean the computer cannot keep up
+    setTimeout(() => {
+      if (document.visibilityState !== 'visible' || root.classList.contains('lowfx')) return;
+      const gaps = [];
+      let prev = 0;
+      const tick = (t) => {
+        if (prev) gaps.push(t - prev);
+        prev = t;
+        if (gaps.length < 90) requestAnimationFrame(tick);
+        else {
+          gaps.sort((a, b) => a - b);
+          const p50 = gaps[gaps.length >> 1];
+          if (p50 > 34 && document.visibilityState === 'visible') set('slow');
+        }
+      };
+      requestAnimationFrame(tick);
+    }, 4000);
+  }
+
   // ---------------------------------------------------------------- wiring
   function init() {
+    lightMode();
     // the 2.6 look is the default; "classic" keeps the previous one
     let look = null;
     try { look = localStorage.getItem('acm.look'); } catch (e) {}

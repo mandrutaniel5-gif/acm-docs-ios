@@ -1907,5 +1907,14 @@
 "Fără ele, ANAF nu primește factura. Le poți completa acum, sau creezi factura și o trimiți în SPV după ce le corectezi.":"بدونها لا تقبل ANAF الفاتورة. يمكنك إكمالها الآن، أو إنشاء الفاتورة وإرسالها إلى SPV بعد تصحيحها.",
 "CUI-ul firmei nu este corect. Verifică cifrele (Date firmă).":"الرقم الضريبي (CUI) للشركة غير صحيح. تحقق من الأرقام (بيانات الشركة).",
 "CUI-ul clientului nu este corect. Verifică cifrele.":"الرقم الضريبي (CUI) للعميل غير صحيح. تحقق من الأرقام.",
-"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"الرقم الشخصي (CNP) للعميل غير صحيح. تحقق من الأرقام أو اترك الحقل فارغاً."
+"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"الرقم الشخصي (CNP) للعميل غير صحيح. تحقق من الأرقام أو اترك الحقل فارغاً.",
+"Pregătesc textul pentru editare…":"جارٍ تجهيز النص للتحرير…",
+"Citesc textul din scanare…":"جارٍ قراءة نص المسح الضوئي…",
+"Poți edita textul scanat: atinge de două ori un rând.":"يمكنك تحرير النص الممسوح: انقر مرتين على سطر.",
+"Poți edita textul scanat: dublu-click pe un rând.":"يمكنك تحرير النص الممسوح: انقر نقرًا مزدوجًا على سطر.",
+"Citește textul din pozele paginii":"اقرأ النص في صور هذه الصفحة",
+"Citește textul din poză: apoi editezi orice rând":"يقرأ النص في الصورة: ثم تحرر أي سطر",
+"Nu mai găsesc poza din care e textul.":"لم أعد أجد الصورة التي جاء منها النص.",
+"Nu am putut șterge rândul":"تعذّر حذف السطر",
+"Nu am putut scrie textul":"تعذّرت كتابة النص"
 };

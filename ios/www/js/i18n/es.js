@@ -1907,5 +1907,14 @@
 "Fără ele, ANAF nu primește factura. Le poți completa acum, sau creezi factura și o trimiți în SPV după ce le corectezi.":"Sin ellos, ANAF no acepta la factura. Puedes completarlos ahora, o crear la factura y enviarla a SPV después de corregirlos.",
 "CUI-ul firmei nu este corect. Verifică cifrele (Date firmă).":"El código fiscal (CUI) de la empresa no es correcto. Revisa los dígitos (Datos de la empresa).",
 "CUI-ul clientului nu este corect. Verifică cifrele.":"El código fiscal (CUI) del cliente no es correcto. Revisa los dígitos.",
-"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"El código personal (CNP) del cliente no es correcto. Revisa los dígitos o deja el campo vacío."
+"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"El código personal (CNP) del cliente no es correcto. Revisa los dígitos o deja el campo vacío.",
+"Pregătesc textul pentru editare…":"Preparando el texto para editar…",
+"Citesc textul din scanare…":"Leyendo el texto del escaneo…",
+"Poți edita textul scanat: atinge de două ori un rând.":"Puedes editar el texto escaneado: toca dos veces una línea.",
+"Poți edita textul scanat: dublu-click pe un rând.":"Puedes editar el texto escaneado: haz doble clic en una línea.",
+"Citește textul din pozele paginii":"Leer el texto de las imágenes de esta página",
+"Citește textul din poză: apoi editezi orice rând":"Lee el texto de la imagen: luego editas cualquier línea",
+"Nu mai găsesc poza din care e textul.":"Ya no encuentro la imagen de la que viene el texto.",
+"Nu am putut șterge rândul":"No se pudo borrar la línea",
+"Nu am putut scrie textul":"No se pudo escribir el texto"
 };

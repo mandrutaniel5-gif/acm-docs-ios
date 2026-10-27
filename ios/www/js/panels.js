@@ -58,12 +58,12 @@ const Bars = (() => {
     if (item.kind === 'text') {
       if (item.editable) {
         bar.append(button('edit', 'Editează', 'Editează textul (Enter)', () => Pages.beginEdit(item)));
-        if (item.style) styleControls(bar, item.style, (ch) => Pages.restyleItem(item, ch));
+        if (item.style && !item.scan) styleControls(bar, item.style, (ch) => Pages.restyleItem(item, ch));
       }
       bar.append(button('copy', null, 'Copiază textul (Ctrl+C)', () => Pages.copyText(item)));
     }
     if (item.kind === 'image') {
-      bar.append(button('text', 'Text editabil', 'Citește textul din poză și îl face editabil', () => ImageText.run(item.page, item.objects[0])));
+      bar.append(button('text', 'Text editabil', 'Citește textul din poză: apoi editezi orice rând', () => ImageText.read(item.page, item.objects[0])));
     }
     bar.append(button('del', item.kind === 'text' ? null : 'Șterge', 'Șterge (Delete)', () => Pages.guard(() => Editor.deleteItem(item))));
     position(bar, r, view);
@@ -307,6 +307,8 @@ const Search = (() => {
     timer = setTimeout(() => {
       try {
         results = q.trim() ? Editor.doc.search(q.trim()) : [];
+        // and the text read from scans
+        if (q.trim() && typeof ImageText !== 'undefined') results = results.concat(ImageText.search(q.trim(), (p) => Editor.items(p), new Set(results.map((r) => r.page)))).sort((a, b) => a.page - b.page || a.rects[0].t - b.rects[0].t);
       } catch (e) {
         results = [];
       }

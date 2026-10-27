@@ -1907,5 +1907,14 @@
 "Fără ele, ANAF nu primește factura. Le poți completa acum, sau creezi factura și o trimiți în SPV după ce le corectezi.":"これがないと ANAF は請求書を受け付けません。今すぐ入力するか、請求書を作成して修正後に SPV に送信できます。",
 "CUI-ul firmei nu este corect. Verifică cifrele (Date firmă).":"会社の税番号（CUI）が正しくありません。数字を確認してください（会社情報）。",
 "CUI-ul clientului nu este corect. Verifică cifrele.":"顧客の税番号（CUI）が正しくありません。数字を確認してください。",
-"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"顧客の個人番号（CNP）が正しくありません。数字を確認するか、空欄にしてください。"
+"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"顧客の個人番号（CNP）が正しくありません。数字を確認するか、空欄にしてください。",
+"Pregătesc textul pentru editare…":"編集用にテキストを準備しています…",
+"Citesc textul din scanare…":"スキャンの文字を読み取っています…",
+"Poți edita textul scanat: atinge de două ori un rând.":"スキャンした文字を編集できます：行を2回タップしてください。",
+"Poți edita textul scanat: dublu-click pe un rând.":"スキャンした文字を編集できます：行をダブルクリックしてください。",
+"Citește textul din pozele paginii":"このページの画像の文字を読み取る",
+"Citește textul din poză: apoi editezi orice rând":"画像の文字を読み取ります：その後どの行でも編集できます",
+"Nu mai găsesc poza din care e textul.":"文字の元の画像が見つかりません。",
+"Nu am putut șterge rândul":"行を削除できませんでした",
+"Nu am putut scrie textul":"文字を書き込めませんでした"
 };

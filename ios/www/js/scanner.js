@@ -809,13 +809,14 @@ const Scanner = (() => {
     if (!(await planOk())) return;
     let doc = null;
     try {
-      await finish(false);
+      // the text is read before the PDF appears (the bar shows it): then it opens ready to edit
+      await finish(!!prefs.ocr);
       setBusy(I18n.t('Se salvează…'));
       await sleep(16);
       const list = pages.map((pg) => { const pt = pagePt(pg.full); return { jpeg: pg.full.jpeg, ptW: pt.w, ptH: pt.h }; });
       doc = PDF.Doc.fromJpegs(list);
-      const later = prefs.ocr && !pages.every(textReady);
-      if (prefs.ocr && !later) addText(doc, pages.map((pg) => pg.ocr.data), list);
+      const later = false;
+      if (prefs.ocr) addText(doc, pages.map((pg) => pg.ocr.data), list);
       const bytes = doc.save();
       const dir = Host.join(await Host.specialDir('documents'), 'Scanări');
       Host.mkdirp(dir);
@@ -826,7 +827,7 @@ const Scanner = (() => {
       setBusy(null);
       const keep = later ? pages.slice() : null;
       close(!!keep);
-      App.quietScanHint(path);
+      ImageText.fromScanner(path, prefs.ocr ? pages.map((pg) => pg.ocr && pg.ocr.data) : null);
       await App.openPath(path);
       UI.toast(I18n.t('PDF salvat în') + ' ' + (Host.mobile ? (Host.info.platform === 'ios' ? I18n.t('Fișiere › ACM Docs › Scanări') : 'Documents/ACM Docs/Scanări') : dir));
       if (keep) textLater(path, keep, list);

@@ -620,6 +620,8 @@ const App = (() => {
         explain(kind, name);
         return;
       }
+      // a scan: its text is read now, with the loading bar, so every line can be edited as soon as it shows
+      try { await ImageText.start(); } catch (e) { console.warn(e); }
       showEditor();
       afterOpen(kind === 'image');
     } catch (e) {
@@ -630,9 +632,8 @@ const App = (() => {
     }
   }
 
-  // a scan saved just now gets its hidden text in a moment: no "make text editable" hint
-  let quietPath = null;
-  function quietScanHint(path) { quietPath = path; }
+  // kept for the scanner (older call): nothing to do any more
+  function quietScanHint() {}
   function afterOpen(fromImage) {
     requestAnimationFrame(() => {
       Editor.zoom = Pages.fitWidthZoom();
@@ -642,21 +643,7 @@ const App = (() => {
       $('viewport').focus();
     });
     hint();
-    // Scanned document: offer to make its text editable.
-    setTimeout(() => {
-      if (!Editor.doc) return;
-      if (quietPath && Editor.path === quietPath) { quietPath = null; return; }
-      let scanned = [];
-      try { scanned = ImageText.scannedPages(); } catch (e) {}
-      if (scanned.length) {
-        UI.toast(fromImage ? 'Poza a devenit PDF. Vrei ca textul din ea să fie editabil?' : 'Documentul pare scanat (doar poze). Vrei ca textul să fie editabil?', {
-          duration: 12000,
-          action: { label: 'Fă textul editabil', run: () => ImageText.run(scanned[0], null, scanned) },
-        });
-      } else if (fromImage) {
-        UI.toast('Poza a fost pusă într-un PDF nou. Salvează ca să-l păstrezi.');
-      }
-    }, 400);
+    if (fromImage && !ImageText.pages().length) setTimeout(() => UI.toast('Poza a fost pusă într-un PDF nou. Salvează ca să-l păstrezi.'), 400);
   }
 
   async function openDialog() {
@@ -883,7 +870,7 @@ const App = (() => {
       UI.phone() && document.documentElement.classList.contains('v26') ? { label: 'Caută în document', icon: 'search', run: () => $('btn-search').click() } : null,
       { label: 'Salvează ca…', icon: 'save', run: () => saveAs() },
       typeof AcmShare !== 'undefined' ? { label: 'Trimite criptat (.acm)…', icon: 'lockfile', run: () => sendEncrypted() } : null,
-      { label: 'Fă editabil textul din poze (pagina asta)', icon: 'text', run: () => ImageText.run(cur, null) },
+      { label: 'Citește textul din pozele paginii', icon: 'text', run: () => ImageText.read(cur, null) },
       { label: 'Adaugă pagini din alt PDF…', icon: 'addpage', run: () => addPdf() },
       { label: 'Pagină goală după pagina curentă', icon: 'doc', run: () => Pages.guard(() => { Editor.insertBlank(cur + 1); setTimeout(() => Pages.scrollToPage(cur + 1), 60); }) },
       '-',
