@@ -461,6 +461,7 @@ const Pages = (() => {
       if (Editor.tool !== 'select') return;
       const it = itemAt(v, norm(v, e));
       if (it && it.kind === 'text') beginEdit(v, it);
+      else scanNotReady(v);
     });
     v.ov.addEventListener('contextmenu', (e) => {
       e.preventDefault();
@@ -518,9 +519,21 @@ const Pages = (() => {
       const wasSelected = !!(it && Editor.selected && Editor.selected.id === it.id);
       Editor.select(it);
       if (wasSelected && it.kind === 'text' && it.editable) beginEdit(v, it);
+      else if (wasSelected && it.kind === 'image') scanNotReady(v);
       return;
     }
     act(v, e);
+  }
+  /** A scan whose text is still being read (or was not read yet): say so, and read this page first. */
+  function scanNotReady(v) {
+    if (typeof ImageText === 'undefined') return;
+    const st = ImageText.state(v.i);
+    if (st === 'done') return;
+    let scanned = false;
+    try { scanned = ImageText.scannedPages().includes(v.i); } catch (e) {}
+    if (!scanned && st !== 'reading') return;
+    ImageText.read(v.i, null, true);
+    UI.toast('Citesc textul din scanare… încă o clipă, apoi poți edita orice rând.');
   }
   function act(v, e) {
     if (edit) {
@@ -534,7 +547,7 @@ const Pages = (() => {
       const it = itemAt(v, p);
       const wasSelected = !!(it && Editor.selected && Editor.selected.id === it.id);
       Editor.select(it);
-      if (it) startDrag(v, it, e, { mode: 'move', wasSelected });
+      if (it && !it.scan) startDrag(v, it, e, { mode: 'move', wasSelected }); // a scanned line stays where it is
       return;
     }
     if (tool === 'text') {
@@ -949,12 +962,18 @@ const Pages = (() => {
     guard(() => {
       const font = Editor.fontFor(item.style, item.text);
       const style = { ...item.style, family: font.family, bold: font.bold, italic: font.italic, css: font.css };
-      const widthPt = (item.box.r - item.box.l) * v.size.w * 1.04 + 2;
+      // a scanned line grows to the right as it is typed (it is one line of a form, not a paragraph)
+      const widthPt = item.scan ? null : (item.box.r - item.box.l) * v.size.w * 1.04 + 2;
       const baseline = item.firstBaseline != null ? item.firstBaseline : item.box.t + (style.size * 0.8) / v.size.h;
       const topLeft = { x: item.box.l, y: baseline - baselineOffset(style) / v.size.h };
       Editor.doc.setActive(v.i, item.objects, false);
       renderView(v, Editor.zoom * dpr());
       openEditor(v, { item, style, font, widthPt, topLeft, text: item.text });
+      // a scanned line: the editor covers the letters of the picture with the paper's color
+      if (item.scan && edit) {
+        edit.box.style.background = item.paper;
+        edit.box.style.minHeight = (item.box.b - topLeft.y) * v.el.offsetHeight + 'px';
+      }
     });
   }
 
@@ -1066,6 +1085,14 @@ const Pages = (() => {
     guard(() => {
       const font = finalText === e.original ? e.font : Editor.fontFor(e.style, finalText);
       const lines = measureLines(e.box, finalText, e.style);
+      if (e.item && e.item.scan) {
+        // the edited line of a scan: its letters leave the picture, the new text takes their place
+        UI.busy('Scriu textul…');
+        ImageText.replace(v.i, e.item, { lines: finalText.trim() ? lines : [], topLeft: e.topLeft, size: e.style.size, argb: e.style.argb, font })
+          .catch((err) => UI.errorDetails('Nu am putut scrie textul', err))
+          .finally(() => { cleanup(); UI.busy(null); });
+        return;
+      }
       cleanup();
       Editor.writeText(v.i, { remove: e.item ? e.item.objects : [], lines, topLeft: e.topLeft, style: { size: e.style.size, argb: e.style.argb }, font });
     }, () => {

@@ -1,12 +1,14 @@
 'use strict';
-// Makes the text inside pictures editable: reads it (OCR, offline), paints the
-// letters over with the colors around them, and writes real text in the same
-// place, size and color. One undo step.
+// Text inside scans and pictures, editable in place.
+//  - the picture is read in the background (OCR, offline); nothing on the page changes: the lines it
+//    found can be searched, copied and edited like the text of any PDF;
+//  - only a line that is edited is replaced: its letters are removed from the picture (the paper, frames,
+//    dotted lines and check boxes stay) and the new text is written in the same place, size and color.
+//    One undo step.
 
 const ImageText = (() => {
   const FIX = { 'ţ': 'ț', 'ş': 'ș', 'Ţ': 'Ț', 'Ş': 'Ș' };
   const fixText = (t) => t.replace(/[ţşŢŞ]/g, (c) => FIX[c]).replace(/\s+/g, ' ').trim();
-  let running = false;
 
   // ---------------------------------------------------------------------------
   // Pixels helpers
@@ -194,10 +196,10 @@ const ImageText = (() => {
   const LEADER = /[.…_·-]{3,}/; // dotted lines of forms: they stay part of the picture
 
   // ---------------------------------------------------------------------------
-  // One picture
+  // Reading one picture: the lines it holds, in page coordinates
   // ---------------------------------------------------------------------------
 
-  async function readPicture(page, img, onProgress) {
+  async function analyze(page, img, onProgress) {
     const doc = Editor.doc;
     const px = doc.imagePixels(page, img.obj);
     // a picture that covers most of the page is a scanned page: let the reader find titles and columns
@@ -216,67 +218,58 @@ const ImageText = (() => {
     const toPage = (x, y) => ({ x: m[4] + m[0] * (x / px.width), y: m[5] + m[3] * (1 - y / px.height) });
     const S = (v) => v / scale;
 
-    // Pieces of text that are read well: runs of good words on one line. Words read badly, dotted
-    // lines and check boxes are left in the picture as they are (nothing is erased that is not rewritten).
+    // Pieces of a line between dotted lines, check boxes and wide gaps (form fields stay separate).
     const pieces = [];
     for (const par of res.paragraphs) {
       for (const ln of par.lines) {
-        const lx0 = S(ln.bbox.x0), lx1 = S(ln.bbox.x1), ly0 = S(ln.bbox.y0), ly1 = S(ln.bbox.y1);
-        const lineH = ly1 - ly0;
         const bl = ln.baseline;
-        const baseAt = (x) => {
-          if (!bl || bl.x1 === bl.x0) return null;
-          return S(bl.y0 + (bl.y1 - bl.y0) * ((x * scale - bl.x0) / (bl.x1 - bl.x0)));
-        };
+        const baseAt = (x) => (!bl || bl.x1 === bl.x0 ? null : S(bl.y0 + (bl.y1 - bl.y0) * ((x * scale - bl.x0) / (bl.x1 - bl.x0))));
         const words = (ln.words || []).map((w) => ({
           text: fixText(w.text || ''), conf: w.conf,
           x0: Math.floor(S(w.bbox.x0)), y0: Math.floor(S(w.bbox.y0)), x1: Math.ceil(S(w.bbox.x1)) - 1, y1: Math.ceil(S(w.bbox.y1)) - 1,
         })).filter((w) => w.text);
-        const good = (w) => w.conf >= 70 && /[\p{L}\p{N}]/u.test(w.text) && !LEADER.test(w.text) && w.x1 - w.x0 >= 2 && w.y1 - w.y0 >= 3 && !isBox(px, w);
+        const good = (w) => w.conf >= 45 && /[\p{L}\p{N}]/u.test(w.text) && !LEADER.test(w.text) && w.x1 - w.x0 >= 2 && w.y1 - w.y0 >= 3 && !isBox(px, w);
         let cur = null;
-        const close = () => { if (cur) pieces.push(cur); cur = null; };
+        const close = () => {
+          if (!cur) return;
+          cur.text = cur.words.map((w) => w.text).join(' ');
+          const chars = cur.text.replace(/[^\p{L}\p{N}]/gu, '').length;
+          const minConf = Math.min(...cur.words.map((w) => w.conf));
+          if ((chars >= 2 || /\d/.test(cur.text)) && !(chars === 2 && minConf < 80) && cur.words.some((w) => w.conf >= 70)) {
+            cur.y0 = Math.round(median(cur.words.map((w) => w.y0)));
+            let base = baseAt((cur.x0 + cur.x1) / 2);
+            if (!(base > cur.y0 + (cur.y1 - cur.y0) * 0.4 && base <= cur.y1 + 2)) base = cur.y1 - (/[gjpqyșț,;]/.test(cur.text) ? (cur.y1 - cur.y0) * 0.22 : 0);
+            cur.base = base;
+            pieces.push(cur);
+          }
+          cur = null;
+        };
         for (const w of words) {
           if (!good(w)) { close(); continue; }
           const h = w.y1 - w.y0 + 1;
-          if (cur && w.x0 - cur.x1 > Math.max(h * 1.6, (cur.y1 - cur.y0) * 1.6)) close(); // a wide gap: two separate fields
-          if (!cur) cur = { words: [], x0: w.x0, y0: w.y0, x1: w.x1, y1: w.y1, line: ln, lineAll: words.length };
+          if (cur && w.x0 - cur.x1 > Math.max(h * 1.6, (cur.y1 - cur.y0) * 1.6)) close();
+          if (!cur) cur = { words: [], x0: w.x0, y0: w.y0, x1: w.x1, y1: w.y1, line: ln };
           cur.words.push(w);
           cur.x1 = Math.max(cur.x1, w.x1); cur.y0 = Math.min(cur.y0, w.y0); cur.y1 = Math.max(cur.y1, w.y1);
         }
         close();
-        for (const pc of pieces) {
-          if (pc.base != null || pc.line !== ln) continue;
-          pc.text = pc.words.map((w) => w.text).join(' ');
-          const chars = pc.text.replace(/[^\p{L}\p{N}]/gu, '').length;
-          if (chars < 2 && !/\d/.test(pc.text)) { pc.drop = true; continue; }
-          if (chars === 2 && Math.min(...pc.words.map((w) => w.conf)) < 80) { pc.drop = true; continue; }
-          pc.y0 = Math.round(median(pc.words.map((w) => w.y0)));
-          let base = baseAt((pc.x0 + pc.x1) / 2);
-          if (!(base > pc.y0 + (pc.y1 - pc.y0) * 0.4 && base <= pc.y1 + 2)) base = pc.y1 - (/[gjpqyșț,;]/.test(pc.text) ? (pc.y1 - pc.y0) * 0.22 : 0);
-          pc.base = base;
-          pc.whole = pc.words.length === pc.lineAll; // the whole line of the reader is in this piece
-          pc.x0Line = lx0; pc.x1Line = lx1;
-        }
       }
     }
-    for (let i = pieces.length - 1; i >= 0; i--) if (pieces[i].drop) pieces.splice(i, 1);
-    if (!pieces.length) return null;
+    if (!pieces.length) return [];
 
-    // Letter size of every piece. The width of the words is the surest measure (the reader's boxes are
-    // sometimes much taller than the letters, reaching into the line above); the height is the fallback.
+    // Letter size: the width of the words is the surest measure (the reader's boxes are sometimes much
+    // taller than the letters); the height is the fallback.
     const fontR = Editor.fontFor({ family: 'Arial', bold: false, italic: false }, pieces.map((pc) => pc.text).join(' '));
     for (const pc of pieces) {
-      pc.sizeH = Math.max(2, (pc.base - pc.y0) / topOf(pc.text)); // picture pixels
+      pc.sizeH = Math.max(2, (pc.base - pc.y0) / topOf(pc.text));
       const w10 = doc.textWidth(fontR.key, fontR.bytes, 10, pc.text);
       if (w10 > 0 && pc.text.replace(/\s/g, '').length >= 6) pc.sizeW = (10 * (pc.x1 - pc.x0 + 1) * ptX) / w10 / ptY;
     }
     const medSize = median(pieces.map((pc) => pc.sizeW || pc.sizeH));
     for (const pc of pieces) {
-      // the height is believed only near the usual size; otherwise the usual size is the reference
       const ref = pc.sizeH > medSize * 0.8 && pc.sizeH < medSize * 1.25 ? pc.sizeH : medSize;
       pc.size = pc.sizeW ? Math.max(ref * 0.75, Math.min(ref * 1.3, pc.sizeW)) : ref;
     }
-    // pieces of one line written in one size (short words alone cannot be measured well)
     const byLine = new Map();
     for (const pc of pieces) { if (!byLine.has(pc.line)) byLine.set(pc.line, []); byLine.get(pc.line).push(pc); }
     for (const list of byLine.values()) {
@@ -285,60 +278,34 @@ const ImageText = (() => {
       const ls = median(measured.map((pc) => pc.size));
       for (const pc of list) if (!pc.sizeW || Math.abs(pc.size - ls) < ls * 0.25) pc.size = ls;
     }
-    // the letters' own band: from just above the capitals to just under the descenders
     for (const pc of pieces) {
       pc.y0 = Math.max(pc.y0, Math.floor(pc.base - pc.size * 0.98));
       pc.y1 = Math.min(pc.y1, Math.ceil(pc.base + pc.size * 0.3));
       for (const w of pc.words) { w.y0 = Math.max(w.y0, pc.y0); w.y1 = Math.min(w.y1, pc.y1); }
       pc.ink = measureInk(px, pc.x0, pc.y0, pc.x1, pc.y1, pc.base);
+      pc.paper = paperAround(px, pc.x0, pc.y0, pc.x1, pc.y1);
     }
     const real = pieces.filter((pc) => pc.ink.contrast >= 40);
-    if (!real.length) return null;
-    // most text is regular, so a blurry scan does not make everything bold
     const medStem = median(real.map((pc) => pc.ink.stem / pc.size));
 
-    // Lines of a paragraph become one text (easier to edit): same left edge, size, color, regular spacing.
-    const blocks = [];
-    for (const pc of real) {
-      const blk = blocks.length ? blocks[blocks.length - 1] : null;
-      const prev = blk && blk[blk.length - 1];
-      const sameRun = prev && prev.whole && pc.whole && Math.abs(prev.x0 - pc.x0) < Math.max(4, prev.size * 0.6)
-        && Math.abs(prev.size - pc.size) < prev.size * 0.15 && colorClose(prev.ink.argb, pc.ink.argb)
-        && pc.base > prev.base && pc.base - prev.base < prev.size * 1.8
-        && (blk.length < 2 || Math.abs((pc.base - prev.base) - (prev.base - blk[blk.length - 2].base)) < prev.size * 0.25);
-      if (sameRun) blk.push(pc); else blocks.push([pc]);
-    }
-
-    // Erase the letters that will be rewritten (only the letters, word by word).
-    for (const pc of real) for (const w of pc.words) {
-      const pad = Math.max(1, Math.round(pc.size * 0.08));
-      eraseInk(px, w.x0 - pad - 1, w.y0 - pad, w.x1 + pad + 1, w.y1 + pad);
-    }
-
-    const writes = [];
-    for (const blk of blocks) {
-      const bold = median(blk.map((l) => l.ink.stem / l.size)) > Math.max(0.118, medStem * 1.3);
-      const argb = blk[Math.floor(blk.length / 2)].ink.argb;
-      const font = Editor.fontFor({ family: 'Arial', bold, italic: false }, blk.map((l) => l.text).join(' '));
-      // a bold font is wider: measured again so each line keeps its width
-      const sizes = blk.map((ln) => {
-        if (!ln.sizeW || !bold) return ln.size * ptY;
-        const w10 = doc.textWidth(font.key, font.bytes, 10, ln.text);
-        return w10 > 0 ? Math.min(ln.size * ptY, (10 * (ln.x1 - ln.x0 + 1) * ptX) / w10) : ln.size * ptY;
-      });
-      const size = Math.max(3, Math.round(Math.min(...sizes) * 10) / 10);
-      const first = blk[0];
-      const tl = toPage(Math.min(...blk.map((l) => l.x0)), first.y0);
-      const topLeft = doc.pointToNorm(page, tl.x, tl.y);
-      const lines = blk.map((ln) => {
-        const o = toPage(ln.x0, ln.base);
-        return { text: ln.text, dx: o.x - tl.x, baseline: tl.y - o.y };
-      });
-      writes.push({ lines, topLeft, font, size, argb });
-    }
-
-    const jpegBytes = px.jpeg && !px.transparent ? await encode(toCanvas(px), 'image/jpeg', 0.92) : null;
-    return { img, px, jpegBytes, writes, count: real.length };
+    // As text items, like the ones of a PDF (positions kept relative to the picture, which may be replaced).
+    const rel = (x, y) => ({ x: x / px.width, y: y / px.height });
+    return real.map((pc, n) => {
+      const bold = pc.ink.stem / pc.size > Math.max(0.118, medStem * 1.3);
+      const size = Math.max(3, Math.round(pc.size * ptY * 10) / 10);
+      const tl = doc.pointToNorm(page, ...Object.values(toPage(pc.x0, pc.y0)));
+      const br = doc.pointToNorm(page, ...Object.values(toPage(pc.x1 + 1, pc.y1 + 1)));
+      const bn = doc.pointToNorm(page, ...Object.values(toPage(pc.x0, pc.base)));
+      const pcol = pc.paper ? pc.paper.color.map(Math.round) : [255, 255, 255];
+      return {
+        id: `scan${page}-${n}-${Math.round(pc.x0)}-${Math.round(pc.y0)}`, page, kind: 'text', scan: true, editable: true,
+        box: { l: tl.x, t: tl.y, r: br.x, b: br.y }, objects: [], text: pc.text, firstBaseline: bn.y,
+        style: { family: 'Arial', size, argb: pc.ink.argb, bold, italic: false, lineGap: size * 1.2, align: 0 },
+        paper: `rgb(${pcol.join(',')})`,
+        imgBox: img.box,
+        words: pc.words.map((w) => ({ a: rel(w.x0, w.y0), b: rel(w.x1, w.y1), text: w.text })),
+      };
+    });
   }
 
   function colorClose(a, b) {
@@ -347,61 +314,114 @@ const ImageText = (() => {
   }
 
   // ---------------------------------------------------------------------------
-  // Public
+  // The text found on each page (kept while the document is open)
   // ---------------------------------------------------------------------------
+
+  const found = new Map(); // page -> { state: 'reading' | 'done', items }
+  let queue = [];
+  let working = false;
+  let toldOnce = false;
+  let docGen = 0;
 
   function candidates(page, onlyObj) {
     const list = Editor.doc.images(page).filter((i) => (!onlyObj || i.obj === onlyObj));
     return list.filter((i) => i.upright && i.width >= 40 && i.height >= 14);
   }
 
-  /** Makes text in one picture (or all pictures of [pages]) editable. */
-  async function run(page, onlyObj, pages) {
-    if (running || !Editor.doc) return;
-    Pages.closeEditor(true);
-    const list = pages || [page];
-    running = true;
-    let total = 0, skipped = 0;
+  /** Reads [page] (or only one picture of it) in the background; nothing on the page changes. */
+  function read(page, onlyObj, urgent) {
+    if (!Editor.doc) return;
+    const f = found.get(page);
+    if (f && (f.state === 'done' || f.state === 'reading') && !onlyObj) return;
+    queue = queue.filter((q) => q.page !== page || q.onlyObj !== onlyObj);
+    queue[urgent ? 'unshift' : 'push']({ page, onlyObj });
+    pump();
+  }
+  async function pump() {
+    if (working) return;
+    working = true;
+    const gen = docGen;
     try {
-      for (let pi = 0; pi < list.length; pi++) {
-        const p = list[pi];
-        const imgs = candidates(p, onlyObj);
-        if (onlyObj && !imgs.length) {
-          const any = Editor.doc.images(p).find((i) => i.obj === onlyObj);
-          if (any && !any.upright) { UI.toast('Poza este rotită; pot citi doar text drept.', { error: true }); return; }
+      while (queue.length && gen === docGen && Editor.doc) {
+        const { page, onlyObj } = queue.shift();
+        const prev = found.get(page);
+        found.set(page, { state: 'reading', items: prev ? prev.items : [] });
+        let items = [];
+        try {
+          const imgs = candidates(page, onlyObj);
+          for (const img of imgs) items.push(...(await analyze(page, img)));
+        } catch (e) { console.warn('scan text', e); }
+        if (gen !== docGen) return;
+        if (onlyObj && prev) items = prev.items.filter((it) => !items.some((n) => n.imgBox && it.imgBox && sameBox(n.imgBox, it.imgBox))).concat(items);
+        found.set(page, { state: 'done', items });
+        Editor.emit('scan-text', page);
+        if (items.length && !toldOnce) {
+          toldOnce = true;
+          UI.toast(Host.mobile ? 'Textul din scanare se poate edita: atinge de două ori un rând.' : 'Textul din scanare se poate edita: dublu-click pe un rând.', { duration: 6000 });
         }
-        const plans = [];
-        for (let ii = 0; ii < imgs.length; ii++) {
-          const label = (list.length > 1 ? `Pagina ${pi + 1} din ${list.length} · ` : '') + 'Citesc textul din poză…';
-          UI.busy(label);
-          const plan = await readPicture(p, imgs[ii], (status, prog) => {
-            if (/recogniz/i.test(status)) UI.busy(`${label} ${Math.round(prog * 100)}%`);
-            else if (/load|init/i.test(status)) UI.busy((list.length > 1 ? `Pagina ${pi + 1} din ${list.length} · ` : '') + 'Pornesc cititorul de text…');
-          });
-          if (plan) plans.push(plan); else skipped++;
-        }
-        if (!plans.length) continue;
-        UI.busy('Scriu textul…');
-        Editor.change([p], (d) => {
-          for (const plan of plans) {
-            d.replaceImage(p, plan.img.obj, plan.px, plan.jpegBytes);
-            for (const wr of plan.writes) {
-              d.writeText(p, { remove: [], lines: wr.lines, topLeft: wr.topLeft, fontKey: wr.font.key, fontBytes: wr.font.bytes, size: wr.size, argb: wr.argb });
-            }
-            total += plan.count;
-          }
-        });
       }
-      Editor.select(null);
-      if (total) UI.toast(`Gata: ${total} ${total === 1 ? 'rând de text a devenit editabil' : 'rânduri de text au devenit editabile'}. Dublu-click pe text ca să-l modifici.`, { duration: 6000 });
-      else UI.toast('Nu am găsit text clar în poză.');
-    } catch (e) {
-      console.error(e);
-      UI.errorDetails('Nu am putut citi textul din poză', e);
     } finally {
-      running = false;
-      UI.busy(null);
+      working = false;
+      if (queue.length && Editor.doc) setTimeout(pump, 0);
     }
+  }
+  const sameBox = (a, b) => Math.abs(a.l - b.l) < 0.002 && Math.abs(a.t - b.t) < 0.002 && Math.abs(a.r - b.r) < 0.002 && Math.abs(a.b - b.b) < 0.002;
+
+  /** Lines of [page] that can be edited, minus those already replaced by real text. */
+  function itemsFor(page, pdfItems) {
+    const f = found.get(page);
+    if (!f || !f.items.length) return [];
+    const texts = (pdfItems || []).filter((i) => i.kind === 'text' && !i.scan);
+    const overlap = (a, b) => Math.max(0, Math.min(a.r, b.r) - Math.max(a.l, b.l)) * Math.max(0, Math.min(a.b, b.b) - Math.max(a.t, b.t));
+    return f.items.filter((it) => {
+      const area = (it.box.r - it.box.l) * (it.box.b - it.box.t);
+      return !texts.some((t) => overlap(it.box, t.box) > area * 0.4);
+    });
+  }
+  const state = (page) => (found.get(page) || {}).state || null;
+
+  /** Search inside the text read from the scans: {page, rects} like the PDF's own search. */
+  function search(q, pdfItemsOf) {
+    const norm = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    const nq = norm(q);
+    const out = [];
+    if (!nq) return out;
+    for (const page of [...found.keys()].sort((a, b) => a - b)) {
+      for (const it of itemsFor(page, pdfItemsOf(page))) {
+        const t = norm(it.text);
+        for (let i = t.indexOf(nq); i >= 0; i = t.indexOf(nq, i + 1)) {
+          const k0 = i / t.length, k1 = (i + nq.length) / t.length, w = it.box.r - it.box.l;
+          out.push({ page, rects: [{ l: it.box.l + w * k0, t: it.box.t, r: it.box.l + w * k1, b: it.box.b }] });
+        }
+      }
+    }
+    return out;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Replacing one line
+  // ---------------------------------------------------------------------------
+
+  /** The scanned line [item] becomes [lines] of real text (empty: the line is only removed). */
+  async function replace(page, item, write) {
+    const doc = Editor.doc;
+    const img = doc.images(page).find((i) => i.upright && item.imgBox && sameBox(i.box, item.imgBox));
+    if (!img) throw new Error('Nu mai găsesc poza din care e textul.');
+    const px = doc.imagePixels(page, img.obj);
+    for (const w of item.words) {
+      const x0 = Math.floor(w.a.x * px.width), y0 = Math.floor(w.a.y * px.height), x1 = Math.ceil(w.b.x * px.width), y1 = Math.ceil(w.b.y * px.height);
+      const pad = Math.max(1, Math.round((y1 - y0) * 0.1));
+      eraseInk(px, x0 - pad - 1, y0 - pad, x1 + pad + 1, y1 + pad);
+    }
+    const jpegBytes = px.jpeg && !px.transparent ? await encode(toCanvas(px), 'image/jpeg', 0.92) : null;
+    if (Editor.doc !== doc) return null;
+    let created = null;
+    Editor.change([page], (d) => {
+      d.replaceImage(page, img.obj, px, jpegBytes);
+      if (write && write.lines.length) created = d.writeText(page, { remove: [], lines: write.lines, topLeft: write.topLeft, fontKey: write.font.key, fontBytes: write.font.bytes, size: write.size, argb: write.argb });
+    });
+    if (created && created.length) Editor.selectObject(page, created[0]); else Editor.select(null);
+    return created;
   }
 
   /** Pages that look scanned: a big picture and no real text. */
@@ -419,5 +439,27 @@ const ImageText = (() => {
     return out;
   }
 
-  return { run, scannedPages, get running() { return running; } };
+  /** A document was opened: its scanned pages are read in the background, the first one first. */
+  function start() {
+    docGen++;
+    found.clear();
+    queue = [];
+    let pages = [];
+    try { pages = scannedPages(); } catch (e) {}
+    for (const p of pages) read(p);
+  }
+
+  if (typeof Editor !== 'undefined') {
+    // pages added, removed, moved or rotated: what was read no longer matches; undo / redo keep it
+    // (the text written over a line hides that line, so an undone edit shows the scanned line again)
+    let pageCount = 0;
+    Editor.on('doc', (info) => {
+      const n = Editor.sizes ? Editor.sizes.length : 0;
+      if (info && info.history && n === pageCount) return;
+      pageCount = n;
+      docGen++; found.clear(); queue = [];
+    });
+  }
+
+  return { start, read, itemsFor, state, search, replace, scannedPages, get busy() { return working; } };
 })();

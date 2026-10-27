@@ -88,7 +88,7 @@ const Editor = (() => {
     resetCaches();
     E.sizes = d.pageSizes();
     E.selected = null;
-    E.emit('doc', { fresh: false });
+    E.emit('doc', { fresh: false, history: true });
   }
 
   // ---------------------------------------------------------------------------
@@ -206,7 +206,10 @@ const Editor = (() => {
       try { list = E.doc.items(page); } catch (e) { console.warn('items', e); }
       items.set(page, list);
     }
-    return items.get(page);
+    const list = items.get(page);
+    // lines read from a scan on this page (editable in place)
+    const scan = typeof ImageText !== 'undefined' ? ImageText.itemsFor(page, list) : [];
+    return scan.length ? list.concat(scan) : list;
   };
 
   E.fields = (page) => {
@@ -266,6 +269,11 @@ const Editor = (() => {
   };
 
   E.deleteItem = (item) => {
+    if (item.scan) {
+      // a line of a scan: its letters are removed from the picture
+      ImageText.replace(item.page, item, null).catch((e) => UI.errorDetails('Nu am putut șterge rândul', e));
+      return;
+    }
     E.change([item.page], (d) => d.deleteObjects(item.page, item.objects));
     E.selected = null;
     E.emit('selection');
