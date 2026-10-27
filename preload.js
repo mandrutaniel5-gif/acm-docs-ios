@@ -6,7 +6,7 @@
 'use strict';
 const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
-const INVOKE = new Set(['startup-file', 'dialog-open', 'dialog-save', 'ocr-warm', 'ocr', 'show-in-folder', 'fetch-text', 'open-external',
+const INVOKE = new Set(['gpu-info', 'startup-file', 'dialog-open', 'dialog-save', 'ocr-warm', 'ocr', 'show-in-folder', 'fetch-text', 'open-external',
   'open-path', 'special-dir', 'set-theme', 'html-to-pdf', 'capture', 'privacy', 'secure', 'fs-read', 'net-request']);
 const EVENTS = new Set(['open-file', 'ocr-progress']);
 

@@ -31,7 +31,7 @@
     mkdirs: (d) => { dirs.add(d); return true; },
     mtime: (p) => mtimes.get(p) || (files.has(p) ? 1700000000000 : 0),
     remove: (p) => files.delete(p),
-    fonts: () => '[]',
+    fonts: () => JSON.stringify(T.fonts || []),
     setTheme: () => {},
     exit: () => {},
     request(id, op, argsJson) {

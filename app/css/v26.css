@@ -355,3 +355,18 @@ html.v26[data-theme="dark"] .hero-acts button:not(.avatar.on), html.v26[data-the
 html.v26 .hero-acts button::after, html.v26 .hero-acts .ib::after { opacity: .5; }
 html.v26 .qi { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 1px 2px rgba(15, 23, 42, .1), 0 4px 10px -4px rgba(15, 23, 42, .22) !important; }
 html.v26 .qi::after { background: linear-gradient(180deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, 0) 45%) !important; }
+
+/* ================================================================== light mode (no graphics card / slow computer)
+   Blur behind glass is the most expensive thing to draw without a graphics card: it is turned off and the
+   glass surfaces become nearly opaque, so everything stays readable and looks the same at a glance. */
+:root.lowfx {
+  --glass: rgba(255, 255, 255, .97); --glass-strong: rgba(252, 252, 254, .98); --glass-bar: rgba(250, 250, 252, .98);
+  --lg-body: linear-gradient(180deg, rgba(255, 255, 255, .97), rgba(248, 248, 250, .95)); --lg-solid: rgba(250, 250, 252, .98);
+  --bar: rgba(249, 249, 251, .98); --glass-blur: none; --lg-blur: none; --gl-blur: none;
+}
+:root.lowfx[data-theme="dark"] {
+  --glass: rgba(36, 36, 40, .97); --glass-strong: rgba(36, 36, 40, .98); --glass-bar: rgba(30, 30, 34, .98);
+  --lg-body: linear-gradient(180deg, rgba(48, 48, 52, .97), rgba(40, 40, 44, .95)); --lg-solid: rgba(36, 36, 40, .98);
+  --bar: rgba(22, 22, 24, .98);
+}
+:root.lowfx *, :root.lowfx *::before, :root.lowfx *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }

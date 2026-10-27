@@ -34,14 +34,23 @@ function fileFromArgs(argv) {
   return null;
 }
 
-// Old laptops (Windows 7) often have video drivers that make Chromium show blank
-// pages. Everything here is drawn by the PDF engine anyway, so the graphics card
-// is not needed: plain software drawing always works.
-app.disableHardwareAcceleration();
 // Romanian dates and number formats everywhere (date picker: zi.lună.an).
 app.commandLine.appendSwitch('lang', 'ro');
 // The app was called "PDF Editor" before: keep its data folder so nothing is lost.
 app.setPath('userData', process.env.ACM_USERDATA || path.join(app.getPath('appData'), 'PDF Editor'));
+// The graphics card draws the window (glass, animations, scrolling): drawing everything with the
+// processor made the app slow on laptops. Some old video drivers fail (blank window, crashes): when
+// the graphics part of the app crashes early, a mark is left and from then on the app draws without it.
+const GPU_OFF = path.join(app.getPath('userData'), 'gpu-off');
+const gpuOff = process.env.ACM_GPU === '0' || fs.existsSync(GPU_OFF);
+if (gpuOff) app.disableHardwareAcceleration();
+const startedAt = Date.now();
+app.on('child-process-gone', (_e, d) => {
+  if (gpuOff || !d || d.type !== 'GPU' || d.reason === 'clean-exit' || Date.now() - startedAt > 60000) return;
+  try { fs.mkdirSync(path.dirname(GPU_OFF), { recursive: true }); fs.writeFileSync(GPU_OFF, String(d.reason || 'crash')); } catch (e) { return; }
+  app.relaunch();
+  app.exit(0);
+});
 
 const single = app.requestSingleInstanceLock();
 if (!single) {
@@ -171,6 +180,8 @@ handle('ocr', async (e, bytes, opts) => {
 });
 
 handle('show-in-folder', (_e, p) => shell.showItemInFolder(p));
+// whether the window is drawn by the graphics card (the page turns heavy effects off when it is not)
+handle('gpu-info', () => { try { return { off: gpuOff, compositing: app.getGPUFeatureStatus().gpu_compositing }; } catch (e) { return { off: gpuOff }; } });
 handle('fetch-text', (_e, url) => new Promise((resolve, reject) => {
   if (!/^https:\/\/(www\.)?bnr\.ro\//.test(String(url))) { reject(new Error('blocked')); return; }
   const req = require('https').get(String(url), { timeout: 12000 }, (res) => {
