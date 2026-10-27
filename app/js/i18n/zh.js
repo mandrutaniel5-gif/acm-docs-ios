@@ -1907,5 +1907,14 @@
 "Fără ele, ANAF nu primește factura. Le poți completa acum, sau creezi factura și o trimiți în SPV după ce le corectezi.":"缺少这些信息，ANAF 不会接受发票。你可以现在补全，或者先创建发票，更正后再发送到 SPV。",
 "CUI-ul firmei nu este corect. Verifică cifrele (Date firmă).":"公司税号（CUI）不正确。请检查数字（公司信息）。",
 "CUI-ul clientului nu este corect. Verifică cifrele.":"客户税号（CUI）不正确。请检查数字。",
-"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"客户个人编号（CNP）不正确。请检查数字或留空。"
+"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"客户个人编号（CNP）不正确。请检查数字或留空。",
+"Pregătesc textul pentru editare…":"正在准备可编辑的文本…",
+"Citesc textul din scanare…":"正在读取扫描件中的文字…",
+"Poți edita textul scanat: atinge de două ori un rând.":"可以编辑扫描的文字：轻点两下某一行。",
+"Poți edita textul scanat: dublu-click pe un rând.":"可以编辑扫描的文字：双击某一行。",
+"Citește textul din pozele paginii":"读取本页图片中的文字",
+"Citește textul din poză: apoi editezi orice rând":"读取图片中的文字：之后可编辑任意一行",
+"Nu mai găsesc poza din care e textul.":"找不到文字所在的图片了。",
+"Nu am putut șterge rândul":"无法删除该行",
+"Nu am putut scrie textul":"无法写入文字"
 };

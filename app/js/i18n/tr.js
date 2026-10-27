@@ -1907,5 +1907,14 @@
 "Fără ele, ANAF nu primește factura. Le poți completa acum, sau creezi factura și o trimiți în SPV după ce le corectezi.":"Bunlar olmadan ANAF faturayı kabul etmez. Şimdi tamamlayabilir veya faturayı oluşturup düzelttikten sonra SPV’ye gönderebilirsin.",
 "CUI-ul firmei nu este corect. Verifică cifrele (Date firmă).":"Firmanın vergi numarası (CUI) doğru değil. Rakamları kontrol et (Firma bilgileri).",
 "CUI-ul clientului nu este corect. Verifică cifrele.":"Müşterinin vergi numarası (CUI) doğru değil. Rakamları kontrol et.",
-"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"Müşterinin kişisel numarası (CNP) doğru değil. Rakamları kontrol et veya alanı boş bırak."
+"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"Müşterinin kişisel numarası (CNP) doğru değil. Rakamları kontrol et veya alanı boş bırak.",
+"Pregătesc textul pentru editare…":"Metin düzenleme için hazırlanıyor…",
+"Citesc textul din scanare…":"Taramanın metni okunuyor…",
+"Poți edita textul scanat: atinge de două ori un rând.":"Taranan metni düzenleyebilirsin: bir satıra iki kez dokun.",
+"Poți edita textul scanat: dublu-click pe un rând.":"Taranan metni düzenleyebilirsin: bir satıra çift tıkla.",
+"Citește textul din pozele paginii":"Bu sayfanın resimlerindeki metni oku",
+"Citește textul din poză: apoi editezi orice rând":"Resimdeki metni okur: sonra istediğin satırı düzenlersin",
+"Nu mai găsesc poza din care e textul.":"Metnin geldiği resmi artık bulamıyorum.",
+"Nu am putut șterge rândul":"Satır silinemedi",
+"Nu am putut scrie textul":"Metin yazılamadı"
 };

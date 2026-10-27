@@ -199,18 +199,25 @@ const ImageText = (() => {
   // Reading one picture: the lines it holds, in page coordinates
   // ---------------------------------------------------------------------------
 
-  async function analyze(page, img, onProgress) {
+  async function analyze(page, img, onProgress, pre) {
     const doc = Editor.doc;
     const px = doc.imagePixels(page, img.obj);
     // a picture that covers most of the page is a scanned page: let the reader find titles and columns
     const page0 = img.box && (img.box.r - img.box.l) * (img.box.b - img.box.t) > 0.35;
-    // The reader needs letters about 30 px tall: a scanned page is read at ~300 dpi, a small picture enlarged.
-    const longest = Math.max(px.width, px.height);
-    const want = page0 ? 3300 : 1600;
-    let scale = longest < want ? Math.min(page0 ? 4 : 3, want / longest) : 1;
-    if (px.width * px.height * scale * scale > 16e6) scale = Math.sqrt(16e6 / (px.width * px.height));
-    const png = await encode(toCanvas(px, scale, true), 'image/png');
-    const res = await Host.ocr(png, onProgress, { page: !!page0 });
+    let res, scale;
+    if (pre && pre.W && Math.abs(pre.W / px.width - pre.H / px.height) < (pre.W / px.width) * 0.02) {
+      // read already by the scanner, on the same picture: used as it is (no second wait)
+      res = { paragraphs: [{ lines: pre.lines }] };
+      scale = pre.W / px.width;
+    } else {
+      // The reader needs letters about 30 px tall: a scanned page is read at ~300 dpi, a small picture enlarged.
+      const longest = Math.max(px.width, px.height);
+      const want = page0 ? 3300 : 1600;
+      scale = longest < want ? Math.min(page0 ? 4 : 3, want / longest) : 1;
+      if (px.width * px.height * scale * scale > 16e6) scale = Math.sqrt(16e6 / (px.width * px.height));
+      const png = await encode(toCanvas(px, scale, true), 'image/png');
+      res = await Host.ocr(png, onProgress, { page: !!page0 });
+    }
     if (window.__ACM_TEST) window.__ocrDebug = { res, scale };
 
     const m = img.m; // [a b c d e f]: picture square -> page
@@ -317,53 +324,58 @@ const ImageText = (() => {
   // The text found on each page (kept while the document is open)
   // ---------------------------------------------------------------------------
 
-  const found = new Map(); // page -> { state: 'reading' | 'done', items }
-  let queue = [];
-  let working = false;
+  const found = new Map(); // page -> { state: 'done', items }
   let toldOnce = false;
-  let docGen = 0;
+  let handoff = null; // what the scanner read, for the PDF it just saved: { path, pages: [{W, H, lines}] }
 
   function candidates(page, onlyObj) {
     const list = Editor.doc.images(page).filter((i) => (!onlyObj || i.obj === onlyObj));
     return list.filter((i) => i.upright && i.width >= 40 && i.height >= 14);
   }
 
-  /** Reads [page] (or only one picture of it) in the background; nothing on the page changes. */
-  function read(page, onlyObj, urgent) {
-    if (!Editor.doc) return;
-    const f = found.get(page);
-    if (f && (f.state === 'done' || f.state === 'reading') && !onlyObj) return;
-    queue = queue.filter((q) => q.page !== page || q.onlyObj !== onlyObj);
-    queue[urgent ? 'unshift' : 'push']({ page, onlyObj });
-    pump();
-  }
-  async function pump() {
-    if (working) return;
-    working = true;
-    const gen = docGen;
+  /** The scanner hands over the text it read, so the PDF opens with it ready (read only once). */
+  function fromScanner(path, pages) { handoff = { path, pages }; }
+
+  /**
+   * Reads the text of [pages] (or of one picture) while the loading bar shows how far it is; when it is
+   * done, every line can be edited at once. Nothing on the page changes.
+   */
+  async function prepare(pages, onlyObj) {
+    if (!Editor.doc || !pages.length) return;
+    const doc = Editor.doc;
+    const pre = handoff && handoff.path && handoff.path === Editor.path ? handoff.pages : null;
+    handoff = null;
+    let total = 0;
     try {
-      while (queue.length && gen === docGen && Editor.doc) {
-        const { page, onlyObj } = queue.shift();
-        const prev = found.get(page);
-        found.set(page, { state: 'reading', items: prev ? prev.items : [] });
+      for (let k = 0; k < pages.length; k++) {
+        const page = pages[k];
+        const label = (pre ? I18n.t('Pregătesc textul pentru editare…') : I18n.t('Citesc textul din scanare…')) + (pages.length > 1 ? ` ${k + 1}/${pages.length}` : '');
+        UI.busy(label);
         let items = [];
-        try {
-          const imgs = candidates(page, onlyObj);
-          for (const img of imgs) items.push(...(await analyze(page, img)));
-        } catch (e) { console.warn('scan text', e); }
-        if (gen !== docGen) return;
-        if (onlyObj && prev) items = prev.items.filter((it) => !items.some((n) => n.imgBox && it.imgBox && sameBox(n.imgBox, it.imgBox))).concat(items);
-        found.set(page, { state: 'done', items });
-        Editor.emit('scan-text', page);
-        if (items.length && !toldOnce) {
-          toldOnce = true;
-          UI.toast(Host.mobile ? 'Textul din scanare se poate edita: atinge de două ori un rând.' : 'Textul din scanare se poate edita: dublu-click pe un rând.', { duration: 6000 });
+        for (const img of candidates(page, onlyObj)) {
+          items.push(...(await analyze(page, img, (st, p) => { if (/recogniz/i.test(st)) UI.busy(`${label} ${Math.round(p * 100)}%`); }, pre && pre[page])));
+          if (Editor.doc !== doc) return;
         }
+        const prev = found.get(page);
+        if (onlyObj && prev) items = prev.items.filter((it) => !items.some((n) => sameBox(n.imgBox, it.imgBox))).concat(items);
+        found.set(page, { state: 'done', items });
+        total += items.length;
       }
+    } catch (e) {
+      console.warn('scan text', e);
     } finally {
-      working = false;
-      if (queue.length && Editor.doc) setTimeout(pump, 0);
+      UI.busy(null);
     }
+    Editor.emit('scan-text');
+    if (total && !toldOnce) {
+      toldOnce = true;
+      UI.toast(Host.mobile ? 'Poți edita textul scanat: atinge de două ori un rând.' : 'Poți edita textul scanat: dublu-click pe un rând.', { duration: 6000 });
+    }
+  }
+  /** One page (or one picture) on request: from the menu or the picture's bar. */
+  function read(page, onlyObj) {
+    if (onlyObj || state(page) !== 'done') return prepare([page], onlyObj);
+    return Promise.resolve();
   }
   const sameBox = (a, b) => Math.abs(a.l - b.l) < 0.002 && Math.abs(a.t - b.t) < 0.002 && Math.abs(a.r - b.r) < 0.002 && Math.abs(a.b - b.b) < 0.002;
 
@@ -379,14 +391,16 @@ const ImageText = (() => {
     });
   }
   const state = (page) => (found.get(page) || {}).state || null;
+  const pages = () => [...found.keys()];
 
   /** Search inside the text read from the scans: {page, rects} like the PDF's own search. */
-  function search(q, pdfItemsOf) {
+  function search(q, pdfItemsOf, skipPages) {
     const norm = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
     const nq = norm(q);
     const out = [];
     if (!nq) return out;
     for (const page of [...found.keys()].sort((a, b) => a - b)) {
+      if (skipPages && skipPages.has(page)) continue; // the scanner's hidden text already answers there
       for (const it of itemsFor(page, pdfItemsOf(page))) {
         const t = norm(it.text);
         for (let i = t.indexOf(nq); i >= 0; i = t.indexOf(nq, i + 1)) {
@@ -416,8 +430,10 @@ const ImageText = (() => {
     const jpegBytes = px.jpeg && !px.transparent ? await encode(toCanvas(px), 'image/jpeg', 0.92) : null;
     if (Editor.doc !== doc) return null;
     let created = null;
+    const hidden = doc.hiddenTextIn(page, item.box);
     Editor.change([page], (d) => {
       d.replaceImage(page, img.obj, px, jpegBytes);
+      if (hidden.length) d.deleteObjects(page, hidden); // the old words, kept invisible for search, go too
       if (write && write.lines.length) created = d.writeText(page, { remove: [], lines: write.lines, topLeft: write.topLeft, fontKey: write.font.key, fontBytes: write.font.bytes, size: write.size, argb: write.argb });
     });
     if (created && created.length) Editor.selectObject(page, created[0]); else Editor.select(null);
@@ -430,23 +446,22 @@ const ImageText = (() => {
     const n = Editor.sizes.length;
     for (let p = 0; p < n; p++) {
       if (p >= 40) break;
-      let runs = [];
-      try { runs = Editor.runs(p); } catch (e) {}
-      if (runs.length > 3) continue;
       const big = Editor.doc.images(p).some((i) => i.upright && (i.box.r - i.box.l) * (i.box.b - i.box.t) > 0.35);
-      if (big) out.push(p);
+      if (!big) continue;
+      let texts = [];
+      try { texts = Editor.items(p).filter((i) => i.kind === 'text' && !i.scan); } catch (e) {}
+      if (texts.length <= 3) out.push(p); // no real (visible) text: a scan
     }
     return out;
   }
 
   /** A document was opened: its scanned pages are read in the background, the first one first. */
-  function start() {
-    docGen++;
+  async function start() {
     found.clear();
-    queue = [];
-    let pages = [];
-    try { pages = scannedPages(); } catch (e) {}
-    for (const p of pages) read(p);
+    let list = [];
+    try { list = scannedPages(); } catch (e) {}
+    if (handoff && handoff.path === Editor.path && !handoff.pages) { handoff = null; return; } // scanned without text recognition
+    await prepare(list);
   }
 
   if (typeof Editor !== 'undefined') {
@@ -457,9 +472,9 @@ const ImageText = (() => {
       const n = Editor.sizes ? Editor.sizes.length : 0;
       if (info && info.history && n === pageCount) return;
       pageCount = n;
-      docGen++; found.clear(); queue = [];
+      found.clear();
     });
   }
 
-  return { start, read, itemsFor, state, search, replace, scannedPages, get busy() { return working; } };
+  return { start, read, fromScanner, itemsFor, state, pages, search, replace, scannedPages };
 })();

@@ -1956,5 +1956,14 @@ window.I18N_EN = {"ACM Docs":"ACM Docs",
 "Fără ele, ANAF nu primește factura. Le poți completa acum, sau creezi factura și o trimiți în SPV după ce le corectezi.":"Without them, ANAF won't accept the invoice. You can fill them in now, or create the invoice and send it to SPV after correcting them.",
 "CUI-ul firmei nu este corect. Verifică cifrele (Date firmă).":"The company's tax ID (CUI) is not correct. Check the digits (Company details).",
 "CUI-ul clientului nu este corect. Verifică cifrele.":"The client's tax ID (CUI) is not correct. Check the digits.",
-"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"The client's personal ID (CNP) is not correct. Check the digits or leave the field empty."
+"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"The client's personal ID (CNP) is not correct. Check the digits or leave the field empty.",
+"Pregătesc textul pentru editare…":"Preparing the text for editing…",
+"Citesc textul din scanare…":"Reading the text of the scan…",
+"Poți edita textul scanat: atinge de două ori un rând.":"You can edit the scanned text: double-tap a line.",
+"Poți edita textul scanat: dublu-click pe un rând.":"You can edit the scanned text: double-click a line.",
+"Citește textul din pozele paginii":"Read the text in this page's pictures",
+"Citește textul din poză: apoi editezi orice rând":"Reads the text in the picture: then you edit any line",
+"Nu mai găsesc poza din care e textul.":"I can no longer find the picture the text came from.",
+"Nu am putut șterge rândul":"Could not delete the line",
+"Nu am putut scrie textul":"Could not write the text"
 };

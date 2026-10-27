@@ -36,7 +36,16 @@ await pg.goto(`http://127.0.0.1:${server.address().port}/index.html`);
 await pg.waitForTimeout(2500);
 await pg.evaluate(() => { App.openPath('/docs/scan.pdf'); });
 await pg.waitForFunction(() => typeof Editor !== 'undefined' && Editor.doc && Editor.sizes && Editor.sizes.length, null, { timeout: 30000 });
-await pg.waitForTimeout(1500);
+const tOpen = Date.now();
+let sawBar = '';
+while (Date.now() - tOpen < 180000) {
+  const st = await pg.evaluate(() => ({ busy: !document.getElementById('busy').classList.contains('hidden'), label: document.getElementById('busy-label').textContent, shown: !document.getElementById('editor').classList.contains('hidden') }));
+  if (st.busy && st.label) { if (!sawBar) await pg.screenshot({ path: path.join(OUT, 'loading.png') }); sawBar = st.label; }
+  if (st.shown && !st.busy) break;
+  await pg.waitForTimeout(200);
+}
+console.log('loading bar seen:', JSON.stringify(sawBar), 'opened in', ((Date.now() - tOpen) / 1000).toFixed(1), 's');
+await pg.waitForTimeout(800);
 const render = async (name) => {
   const b64 = await pg.evaluate(() => {
     const { w: wPt, h: hPt } = Editor.sizes[0]; const s = 1400 / wPt;
@@ -48,39 +57,64 @@ const render = async (name) => {
   fs.writeFileSync(path.join(OUT, name + '.png'), Buffer.from(b64, 'base64'));
 };
 await render('before');
-const t0 = Date.now();
-await pg.waitForFunction(() => ImageText.state(0) === 'done', null, { timeout: 300000 });
-console.log('read in', ((Date.now() - t0) / 1000).toFixed(1), 's');
-await render('after-read');
+// opened = ready: the text was read under the loading bar, before the page showed
+console.log('ready at open:', await pg.evaluate(() => ImageText.state(0)));
 const items = await pg.evaluate(() => Editor.items(0).filter((i) => i.scan).map((i) => i.text));
 fs.writeFileSync(path.join(OUT, 'lines.txt'), items.join('\n'));
 console.log('scan lines', items.length);
-const same = await pg.evaluate(() => true);
-// edit one line, as a person does: double-click, change the text, click outside
-const target = process.env.EDIT_FROM || 'Motiv';
-const ok = await pg.evaluate(({ target, to }) => {
-  const it = Editor.items(0).find((i) => i.scan && i.text.includes(target));
-  if (!it) return 'no line with ' + target;
-  Pages.beginEdit(it);
-  const box = document.querySelector('.text-edit');
-  if (!box) return 'no editor';
-  box.textContent = it.text.replace(target, to);
-  box.dispatchEvent(new Event('input'));
-  window.__editItem = it;
-  return 'open';
-}, { target, to: process.env.EDIT_TO || 'Motivul' });
-await pg.waitForTimeout(400);
-await pg.evaluate(() => { const b = document.querySelector('.text-edit'); b.scrollIntoView({ block: 'center' }); });
-await pg.waitForTimeout(400);
-await pg.screenshot({ path: path.join(OUT, 'editing.png') });
-const ok2 = await pg.evaluate(() => {
-  const it = window.__editItem; const box = document.querySelector('.text-edit');
-  Pages.closeEditor(true);
-  return 'edited: ' + it.text + ' -> ' + box.textContent;
-}, { target, to: process.env.EDIT_TO || 'Motivul' });
-console.log(ok, ok2);
-await pg.waitForTimeout(2500);
+const editLine = async (tag, from, to) => {
+  const r = await pg.evaluate(({ from, to }) => {
+    const it = Editor.items(0).find((i) => i.scan && i.text.includes(from));
+    if (!it) return 'no line with ' + from;
+    Pages.beginEdit(it);
+    const box = document.querySelector('.text-edit');
+    if (!box) return 'no editor';
+    box.textContent = it.text.replace(from, to);
+    box.dispatchEvent(new Event('input'));
+    Pages.closeEditor(true);
+    return 'edited: ' + it.text + ' -> ' + box.textContent;
+  }, { from, to });
+  console.log(tag, r);
+  await pg.waitForTimeout(2500);
+};
+await editLine('plain scan', 'activ rămas', 'activ rămas (lichidator ACM)');
 await render('after-edit');
+console.log('search "lichidator":', await pg.evaluate(() => Editor.doc.search('lichidator').length + ' in PDF text'));
+
+// A PDF as the scanner makes it: the picture plus invisible words (the scanner's hidden text)
+const b64 = await pg.evaluate(async () => {
+  const src = Editor.doc;
+  const img = src.images(0)[0];
+  const px = src.imagePixels(0, img.obj);
+  const c = document.createElement('canvas'); c.width = px.width; c.height = px.height;
+  c.getContext('2d').putImageData(new ImageData(px.rgba, px.width, px.height), 0, 0);
+  const jpeg = new Uint8Array(await (await new Promise((r) => c.toBlob(r, 'image/jpeg', 0.9))).arrayBuffer());
+  const d = PDF.Doc.fromJpegs([{ jpeg, ptW: 595.28, ptH: 841.89 }]);
+  const dbg = window.__ocrDebug;
+  const words = [];
+  for (const par of dbg.res.paragraphs) for (const l of par.lines) for (const w of l.words) words.push({ text: w.text, l: w.bbox.x0 / dbg.scale / px.width, r: w.bbox.x1 / dbg.scale / px.width, base: w.bbox.y1 / dbg.scale / px.height, size: 9 });
+  const f = SystemFonts.findTrueType('Arial', false, false, 'ăâîșț');
+  d.writeHiddenText(0, words, f.key, f.bytes);
+  const bytes = d.save(); d.close();
+  let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+});
+await pg.evaluate((b) => { window.__acmFiles.set('/docs/scanner.pdf', b); }, b64);
+await pg.evaluate(() => { Editor.dirty = false; });
+// as the scanner does: it hands over what it read, so the PDF opens without reading again
+await pg.evaluate(() => {
+  const d = window.__ocrDebug; const img = Editor.doc.images(0)[0]; const px = Editor.doc.imagePixels(0, img.obj);
+  const lines = d.res.paragraphs.flatMap((p) => p.lines);
+  ImageText.fromScanner('/docs/scanner.pdf', [{ W: px.width * d.scale, H: px.height * d.scale, lines }]);
+});
+const t2 = Date.now();
+await pg.evaluate(() => App.openPath('/docs/scanner.pdf'));
+console.log('scanner PDF opened in', ((Date.now() - t2) / 1000).toFixed(1), 's');
+console.log('scanner PDF: scanned pages', await pg.evaluate(() => JSON.stringify(ImageText.scannedPages())), 'ready:', await pg.evaluate(() => ImageText.state(0)));
+const hiddenBefore = await pg.evaluate(() => Editor.doc.search('voința').length);
+await editLine('scanner pdf', 'voința profesionistului', 'voința asociatului');
+console.log('hidden "voința" before/after edit:', hiddenBefore, await pg.evaluate(() => Editor.doc.search('profesionistului').length));
+await render('scanner-after-edit');
 const toasts = await pg.evaluate(() => [...document.querySelectorAll('#toasts > *, #modal-root .modal')].map((t) => t.innerText.trim().slice(0, 200)).join(' | '));
 console.log('toasts:', toasts);
 console.log(errs.length ? 'ERRORS ' + errs.slice(0, 3).join(' | ') : 'no errors');

@@ -799,6 +799,25 @@ const PDF = (() => {
       });
     }
 
+    /** Invisible (scanned-page) text objects whose middle lies inside the normalized [box]. */
+    hiddenTextIn(pageIndex, box) {
+      return withAlloc((a) => {
+        const w = W();
+        const page = this.page(pageIndex);
+        const lp = a.bytes(4), bp = a.bytes(4), rp = a.bytes(4), tp = a.bytes(4);
+        const out = [];
+        for (let i = 0, n = w.FPDFPage_CountObjects(page); i < n; i++) {
+          const o = w.FPDFPage_GetObject(page, i);
+          if (!o || w.FPDFPageObj_GetType(o) !== OBJ_TEXT || w.FPDFTextObj_GetTextRenderMode(o) !== 3) continue;
+          if (!w.FPDFPageObj_GetBounds(o, lp, bp, rp, tp)) continue;
+          const r = this._normRect(page, f32(lp), f32(bp), f32(rp), f32(tp), a);
+          const cx = (r.l + r.r) / 2, cy = (r.t + r.b) / 2;
+          if (cx >= box.l && cx <= box.r && cy >= box.t && cy <= box.b) out.push(o);
+        }
+        return out;
+      });
+    }
+
     deleteObjects(pageIndex, objs) {
       const p = this.page(pageIndex);
       for (const o of objs) if (W().FPDFPage_RemoveObject(p, o)) W().FPDFPageObj_Destroy(o);

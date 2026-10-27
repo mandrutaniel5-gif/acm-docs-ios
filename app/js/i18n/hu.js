@@ -1907,5 +1907,14 @@
 "Fără ele, ANAF nu primește factura. Le poți completa acum, sau creezi factura și o trimiți în SPV după ce le corectezi.":"Ezek nélkül az ANAF nem fogadja be a számlát. Kiegészítheted most, vagy létrehozhatod a számlát, és a javítás után küldheted az SPV-be.",
 "CUI-ul firmei nu este corect. Verifică cifrele (Date firmă).":"A cég adószáma (CUI) nem helyes. Ellenőrizd a számjegyeket (Cégadatok).",
 "CUI-ul clientului nu este corect. Verifică cifrele.":"Az ügyfél adószáma (CUI) nem helyes. Ellenőrizd a számjegyeket.",
-"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"Az ügyfél személyi száma (CNP) nem helyes. Ellenőrizd a számjegyeket, vagy hagyd üresen a mezőt."
+"CNP-ul clientului nu este corect. Verifică cifrele sau lasă câmpul gol.":"Az ügyfél személyi száma (CNP) nem helyes. Ellenőrizd a számjegyeket, vagy hagyd üresen a mezőt.",
+"Pregătesc textul pentru editare…":"Szöveg előkészítése szerkesztéshez…",
+"Citesc textul din scanare…":"A szkennelt szöveg olvasása…",
+"Poți edita textul scanat: atinge de două ori un rând.":"Szerkesztheted a szkennelt szöveget: koppints duplán egy sorra.",
+"Poți edita textul scanat: dublu-click pe un rând.":"Szerkesztheted a szkennelt szöveget: kattints duplán egy sorra.",
+"Citește textul din pozele paginii":"Az oldal képein lévő szöveg olvasása",
+"Citește textul din poză: apoi editezi orice rând":"Elolvassa a kép szövegét: utána bármelyik sort szerkesztheted",
+"Nu mai găsesc poza din care e textul.":"Nem találom a képet, amelyből a szöveg származik.",
+"Nu am putut șterge rândul":"A sort nem sikerült törölni",
+"Nu am putut scrie textul":"A szöveget nem sikerült megírni"
 };

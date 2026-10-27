@@ -531,9 +531,8 @@ const Pages = (() => {
     if (st === 'done') return;
     let scanned = false;
     try { scanned = ImageText.scannedPages().includes(v.i); } catch (e) {}
-    if (!scanned && st !== 'reading') return;
-    ImageText.read(v.i, null, true);
-    UI.toast('Citesc textul din scanare… încă o clipă, apoi poți edita orice rând.');
+    if (!scanned) return;
+    ImageText.read(v.i, null);
   }
   function act(v, e) {
     if (edit) {
