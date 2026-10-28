@@ -173,6 +173,25 @@ const Writer = (() => {
   }
 
   // ---------------------------------------------------------------- marker (highlight)
+  // Typing right after (or before) highlighted text does not continue the highlight: only a marker
+  // just picked at the caret colors what is typed.
+  let markerArmed = false, lastTyped = 0;
+  function leaveMark() {
+    if (markerArmed) return;
+    const sel = window.getSelection();
+    if (!sel.rangeCount || !sel.isCollapsed || !inPage(sel.anchorNode)) return;
+    const r = sel.getRangeAt(0);
+    const mk = markAround(r.startContainer);
+    if (!mk) return;
+    const visible = (range) => range.toString().replace(/\u200b/g, '').length > 0;
+    const after = document.createRange(); after.setStart(r.startContainer, r.startOffset); after.setEndAfter(mk);
+    const before = document.createRange(); before.setStartBefore(mk); before.setEnd(r.startContainer, r.startOffset);
+    // a separate piece of text next to the highlight, with the caret inside it (not on the boundary,
+    // where the browser would put it back into the highlight)
+    const sel2 = (node, off) => { const nr = document.createRange(); nr.setStart(node, off); nr.collapse(true); sel.removeAllRanges(); sel.addRange(nr); };
+    if (!visible(after)) { const gap = document.createTextNode('\u200b'); mk.after(gap); sel2(gap, 1); }
+    else if (!visible(before)) { const gap = document.createTextNode('\u200b'); mk.before(gap); sel2(gap, 1); }
+  }
   const isMark = (n) => n && n.nodeType === 1 && n.style && n.style.backgroundColor
     && !/^(transparent|initial|inherit|rgba\(0, 0, 0, 0\))$/.test(n.style.backgroundColor) && /^inline/.test(getComputedStyle(n).display);
   /** The outermost highlighted piece of text around node (or null). */
@@ -497,7 +516,15 @@ const Writer = (() => {
     tools.u = T('underline', 'Subliniat (Ctrl+U)', () => cmd('underline'));
     tools.s = T('strike', 'Tăiat', () => cmd('strikeThrough'));
     tools.fc = Office.colorBtn('fontcolor', 'Culoarea textului', () => tools.fcVal || '#c00000', (c) => { tools.fcVal = c || '#000000'; cmd('foreColor', c || '#000000'); }, true);
-    tools.hl = Office.colorBtn('marker', 'Evidențiere (marker)', () => tools.hlOn || tools.hlVal || '#ffff00', (c) => { if (c) { tools.hlVal = c; cmd('hiliteColor', c); } else unmark(); }, true);
+    tools.hl = Office.colorBtn('marker', 'Evidențiere (marker)', () => tools.hlOn || tools.hlVal || '#ffff00', (c) => {
+      if (c) {
+        tools.hlVal = c;
+        // at a blinking caret the marker colors only what is typed now (until the caret is moved)
+        const s = window.getSelection();
+        markerArmed = !!(s.rangeCount && s.isCollapsed); lastTyped = Date.now();
+        cmd('hiliteColor', c);
+      } else unmark();
+    }, true);
     for (const b of [tools.fc, tools.hl]) b.addEventListener('mousedown', saveSel);
     tools.al = T('alignleft', 'Aliniază la stânga', () => cmd('justifyLeft'));
     tools.ac = T('aligncenter', 'Centrează', () => cmd('justifyCenter'));
@@ -551,7 +578,8 @@ const Writer = (() => {
     // the marker shows when the text here is highlighted (and with which color)
     const mk = markAround(n);
     tools.hlOn = mk ? mk.style.backgroundColor : null;
-    tools.hl.classList.toggle('on', !!mk);
+    // the marker never looks "pressed": it only shows the color of the text here
+    tools.hl.classList.remove('on');
     if (tools.hl.repaint) tools.hl.repaint();
     const cs = getComputedStyle(n);
     const al = cs.textAlign;
@@ -1110,12 +1138,14 @@ ${css}
     document.head.append(base);
     p.addEventListener('beforeinput', (e) => {
       if (e.inputType === 'historyUndo') { e.preventDefault(); undo(); return; }
+      if (e.inputType === 'insertText' && !e.isComposing) leaveMark();
       if (e.inputType === 'historyRedo') { e.preventDefault(); redo(); return; }
       const now = Date.now();
       if (now - lastInput > 900 || /^(insertParagraph|deleteContent|insertFromPaste|insertFromDrop)/.test(e.inputType)) snapshot();
       lastInput = now;
     });
-    p.addEventListener('input', () => { changed(); });
+    p.addEventListener('input', () => { lastTyped = Date.now(); changed(); });
+    p.addEventListener('compositionstart', () => leaveMark()); // phone keyboards type through composition
     p.addEventListener('paste', (e) => {
       const dt = e.clipboardData;
       if (!dt) return;
@@ -1136,7 +1166,11 @@ ${css}
     });
     p.addEventListener('keyup', () => { saveSel(); refreshTools(); showTableBar(); });
     p.addEventListener('mouseup', () => { saveSel(); refreshTools(); });
-    document.addEventListener('selectionchange', () => { if (!$('writer').classList.contains('hidden') && document.activeElement === p) { saveSel(); refreshTools(); } });
+    document.addEventListener('selectionchange', () => {
+      if ($('writer').classList.contains('hidden') || document.activeElement !== p) return;
+      if (Date.now() - lastTyped > 120) markerArmed = false; // the caret was moved (not by typing)
+      saveSel(); refreshTools();
+    });
     $('wr-scroll').addEventListener('scroll', () => { if (selImg) placeBar($('wr-imgbar'), selImg.getBoundingClientRect()); if (!$('wr-tblbar').classList.contains('hidden')) showTableBar(); }, { passive: true });
 
     window.addEventListener('keydown', (e) => {

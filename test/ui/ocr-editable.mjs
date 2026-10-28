@@ -57,8 +57,16 @@ const render = async (name) => {
   fs.writeFileSync(path.join(OUT, name + '.png'), Buffer.from(b64, 'base64'));
 };
 await render('before');
-// opened = ready: the text was read under the loading bar, before the page showed
-console.log('ready at open:', await pg.evaluate(() => ImageText.state(0)));
+// a scan without a text layer opens at once: nothing is read until a line is edited
+console.log('state at open (nothing read):', await pg.evaluate(() => ImageText.state(0)));
+// a double-click on a line: the page is read (with the loading bar), then the line opens
+const tr = Date.now();
+const dbl = await pg.evaluate(async () => {
+  const ov = document.querySelector('.pv .ov, .page .ov, [class*="ov"]');
+  return null;
+});
+await pg.evaluate(() => ImageText.read(0));
+console.log('read on first edit in', ((Date.now() - tr) / 1000).toFixed(1), 's · state:', await pg.evaluate(() => ImageText.state(0)));
 const items = await pg.evaluate(() => Editor.items(0).filter((i) => i.scan).map((i) => i.text));
 fs.writeFileSync(path.join(OUT, 'lines.txt'), items.join('\n'));
 console.log('scan lines', items.length);
@@ -79,7 +87,17 @@ const editLine = async (tag, from, to) => {
 };
 await editLine('plain scan', 'activ rămas', 'activ rămas (lichidator ACM)');
 await render('after-edit');
-console.log('search "lichidator":', await pg.evaluate(() => Editor.doc.search('lichidator').length + ' in PDF text'));
+// saved and opened again: instant, every line ready, the edit kept
+const b64s = await pg.evaluate(() => { const bytes = Editor.doc.save(); let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(s); });
+await pg.evaluate((b) => { window.__acmFiles.set('/docs/saved.pdf', b); Editor.dirty = false; }, b64s);
+const t3 = Date.now();
+await pg.evaluate(() => App.openPath('/docs/saved.pdf'));
+console.log('saved scan reopened in', ((Date.now() - t3) / 1000).toFixed(1), 's · state:', await pg.evaluate(() => ImageText.state(0)), '· lines:', await pg.evaluate(() => Editor.items(0).filter((i) => i.scan).length), '· edit kept:', await pg.evaluate(() => Editor.items(0).some((i) => !i.scan && i.kind === 'text' && /lichidator/.test(i.text))));
+await editLine('saved scan', 'voința profesionistului', 'voința asociatului');
+await render('saved-after-edit');
+await pg.evaluate(() => { Editor.dirty = false; App.openPath('/docs/scan.pdf'); });
+await pg.waitForTimeout(1500);
+await pg.evaluate(() => ImageText.read(0));
 
 // A PDF as the scanner makes it: the picture plus invisible words (the scanner's hidden text)
 const b64 = await pg.evaluate(async () => {
@@ -105,7 +123,7 @@ await pg.evaluate(() => { Editor.dirty = false; });
 await pg.evaluate(() => {
   const d = window.__ocrDebug; const img = Editor.doc.images(0)[0]; const px = Editor.doc.imagePixels(0, img.obj);
   const lines = d.res.paragraphs.flatMap((p) => p.lines);
-  ImageText.fromScanner('/docs/scanner.pdf', [{ W: px.width * d.scale, H: px.height * d.scale, lines }]);
+  if (!window.__noHandoff) ImageText.fromScanner('/docs/scanner.pdf', [{ W: px.width * d.scale, H: px.height * d.scale, lines }]);
 });
 const t2 = Date.now();
 await pg.evaluate(() => App.openPath('/docs/scanner.pdf'));

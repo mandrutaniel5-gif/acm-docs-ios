@@ -333,6 +333,44 @@ const ImageText = (() => {
     return list.filter((i) => i.upright && i.width >= 40 && i.height >= 14);
   }
 
+  /**
+   * The page's own text layer (invisible words a scanner — ours or another — keeps in the PDF), as the
+   * reader's lines for the picture [img]: no reading needed. null when the page has none.
+   */
+  function layerLines(page, img, px) {
+    let words = [];
+    try { words = Editor.doc.hiddenWords(page); } catch (e) { return null; }
+    const b = img.box, bw = b.r - b.l, bh = b.b - b.t;
+    const pageH = Editor.sizes[page] ? Editor.sizes[page].h : 842;
+    const inside = words.filter((w) => (w.l + w.r) / 2 > b.l && (w.l + w.r) / 2 < b.r && w.base > b.t && w.base < b.b);
+    if (inside.length < 3) return null;
+    const X = (v) => ((v - b.l) / bw) * px.width, Y = (v) => ((v - b.t) / bh) * px.height;
+    const conv = inside.map((w) => {
+      const sizePx = (w.size / pageH / bh) * px.height;
+      const base = Y(w.base);
+      return { text: w.text, conf: 90, base, sizePx, bbox: { x0: X(w.l), x1: X(w.r), y0: base - sizePx * 0.75, y1: base + sizePx * 0.22 } };
+    }).sort((p, q) => p.base - q.base || p.bbox.x0 - q.bbox.x0);
+    // words on the same baseline make a line
+    const lines = [];
+    for (const w of conv) {
+      const ln = lines.find((l) => Math.abs(l.base - w.base) < w.sizePx * 0.35);
+      if (ln) ln.words.push(w); else lines.push({ base: w.base, words: [w] });
+    }
+    return {
+      W: px.width, H: px.height,
+      lines: lines.map((l) => {
+        l.words.sort((p, q) => p.bbox.x0 - q.bbox.x0);
+        // a gap wider than a few spaces (a check box, a dotted line) keeps the pieces apart
+        const split = [];
+        l.words.forEach((w, i) => { const prev = l.words[i - 1]; if (prev && w.bbox.x0 - prev.bbox.x1 > w.sizePx * 0.9) split.push({ text: '·', conf: 0, bbox: { x0: prev.bbox.x1, x1: w.bbox.x0, y0: w.bbox.y0, y1: w.bbox.y1 } }); split.push(w); });
+        l.words = split;
+        const x0 = Math.min(...l.words.map((w) => w.bbox.x0)), x1 = Math.max(...l.words.map((w) => w.bbox.x1));
+        return { bbox: { x0, x1, y0: Math.min(...l.words.map((w) => w.bbox.y0)), y1: Math.max(...l.words.map((w) => w.bbox.y1)) }, baseline: { x0, x1, y0: l.base, y1: l.base }, rowHeight: null, words: l.words };
+      }),
+    };
+  }
+  const hasLayer = (page) => { try { return Editor.doc.hiddenWords(page).length >= 3; } catch (e) { return false; } };
+
   /** The scanner hands over the text it read, so the PDF opens with it ready (read only once). */
   function fromScanner(path, pages) { handoff = { path, pages }; }
 
@@ -349,11 +387,15 @@ const ImageText = (() => {
     try {
       for (let k = 0; k < pages.length; k++) {
         const page = pages[k];
-        const label = (pre ? I18n.t('Pregătesc textul pentru editare…') : I18n.t('Citesc textul din scanare…')) + (pages.length > 1 ? ` ${k + 1}/${pages.length}` : '');
+        const quick = pre || hasLayer(page);
+        const label = (quick ? I18n.t('Pregătesc textul pentru editare…') : I18n.t('Citesc textul din scanare…')) + (pages.length > 1 ? ` ${k + 1}/${pages.length}` : '');
         UI.busy(label);
         let items = [];
         for (const img of candidates(page, onlyObj)) {
-          items.push(...(await analyze(page, img, (st, p) => { if (/recogniz/i.test(st)) UI.busy(`${label} ${Math.round(p * 100)}%`); }, pre && pre[page])));
+          // the text the scanner just read, or the page's own text layer: ready at once; otherwise it is read now
+          let given = pre && pre[page];
+          if (!given) { const px = doc.imagePixels(page, img.obj); given = layerLines(page, img, px); }
+          items.push(...(await analyze(page, img, (st, p) => { if (/recogniz/i.test(st)) UI.busy(`${label} ${Math.round(p * 100)}%`); }, given)));
           if (Editor.doc !== doc) return;
         }
         const prev = found.get(page);
@@ -431,7 +473,21 @@ const ImageText = (() => {
     if (Editor.doc !== doc) return null;
     let created = null;
     const hidden = doc.hiddenTextIn(page, item.box);
+    // a page read just now keeps its text, invisible, in the PDF: searchable everywhere, and editable at
+    // once the next time it is opened (no reading again)
+    let layer = null;
+    if (!hasLayer(page)) {
+      const font = Editor.fontFor({ family: 'Arial', bold: false, italic: false }, (found.get(page) || { items: [] }).items.map((i) => i.text).join(' ').slice(0, 4000));
+      const words = [];
+      for (const it of (found.get(page) || { items: [] }).items) {
+        if (it === item) continue;
+        const bb = it.imgBox, bw = bb.r - bb.l;
+        for (const w of it.words) words.push({ text: w.text, l: bb.l + w.a.x * bw, r: bb.l + w.b.x * bw, base: it.firstBaseline, size: it.style.size });
+      }
+      if (words.length) layer = { words, font };
+    }
     Editor.change([page], (d) => {
+      if (layer) d.writeHiddenText(page, layer.words, layer.font.key, layer.font.bytes);
       d.replaceImage(page, img.obj, px, jpegBytes);
       if (hidden.length) d.deleteObjects(page, hidden); // the old words, kept invisible for search, go too
       if (write && write.lines.length) created = d.writeText(page, { remove: [], lines: write.lines, topLeft: write.topLeft, fontKey: write.font.key, fontBytes: write.font.bytes, size: write.size, argb: write.argb });
@@ -461,7 +517,10 @@ const ImageText = (() => {
     let list = [];
     try { list = scannedPages(); } catch (e) {}
     if (handoff && handoff.path === Editor.path && !handoff.pages) { handoff = null; return; } // scanned without text recognition
-    await prepare(list);
+    // only what is ready at once (the scanner's text, or a text layer saved in the PDF): nothing is read
+    // when the document opens; a page without text is read when one of its lines is first edited
+    const fromScan = handoff && handoff.path === Editor.path;
+    await prepare(list.filter((p) => fromScan || hasLayer(p)));
   }
 
   if (typeof Editor !== 'undefined') {
@@ -476,5 +535,5 @@ const ImageText = (() => {
     });
   }
 
-  return { start, read, fromScanner, itemsFor, state, pages, search, replace, scannedPages };
+  return { start, read, fromScanner, hasLayer, itemsFor, state, pages, search, replace, scannedPages };
 })();

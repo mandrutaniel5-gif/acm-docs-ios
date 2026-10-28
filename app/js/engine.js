@@ -799,6 +799,33 @@ const PDF = (() => {
       });
     }
 
+    /** The invisible words of a scanned page (its text layer): [{text, l, r, base, size (pt)}], normalized. */
+    hiddenWords(pageIndex) {
+      return withAlloc((a) => {
+        const w = W();
+        const page = this.page(pageIndex);
+        const lp = a.bytes(4), bp = a.bytes(4), rp = a.bytes(4), tp = a.bytes(4), mx = a.bytes(24), fs = a.bytes(4);
+        const out = [];
+        const textPage = w.FPDFText_LoadPage(page);
+        if (!textPage) return out;
+        try {
+          for (let i = 0, n = w.FPDFPage_CountObjects(page); i < n; i++) {
+            const o = w.FPDFPage_GetObject(page, i);
+            if (!o || w.FPDFPageObj_GetType(o) !== OBJ_TEXT || w.FPDFTextObj_GetTextRenderMode(o) !== 3) continue;
+            if (!w.FPDFPageObj_GetBounds(o, lp, bp, rp, tp) || !w.FPDFPageObj_GetMatrix(o, mx)) continue;
+            const text = wideString((buf, len) => w.FPDFTextObj_GetText(o, textPage, buf, len)).trim();
+            if (!text) continue;
+            const m = Array.from(new Float32Array(Pdfium.memory.buffer, mx, 6));
+            const r = this._normRect(page, f32(lp), f32(bp), f32(rp), f32(tp), a);
+            const base = this.pageToNorm(page, m[4], m[5], a).y;
+            const size = (w.FPDFTextObj_GetFontSize(o, fs) ? f32(fs) : 10) * Math.abs(m[3] || 1);
+            out.push({ text, l: r.l, r: r.r, base, size });
+          }
+        } finally { w.FPDFText_ClosePage(textPage); }
+        return out;
+      });
+    }
+
     /** Invisible (scanned-page) text objects whose middle lies inside the normalized [box]. */
     hiddenTextIn(pageIndex, box) {
       return withAlloc((a) => {
