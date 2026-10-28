@@ -339,8 +339,117 @@ const Office = (() => {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Cropping a picture (documents, slides, PDF): one window, the same everywhere
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Shows the picture [src] (a URL) with a frame to keep; drag the frame or its handles, or pick a shape.
+   * Resolves to the part kept as fractions {x, y, w, h} of the picture, or null when cancelled.
+   */
+  function cropDialog(src, start) {
+    return UI.modal((box, close) => {
+      box.classList.add('acm-ui', 'crop-modal');
+      box.dataset.sticky = '1';
+      const img = el('img', { src, draggable: false, alt: '' });
+      const frame = el('div', { class: 'crop-frame' }, ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].map((h) => el('i', { class: 'ch ' + h, 'data-h': h })));
+      const stage = el('div', { class: 'crop-stage' }, [img, el('div', { class: 'crop-shade' }), frame]);
+      let r = { x: 0, y: 0, w: 1, h: 1, ...(start || {}) };
+      let ratio = 0; // 0 = free; otherwise width / height of the kept part, in picture pixels
+      let nat = { w: 1, h: 1 };
+      const draw = () => {
+        const W = img.clientWidth, H = img.clientHeight;
+        Object.assign(frame.style, { left: r.x * W + 'px', top: r.y * H + 'px', width: r.w * W + 'px', height: r.h * H + 'px' });
+        stage.querySelector('.crop-shade').style.clipPath = `polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 0, ${r.x * 100}% ${r.y * 100}%, ${r.x * 100}% ${(r.y + r.h) * 100}%, ${(r.x + r.w) * 100}% ${(r.y + r.h) * 100}%, ${(r.x + r.w) * 100}% ${r.y * 100}%, ${r.x * 100}% ${r.y * 100}%)`;
+        size.textContent = `${Math.round(r.w * nat.w)} × ${Math.round(r.h * nat.h)} px`;
+      };
+      // a fixed shape: the largest part with that shape, in the middle of what is kept now
+      const applyRatio = () => {
+        if (!ratio) return draw();
+        const k = ratio * (nat.h / nat.w); // in fractions
+        let w = r.w, h = w / k;
+        if (h > 1) { h = 1; w = h * k; }
+        if (h > r.h && r.h * k <= 1) { h = r.h; w = h * k; }
+        const cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+        r = { w, h, x: Math.max(0, Math.min(1 - w, cx - w / 2)), y: Math.max(0, Math.min(1 - h, cy - h / 2)) };
+        draw();
+      };
+      const chips = el('div', { class: 'chips crop-chips' });
+      const shapes = [['Liber', 0], ['Original', -1], ['1:1', 1], ['4:3', 4 / 3], ['3:4', 3 / 4], ['16:9', 16 / 9]];
+      for (const [label, v] of shapes) {
+        const b = el('button', { class: 'chip' + (v === 0 ? ' on' : ''), type: 'button', text: label });
+        b.addEventListener('click', () => { chips.querySelectorAll('.chip').forEach((c) => c.classList.remove('on')); b.classList.add('on'); ratio = v === -1 ? nat.w / nat.h : v; applyRatio(); });
+        chips.append(b);
+      }
+      const size = el('span', { class: 'crop-size muted small' });
+      // dragging the frame (move) or a handle (resize), with a mouse or a finger
+      let drag = null;
+      stage.addEventListener('pointerdown', (e) => {
+        const h = e.target.dataset && e.target.dataset.h;
+        if (!h && !e.target.closest('.crop-frame')) return;
+        e.preventDefault();
+        stage.setPointerCapture(e.pointerId);
+        drag = { h: h || 'move', x: e.clientX, y: e.clientY, r: { ...r } };
+      });
+      stage.addEventListener('pointermove', (e) => {
+        if (!drag) return;
+        const W = img.clientWidth, H = img.clientHeight;
+        const dx = (e.clientX - drag.x) / W, dy = (e.clientY - drag.y) / H;
+        const o = drag.r, MIN = 0.04;
+        let { x, y, w, h } = o;
+        if (drag.h === 'move') { x = Math.max(0, Math.min(1 - w, o.x + dx)); y = Math.max(0, Math.min(1 - h, o.y + dy)); }
+        else {
+          if (drag.h.includes('w')) { x = Math.max(0, Math.min(o.x + o.w - MIN, o.x + dx)); w = o.x + o.w - x; }
+          if (drag.h.includes('e')) { w = Math.max(MIN, Math.min(1 - o.x, o.w + dx)); }
+          if (drag.h.includes('n')) { y = Math.max(0, Math.min(o.y + o.h - MIN, o.y + dy)); h = o.y + o.h - y; }
+          if (drag.h.includes('s')) { h = Math.max(MIN, Math.min(1 - o.y, o.h + dy)); }
+          if (ratio) {
+            const k = ratio * (nat.h / nat.w);
+            if (drag.h === 'n' || drag.h === 's') w = Math.min(1 - x, h * k); else h = Math.min(drag.h.includes('n') ? o.y + o.h : 1 - y, w / k);
+            w = h * k;
+            if (drag.h.includes('w')) x = o.x + o.w - w;
+            if (drag.h.includes('n')) y = o.y + o.h - h;
+          }
+        }
+        r = { x, y, w, h };
+        draw();
+      });
+      const end = () => { drag = null; };
+      stage.addEventListener('pointerup', end);
+      stage.addEventListener('pointercancel', end);
+      img.addEventListener('load', () => { nat = { w: img.naturalWidth || 1, h: img.naturalHeight || 1 }; draw(); });
+      const ro = new ResizeObserver(draw);
+      ro.observe(stage);
+      box.append(
+        el('h2', { text: 'Decupează imaginea' }),
+        el('p', { class: 'muted small', text: 'Trage chenarul sau colțurile lui. Ce e în afară se taie.' }),
+        stage, el('div', { class: 'crop-row' }, [chips, size]),
+        el('div', { class: 'actions' }, [
+          el('button', { class: 'btn', type: 'button', text: 'Resetează', onclick: () => { r = { x: 0, y: 0, w: 1, h: 1 }; applyRatio(); } }),
+          el('div', { class: 'spacer' }),
+          el('button', { class: 'btn', type: 'button', text: 'Anulează', onclick: () => { ro.disconnect(); close(null); } }),
+          el('button', { class: 'btn primary', type: 'button', text: 'Decupează', onclick: () => { ro.disconnect(); close(r.w > 0.999 && r.h > 0.999 ? null : { ...r }); } }),
+        ]),
+      );
+    });
+  }
+
+  /** The kept part of the picture at [url], as a new data URL (PNG keeps transparency). */
+  async function cropDataUrl(url, r) {
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+    const sx = Math.round(r.x * img.naturalWidth), sy = Math.round(r.y * img.naturalHeight);
+    const sw = Math.max(1, Math.round(r.w * img.naturalWidth)), sh = Math.max(1, Math.round(r.h * img.naturalHeight));
+    const c = el('canvas', { width: sw, height: sh });
+    c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+    const png = /^data:image\/(png|gif|webp|svg)/.test(url);
+    return { url: c.toDataURL(png ? 'image/png' : 'image/jpeg', 0.92), width: sw, height: sh };
+  }
+
   return {
     kindOf, sourceFor, target, saveAsDialog, writeFile, askName, exportPdf, thumbOf, docsDir, clean,
     pickColor, closePicker, tbtn, colorBtn, select, sep, register, active, anyDirty, ensureSaved, FONTS, dataUrlToBytes, imageDataUrl,
+    cropDialog, cropDataUrl,
   };
 })();

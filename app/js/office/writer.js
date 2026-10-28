@@ -449,27 +449,125 @@ const Writer = (() => {
   function selectImage(img) {
     selImg = img;
     page().querySelectorAll('img.sel').forEach((i) => i.classList.remove('sel'));
-    if (!img) { $('wr-imgbar').classList.add('hidden'); return; }
+    const frame = imgFrame();
+    if (!img) { $('wr-imgbar').classList.add('hidden'); frame.classList.add('hidden'); return; }
     img.classList.add('sel');
     const bar = $('wr-imgbar');
+    bar.querySelector('[data-op="inline"]').classList.toggle('hidden', !img.classList.contains('free'));
     bar.classList.remove('hidden');
-    placeBar(bar, img.getBoundingClientRect());
+    placeImgUi();
+  }
+  /** The handles around the selected picture (resize) — the picture itself is dragged to move it. */
+  function imgFrame() {
+    let f = $('wr-imgsel');
+    if (!f) {
+      f = el('div', { id: 'wr-imgsel', class: 'hidden' }, ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].map((h) => el('i', { class: 'ch ' + h, 'data-h': h })));
+      $('wr-scroll').append(f);
+      f.addEventListener('pointerdown', (e) => { const h = e.target.dataset.h; if (h && selImg) startImgDrag(e, h); });
+    }
+    return f;
+  }
+  function placeImgUi() {
+    if (!selImg) return;
+    const r = selImg.getBoundingClientRect(), host = $('wr-scroll').getBoundingClientRect(), sc = $('wr-scroll');
+    Object.assign(imgFrame().style, { left: r.left - host.left + sc.scrollLeft + 'px', top: r.top - host.top + sc.scrollTop + 'px', width: r.width + 'px', height: r.height + 'px' });
+    imgFrame().classList.remove('hidden');
+    placeBar($('wr-imgbar'), r);
+  }
+  const zoomOf = () => parseFloat(page().style.zoom) || 1;
+  /** A picture taken out of the text: it stays exactly where it is now and can go anywhere on the page. */
+  function makeFree(img) {
+    if (img.classList.contains('free')) return;
+    const z = zoomOf(), pr = page().getBoundingClientRect(), r = img.getBoundingClientRect();
+    const w = r.width / z;
+    img.classList.add('free');
+    img.style.left = Math.round((r.left - pr.left) / z) + 'px';
+    img.style.top = Math.round((r.top - pr.top) / z) + 'px';
+    img.style.width = Math.round(w) + 'px';
+    img.style.height = 'auto';
+    img.removeAttribute('width'); img.removeAttribute('height');
+  }
+  /** Moving (h = 'move') or resizing (h = a handle) the selected picture, with the mouse or a finger. */
+  function startImgDrag(e, h) {
+    e.preventDefault(); e.stopPropagation();
+    const img = selImg, z = zoomOf();
+    const start = { x: e.clientX, y: e.clientY, w: img.getBoundingClientRect().width / z, h: img.getBoundingClientRect().height / z, l: parseFloat(img.style.left) || 0, t: parseFloat(img.style.top) || 0 };
+    const aspect = start.w / Math.max(1, start.h);
+    let moved = false;
+    const onMove = (ev) => {
+      const dx = (ev.clientX - start.x) / z, dy = (ev.clientY - start.y) / z;
+      if (!moved) { if (Math.hypot(dx, dy) < 3) return; moved = true; snapshot(); if (h === 'move') makeFree(img); start.l = parseFloat(img.style.left) || 0; start.t = parseFloat(img.style.top) || 0; }
+      const free = img.classList.contains('free');
+      if (h === 'move') {
+        img.style.left = Math.round(Math.max(-start.w * 0.8, Math.min(PAGE_W - start.w * 0.2, start.l + dx))) + 'px';
+        img.style.top = Math.round(Math.max(0, start.t + dy)) + 'px';
+      } else {
+        let w = start.w, hh = start.h;
+        if (h.includes('e')) w = start.w + dx;
+        if (h.includes('w')) w = start.w - dx;
+        if (h.includes('s')) hh = start.h + dy;
+        if (h.includes('n')) hh = start.h - dy;
+        const corner = h.length === 2;
+        if (corner && !ev.shiftKey) hh = w / aspect; // corners keep the shape (Shift: free)
+        w = Math.max(16, Math.min(PAGE_W, w)); hh = Math.max(12, hh);
+        img.style.width = Math.round(w) + 'px';
+        img.style.height = corner && !ev.shiftKey ? 'auto' : Math.round(hh) + 'px';
+        img.removeAttribute('width'); img.removeAttribute('height');
+        if (free && h.includes('w')) img.style.left = Math.round(start.l + (start.w - w)) + 'px';
+        if (free && h.includes('n')) img.style.top = Math.round(start.t + (start.h - (corner && !ev.shiftKey ? w / aspect : hh))) + 'px';
+      }
+      placeImgUi();
+    };
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove, true);
+      window.removeEventListener('pointerup', onUp, true);
+      window.removeEventListener('pointercancel', onUp, true);
+      if (moved) { changed(); selectImage(img); }
+    };
+    window.addEventListener('pointermove', onMove, true);
+    window.addEventListener('pointerup', onUp, true);
+    window.addEventListener('pointercancel', onUp, true);
   }
 
-  function imgOp(op) {
+  async function imgOp(op) {
     if (!selImg) return;
-    snapshot();
+    const img = selImg;
     const contentW = PAGE_W - margins.l - margins.r;
-    const pct = { s: 0.25, m: 0.5, l: 0.75, f: 1 }[op];
-    if (pct) { selImg.style.width = Math.round(contentW * pct) + 'px'; selImg.style.height = 'auto'; selImg.removeAttribute('width'); selImg.removeAttribute('height'); }
-    if (op === 'left' || op === 'center' || op === 'right') {
-      let p = selImg.parentElement;
-      if (p === page()) { const w = document.createElement('p'); selImg.before(w); w.append(selImg); p = w; }
-      p.style.textAlign = op;
+    if (op === 'crop') {
+      $('wr-imgbar').classList.add('hidden'); imgFrame().classList.add('hidden');
+      const r = await Office.cropDialog(img.src);
+      if (!r) { selectImage(img); return; }
+      const z = zoomOf(), b = img.getBoundingClientRect();
+      const out = await Office.cropDataUrl(img.src, r);
+      snapshot();
+      const w = b.width / z, h = b.height / z;
+      img.src = out.url;
+      img.style.width = Math.max(8, Math.round(w * r.w)) + 'px';
+      img.style.height = img.style.height && img.style.height !== 'auto' ? Math.max(8, Math.round(h * r.h)) + 'px' : 'auto';
+      if (img.classList.contains('free')) { img.style.left = Math.round((parseFloat(img.style.left) || 0) + w * r.x) + 'px'; img.style.top = Math.round((parseFloat(img.style.top) || 0) + h * r.y) + 'px'; }
+      img.removeAttribute('width'); img.removeAttribute('height');
+      changed();
+      await img.decode().catch(() => {});
+      selectImage(img);
+      return;
     }
-    if (op === 'del') { selImg.remove(); selectImage(null); changed(); return; }
+    snapshot();
+    const pct = { s: 0.25, m: 0.5, l: 0.75, f: 1 }[op];
+    if (pct) { img.style.width = Math.round(contentW * pct) + 'px'; img.style.height = 'auto'; img.removeAttribute('width'); img.removeAttribute('height'); }
+    if (op === 'inline') { img.classList.remove('free'); img.style.left = ''; img.style.top = ''; }
+    if (op === 'left' || op === 'center' || op === 'right') {
+      if (img.classList.contains('free')) {
+        const w = img.getBoundingClientRect().width / zoomOf();
+        img.style.left = Math.round(op === 'left' ? margins.l : op === 'right' ? PAGE_W - margins.r - w : (PAGE_W - w) / 2) + 'px';
+      } else {
+        let p = img.parentElement;
+        if (p === page()) { const w = document.createElement('p'); img.before(w); w.append(img); p = w; }
+        p.style.textAlign = op;
+      }
+    }
+    if (op === 'del') { img.remove(); selectImage(null); changed(); return; }
     changed();
-    selectImage(selImg);
+    requestAnimationFrame(() => selectImage(img));
   }
 
   function placeBar(bar, r) {
@@ -552,8 +650,11 @@ const Writer = (() => {
     // picture bar
     const ib = $('wr-imgbar');
     const IB = (label, op, title) => { const b = el('button', { class: 'fb', text: label, title: title || label, type: 'button' }); b.addEventListener('mousedown', (e) => e.preventDefault()); b.addEventListener('click', () => imgOp(op)); return b; };
+    const ibInline = IB('Înapoi în text', 'inline', 'Pune imaginea înapoi în rândurile textului');
+    ibInline.dataset.op = 'inline';
     ib.append(IB('Mică', 's'), IB('Medie', 'm'), IB('Mare', 'l'), IB('Toată lățimea', 'f'), el('div', { class: 'fdiv' }),
-      IB('Stânga', 'left'), IB('Centru', 'center'), IB('Dreapta', 'right'), el('div', { class: 'fdiv' }), IB('Șterge', 'del'));
+      IB('Stânga', 'left'), IB('Centru', 'center'), IB('Dreapta', 'right'), el('div', { class: 'fdiv' }),
+      IB('Decupează', 'crop', 'Taie marginile imaginii'), ibInline, IB('Șterge', 'del'));
     // table bar
     const tb = $('wr-tblbar');
     const TB = (label, op, title) => { const b = el('button', { class: 'fb', text: label, title: title || label, type: 'button' }); b.addEventListener('mousedown', (e) => e.preventDefault()); b.addEventListener('click', () => tableOp(op)); return b; };
@@ -879,7 +980,19 @@ const Writer = (() => {
       if (!d) return null;
       const type = /png/.test(d.mime) ? 'png' : /gif/.test(d.mime) ? 'gif' : /bmp/.test(d.mime) ? 'bmp' : 'jpg';
       const w = Math.max(1, Math.round(img.offsetWidth || img.naturalWidth)), h = Math.max(1, Math.round(img.offsetHeight || img.naturalHeight));
-      try { return new D.ImageRun({ type, data: d.bytes, transformation: { width: w, height: h } }); } catch (e) { return null; }
+      // a picture placed freely on the page: kept where it is (over the text, like in Word "in front of text")
+      let floating;
+      if (img.classList.contains('free') && D.HorizontalPositionRelativeFrom) {
+        const para = img.parentElement.closest('p, h1, h2, h3, h4, h5, h6, li, td, blockquote, div') || page();
+        const EMU = 9525;
+        const top = img.offsetTop - (para === page() ? 0 : para.offsetTop);
+        floating = {
+          horizontalPosition: { relative: D.HorizontalPositionRelativeFrom.PAGE, offset: Math.round((parseFloat(img.style.left) || 0) * EMU) },
+          verticalPosition: { relative: D.VerticalPositionRelativeFrom.PARAGRAPH, offset: Math.round(top * EMU) },
+          wrap: { type: D.TextWrappingType.NONE }, allowOverlap: true, zIndex: 3,
+        };
+      }
+      try { return new D.ImageRun({ type, data: d.bytes, transformation: { width: w, height: h }, ...(floating ? { floating } : {}) }); } catch (e) { return null; }
     }
 
     function paraProps(b, extra = {}) {
@@ -1171,7 +1284,11 @@ ${css}
       if (Date.now() - lastTyped > 120) markerArmed = false; // the caret was moved (not by typing)
       saveSel(); refreshTools();
     });
-    $('wr-scroll').addEventListener('scroll', () => { if (selImg) placeBar($('wr-imgbar'), selImg.getBoundingClientRect()); if (!$('wr-tblbar').classList.contains('hidden')) showTableBar(); }, { passive: true });
+    $('wr-scroll').addEventListener('scroll', () => { if (selImg) placeImgUi(); if (!$('wr-tblbar').classList.contains('hidden')) showTableBar(); }, { passive: true });
+    window.addEventListener('resize', () => { if (selImg) placeImgUi(); });
+    // the selected picture is dragged to move it anywhere on the page (it leaves the text when moved)
+    p.addEventListener('pointerdown', (e) => { if (e.target.tagName === 'IMG' && e.target === selImg && e.button === 0) startImgDrag(e, 'move'); });
+    p.addEventListener('dragstart', (e) => { if (e.target.tagName === 'IMG') e.preventDefault(); });
 
     window.addEventListener('keydown', (e) => {
       if ($('writer').classList.contains('hidden') || document.querySelector('#modal-root .backdrop')) return;

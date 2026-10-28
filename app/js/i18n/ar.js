@@ -1916,5 +1916,19 @@
 "Citește textul din poză: apoi editezi orice rând":"يقرأ النص في الصورة: ثم تحرر أي سطر",
 "Nu mai găsesc poza din care e textul.":"لم أعد أجد الصورة التي جاء منها النص.",
 "Nu am putut șterge rândul":"تعذّر حذف السطر",
-"Nu am putut scrie textul":"تعذّرت كتابة النص"
+"Nu am putut scrie textul":"تعذّرت كتابة النص",
+"Decupează imaginea":"اقتصاص الصورة",
+"Trage chenarul sau colțurile lui. Ce e în afară se taie.":"اسحب الإطار أو زواياه. ما يقع خارجه يُقص.",
+"Liber":"حر",
+"Resetează":"إعادة ضبط",
+"Decupează":"اقتصاص",
+"Înapoi în text":"العودة إلى النص",
+"Pune imaginea înapoi în rândurile textului":"إعادة الصورة إلى أسطر النص",
+"Taie marginile imaginii":"قص حواف الصورة",
+"Decupează…":"اقتصاص…",
+"Decupează poza…":"اقتصاص الصورة…",
+"Taie marginile pozei":"قص حواف الصورة",
+"Nu am putut decupa poza":"تعذّر اقتصاص الصورة",
+"Poza este rotită: o poți muta sau redimensiona, dar nu decupa.":"الصورة مُدارة: يمكنك نقلها أو تغيير حجمها، لكن لا يمكنك اقتصاصها.",
+"Toată pagina":"الصفحة كاملة"
 };

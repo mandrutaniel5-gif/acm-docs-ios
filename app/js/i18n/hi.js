@@ -1916,5 +1916,19 @@
 "Citește textul din poză: apoi editezi orice rând":"तस्वीर का टेक्स्ट पढ़ता है: फिर आप कोई भी पंक्ति बदलते हैं",
 "Nu mai găsesc poza din care e textul.":"जिस तस्वीर से टेक्स्ट आया था, वह अब नहीं मिल रही।",
 "Nu am putut șterge rândul":"पंक्ति हटाई नहीं जा सकी",
-"Nu am putut scrie textul":"टेक्स्ट लिखा नहीं जा सका"
+"Nu am putut scrie textul":"टेक्स्ट लिखा नहीं जा सका",
+"Decupează imaginea":"तस्वीर क्रॉप करें",
+"Trage chenarul sau colțurile lui. Ce e în afară se taie.":"फ़्रेम या उसके कोने खींचें। बाहर का हिस्सा कट जाएगा।",
+"Liber":"मुक्त",
+"Resetează":"रीसेट करें",
+"Decupează":"क्रॉप करें",
+"Înapoi în text":"वापस टेक्स्ट में",
+"Pune imaginea înapoi în rândurile textului":"तस्वीर को टेक्स्ट की पंक्तियों में वापस रखें",
+"Taie marginile imaginii":"तस्वीर के किनारे काटें",
+"Decupează…":"क्रॉप करें…",
+"Decupează poza…":"तस्वीर क्रॉप करें…",
+"Taie marginile pozei":"तस्वीर के किनारे काटें",
+"Nu am putut decupa poza":"तस्वीर क्रॉप नहीं हो सकी",
+"Poza este rotită: o poți muta sau redimensiona, dar nu decupa.":"तस्वीर घुमाई गई है: आप उसे हिला या आकार बदल सकते हैं, पर क्रॉप नहीं कर सकते।",
+"Toată pagina":"पूरा पेज"
 };

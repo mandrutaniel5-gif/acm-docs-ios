@@ -1916,5 +1916,19 @@
 "Citește textul din poză: apoi editezi orice rând":"画像の文字を読み取ります：その後どの行でも編集できます",
 "Nu mai găsesc poza din care e textul.":"文字の元の画像が見つかりません。",
 "Nu am putut șterge rândul":"行を削除できませんでした",
-"Nu am putut scrie textul":"文字を書き込めませんでした"
+"Nu am putut scrie textul":"文字を書き込めませんでした",
+"Decupează imaginea":"画像をトリミング",
+"Trage chenarul sau colțurile lui. Ce e în afară se taie.":"枠またはその角をドラッグします。枠の外は切り取られます。",
+"Liber":"自由",
+"Resetează":"リセット",
+"Decupează":"トリミング",
+"Înapoi în text":"テキストに戻す",
+"Pune imaginea înapoi în rândurile textului":"画像をテキストの行に戻す",
+"Taie marginile imaginii":"画像の端を切り取る",
+"Decupează…":"トリミング…",
+"Decupează poza…":"画像をトリミング…",
+"Taie marginile pozei":"画像の端を切り取る",
+"Nu am putut decupa poza":"画像をトリミングできませんでした",
+"Poza este rotită: o poți muta sau redimensiona, dar nu decupa.":"画像が回転しています：移動やサイズ変更はできますが、トリミングはできません。",
+"Toată pagina":"ページ全体"
 };

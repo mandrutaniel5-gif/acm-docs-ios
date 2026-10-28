@@ -268,6 +268,35 @@ const Editor = (() => {
     E.selectObject(item.page, item.objects[0]);
   };
 
+  /** Cuts the edges of a picture on the page (the part kept stays exactly where it was). */
+  E.cropImage = async (item) => {
+    const page = item.page, obj = item.objects[0];
+    const info = E.doc.images(page).find((i) => i.obj === obj);
+    if (!info || !info.upright) { UI.toast('Poza este rotită: o poți muta sau redimensiona, dar nu decupa.', { error: true }); return; }
+    const px = E.doc.imagePixels(page, obj);
+    const c = document.createElement('canvas');
+    c.width = px.width; c.height = px.height;
+    c.getContext('2d').putImageData(new ImageData(px.rgba, px.width, px.height), 0, 0);
+    const r = await Office.cropDialog(c.toDataURL(px.transparent ? 'image/png' : 'image/jpeg', 0.9));
+    if (!r || !E.doc) return;
+    const sx = Math.round(r.x * px.width), sy = Math.round(r.y * px.height);
+    const sw = Math.max(1, Math.round(r.w * px.width)), sh = Math.max(1, Math.round(r.h * px.height));
+    const out = new Uint8ClampedArray(sw * sh * 4);
+    for (let y = 0; y < sh; y++) out.set(px.rgba.subarray(((sy + y) * px.width + sx) * 4, ((sy + y) * px.width + sx + sw) * 4), y * sw * 4);
+    let jpeg = null;
+    if (px.jpeg && !px.transparent) {
+      const k = document.createElement('canvas'); k.width = sw; k.height = sh;
+      k.getContext('2d').putImageData(new ImageData(out, sw, sh), 0, 0);
+      jpeg = new Uint8Array(await (await new Promise((res) => k.toBlob(res, 'image/jpeg', 0.92))).arrayBuffer());
+    }
+    const b = info.box, bw = b.r - b.l, bh = b.b - b.t;
+    const to = { l: b.l + bw * r.x, t: b.t + bh * r.y, r: b.l + bw * (r.x + r.w), b: b.t + bh * (r.y + r.h) };
+    E.change([page], (d) => {
+      d.replaceImage(page, obj, { rgba: out, width: sw, height: sh, transparent: px.transparent }, jpeg);
+      d.transform(page, [obj], b, to);
+    });
+  };
+
   E.deleteItem = (item) => {
     if (item.scan) {
       // a line of a scan: its letters are removed from the picture

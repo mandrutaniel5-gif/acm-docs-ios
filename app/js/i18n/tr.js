@@ -1916,5 +1916,19 @@
 "Citește textul din poză: apoi editezi orice rând":"Resimdeki metni okur: sonra istediğin satırı düzenlersin",
 "Nu mai găsesc poza din care e textul.":"Metnin geldiği resmi artık bulamıyorum.",
 "Nu am putut șterge rândul":"Satır silinemedi",
-"Nu am putut scrie textul":"Metin yazılamadı"
+"Nu am putut scrie textul":"Metin yazılamadı",
+"Decupează imaginea":"Resmi kırp",
+"Trage chenarul sau colțurile lui. Ce e în afară se taie.":"Çerçeveyi veya köşelerini sürükle. Dışında kalan kesilir.",
+"Liber":"Serbest",
+"Resetează":"Sıfırla",
+"Decupează":"Kırp",
+"Înapoi în text":"Metne geri al",
+"Pune imaginea înapoi în rândurile textului":"Resmi metnin satırlarına geri koy",
+"Taie marginile imaginii":"Resmin kenarlarını kes",
+"Decupează…":"Kırp…",
+"Decupează poza…":"Resmi kırp…",
+"Taie marginile pozei":"Resmin kenarlarını kes",
+"Nu am putut decupa poza":"Resim kırpılamadı",
+"Poza este rotită: o poți muta sau redimensiona, dar nu decupa.":"Resim döndürülmüş: taşıyabilir veya boyutunu değiştirebilirsin ama kırpamazsın.",
+"Toată pagina":"Tüm sayfa"
 };

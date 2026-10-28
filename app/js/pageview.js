@@ -472,6 +472,7 @@ const Pages = (() => {
       UI.menu(e.clientX, e.clientY, [
         { label: 'Editează textul', icon: 'edit', disabled: !(isText && it.editable), run: () => beginEdit(v, it) },
         { label: 'Copiază textul', icon: 'copy', disabled: !isText, run: () => copyText(it) },
+        it.kind === 'image' ? { label: 'Decupează poza…', icon: 'crop', run: () => Editor.cropImage(it).catch((err) => UI.errorDetails('Nu am putut decupa poza', err)) } : null,
         '-',
         { label: 'Șterge', icon: 'del', run: () => guard(() => Editor.deleteItem(it)) },
       ]);

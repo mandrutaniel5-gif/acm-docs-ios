@@ -1916,5 +1916,19 @@
 "Citește textul din poză: apoi editezi orice rând":"Elolvassa a kép szövegét: utána bármelyik sort szerkesztheted",
 "Nu mai găsesc poza din care e textul.":"Nem találom a képet, amelyből a szöveg származik.",
 "Nu am putut șterge rândul":"A sort nem sikerült törölni",
-"Nu am putut scrie textul":"A szöveget nem sikerült megírni"
+"Nu am putut scrie textul":"A szöveget nem sikerült megírni",
+"Decupează imaginea":"Kép körbevágása",
+"Trage chenarul sau colțurile lui. Ce e în afară se taie.":"Húzd a keretet vagy a sarkait. Ami kívül esik, levágódik.",
+"Liber":"Szabad",
+"Resetează":"Visszaállítás",
+"Decupează":"Körbevágás",
+"Înapoi în text":"Vissza a szövegbe",
+"Pune imaginea înapoi în rândurile textului":"A kép visszahelyezése a szövegsorok közé",
+"Taie marginile imaginii":"A kép széleinek levágása",
+"Decupează…":"Körbevágás…",
+"Decupează poza…":"Kép körbevágása…",
+"Taie marginile pozei":"A kép széleinek levágása",
+"Nu am putut decupa poza":"A képet nem sikerült körbevágni",
+"Poza este rotită: o poți muta sau redimensiona, dar nu decupa.":"A kép el van forgatva: mozgathatod vagy átméretezheted, de nem vághatod körbe.",
+"Toată pagina":"Teljes oldal"
 };
