@@ -1,0 +1,398 @@
+Command line invocation:
+    /Applications/Xcode_26.3.app/Contents/Developer/usr/bin/xcodebuild -project ACMDocs.xcodeproj -scheme ACMDocs -configuration Release -sdk iphoneos -destination generic/platform=iOS -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= build
+
+Build settings from command line:
+    CODE_SIGN_IDENTITY = 
+    CODE_SIGNING_ALLOWED = NO
+    CODE_SIGNING_REQUIRED = NO
+    SDKROOT = iphoneos26.2
+
+note: Using codesigning identity override: 
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (1 target)
+    Target 'ACMDocs' in project 'ACMDocs' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode_26.3.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode_26.3.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: f7bc280926fe009e352f1bfb7c552f22
+Build description path: /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/XCBuildData/f7bc280926fe009e352f1bfb7c552f22.xcbuilddata
+ClangStatCache /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/SDKStatCaches.noindex/iphoneos26.2-23C57-dc75598d0054f22ec865fa860f139d722dd23b4ebda140f7210d155ff1243552.sdkstatcache
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs.xcodeproj
+    /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk -o /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/SDKStatCaches.noindex/iphoneos26.2-23C57-dc75598d0054f22ec865fa860f139d722dd23b4ebda140f7210d155ff1243552.sdkstatcache
+
+CreateBuildDirectory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs.xcodeproj
+    builtin-create-build-directory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products
+
+CreateBuildDirectory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs.xcodeproj
+    builtin-create-build-directory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs-af18f57ed0ed229fae7bf28064b99217-VFS-iphoneos/all-product-headers.yaml
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs.xcodeproj
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs-af18f57ed0ed229fae7bf28064b99217-VFS-iphoneos/all-product-headers.yaml
+
+CreateBuildDirectory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs.xcodeproj
+    builtin-create-build-directory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos
+
+CreateBuildDirectory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs.xcodeproj
+    builtin-create-build-directory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs.xcodeproj
+    builtin-create-build-directory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/EagerLinkingTBDs/Release-iphoneos
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs.xcodeproj
+    builtin-create-build-directory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/EagerLinkingTBDs/Release-iphoneos
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs_const_extract_protocols.json (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs_const_extract_protocols.json
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.SwiftFileList (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.SwiftFileList
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.SwiftConstValuesFileList (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.LinkFileList (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.LinkFileList
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs-OutputFileMap.json (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs.hmap (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs.hmap
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs.DependencyStaticMetadataFileList (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs.DependencyMetadataFileList (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs.DependencyMetadataFileList
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-project-headers.hmap (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-project-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-own-target-headers.hmap (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-own-target-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-generated-files.hmap (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-generated-files.hmap
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-all-target-headers.hmap (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-all-target-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-all-non-framework-target-headers.hmap (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    write-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-all-non-framework-target-headers.hmap
+
+MkDir /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    /bin/mkdir -p /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app
+
+MkDir /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_output/thinned (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    /bin/mkdir -p /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_output/thinned
+
+MkDir /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_output/unthinned (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    /bin/mkdir -p /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_output/unthinned
+
+GenerateAssetSymbols /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/Assets.xcassets (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    /Applications/Xcode_26.3.app/Contents/Developer/usr/bin/actool /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/Assets.xcassets --compile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app --output-format human-readable-text --notices --warnings --export-dependency-info /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_dependencies --output-partial-info-plist /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_generated_info.plist --app-icon AppIcon --compress-pngs --enable-on-demand-resources YES --development-region en --target-device iphone --target-device ipad --minimum-deployment-target 15.0 --platform iphoneos --bundle-identifier ro.acmcode.docs --generate-swift-asset-symbol-extensions NO --generate-swift-asset-symbols /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources/GeneratedAssetSymbols.swift --generate-objc-asset-symbols /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources/GeneratedAssetSymbols.h --generate-asset-symbol-index /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+/* com.apple.actool.compilation-results */
+/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources/GeneratedAssetSymbols.h
+/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources/GeneratedAssetSymbols.swift
+
+
+CpResource /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/www /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/www (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/www /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app
+
+CompileAssetCatalogVariant thinned /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/Assets.xcassets (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    /Applications/Xcode_26.3.app/Contents/Developer/usr/bin/actool /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/Assets.xcassets --compile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_output/thinned --output-format human-readable-text --notices --warnings --export-dependency-info /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_dependencies_thinned --output-partial-info-plist /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_generated_info.plist_thinned --app-icon AppIcon --compress-pngs --enable-on-demand-resources YES --development-region en --target-device iphone --target-device ipad --minimum-deployment-target 15.0 --platform iphoneos
+/* com.apple.actool.compilation-results */
+/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_generated_info.plist_thinned
+/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_output/thinned/AppIcon60x60@2x.png
+/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_output/thinned/AppIcon76x76@2x~ipad.png
+/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_output/thinned/Assets.car
+
+
+SwiftDriver ACMDocs normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-SwiftDriver -- /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ACMDocs -O -whole-module-optimization -enforce-exclusivity\=checked @/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.SwiftFileList -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk -target arm64-apple-ios15.0 -g -module-cache-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex -Xfrontend -serialize-debugging-options -swift-version 5 -I /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos -F /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos -c -num-threads 3 -Xcc -ivfsstatcache -Xcc /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/SDKStatCaches.noindex/iphoneos26.2-23C57-dc75598d0054f22ec865fa860f139d722dd23b4ebda140f7210d155ff1243552.sdkstatcache -output-file-map /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-generated-files.hmap -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-own-target-headers.hmap -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-project-headers.hmap -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/include -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources -emit-objc-header -emit-objc-header-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs-Swift.h -working-directory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios -no-emit-module-separately-wmo
+
+SwiftDriver\ Compilation ACMDocs normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-Swift-Compilation -- /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ACMDocs -O -whole-module-optimization -enforce-exclusivity\=checked @/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.SwiftFileList -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk -target arm64-apple-ios15.0 -g -module-cache-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex -Xfrontend -serialize-debugging-options -swift-version 5 -I /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos -F /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos -c -num-threads 3 -Xcc -ivfsstatcache -Xcc /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/SDKStatCaches.noindex/iphoneos26.2-23C57-dc75598d0054f22ec865fa860f139d722dd23b4ebda140f7210d155ff1243552.sdkstatcache -output-file-map /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-generated-files.hmap -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-own-target-headers.hmap -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-project-headers.hmap -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/include -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources -emit-objc-header -emit-objc-header-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs-Swift.h -working-directory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios -no-emit-module-separately-wmo
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_stdbool-44DX8GNDWQX7RJ7760UM60HDL.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/DeveloperToolsSupport-5ENQ941J8DJWXV42Q3KWDTPRQ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_stddef-DMSADCBJV4TA1SED5KM78HXML.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/ptrauth-56HEJHD2HF98PGPFQRFFEQY3J.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/SwiftShims-DI8FFNR9O94L03098VQN5ST13.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_float-3962ZEH1RIJANYMFUWDAKSHVL.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/ptrcheck-23MT3QRT1PLCJMF7FFSECWDXF.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_AvailabilityInternal-5M5D0W5AASSY8NPCS6PFN1GXT.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_SwiftConcurrencyShims-DPO5TW1XS9V6M90F9AZQIO9E0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_stdarg-2ITNR6DIBM01TJI98XQ89F4ZP.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_DarwinFoundation1-CAKPV27UT1O10YDSU7SPNQ42A.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_DarwinFoundation2-6Q8HWQT3V5VMFD2XFTD2ZNS0F.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_limits-780RXX2U10D26I61WLZNYTZ9T.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/ExtensionFoundation-68R2P9B3D2NR1M80JV067MDBB.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/sys_types-B62PNJ350V92ML2XY0IO3WO9P.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_tgmath-CY2O7M6F9GE5KSZOIHKNTIBHY.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_stdint-9JCPC1DESKMLLB1LM7FYRUB2P.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_intrinsics-7NA8GWHY03SQQP9ACH02LW5O7.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_DarwinFoundation3-DL15TZIB0KUGB3AWWWBIAGKQV.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_stdatomic-ER646GPYD2UGQQ2CIB3HU2PQJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_inttypes-4MZZP2X88RR0BJT0MNQ282K0K.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/simd-74BAQFI9W2ZPFYJAAWXAMB2S2.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Darwin-334EC9GL5R2RJ0V98DB23JV0D.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/ObjectiveC-6ZWZRKIIE02KW9ITYEHS9F55S.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/MachO-E5EFMUJAU60CBF6U46GV21UKU.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/os_object-88MSA663640EX1459N722YPD.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Spatial-B5Q4IZERO5HN8DEO9S606UI6L.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/os_workgroup-BKCD7NJ5YX416H36E8UMRGFVL.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Dispatch-DP3OM5BAQPDHUZQOPH1NV1Q2L.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreFoundation-6BZCJWHNBEA6EQ1DAI85C6VXF.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/dnssd-EZ0LGXB2MNY3R2IQJZEPATP42.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/XPC-D1Y2XOIFDCRB9INOZBRRIWV6N.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CFNetwork-656I22U6877W1WHMSTQWUS3VL.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Security-B16QHUDZTBMM8GKDQN7RK4CPL.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/os-8AJB8SR7V4D8YNJVGOBFDIV5D.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreGraphics-6ASPTJBGETDN8X3ALIB7FHR2A.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreAudioTypes-DJ1TYV34STBJW8I67AK1RW5H2.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Foundation-CEX88ECEH4O9RADEF8DUJ6HCF.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreAudio-2NESUBXNKYFBATPBT1NSCDPUH.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/ImageIO-E019Q08OSG9NT55AQNLSF9QHT.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreText-BYB1ID04EI7FAYRZ7ZPYBE4IW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/UniformTypeIdentifiers-1D394T8JO6K2KR81K62H4XLLB.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Symbols-E922ZQ554Z4XIS94XY50H55ZU.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/UserNotifications-CAQI41CJBYVED07BS20BJAZ3O.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreData-E58A38BVO65KFXTFA4BR1EB77.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/UIUtilities-9O07FUQC5FPCJV765RLBLQN1Q.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/OSLog-EC46OA58G6SFG9VXCKRSXGHRY.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreTransferable-6Q9AHTVHU19BCYHB0ELR34QFS.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreMIDI-1Q2QW01JIXM7SJ34M3KVD4Q7X.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/IOSurface-A8K8PG6ZDZR1VP32FJGJCQZ48.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/FileProvider-5F19JS53JJHH3CVT678UNET1O.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/OpenGLES-5BR8OI16J6SKL89LILTQMH2UV.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Metal-53M0X5W7Q1KABJAIIY6DS5R7.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/LocalAuthentication-4KG02RMZVZ37D3NTXYCKW3WVF.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_LocationEssentials-6LROASPGPSFP2UG231HBNA6IN.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Network-1JL37IEH9FFGSZRLIQI95QZI4.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreLocation-35NFSYSV3T6VC9E0XX3NM50S.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/DataDetection-6CJQKNL0YL2KEKCERNO5SHIQN.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreVideo-7KHLTEY70OSJX8J85DI5A6Q2G.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/AudioToolbox-3M027KUQPLNUBGFXI9R6N0CVZ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Accessibility-AKTPWAZV5IKJXU7HP645D4YEW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/AVRouting-3WBHD1GJI8M5IENN51I6SC87A.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/QuartzCore-37KYUVH38XOFVJD6VSW3UL9PW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreImage-5FGWG9GZ13SSZP7YUF96IGEZK.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreMedia-1EPHRAIXJKZ93YXWGIB8T6XUO.pcm
+
+LinkAssetCatalog /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/Assets.xcassets (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-linkAssetCatalog --thinned /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_output/thinned --thinned-dependencies /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_dependencies_thinned --thinned-info-plist-content /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_generated_info.plist_thinned --unthinned /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_output/unthinned --unthinned-dependencies /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_dependencies_unthinned --unthinned-info-plist-content /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_generated_info.plist_unthinned --output /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app --plist-output /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_generated_info.plist
+note: Emplaced /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/AppIcon76x76@2x~ipad.png (in target 'ACMDocs' from project 'ACMDocs')
+note: Emplaced /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/AppIcon60x60@2x.png (in target 'ACMDocs' from project 'ACMDocs')
+note: Emplaced /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/Assets.car (in target 'ACMDocs' from project 'ACMDocs')
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/SwiftUICore-EOXOIT6P3UE5HSZCHAO5E09G7.pcm
+
+ProcessInfoPlistFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/Info.plist /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/Info.plist (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-infoPlistUtility /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/Info.plist -producttype com.apple.product-type.application -genpkginfo /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/PkgInfo -expandbuildsettings -format binary -platform iphoneos -additionalcontentfile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/assetcatalog_generated_info.plist -requiredArchitecture arm64 -o /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/Info.plist
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/UIKit-94H090LMDIEKUCND4VR5K2PJJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/AVFAudio-65H0VWO1TBQHABRMNDBZ5LTVT.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/MediaToolbox-CW0U2E8M9Y7W5OC7WUIEEGL0E.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/AVFoundation-GYPGQ7QCZNQI7BIUNODMW9SS.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Photos-7T2RMVNUVBI7HTI2XGKYQPCT8.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/WebKit-C8LN3BR86PORCSUHDHXYLYDTB.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/PhotosUI-2DMCPXUK2P7T9K6YG3TW8ROLU.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/SwiftUI-9O8VV012ZA4KO7Z52JO46QR4G.pcm
+
+SwiftCompile normal arm64 Compiling\ AppDelegate.swift,\ Bridge.swift,\ Files.swift,\ GlassTabBar.swift,\ Privacy.swift,\ QRScanner.swift,\ Secure.swift,\ WebViewController.swift,\ GeneratedAssetSymbols.swift /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/AppDelegate.swift /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/Bridge.swift /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/Files.swift /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/GlassTabBar.swift /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/Privacy.swift /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/QRScanner.swift /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/Secure.swift /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/ACMDocs/WebViewController.swift /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources/GeneratedAssetSymbols.swift /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/ObjectiveC.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/AudioToolbox.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/DataDetection.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Combine.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/OSLog.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Foundation.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Metal.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/_DarwinFoundation3.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Synchronization.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/simd.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Photos.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/os.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/_Builtin_float.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/System.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/_Concurrency.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/_DarwinFoundation2.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/LocalAuthentication.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Swift.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/CoreMIDI.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/QuartzCore.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/CoreLocation.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/WebKit.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/CoreGraphics.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/XPC.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Observation.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Accessibility.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Spatial.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/SwiftUI.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Darwin.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Dispatch.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/CoreVideo.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/_DarwinFoundation1.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/UniformTypeIdentifiers.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/CoreFoundation.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/CoreImage.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/FileProvider.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/ExtensionFoundation.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/PhotosUI.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/_StringProcessing.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Symbols.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/AVFAudio.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/CoreData.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/AVFoundation.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/DeveloperToolsSupport.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/CoreMedia.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/CoreAudio.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Distributed.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/SwiftUICore.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/CoreText.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/CoreTransferable.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/Network.swiftmodule/arm64e-apple-ios.swiftmodule /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/prebuilt-modules/26.2/UIKit.swiftmodule/arm64e-apple-ios.swiftmodule /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/XPC-D1Y2XOIFDCRB9INOZBRRIWV6N.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Spatial-B5Q4IZERO5HN8DEO9S606UI6L.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_limits-780RXX2U10D26I61WLZNYTZ9T.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/SwiftUICore-EOXOIT6P3UE5HSZCHAO5E09G7.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CFNetwork-656I22U6877W1WHMSTQWUS3VL.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/os_workgroup-BKCD7NJ5YX416H36E8UMRGFVL.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_SwiftConcurrencyShims-DPO5TW1XS9V6M90F9AZQIO9E0.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_DarwinFoundation3-DL15TZIB0KUGB3AWWWBIAGKQV.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Accessibility-AKTPWAZV5IKJXU7HP645D4YEW.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/SwiftShims-DI8FFNR9O94L03098VQN5ST13.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Security-B16QHUDZTBMM8GKDQN7RK4CPL.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/ptrcheck-23MT3QRT1PLCJMF7FFSECWDXF.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/OpenGLES-5BR8OI16J6SKL89LILTQMH2UV.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/dnssd-EZ0LGXB2MNY3R2IQJZEPATP42.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/AVRouting-3WBHD1GJI8M5IENN51I6SC87A.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_DarwinFoundation1-CAKPV27UT1O10YDSU7SPNQ42A.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_stdarg-2ITNR6DIBM01TJI98XQ89F4ZP.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/UIUtilities-9O07FUQC5FPCJV765RLBLQN1Q.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreLocation-35NFSYSV3T6VC9E0XX3NM50S.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/MachO-E5EFMUJAU60CBF6U46GV21UKU.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/os_object-88MSA663640EX1459N722YPD.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/DataDetection-6CJQKNL0YL2KEKCERNO5SHIQN.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Foundation-CEX88ECEH4O9RADEF8DUJ6HCF.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/os-8AJB8SR7V4D8YNJVGOBFDIV5D.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/DeveloperToolsSupport-5ENQ941J8DJWXV42Q3KWDTPRQ.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreText-BYB1ID04EI7FAYRZ7ZPYBE4IW.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreMIDI-1Q2QW01JIXM7SJ34M3KVD4Q7X.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/ExtensionFoundation-68R2P9B3D2NR1M80JV067MDBB.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/IOSurface-A8K8PG6ZDZR1VP32FJGJCQZ48.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Network-1JL37IEH9FFGSZRLIQI95QZI4.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/UIKit-94H090LMDIEKUCND4VR5K2PJJ.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/LocalAuthentication-4KG02RMZVZ37D3NTXYCKW3WVF.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/UserNotifications-CAQI41CJBYVED07BS20BJAZ3O.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreFoundation-6BZCJWHNBEA6EQ1DAI85C6VXF.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Darwin-334EC9GL5R2RJ0V98DB23JV0D.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_stdint-9JCPC1DESKMLLB1LM7FYRUB2P.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreMedia-1EPHRAIXJKZ93YXWGIB8T6XUO.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_stdatomic-ER646GPYD2UGQQ2CIB3HU2PQJ.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/simd-74BAQFI9W2ZPFYJAAWXAMB2S2.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/ptrauth-56HEJHD2HF98PGPFQRFFEQY3J.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/OSLog-EC46OA58G6SFG9VXCKRSXGHRY.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/PhotosUI-2DMCPXUK2P7T9K6YG3TW8ROLU.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/MediaToolbox-CW0U2E8M9Y7W5OC7WUIEEGL0E.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/AVFoundation-GYPGQ7QCZNQI7BIUNODMW9SS.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/sys_types-B62PNJ350V92ML2XY0IO3WO9P.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_intrinsics-7NA8GWHY03SQQP9ACH02LW5O7.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_float-3962ZEH1RIJANYMFUWDAKSHVL.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_LocationEssentials-6LROASPGPSFP2UG231HBNA6IN.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreVideo-7KHLTEY70OSJX8J85DI5A6Q2G.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/ImageIO-E019Q08OSG9NT55AQNLSF9QHT.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreData-E58A38BVO65KFXTFA4BR1EB77.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Symbols-E922ZQ554Z4XIS94XY50H55ZU.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_DarwinFoundation2-6Q8HWQT3V5VMFD2XFTD2ZNS0F.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/WebKit-C8LN3BR86PORCSUHDHXYLYDTB.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Photos-7T2RMVNUVBI7HTI2XGKYQPCT8.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreAudio-2NESUBXNKYFBATPBT1NSCDPUH.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/ObjectiveC-6ZWZRKIIE02KW9ITYEHS9F55S.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_stddef-DMSADCBJV4TA1SED5KM78HXML.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/SwiftUI-9O8VV012ZA4KO7Z52JO46QR4G.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Dispatch-DP3OM5BAQPDHUZQOPH1NV1Q2L.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_tgmath-CY2O7M6F9GE5KSZOIHKNTIBHY.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/AVFAudio-65H0VWO1TBQHABRMNDBZ5LTVT.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreGraphics-6ASPTJBGETDN8X3ALIB7FHR2A.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Metal-53M0X5W7Q1KABJAIIY6DS5R7.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_inttypes-4MZZP2X88RR0BJT0MNQ282K0K.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/QuartzCore-37KYUVH38XOFVJD6VSW3UL9PW.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreAudioTypes-DJ1TYV34STBJW8I67AK1RW5H2.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreImage-5FGWG9GZ13SSZP7YUF96IGEZK.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/AudioToolbox-3M027KUQPLNUBGFXI9R6N0CVZ.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_Builtin_stdbool-44DX8GNDWQX7RJ7760UM60HDL.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/CoreTransferable-6Q9AHTVHU19BCYHB0ELR34QFS.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/_AvailabilityInternal-5M5D0W5AASSY8NPCS6PFN1GXT.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/UniformTypeIdentifiers-1D394T8JO6K2KR81K62H4XLLB.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/FileProvider-5F19JS53JJHH3CVT678UNET1O.pcm /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs-dependencies-1.json (in target 'ACMDocs' from project 'ACMDocs')
+
+CompileSwift normal arm64 (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    
+
+SwiftDriverJobDiscovery normal arm64 Compiling AppDelegate.swift, Bridge.swift, Files.swift, GlassTabBar.swift, Privacy.swift, QRScanner.swift, Secure.swift, WebViewController.swift, GeneratedAssetSymbols.swift (in target 'ACMDocs' from project 'ACMDocs')
+
+SwiftDriver\ Compilation\ Requirements ACMDocs normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ACMDocs -O -whole-module-optimization -enforce-exclusivity\=checked @/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.SwiftFileList -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk -target arm64-apple-ios15.0 -g -module-cache-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex -Xfrontend -serialize-debugging-options -swift-version 5 -I /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos -F /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos -c -num-threads 3 -Xcc -ivfsstatcache -Xcc /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/SDKStatCaches.noindex/iphoneos26.2-23C57-dc75598d0054f22ec865fa860f139d722dd23b4ebda140f7210d155ff1243552.sdkstatcache -output-file-map /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-generated-files.hmap -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-own-target-headers.hmap -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs-project-headers.hmap -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/include -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources -emit-objc-header -emit-objc-header-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs-Swift.h -working-directory /Users/runner/work/acm-docs-ios/acm-docs-ios/ios -no-emit-module-separately-wmo
+
+SwiftMergeGeneratedHeaders /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources/ACMDocs-Swift.h /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs-Swift.h (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-swiftHeaderTool -arch arm64 /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs-Swift.h -o /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/DerivedSources/ACMDocs-Swift.h
+
+Copy /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.swiftmodule/arm64-apple-ios.swiftmodule /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.swiftmodule (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.swiftmodule /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.swiftmodule/arm64-apple-ios.swiftmodule
+
+Copy /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.swiftmodule/arm64-apple-ios.swiftdoc /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.swiftdoc (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.swiftdoc /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.swiftmodule/arm64-apple-ios.swiftdoc
+
+Copy /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.swiftmodule/arm64-apple-ios.abi.json /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.abi.json (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.abi.json /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.swiftmodule/arm64-apple-ios.abi.json
+
+Copy /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.swiftsourceinfo (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.swiftsourceinfo /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo
+
+Ld /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/ACMDocs normal (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios15.0 -isysroot /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk -Os -L/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/EagerLinkingTBDs/Release-iphoneos -L/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos -F/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/EagerLinkingTBDs/Release-iphoneos -F/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos -filelist /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.LinkFileList -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -Xlinker -object_path_lto -Xlinker /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs_lto.o -Xlinker -dependency_info -Xlinker /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.swiftmodule @/Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs-linker-args.resp -o /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/ACMDocs
+
+ExtractAppIntentsMetadata (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.G44tCI/Metal.xctoolchain --module-name ACMDocs --sdk-root /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk --xcode-version 17C529 --platform-family iOS --deployment-target 15.0 --bundle-identifier ro.acmcode.docs --output /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app --target-triple arm64-apple-ios15.0 --binary-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/ACMDocs --dependency-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs_dependency_info.dat --stringsdata-file /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.SwiftFileList --metadata-file-list /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/Objects-normal/arm64/ACMDocs.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-10-28 23:08:56.612 appintentsmetadataprocessor[2535:11336] Starting appintentsmetadataprocessor export
+2026-10-28 23:08:56.619 appintentsmetadataprocessor[2535:11336] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+CopySwiftLibs /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/ACMDocs --scan-folder /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/Frameworks --scan-folder /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/PlugIns --scan-folder /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/SystemExtensions --scan-folder /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/Extensions --platform iphoneos --toolchain /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.G44tCI/Metal.xctoolchain --toolchain /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os --back-deploy-swift-span
+Ignoring --strip-bitcode because --sign was not passed
+
+GenerateDSYMFile /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app.dSYM /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/ACMDocs (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/dsymutil /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/ACMDocs -o /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app.dSYM
+
+AppIntentsSSUTraining (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/Info.plist --temp-dir-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ssu --bundle-id ro.acmcode.docs --product-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app --extracted-metadata-path /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app/Metadata.appintents --metadata-file-list /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Intermediates.noindex/ACMDocs.build/Release-iphoneos/ACMDocs.build/ACMDocs.DependencyMetadataFileList --archive-ssu-assets
+2026-10-28 23:08:56.657 appintentsnltrainingprocessor[2537:11342] Parsing options for appintentsnltrainingprocessor
+2026-10-28 23:08:56.659 appintentsnltrainingprocessor[2537:11342] No AppShortcuts found - Skipping.
+
+RegisterExecutionPolicyException /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-RegisterExecutionPolicyException /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app
+
+Validate /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    builtin-validationUtility /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app -shallow-bundle -infoplist-subpath Info.plist
+
+Touch /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app (in target 'ACMDocs' from project 'ACMDocs')
+    cd /Users/runner/work/acm-docs-ios/acm-docs-ios/ios
+    /usr/bin/touch -c /Users/runner/work/acm-docs-ios/acm-docs-ios/ios/build/Build/Products/Release-iphoneos/ACMDocs.app
+
+** BUILD SUCCEEDED **
+
