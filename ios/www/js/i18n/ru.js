@@ -1916,5 +1916,19 @@
 "Citește textul din poză: apoi editezi orice rând":"Читает текст на изображении: затем редактируешь любую строку",
 "Nu mai găsesc poza din care e textul.":"Не могу найти изображение, из которого текст.",
 "Nu am putut șterge rândul":"Не удалось удалить строку",
-"Nu am putut scrie textul":"Не удалось записать текст"
+"Nu am putut scrie textul":"Не удалось записать текст",
+"Decupează imaginea":"Обрезать изображение",
+"Trage chenarul sau colțurile lui. Ce e în afară se taie.":"Перетащи рамку или её углы. Всё за пределами будет обрезано.",
+"Liber":"Свободно",
+"Resetează":"Сбросить",
+"Decupează":"Обрезать",
+"Înapoi în text":"Обратно в текст",
+"Pune imaginea înapoi în rândurile textului":"Вернуть изображение в строки текста",
+"Taie marginile imaginii":"Обрезать края изображения",
+"Decupează…":"Обрезать…",
+"Decupează poza…":"Обрезать изображение…",
+"Taie marginile pozei":"Обрезать края изображения",
+"Nu am putut decupa poza":"Не удалось обрезать изображение",
+"Poza este rotită: o poți muta sau redimensiona, dar nu decupa.":"Изображение повёрнуто: его можно переместить или изменить размер, но не обрезать.",
+"Toată pagina":"Вся страница"
 };

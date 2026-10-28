@@ -1916,5 +1916,19 @@
 "Citește textul din poză: apoi editezi orice rând":"이미지의 글자를 읽습니다: 그다음 아무 줄이나 편집하세요",
 "Nu mai găsesc poza din care e textul.":"텍스트가 있던 이미지를 더 이상 찾을 수 없습니다.",
 "Nu am putut șterge rândul":"줄을 삭제하지 못했습니다",
-"Nu am putut scrie textul":"텍스트를 쓰지 못했습니다"
+"Nu am putut scrie textul":"텍스트를 쓰지 못했습니다",
+"Decupează imaginea":"이미지 자르기",
+"Trage chenarul sau colțurile lui. Ce e în afară se taie.":"테두리나 모서리를 끄세요. 바깥 부분은 잘립니다.",
+"Liber":"자유",
+"Resetează":"초기화",
+"Decupează":"자르기",
+"Înapoi în text":"텍스트로 되돌리기",
+"Pune imaginea înapoi în rândurile textului":"이미지를 텍스트 줄 안으로 되돌리기",
+"Taie marginile imaginii":"이미지 가장자리 자르기",
+"Decupează…":"자르기…",
+"Decupează poza…":"이미지 자르기…",
+"Taie marginile pozei":"이미지 가장자리 자르기",
+"Nu am putut decupa poza":"이미지를 자르지 못했습니다",
+"Poza este rotită: o poți muta sau redimensiona, dar nu decupa.":"이미지가 회전되어 있습니다: 이동하거나 크기를 바꿀 수 있지만 자를 수는 없습니다.",
+"Toată pagina":"전체 페이지"
 };

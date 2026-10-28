@@ -63,6 +63,7 @@ const Bars = (() => {
       bar.append(button('copy', null, 'Copiază textul (Ctrl+C)', () => Pages.copyText(item)));
     }
     if (item.kind === 'image') {
+      bar.append(button('crop', 'Decupează', 'Taie marginile pozei', () => Editor.cropImage(item).catch((e) => UI.errorDetails('Nu am putut decupa poza', e))));
       bar.append(button('text', 'Text editabil', 'Citește textul din poză: apoi editezi orice rând', () => ImageText.read(item.page, item.objects[0])));
     }
     bar.append(button('del', item.kind === 'text' ? null : 'Șterge', 'Șterge (Delete)', () => Pages.guard(() => Editor.deleteItem(item))));

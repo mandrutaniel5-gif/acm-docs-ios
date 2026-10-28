@@ -1916,5 +1916,19 @@
 "Citește textul din poză: apoi editezi orice rând":"读取图片中的文字：之后可编辑任意一行",
 "Nu mai găsesc poza din care e textul.":"找不到文字所在的图片了。",
 "Nu am putut șterge rândul":"无法删除该行",
-"Nu am putut scrie textul":"无法写入文字"
+"Nu am putut scrie textul":"无法写入文字",
+"Decupează imaginea":"裁剪图片",
+"Trage chenarul sau colțurile lui. Ce e în afară se taie.":"拖动边框或其角。框外的部分会被裁掉。",
+"Liber":"自由",
+"Resetează":"重置",
+"Decupează":"裁剪",
+"Înapoi în text":"放回文字中",
+"Pune imaginea înapoi în rândurile textului":"把图片放回文字行中",
+"Taie marginile imaginii":"裁掉图片边缘",
+"Decupează…":"裁剪…",
+"Decupează poza…":"裁剪图片…",
+"Taie marginile pozei":"裁掉图片边缘",
+"Nu am putut decupa poza":"无法裁剪图片",
+"Poza este rotită: o poți muta sau redimensiona, dar nu decupa.":"图片已旋转：可以移动或调整大小，但不能裁剪。",
+"Toată pagina":"整页"
 };

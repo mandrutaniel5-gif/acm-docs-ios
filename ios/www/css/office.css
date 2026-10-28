@@ -180,3 +180,30 @@
 #style-controls.mob .stepper { flex: none; }
 .selbox .sl-write { position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%); pointer-events: auto; display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 18px; background: #007aff; color: #fff; font: 600 14px/1 var(--font, system-ui); box-shadow: 0 4px 14px rgba(0, 0, 0, .2); white-space: nowrap; z-index: 3; }
 .selbox .sl-write svg { width: 16px; height: 16px; fill: currentColor; }
+
+/* ================================================================== crop a picture (documents, slides, PDF) */
+.crop-modal { width: min(760px, 96vw); max-width: none; }
+.crop-stage { position: relative; margin: 10px auto 12px; width: max-content; max-width: 100%; touch-action: none; user-select: none; -webkit-user-select: none; }
+.crop-stage img { display: block; max-width: 100%; max-height: min(58vh, 520px); width: auto; height: auto; border-radius: 4px; }
+.crop-shade { position: absolute; inset: 0; background: rgba(0, 0, 0, .5); pointer-events: none; border-radius: 4px; }
+.crop-frame { position: absolute; box-shadow: 0 0 0 1.5px #fff, 0 0 0 2.5px rgba(0, 0, 0, .35); cursor: move;
+  background-image: linear-gradient(rgba(255, 255, 255, .35) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .35) 1px, transparent 1px);
+  background-size: 33.333% 33.333%; background-position: -1px -1px; }
+.crop-frame .ch { position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; }
+.crop-frame .ch::after { content: ''; position: absolute; inset: 6px; background: #fff; border-radius: 3px; box-shadow: 0 1px 3px rgba(0, 0, 0, .45); }
+.crop-frame .nw { left: 0; top: 0; cursor: nwse-resize; } .crop-frame .n { left: 50%; top: 0; cursor: ns-resize; } .crop-frame .ne { left: 100%; top: 0; cursor: nesw-resize; }
+.crop-frame .e { left: 100%; top: 50%; cursor: ew-resize; } .crop-frame .se { left: 100%; top: 100%; cursor: nwse-resize; } .crop-frame .s { left: 50%; top: 100%; cursor: ns-resize; }
+.crop-frame .sw { left: 0; top: 100%; cursor: nesw-resize; } .crop-frame .w { left: 0; top: 50%; cursor: ew-resize; }
+.crop-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.crop-chips { flex-wrap: wrap; }
+
+/* pictures in documents: moved anywhere (free), resized from the handles */
+#wr-page { position: relative; }
+#wr-page img.free { position: absolute; z-index: 2; max-width: none; }
+#wr-page img.sel { cursor: move; touch-action: none; }
+#wr-imgsel { position: absolute; pointer-events: none; z-index: 30; box-shadow: 0 0 0 1.5px #007aff; }
+#wr-imgsel .ch { position: absolute; width: 24px; height: 24px; margin: -12px 0 0 -12px; pointer-events: auto; touch-action: none; }
+#wr-imgsel .ch::after { content: ''; position: absolute; inset: 7px; background: #fff; border: 1.5px solid #007aff; border-radius: 50%; }
+#wr-imgsel .nw { left: 0; top: 0; cursor: nwse-resize; } #wr-imgsel .n { left: 50%; top: 0; cursor: ns-resize; } #wr-imgsel .ne { left: 100%; top: 0; cursor: nesw-resize; }
+#wr-imgsel .e { left: 100%; top: 50%; cursor: ew-resize; } #wr-imgsel .se { left: 100%; top: 100%; cursor: nwse-resize; } #wr-imgsel .s { left: 50%; top: 100%; cursor: ns-resize; }
+#wr-imgsel .sw { left: 0; top: 100%; cursor: nesw-resize; } #wr-imgsel .w { left: 0; top: 50%; cursor: ew-resize; }

@@ -670,6 +670,19 @@ const Slides = (() => {
     drawSelection();
   }
 
+  /** Cuts the edges of a picture; what stays keeps its place and its scale on the slide. */
+  async function cropImage(it) {
+    const url = deck.media[it.src] || it.src;
+    const r = await Office.cropDialog(url);
+    if (!r) return;
+    const out = await Office.cropDataUrl(url, r);
+    change(() => {
+      it.src = addMedia(out.url);
+      it.x = Math.round(it.x + it.w * r.x); it.y = Math.round(it.y + it.h * r.y);
+      it.w = Math.max(8, Math.round(it.w * r.w)); it.h = Math.max(8, Math.round(it.h * r.h));
+    });
+  }
+
   async function replaceImage(it) {
     const img = await Office.imageDataUrl(1920);
     if (!img) return;
@@ -929,12 +942,13 @@ const Slides = (() => {
     });
     tools.dup = T('copy', 'Duplică (Ctrl+D)', () => duplicateSel());
     tools.del = T('del', 'Șterge (Delete)', () => deleteSel());
+    tools.crop = T('crop', 'Decupează imaginea', () => { const e = cur1(); if (e && e.type === 'image') cropImage(e); });
     tools.bg = T('wallpaper', 'Fundal', (b) => backgroundMenu(b), { label: 'Fundal' });
     tools.theme = T('palette', 'Teme', (b) => themeMenu(b), { label: 'Temă' });
     for (const s of [tools.font, tools.size]) s.addEventListener('mousedown', () => { /* keep text selection */ });
     bar.append(tools.undo, tools.redo, Office.sep(), tools.newSlide, tools.text, tools.image, tools.shape, tools.table, Office.sep(),
       tools.font, tools.size, tools.b, tools.i, tools.u, tools.color, Office.sep(), tools.al, tools.ac, tools.ar, tools.bul, tools.va, Office.sep(),
-      tools.fill, tools.line, tools.arr, tools.dup, tools.del, Office.sep(), tools.bg, tools.theme);
+      tools.fill, tools.line, tools.arr, tools.crop, tools.dup, tools.del, Office.sep(), tools.bg, tools.theme);
   }
 
   function refreshTools() {
@@ -945,6 +959,7 @@ const Slides = (() => {
     const textual = e && e.type !== 'image';
     for (const t of ['font', 'size', 'b', 'i', 'u', 'color', 'al', 'ac', 'ar', 'bul', 'va']) tools[t].disabled = !textual;
     for (const t of ['fill', 'line', 'arr', 'dup', 'del']) tools[t].disabled = !e;
+    tools.crop.disabled = !(e && e.type === 'image');
     if (!e) return;
     const s = e.st || {};
     if (editingId) {
@@ -1748,6 +1763,7 @@ ${CSS}
         { label: 'Adu în față', icon: 'front', run: () => order('front') },
         { label: 'Trimite în spate', icon: 'tobackl', run: () => order('back') },
         it.type === 'image' ? { label: 'Schimbă imaginea…', icon: 'image', run: () => replaceImage(it) } : { label: 'Editează textul', icon: 'edit', run: () => beginEdit(it.id) },
+        it.type === 'image' ? { label: 'Decupează…', icon: 'crop', run: () => cropImage(it) } : null,
         '-',
         { label: 'Șterge', icon: 'del', run: () => deleteSel() },
       ] : [

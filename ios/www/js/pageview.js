@@ -461,7 +461,7 @@ const Pages = (() => {
       if (Editor.tool !== 'select') return;
       const it = itemAt(v, norm(v, e));
       if (it && it.kind === 'text') beginEdit(v, it);
-      else scanNotReady(v);
+      else scanNotReady(v, norm(v, e));
     });
     v.ov.addEventListener('contextmenu', (e) => {
       e.preventDefault();
@@ -472,6 +472,7 @@ const Pages = (() => {
       UI.menu(e.clientX, e.clientY, [
         { label: 'Editează textul', icon: 'edit', disabled: !(isText && it.editable), run: () => beginEdit(v, it) },
         { label: 'Copiază textul', icon: 'copy', disabled: !isText, run: () => copyText(it) },
+        it.kind === 'image' ? { label: 'Decupează poza…', icon: 'crop', run: () => Editor.cropImage(it).catch((err) => UI.errorDetails('Nu am putut decupa poza', err)) } : null,
         '-',
         { label: 'Șterge', icon: 'del', run: () => guard(() => Editor.deleteItem(it)) },
       ]);
@@ -519,20 +520,21 @@ const Pages = (() => {
       const wasSelected = !!(it && Editor.selected && Editor.selected.id === it.id);
       Editor.select(it);
       if (wasSelected && it.kind === 'text' && it.editable) beginEdit(v, it);
-      else if (wasSelected && it.kind === 'image') scanNotReady(v);
+      else if (wasSelected && it.kind === 'image') scanNotReady(v, norm(v, e));
       return;
     }
     act(v, e);
   }
-  /** A scan whose text is still being read (or was not read yet): say so, and read this page first. */
-  function scanNotReady(v) {
+  /** A line of a scan whose page was not read yet: the page is read now (with the loading bar), then that line opens for editing. */
+  async function scanNotReady(v, p) {
     if (typeof ImageText === 'undefined') return;
-    const st = ImageText.state(v.i);
-    if (st === 'done') return;
+    if (ImageText.state(v.i) === 'done') return;
     let scanned = false;
     try { scanned = ImageText.scannedPages().includes(v.i); } catch (e) {}
     if (!scanned) return;
-    ImageText.read(v.i, null);
+    await ImageText.read(v.i, null);
+    const it = p && itemAt(v, p);
+    if (it && it.kind === 'text' && it.scan) { Editor.select(it); beginEdit(v, it); }
   }
   function act(v, e) {
     if (edit) {

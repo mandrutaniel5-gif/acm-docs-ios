@@ -832,25 +832,108 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     previewTimer = setTimeout(renderPreview, 140);
   }
 
+  // Preview zoom: by default the whole page fits (laptop) or its width fits (phone); then -, +, Ctrl + wheel,
+  // two fingers or a double tap.
+  let pvZoom = null; // null = fit
+  let pvH = 1123;
+  const ZOOMS = [0.4, 0.5, 0.67, 0.8, 1, 1.25, 1.5, 2, 2.5, 3];
+  function fitK() {
+    const box = $('inv-preview-box');
+    const w = (box.clientWidth - (UI.phone() ? 20 : 40)) / 794;
+    if (UI.phone()) return Math.max(0.2, w);
+    const lbl = box.querySelector('.pv-label');
+    const h = (box.clientHeight - (lbl ? lbl.offsetHeight + 12 : 0) - 70) / 1123;
+    return Math.max(0.25, Math.min(1, w, h));
+  }
+  function applyZoom(anchor) {
+    const box = $('inv-preview-box'), frame = $('inv-preview'), wrap = $('inv-preview-wrap');
+    if (!box.offsetWidth) return;
+    const before = parseFloat(wrap.dataset.k || '0');
+    const k = pvZoom || fitK();
+    // keep the point under the fingers / the pointer where it is
+    let ax = 0, ay = 0, fx = 0, fy = 0;
+    if (anchor && before) {
+      const r = wrap.getBoundingClientRect(), br = box.getBoundingClientRect();
+      fx = (anchor.x - r.left) / before; fy = (anchor.y - r.top) / before;
+      ax = anchor.x - br.left; ay = anchor.y - br.top;
+    }
+    frame.style.transform = `scale(${k})`;
+    wrap.style.height = pvH * k + 'px';
+    wrap.style.width = 794 * k + 'px';
+    wrap.dataset.k = k;
+    const val = $('inv-zoom-val');
+    if (val) val.textContent = Math.round(k * 100) + '%';
+    if (anchor && before) {
+      box.scrollLeft = wrap.offsetLeft + fx * k - ax;
+      box.scrollTop = wrap.offsetTop + fy * k - ay;
+    }
+  }
+  function zoomTo(k, anchor) {
+    pvZoom = Math.max(0.25, Math.min(4, k));
+    applyZoom(anchor);
+  }
+  function zoomStep(dir) {
+    const cur = pvZoom || fitK();
+    const next = dir > 0 ? ZOOMS.find((z) => z > cur + 0.01) : [...ZOOMS].reverse().find((z) => z < cur - 0.01);
+    zoomTo(next || cur);
+  }
+
   function renderPreview() {
     const frame = $('inv-preview');
     const box = $('inv-preview-box');
     if (!box.offsetWidth) return; // hidden (phone, preview closed)
-    const k = Math.min(1, (box.clientWidth - (UI.phone() ? 20 : 40)) / 794);
-    frame.style.transform = `scale(${k})`;
+    applyZoom();
     frame.srcdoc = html();
     frame.onload = () => {
       try {
-        const h = Math.max(1123, frame.contentDocument.documentElement.scrollHeight);
-        frame.style.height = h + 'px';
-        $('inv-preview-wrap').style.height = h * k + 'px';
-        $('inv-preview-wrap').style.width = 794 * k + 'px';
+        pvH = Math.max(1123, frame.contentDocument.documentElement.scrollHeight);
+        frame.style.height = pvH + 'px';
+        applyZoom();
       } catch (e) {}
     };
   }
 
+  function previewGestures() {
+    const box = $('inv-preview-box');
+    // the zoom pill, at the bottom of the preview
+    const pill = el('div', { class: 'inv-zoom', id: 'inv-zoom' }, [
+      el('button', { class: 'ib', type: 'button', title: 'Micșorează', html: svg('zoomout'), onclick: () => zoomStep(-1) }),
+      el('button', { class: 'zv', id: 'inv-zoom-val', type: 'button', title: 'Toată pagina', text: '100%', onclick: () => { pvZoom = null; applyZoom(); } }),
+      el('button', { class: 'ib', type: 'button', title: 'Mărește', html: svg('zoomin'), onclick: () => zoomStep(1) }),
+    ]);
+    box.append(pill);
+    box.addEventListener('wheel', (e) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      zoomTo((pvZoom || fitK()) * Math.exp(-e.deltaY * 0.0022), { x: e.clientX, y: e.clientY });
+    }, { passive: false });
+    // two fingers: zoom; a double tap: between "fits" and twice as big
+    const pts = new Map();
+    let pinch = null, lastTap = 0;
+    const mid = () => { const [a, b] = [...pts.values()]; return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, d: Math.hypot(a.x - b.x, a.y - b.y) }; };
+    box.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'touch') return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pts.size === 2) { const m = mid(); pinch = { d: m.d, k: pvZoom || fitK() }; }
+      else if (pts.size === 1) {
+        const now = Date.now();
+        if (now - lastTap < 300 && !e.target.closest('.inv-zoom, .pv-label')) { const f = fitK(); zoomTo(pvZoom && pvZoom > f * 1.2 ? f : f * 2, { x: e.clientX, y: e.clientY }); if (pvZoom === f) pvZoom = null; lastTap = 0; }
+        else lastTap = now;
+      }
+    });
+    box.addEventListener('pointermove', (e) => {
+      if (!pts.has(e.pointerId)) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pinch && pts.size === 2) { const m = mid(); zoomTo(pinch.k * (m.d / Math.max(1, pinch.d)), m); }
+    });
+    const up = (e) => { pts.delete(e.pointerId); if (pts.size < 2) pinch = null; };
+    box.addEventListener('pointerup', up);
+    box.addEventListener('pointercancel', up);
+  }
+
   function togglePreview(open) {
     $('invoice').classList.toggle('pv-open', open);
+    if (open) pvZoom = null;
     if (open) setTimeout(renderPreview, 10);
   }
 
@@ -1506,6 +1589,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     $('inv-create').addEventListener('click', create);
     $('inv-pv-btn').addEventListener('click', () => togglePreview(true));
     $('inv-pv-close').addEventListener('click', () => togglePreview(false));
+    previewGestures();
     // language of the document, right above the preview
     const pickLang = (c) => { if (!inv || inv.lang === c) return; inv.lang = c; if (advOpen) buildAdvanced(); else buildForm(); changed(); };
     const pvl = langSelect('ro', pickLang);
@@ -1519,7 +1603,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     pvl2.id = 'pv-lang-top';
     top.append(pvl2);
     $('inv-left').insertBefore(top, $('inv-left').firstChild);
-    window.addEventListener('resize', () => { if (!$('invoice').classList.contains('hidden')) renderPreview(); });
+    window.addEventListener('resize', () => { if (!$('invoice').classList.contains('hidden')) applyZoom(); });
     I18n.onChange(() => { if (inv && !$('invoice').classList.contains('hidden')) { buildForm(); changed(); } });
   }
 
@@ -1605,13 +1689,26 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
       tip.classList.remove('hidden');
       const wr = wrap.getBoundingClientRect();
       const hr = wrap.querySelector(`.hit[data-i="${i}"]`).getBoundingClientRect();
-      // beside the month, never on top of it
-      const right = hr.right - wr.left + 4, leftSide = hr.left - wr.left - tip.offsetWidth - 4;
-      tip.style.left = (right + tip.offsetWidth <= wr.width ? right : Math.max(0, leftSide)) + 'px';
+      // beside the month when it fits, otherwise as close as possible; always inside the card
+      const tw = tip.offsetWidth;
+      const right = hr.right - wr.left + 4, leftSide = hr.left - wr.left - tw - 4;
+      const x = right + tw <= wr.width ? right : leftSide >= 0 ? leftSide : (hr.left + hr.right) / 2 - wr.left - tw / 2;
+      tip.style.left = Math.max(0, Math.min(wr.width - tw, x)) + 'px';
+      open = i;
     };
-    wrap.addEventListener('pointermove', (e) => { const h = e.target.closest && e.target.closest('.hit'); if (h) showTip(+h.dataset.i, e); });
-    wrap.addEventListener('pointerdown', (e) => { const h = e.target.closest && e.target.closest('.hit'); if (h) showTip(+h.dataset.i, e); });
-    wrap.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { tip.classList.add('hidden'); wrap.querySelectorAll('.hit.on').forEach((h) => h.classList.remove('on')); } });
+    let open = -1;
+    const hideTip = () => { open = -1; tip.classList.add('hidden'); wrap.querySelectorAll('.hit.on').forEach((h) => h.classList.remove('on')); };
+    // mouse: follows the pointer; touch: a tap shows the month, the same tap again (or anywhere else) hides it
+    wrap.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse') return; const h = e.target.closest && e.target.closest('.hit'); if (h) showTip(+h.dataset.i, e); });
+    wrap.addEventListener('click', (e) => {
+      const h = e.target.closest && e.target.closest('.hit');
+      if (!h || +h.dataset.i === open) hideTip(); else showTip(+h.dataset.i, e);
+    });
+    wrap.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') hideTip(); });
+    const outside = (e) => { if (!wrap.isConnected) { document.removeEventListener('pointerdown', outside, true); window.removeEventListener('scroll', onScroll, true); return; } if (open >= 0 && !wrap.contains(e.target)) hideTip(); };
+    const onScroll = () => { if (open >= 0) hideTip(); };
+    document.addEventListener('pointerdown', outside, true);
+    window.addEventListener('scroll', onScroll, true);
 
     const seg = el('div', { class: 'chips' });
     for (const [n, label] of [[6, `6 ${I18n.t('luni')}`], [12, `12 ${I18n.t('luni')}`]]) {

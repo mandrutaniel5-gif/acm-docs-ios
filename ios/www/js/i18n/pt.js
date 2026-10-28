@@ -1916,5 +1916,19 @@
 "Citește textul din poză: apoi editezi orice rând":"Lê o texto da imagem: depois editas qualquer linha",
 "Nu mai găsesc poza din care e textul.":"Já não encontro a imagem de onde vem o texto.",
 "Nu am putut șterge rândul":"Não foi possível apagar a linha",
-"Nu am putut scrie textul":"Não foi possível escrever o texto"
+"Nu am putut scrie textul":"Não foi possível escrever o texto",
+"Decupează imaginea":"Recortar a imagem",
+"Trage chenarul sau colțurile lui. Ce e în afară se taie.":"Arrasta a moldura ou os cantos. O que fica fora é cortado.",
+"Liber":"Livre",
+"Resetează":"Repor",
+"Decupează":"Recortar",
+"Înapoi în text":"De volta ao texto",
+"Pune imaginea înapoi în rândurile textului":"Pôr a imagem de novo nas linhas do texto",
+"Taie marginile imaginii":"Cortar as margens da imagem",
+"Decupează…":"Recortar…",
+"Decupează poza…":"Recortar imagem…",
+"Taie marginile pozei":"Cortar as margens da imagem",
+"Nu am putut decupa poza":"Não foi possível recortar a imagem",
+"Poza este rotită: o poți muta sau redimensiona, dar nu decupa.":"A imagem está rodada: podes movê-la ou redimensioná-la, mas não recortá-la.",
+"Toată pagina":"Página inteira"
 };
