@@ -15,7 +15,8 @@ import { randomBytes } from 'node:crypto';
 import { CALLBACK } from './anaf.js';
 
 const PROIECT_CONTABIL = 'acm-contabil';
-const MODEL = () => process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+// modelul principal + rezerve, folosite când Gemini e supraîncărcat (503) sau limitat (429)
+const MODELE = () => [...new Set([process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.6-flash'])];
 const GEMINI = 'https://generativelanguage.googleapis.com/v1beta/models';
 const AUTHORIZE = 'https://logincert.anaf.ro/anaf-oauth2/v1/authorize';
 
@@ -94,13 +95,23 @@ export function makeContabil({ db, anaf }) {
       contents: [...istoric.map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })), { role: 'user', parts }],
       generationConfig: { maxOutputTokens: maxTokens, temperature: 0.2, ...(json ? { responseMimeType: 'application/json' } : {}) },
     };
-    const r = await fetch(`${GEMINI}/${MODEL()}:generateContent`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY }, body: JSON.stringify(body),
-    });
-    const d = await r.json().catch(() => ({}));
+    let d, r, ultim;
+    const modele = MODELE();
+    for (let i = 0; i < modele.length * 2; i++) {
+      const model = modele[Math.floor(i / 2)];
+      r = await fetch(`${GEMINI}/${model}:generateContent`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY }, body: JSON.stringify(body),
+      });
+      d = await r.json().catch(() => ({}));
+      if (r.ok) break;
+      ultim = d;
+      console.error('Gemini', model, r.status, JSON.stringify(d).slice(0, 300));
+      const temporar = r.status === 503 || r.status === 429 || r.status === 500 || r.status === 404;
+      if (!temporar) break;
+      await new Promise((ok) => setTimeout(ok, i % 2 ? 300 : 1200)); // o reîncercare pe același model, apoi următorul
+    }
     if (!r.ok) {
-      console.error('Gemini', r.status, JSON.stringify(d).slice(0, 500));
-      throw err(r.status === 429 ? 429 : 502, r.status === 429 ? 'Asistentul AI e ocupat (limita Gemini). Încearcă peste un minut.' : `Asistentul AI nu a răspuns (${d.error?.message || r.status}).`);
+      throw err(r.status === 429 ? 429 : 502, r.status === 429 ? 'Asistentul AI e ocupat (limita gratuită Gemini). Încearcă peste un minut.' : r.status === 503 ? 'Serviciul Gemini e foarte aglomerat acum. Încearcă din nou peste un minut.' : `Asistentul AI nu a răspuns (${ultim?.error?.message || r.status}).`);
     }
     const c = d.candidates?.[0];
     const text = (c?.content?.parts || []).filter((p) => p.text && !p.thought).map((p) => p.text).join('');
