@@ -21,6 +21,7 @@ import { PLANS, PRICES, ACTIONS, PAID, GROUP_PLANS, monthOf } from './plans.js';
 import { mailReady, sendSignInCode, sendAdminAlert, sendVerifyCode } from './mail.js';
 import { makeAdmin } from './admin.js';
 import { makeAnaf } from './anaf.js';
+import { makeContabil } from './contabil.js';
 import { timingSafeEqual } from 'node:crypto';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
@@ -1389,3 +1390,12 @@ export const anafCallback = ANAF.anafCallback;
 export const anafClaim = ANAF.anafClaim;
 export const anafRefresh = ANAF.anafRefresh;
 export const anafInfo = ANAF.anafInfo;
+
+// ---------------------------------------------------------------- ACM Contabil (aplicația de contabilitate a firmei)
+const CONTABIL = makeContabil({ db, anaf: ANAF });
+export const contabilAi = CONTABIL.contabilAi;
+export const contabilCui = CONTABIL.contabilCui;
+export const contabilAnafInfo = CONTABIL.contabilAnafInfo;
+export const contabilAnafStart = CONTABIL.contabilAnafStart;
+export const contabilAnafClaim = CONTABIL.contabilAnafClaim;
+export const contabilAnafRefresh = CONTABIL.contabilAnafRefresh;

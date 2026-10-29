@@ -11,7 +11,7 @@
 //  - invoices never pass through the server: the devices send them to ANAF directly.
 import { onCall, onRequest, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, FieldValue, Timestamp } from 'firebase-admin/firestore';
-import { randomBytes, createCipheriv, hkdfSync } from 'node:crypto';
+import { randomBytes, createCipheriv, hkdfSync, createECDH } from 'node:crypto';
 import { x25519 } from '@noble/curves/ed25519.js';
 
 const fail = (code, msg) => { throw new HttpsError(code, msg); };
@@ -27,6 +27,16 @@ export function makeAnaf({ db, needDevice, emulator }) {
   /** The device's one-time public key (X25519, base64): the sealed keys can only be opened by it. */
   function sealFor(pubB64, obj) {
     const pub = Buffer.from(String(pubB64 || ''), 'base64');
+    // ACM Contabil: ECDH P-256 (WebCrypto on every platform) + HKDF-SHA256 + AES-256-GCM
+    if (pub.length === 65 && pub[0] === 4) {
+      const e = createECDH('prime256v1');
+      e.generateKeys();
+      const k = Buffer.from(hkdfSync('sha256', e.computeSecret(pub), Buffer.alloc(0), Buffer.from('acm-contabil-anaf-v1'), 32));
+      const iv = randomBytes(12);
+      const c = createCipheriv('aes-256-gcm', k, iv);
+      const ct = Buffer.concat([c.update(Buffer.from(JSON.stringify(obj))), c.final(), c.getAuthTag()]);
+      return { epk: e.getPublicKey().toString('base64'), iv: iv.toString('base64'), ct: ct.toString('base64') };
+    }
     if (pub.length !== 32) fail('invalid-argument', 'device key');
     const sk = randomBytes(32);
     const epk = Buffer.from(x25519.getPublicKey(sk));
@@ -93,6 +103,7 @@ export function makeAnaf({ db, needDevice, emulator }) {
       if (req.query.error || !code) { await ref.delete(); return page(false, 'Conectarea a fost anulată', 'Nu s-a conectat nimic. Poți încerca din nou din aplicație.'); }
       const t = await tokenCall({ grant_type: 'authorization_code', code, redirect_uri: CALLBACK });
       await ref.update({ sealed: sealFor(s.data().pub, t), pub: FieldValue.delete() });
+      if (s.data().app === 'contabil') return page(true, 'Firma este conectată la SPV', 'Întoarce-te în aplicația ACM Contabil: facturile primite și emise se vor importa automat.');
       return page(true, 'Firma este conectată', 'Întoarce-te în aplicația ACM Docs: facturile se vor trimite automat în SPV.');
     } catch (e) {
       console.warn('anaf callback', e && e.message);
@@ -131,5 +142,5 @@ export function makeAnaf({ db, needDevice, emulator }) {
     return { ready: !!(c.clientId && c.clientSecret), env: c.env === 'prod' ? 'prod' : 'test' };
   });
 
-  return { anafStart, anafCallback, anafClaim, anafRefresh, anafInfo, conf };
+  return { anafStart, anafCallback, anafClaim, anafRefresh, anafInfo, conf, sealFor, tokenCall, states };
 }
