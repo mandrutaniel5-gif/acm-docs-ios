@@ -1,0 +1,29 @@
+✓ tva-incl-pj-bucuresti: no problems 
+✓ tva-incl-pj-bucuresti: 3 lines
+✓ tva-incl-pj-bucuresti: payable 588.57 = PDF total 588.57
+✓ tva-excl-discount-pf: no problems 
+✓ tva-excl-discount-pf: 3 lines
+✓ tva-excl-discount-pf: payable 640.95 = PDF total 640.95
+✓ neplatitor-pf-numerar: no problems 
+✓ neplatitor-pf-numerar: 3 lines
+✓ neplatitor-pf-numerar: payable 559.14 = PDF total 559.14
+✓ neplatitor-pj: no problems 
+✓ neplatitor-pj: 3 lines
+✓ neplatitor-pj: payable 588.57 = PDF total 588.57
+✓ tva-eur-extern: no problems 
+✓ tva-eur-extern: 3 lines
+✓ tva-eur-extern: payable 588.57 = PDF total 588.57
+✓ Bucharest: SECTOR3 + RO-B
+✓ non-VAT payer: category O, no VAT ids
+✓ B2C / extern routing
+✓ EUR invoice: VAT also in RON
+✓ missing data is listed: 8
+✓ CUI check digit
+✓ county names → codes
+✓ ANAF validator: tva-incl-pj-bucuresti → ok []
+✓ ANAF validator: tva-excl-discount-pf → ok []
+✓ ANAF validator: neplatitor-pf-numerar → ok []
+✓ ANAF validator: neplatitor-pj → ok []
+✓ ANAF validator: tva-eur-extern → ok []
+
+all passed
