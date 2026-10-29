@@ -53,6 +53,8 @@ jobs:
           STRIPE_TAX: ${{ secrets.STRIPE_TAX }}
           SMTP_URL: ${{ secrets.SMTP_URL }}
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
         run: |
           if [ -z "$SA" ]; then echo "No deploy key yet (secret FIREBASE_SERVICE_ACCOUNT): tests only." | tee deploy.txt; exit 0; fi
           printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
@@ -64,6 +66,10 @@ jobs:
           [ -n "$STRIPE_TAX" ] && echo "STRIPE_TAX=$STRIPE_TAX" >> functions/.env
           [ -n "$SMTP_URL" ] && echo "SMTP_URL=$SMTP_URL" >> functions/.env
           [ -n "$MAIL_FROM" ] && echo "MAIL_FROM=$MAIL_FROM" >> functions/.env
+          # ACM Contabil: asistentul AI cu Google Gemini (secretul GitHub GEMINI_API_KEY; opțional variabila GEMINI_MODEL)
+          [ -n "$GEMINI_API_KEY" ] && echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> functions/.env
+          [ -n "$GEMINI_MODEL" ] && echo "GEMINI_MODEL=$GEMINI_MODEL" >> functions/.env
+          echo "contabil AI: $([ -n "$GEMINI_API_KEY" ] && echo "on (Gemini ${GEMINI_MODEL:-gemini-3.5-flash-lite})" || echo 'off (no GEMINI_API_KEY secret yet)')" | tee -a deploy.txt
           echo "payments: $([ -n "$STRIPE_SECRET_KEY" ] && echo on || echo 'off (no STRIPE_SECRET_KEY secret yet)')" | tee -a deploy.txt
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
           set -o pipefail
