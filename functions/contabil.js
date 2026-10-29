@@ -2,7 +2,8 @@
 //
 // ACM Contabil nu are conturi: fiecare dispozitiv se autentifică anonim în proiectul Firebase „acm-contabil”
 // (unde stă seiful criptat). Aici verificăm acel token și oferim:
-//  - asistentul AI (cheia Claude: ANTHROPIC_API_KEY în functions/.env, scrisă la publicare din secretul GitHub);
+//  - asistentul AI (Google Gemini: GEMINI_API_KEY în functions/.env, scrisă la publicare din secretul GitHub;
+//    modelul se poate schimba cu GEMINI_MODEL, implicit gemini-3.5-flash-lite);
 //  - căutarea firmelor după CUI (registrul public ANAF);
 //  - conectarea la SPV: același client OAuth ANAF ca ACM Docs, același callback. Cheile se sigilează pentru
 //    dispozitivul care a cerut (ECDH P-256 + AES-256-GCM) și nu pot fi citite de server. Facturile nu trec pe aici.
@@ -11,11 +12,11 @@ import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { randomBytes } from 'node:crypto';
-import Anthropic from '@anthropic-ai/sdk';
 import { CALLBACK } from './anaf.js';
 
 const PROIECT_CONTABIL = 'acm-contabil';
-const MODEL = 'claude-sonnet-5-5';
+const MODEL = () => process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+const GEMINI = 'https://generativelanguage.googleapis.com/v1beta/models';
 const AUTHORIZE = 'https://logincert.anaf.ro/anaf-oauth2/v1/authorize';
 
 const SYSTEM = `Ești asistentul contabil din aplicația ACM Contabil, folosită de o persoană cu puțină experiență în contabilitate, pentru un SRL din România (servicii IT).
@@ -81,37 +82,53 @@ export function makeContabil({ db, anaf }) {
   });
 
   const parseJSON = (text) => { const m = text.match(/[[{][\s\S]*[\]}]/); return JSON.parse(m ? m[0] : text); };
-  const fileBlock = (file) => (file.type === 'application/pdf'
-    ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: file.data } }
-    : { type: 'image', source: { type: 'base64', media_type: file.type, data: file.data } });
-  const textOf = (r) => r.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
+  const filePart = (file) => ({ inlineData: { mimeType: file.type, data: file.data } });
+
+  /** Un apel Gemini (REST, fără SDK). parts = conținutul ultimului mesaj; istoric = mesajele de dinainte. */
+  async function gemini({ system, istoric = [], parts, maxTokens, json = false }) {
+    const body = {
+      systemInstruction: { parts: [{ text: system }] },
+      contents: [...istoric.map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })), { role: 'user', parts }],
+      generationConfig: { maxOutputTokens: maxTokens, temperature: 0.2, ...(json ? { responseMimeType: 'application/json' } : {}) },
+    };
+    const r = await fetch(`${GEMINI}/${MODEL()}:generateContent`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY }, body: JSON.stringify(body),
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      console.error('Gemini', r.status, JSON.stringify(d).slice(0, 500));
+      throw err(r.status === 429 ? 429 : 502, r.status === 429 ? 'Asistentul AI e ocupat (limita Gemini). Încearcă peste un minut.' : `Asistentul AI nu a răspuns (${d.error?.message || r.status}).`);
+    }
+    const c = d.candidates?.[0];
+    const text = (c?.content?.parts || []).filter((p) => p.text && !p.thought).map((p) => p.text).join('');
+    if (!text) throw err(502, `Asistentul AI nu a dat un răspuns (${c?.finishReason || d.promptFeedback?.blockReason || 'gol'}).`);
+    return text;
+  }
 
   const contabilAi = endpoint(async (b, u) => {
-    if (!process.env.ANTHROPIC_API_KEY) throw err(412, 'Asistentul AI nu este configurat pe server (lipsește cheia Claude).');
+    if (!process.env.GEMINI_API_KEY) throw err(412, 'Asistentul AI nu este configurat pe server (lipsește cheia Gemini).');
     await limita(u.uid);
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const { mode, messages = [], context = '', file, items } = b;
     if (mode === 'extract' || mode === 'extras') {
       if (!file || !file.data || !file.type) throw err(400, 'Lipsește fișierul');
       if (file.data.length > 14_000_000) throw err(413, 'Fișier prea mare (max ~10 MB)');
-      const r = await client.messages.create({
-        model: MODEL, max_tokens: mode === 'extras' ? 8000 : 1500, system: SYSTEM,
-        messages: [{ role: 'user', content: [fileBlock(file), { type: 'text', text: (mode === 'extras' ? EXTRAS_PROMPT : EXTRACT_PROMPT) + (context ? `\n\nContext firmă: ${context}` : '') }] }],
+      const text = await gemini({
+        system: SYSTEM, json: true, maxTokens: mode === 'extras' ? 16000 : 4000,
+        parts: [filePart(file), { text: (mode === 'extras' ? EXTRAS_PROMPT : EXTRACT_PROMPT) + (context ? `\n\nContext firmă: ${context}` : '') }],
       });
-      return { result: parseJSON(textOf(r)) };
+      return { result: parseJSON(text) };
     }
     if (mode === 'incadrare') {
-      const r = await client.messages.create({ model: MODEL, max_tokens: 3000, system: SYSTEM, messages: [{ role: 'user', content: INCADRARE_PROMPT(items || []) + (context ? `\nContext: ${context}` : '') }] });
-      return { result: parseJSON(textOf(r)) };
+      const text = await gemini({ system: SYSTEM, json: true, maxTokens: 6000, parts: [{ text: INCADRARE_PROMPT(items || []) + (context ? `\nContext: ${context}` : '') }] });
+      return { result: parseJSON(text) };
     }
     const clean = messages.slice(-20).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 20000) }));
     if (!clean.length || clean[clean.length - 1].role !== 'user') throw err(400, 'Mesaj invalid');
-    const r = await client.messages.create({
-      model: MODEL, max_tokens: mode === 'review' ? 2500 : 1200,
+    const text = await gemini({
       system: SYSTEM + (context ? `\n\nSituația curentă din aplicație (date reale ale firmei):\n${String(context).slice(0, 30000)}` : ''),
-      messages: clean,
+      istoric: clean.slice(0, -1), parts: [{ text: clean[clean.length - 1].content }], maxTokens: mode === 'review' ? 6000 : 3000,
     });
-    return { text: textOf(r) };
+    return { text };
   }, { timeoutSeconds: 180, memory: '512MiB' });
 
   const contabilCui = endpoint(async (b) => {
