@@ -30,7 +30,9 @@ import { ed25519 } from '@noble/curves/ed25519.js';
 import { sha256 } from '@noble/hashes/sha2.js';
 import { randomBytes, randomInt } from 'node:crypto';
 
-setGlobalOptions({ region: 'europe-west1', maxInstances: 10, memory: '256MiB' });
+// No server is kept running while nobody uses the app (minInstances 0): an always-on instance is billed
+// every hour of the month. The first request after a quiet while takes 1-3 s longer, nothing else changes.
+setGlobalOptions({ region: 'europe-west1', maxInstances: 10, minInstances: 0, memory: '256MiB' });
 initializeApp();
 const db = getFirestore();
 
@@ -81,7 +83,7 @@ const token = (uid, dev) => getAuth().createCustomToken(uid, { dev });
  * The first device of the account becomes the primary; any later one is a member, and every
  * other device gets a "new sign-in" alert.
  */
-export const registerDevice = onCall({ minInstances: 1 }, async (req) => {
+export const registerDevice = onCall(async (req) => {
   const uid = needUser(req);
   await needOn('newDevice');
   const { bundle, info, ts, proof } = req.data || {};
@@ -131,7 +133,7 @@ export const registerDevice = onCall({ minInstances: 1 }, async (req) => {
 
 // ------------------------------------------------------------------ session for a registered device
 /** Signed proof of the device key → a session token that carries the device id. */
-export const deviceSession = onCall({ minInstances: 1 }, async (req) => {
+export const deviceSession = onCall(async (req) => {
   const { uid, dev, ts, sig } = req.data || {};
   if (typeof uid !== 'string' || typeof dev !== 'string' || typeof ts !== 'number') fail('invalid-argument', 'args');
   if (Math.abs(Date.now() - ts) > SESSION_SKEW_MS) fail('deadline-exceeded', 'clock');
@@ -388,7 +390,7 @@ function agentOf(ua) {
  * owner should know it is out). Device sessions (custom tokens) are not password sign-ins.
  */
 // sign-up and sign-in wait for these two (Identity Platform gives them 7 seconds): always one warm instance
-export const beforeSignIn = beforeUserSignedIn({ minInstances: 1 }, async (ev) => {
+export const beforeSignIn = beforeUserSignedIn(async (ev) => {
   const info = ev.additionalUserInfo || {};
   const provider = info.providerId || (ev.credential && ev.credential.providerId) || '';
   if (!ev.data) return;
@@ -555,7 +557,7 @@ export const blobRemoved = onObjectDeleted({ bucket: BUCKET }, async (ev) => {
  * device keeps for working offline (paid plans only).
  */
 // one instance stays warm: saving a document never waits for a cold start
-export const useQuota = onCall({ minInstances: 1 }, async (req) => {
+export const useQuota = onCall(async (req) => {
   const { uid, dev } = await needDevice(req);
   const { action, ref } = req.data || {};
   if (!ACTIONS.includes(action)) fail('invalid-argument', 'action');
@@ -946,7 +948,7 @@ export const expirePlans = onSchedule({ schedule: 'every day 03:17', timeZone: '
 
 /** New accounts: a few per address and hour, and no throwaway mailboxes. */
 const THROWAWAY = ['mailinator.com', 'guerrillamail.com', 'guerrillamail.net', 'sharklasers.com', '10minutemail.com', 'temp-mail.org', 'tempmail.com', 'yopmail.com', 'trashmail.com', 'getnada.com', 'dispostable.com', 'maildrop.cc', 'throwawaymail.com', 'fakeinbox.com', 'mailnesia.com', 'mintemail.com', 'emailondeck.com', 'tempail.com', 'moakt.com', 'mohmal.com', 'burnermail.io', 'spamgourmet.com', 'mytemp.email', 'tempmailo.com', 'temp-mail.io', 'minuteinbox.com', 'luxusmail.org', 'cock.li', 'grr.la', 'spam4.me'];
-export const beforeCreate = beforeUserCreated({ minInstances: 1 }, async (ev) => {
+export const beforeCreate = beforeUserCreated(async (ev) => {
   const sw = await switches();
   if (sw.all || sw.off.signup) throw new HttpsError('unavailable', 'paused:signup');
   const email = String((ev.data && ev.data.email) || '').toLowerCase();
