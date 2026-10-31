@@ -1,0 +1,18 @@
+node_modules/
+dist/
+ios/build/
+ios/www/
+ios/*.xcodeproj/
+ios/Payload/
+*.log
+# signing keys: never in the repository
+build/android/*.jks
+build/android/keystore.properties
+*.jks
+*.keystore
+*.p12
+*.mobileprovision
+functions/.env
+functions/.env.local
+test/ui/out/
+test/ui/out-fn/

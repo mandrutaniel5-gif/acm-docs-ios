@@ -1,7 +1,7 @@
 {
   "name": "acm-docs",
   "productName": "ACM Docs",
-  "version": "2.6.4",
+  "version": "2.6.5",
   "description": "ACM Docs - PDF, documente si facturi (ACM Code SRL)",
   "author": "ACM Code SRL",
   "main": "main.js",
@@ -25,14 +25,20 @@
   },
   "scripts": {
     "start": "electron .",
-    "build:win": "sh build/build-win.sh",
-    "build:android": "sh build/build-android.sh"
+    "build:win": "node build/build-win.mjs",
+    "build:android": "node build/build-android.mjs",
+    "build:ios-web": "node build/sync-www.mjs",
+    "lint": "eslint .",
+    "test": "node --test test/sync.test.mjs test/main-safety.test.mjs test/acmcrypto.test.mjs && node test/efactura.test.mjs && node test/t_formula.js",
+    "test:anaf": "node test/efactura.test.mjs --anaf",
+    "test:screens": "node test/ui/screens.mjs --quick"
   },
   "devDependencies": {
     "buffer": "^6.0.3",
     "electron": "44.9.3",
     "electron-builder": "26.18.0",
     "esbuild": "^0.24.2",
+    "eslint": "^9.39.5",
     "events": "^3.3.0",
     "playwright-core": "^1.47.2",
     "process": "^0.11.10",

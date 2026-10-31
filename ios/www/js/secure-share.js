@@ -145,6 +145,7 @@ const Contacts = (() => {
     return null;
   }
   function webcamScan() {
+    // eslint-disable-next-line no-async-promise-executor -- every failure inside is caught and rejected by hand
     return new Promise(async (resolve, reject) => {
       let stream;
       try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }); } catch (e) { return reject(e); }

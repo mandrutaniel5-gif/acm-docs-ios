@@ -7,7 +7,7 @@
 const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 const INVOKE = new Set(['gpu-info', 'startup-file', 'dialog-open', 'dialog-save', 'ocr-warm', 'ocr', 'show-in-folder', 'fetch-text', 'open-external',
-  'open-path', 'special-dir', 'set-theme', 'html-to-pdf', 'capture', 'privacy', 'secure', 'fs-read', 'net-request']);
+  'open-path', 'special-dir', 'set-theme', 'set-lang', 'html-to-pdf', 'capture', 'privacy', 'secure', 'fs-read', 'net-request']);
 const EVENTS = new Set(['open-file', 'ocr-progress']);
 
 /** A synchronous call into the main process; errors come back as errors. */
@@ -37,6 +37,8 @@ contextBridge.exposeInMainWorld('ElectronHost', {
   /** a file shipped inside the app (e.g. pdfium.wasm), never outside its folder */
   appFile: (rel) => bytes(host('appFile', String(rel))),
   appVersion: () => host('appVersion'),
+  /** the app's private folder (not the key folder) */
+  privateDir: () => host('privateDir'),
   /** where a file dropped on the window lives on disk */
   pathOf: (file) => { try { return webUtils.getPathForFile(file) || null; } catch (e) { return null; } },
   listFonts: () => host('listFonts'),

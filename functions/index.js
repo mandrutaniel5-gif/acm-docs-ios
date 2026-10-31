@@ -333,15 +333,21 @@ export const claimPrimary = onCall(async (req) => {
  * so neither a stolen password nor a stolen session alone can destroy an account.
  * Removes the public profile, the @name, devices, events, cloud data and the sign-in itself.
  */
-export const wipeAccount = onCall(async (req) => {
+export const wipeAccount = onCall({ timeoutSeconds: 300 }, async (req) => {
   const { uid, dev } = await needDevice(req);
   const { ts, sig } = req.data || {};
   if (typeof ts !== 'number' || Math.abs(Date.now() - ts) > SESSION_SKEW_MS) fail('deadline-exceeded', 'clock');
   const pref = db.collection('users').doc(uid);
   const profile = await pref.get();
-  if (!profile.exists) fail('failed-precondition', 'no profile');
-  if (!verify(parseBundle(profile.data().key).ed, `acm-wipe\n${uid}\n${dev}\n${ts}`, sig)) fail('permission-denied', 'bad signature');
-  const handle = profile.data().handle;
+  // Every step can be done again: a deletion that stopped half way (the server restarted, a time limit) is
+  // finished by asking once more. The mark is written only after the signature was checked; the public profile
+  // and the device that asks go last, so the account can still prove it is its own until the very end.
+  const mark = metaOf(uid, 'wiping');
+  if (profile.exists) {
+    if (!verify(parseBundle(profile.data().key).ed, `acm-wipe\n${uid}\n${dev}\n${ts}`, sig)) fail('permission-denied', 'bad signature');
+    await mark.set({ at: FieldValue.serverTimestamp(), dev });
+  } else if (!(await mark.get()).exists) fail('failed-precondition', 'no profile');
+  const handle = profile.exists ? profile.data().handle : null;
   // subscriptions end with the account (nothing is charged again), and it leaves any group
   const bill = (await billingOf(uid).get()).data() || {};
   for (const sid of [bill.sub, bill.groupSub].filter(Boolean)) {
@@ -355,11 +361,6 @@ export const wipeAccount = onCall(async (req) => {
     } else await leaveGroup(uid, bill.group);
   }
   await billingOf(uid).delete();
-  const batch = db.batch();
-  if (handle) batch.delete(db.collection('usernames').doc(handle));
-  batch.delete(pref);
-  await batch.commit();
-  await db.recursiveDelete(db.collection('accounts').doc(uid));
   // the account leaves its chats (its messages stay, sealed, for the others)
   try {
     const chats = await chatsCol.where('members', 'array-contains', uid).get();
@@ -372,7 +373,12 @@ export const wipeAccount = onCall(async (req) => {
   // the encrypted blocks of the cloud sync
   try { await getStorage().bucket('acm-docs-52280.firebasestorage.app').deleteFiles({ prefix: `accounts/${uid}/` }); }
   catch (e) { console.warn('storage cleanup', e.message); }
-  await getAuth().deleteUser(uid);
+  const batch = db.batch();
+  if (handle) batch.delete(db.collection('usernames').doc(handle));
+  batch.delete(pref);
+  await batch.commit();
+  await db.recursiveDelete(db.collection('accounts').doc(uid));
+  try { await getAuth().deleteUser(uid); } catch (e) { if (e.code !== 'auth/user-not-found') throw e; }
   return { ok: true };
 });
 
@@ -390,7 +396,8 @@ function agentOf(ua) {
  * devices show "someone signed in with your password" (the password alone opens nothing, but the
  * owner should know it is out). Device sessions (custom tokens) are not password sign-ins.
  */
-// sign-up and sign-in wait for these two (Identity Platform gives them 7 seconds): always one warm instance
+// sign-up and sign-in wait for these two (Identity Platform gives them 7 seconds): they stay light, because
+// a first request after a quiet while also has to start the server (minInstances is 0)
 export const beforeSignIn = beforeUserSignedIn(async (ev) => {
   const info = ev.additionalUserInfo || {};
   const provider = info.providerId || (ev.credential && ev.credential.providerId) || '';
@@ -557,7 +564,6 @@ export const blobRemoved = onObjectDeleted({ bucket: BUCKET }, async (ev) => {
  * document (ref) per month; past the plan's number, the action is refused. Returns a plan token the
  * device keeps for working offline (paid plans only).
  */
-// one instance stays warm: saving a document never waits for a cold start
 export const useQuota = onCall(async (req) => {
   const { uid, dev } = await needDevice(req);
   const { action, ref } = req.data || {};
@@ -787,13 +793,18 @@ async function applySubscription(sub, at = Date.now()) {
       return d.members || [];
     });
     if (!members) return;
-    await billingOf(uid).set({ group: gid, groupSub: sub.id, everSub: true }, { merge: true });
+    // the end of an old group subscription never takes the owner out of the group they pay for now
+    const own = (await billingOf(uid).get()).data() || {};
+    if (live || !own.groupSub || own.groupSub === sub.id) await billingOf(uid).set({ group: gid, groupSub: sub.id, everSub: true }, { merge: true });
     for (const m of [uid, ...members]) await refresh(m);
     return;
   }
   const late = await db.runTransaction(async (tx) => {
     const b = await tx.get(billingOf(uid));
     if (b.exists && b.data().sub === sub.id && (b.data().subAt || 0) > at) return true;
+    // a message about an older subscription (payment retries can go on for weeks) never replaces the
+    // one the account pays for now
+    if (b.exists && b.data().sub && b.data().sub !== sub.id && !live && (b.data().until || 0) > Date.now()) return true;
     tx.set(billingOf(uid), { plan, until, source: 'stripe', sub: sub.id, status: sub.status, period, cancelAt, customer: sub.customer, customerMode: sub.livemode ? 'live' : 'test', everSub: true, subAt: at }, { merge: true });
     return false;
   });
@@ -1047,7 +1058,7 @@ async function switches() {
   const d = (await db.collection('server').doc('switches').get()).data() || {};
   const off = {};
   for (const f of FEATURES) if (d.off && d.off[f] === true) off[f] = true;
-  swCache = { off, all: d.all === true, msg: typeof d.msg === 'string' ? d.msg : '', at: d.at ? d.at.toMillis() : 0 };
+  swCache = { off, all: d.all === true, msg: typeof d.msg === 'string' ? d.msg : '', latest: d.latest || {}, at: d.at ? d.at.toMillis() : 0 };
   swAt = Date.now();
   return swCache;
 }

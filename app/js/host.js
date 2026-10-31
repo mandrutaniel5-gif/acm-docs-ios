@@ -58,6 +58,7 @@ const Host = (() => {
   // (/var/mobile/Containers/Data/Application/<new id>/Documents). Paths saved by the previous version
   // point into the old folder, so documents seemed to vanish and the cloud sync could not write.
   // The files themselves moved along: saved paths are pointed at the current folder.
+  let iosFix = null;
   (function relocateIosPaths() {
     if (!(AB && info.platform === 'ios' && info.docs)) return;
     const m = /\/Containers\/Data\/Application\/([0-9A-Fa-f-]{36})\//.exec(info.docs);
@@ -65,6 +66,7 @@ const Host = (() => {
     const cur = m[1];
     const re = /(\/Containers\/Data\/Application\/)([0-9A-Fa-f-]{36})(\/)/g;
     const fix = (v) => v.replace(re, (all, a, id, b) => (id === cur ? all : a + cur + b));
+    iosFix = fix;
     try {
       const keys = [];
       for (let i = 0; i < localStorage.length; i++) keys.push(localStorage.key(i));
@@ -114,6 +116,7 @@ const Host = (() => {
   }
 
   function writeFile(p, bytes) {
+    statCache.delete(p);
     if (AB) {
       if (!AB.writeB64(p, toB64(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)))) throw new Error('Nu pot scrie fișierul ' + baseName(p));
       return;
@@ -121,10 +124,24 @@ const Host = (() => {
     fs.writeFile(p, bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)); // atomic (preload)
   }
 
+  // Lists check many files each time they are drawn: the answer is kept for a moment, so one screen asks the
+  // system about each file once (and a change made by the app itself is seen at once).
+  const statCache = new Map();
+  let statAt = 0;
+  function statOf(p) {
+    const now = Date.now();
+    if (now - statAt > 1500) { statCache.clear(); statAt = now; }
+    let s = statCache.get(p);
+    if (!s) {
+      const isFile = AB ? !!AB.isFile(p) : !!fs.isFile(p);
+      s = { isFile, mtime: isFile ? (AB ? AB.mtime(p) : fs.mtime(p)) : 0 };
+      statCache.set(p, s);
+    }
+    return s;
+  }
   function exists(p) {
     if (!p) return false;
-    if (AB) return AB.isFile(p);
-    return fs.isFile(p);
+    return statOf(p).isFile;
   }
   function listDir(d) {
     if (AB) { try { return JSON.parse(AB.listDir(d)); } catch (e) { return []; } }
@@ -135,10 +152,10 @@ const Host = (() => {
     return fs.mkdirp(d);
   }
   function mtime(p) {
-    if (AB) return AB.mtime(p);
-    return fs.mtime(p);
+    return p ? statOf(p).mtime : 0;
   }
   function remove(p) {
+    statCache.delete(p);
     if (AB) return AB.remove(p);
     return fs.remove(p);
   }
@@ -501,6 +518,71 @@ const Host = (() => {
       return EH ? EH.appVersion() : '';
     } catch (e) { return ''; }
   }
+
+  // ---------------------------------------------------------------- the app's larger data
+  // Issued documents, clients, companies, the file list and the sync state grow with the years; the
+  // browser's own storage holds only a few MB and refuses more. These keys live in files of the app's
+  // private folder, with every read and write of localStorage going there by itself. Values already in the
+  // browser's storage are moved on first use, and removed from there only after the copy was read back.
+  (function fileStore() {
+    let dir = null;
+    try { dir = AB ? info.priv : EH && EH.privateDir ? EH.privateDir() : null; } catch (e) {}
+    if (!dir) return; // browser preview: the normal storage
+    const root = join(dir, 'store');
+    try { if (!mkdirp(root)) return; } catch (e) { return; }
+    const KEYS = new Set(['acm.docs', 'acm.businesses', 'acm.invoiceClients', 'acm.invoiceItems', 'pdfeditor.files', 'pdfeditor.thumbs', 'pdfeditor.signatures']);
+    const mine = (k) => KEYS.has(k) || String(k).startsWith('acm.sync.');
+    const pathOf = (k) => join(root, String(k).replace(/[^A-Za-z0-9._-]/g, '_') + '.json');
+    const S = Storage.prototype, get0 = S.getItem, set0 = S.setItem, del0 = S.removeItem, clear0 = S.clear;
+    const memory = new Map();
+    const save = (k, v) => writeFile(pathOf(k), new TextEncoder().encode(JSON.stringify({ k, v })));
+    const readDisk = (k) => {
+      const p = pathOf(k);
+      if (!exists(p)) return undefined;
+      return JSON.parse(new TextDecoder().decode(AB ? fromB64(AB.readB64(p)) : fs.readFile(p))).v;
+    };
+    function load(k, store) {
+      if (memory.has(k)) return memory.get(k);
+      let v;
+      try { v = readDisk(k); } catch (e) { console.error('store read', k, e); v = undefined; }
+      if (v === undefined) {
+        v = get0.call(store, k);
+        if (v !== null) {
+          try {
+            save(k, v);
+            if (readDisk(k) === v) del0.call(store, k);
+          } catch (e) { console.error('store move', k, e); }
+        }
+      }
+      if (typeof v === 'string' && iosFix) v = iosFix(v);
+      memory.set(k, v === undefined ? null : v);
+      return memory.get(k);
+    }
+    S.getItem = function (k) { return this === window.localStorage && mine(k) ? load(k, this) : get0.call(this, k); };
+    S.setItem = function (k, v) {
+      if (this !== window.localStorage || !mine(k)) return set0.call(this, k, v);
+      const val = String(v);
+      try { save(k, val); } catch (e) {
+        console.error('store write', k, e);
+        set0.call(this, k, val); // no file possible right now: the browser's storage (it says if it is full)
+        return undefined;
+      }
+      memory.set(k, val);
+      del0.call(this, k);
+      return undefined;
+    };
+    S.removeItem = function (k) {
+      if (this === window.localStorage && mine(k)) { memory.set(k, null); try { remove(pathOf(k)); } catch (e) {} }
+      return del0.call(this, k);
+    };
+    S.clear = function () {
+      if (this === window.localStorage) {
+        memory.clear();
+        try { for (const f of listDir(root)) if (/\.json$/.test(f)) remove(join(root, f)); } catch (e) { console.error('store clear', e); }
+      }
+      return clear0.call(this);
+    };
+  })();
 
   // ---------------------------------------------------------------- secure storage
   // Account keys and the 24 recovery words. iPhone: Keychain, opened only with Face ID / Touch ID

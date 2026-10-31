@@ -168,11 +168,34 @@ const Biz = (() => {
   function save(p) {
     const l = list().slice();
     const i = l.findIndex((x) => x.id === p.id);
-    const n = normalize(p);
+    const n = { ...normalize(p), at: Date.now() };
     if (i >= 0) l[i] = n; else l.push(n);
     saveList(l);
     if (l.length === 1 || i < 0) setActive(n.id);
     return n;
+  }
+  /**
+   * The number the next document gets: the company's counter, but always past the documents of this year
+   * in that series (also those that arrived from another device).
+   */
+  function nextOf(p, type) {
+    const series = p.series[type], year = new Date().getFullYear() + '-';
+    let max = 0;
+    for (const d of docs()) if (d.bizId === p.id && d.type === type && d.series === series && String(d.date).startsWith(year) && d.number > max) max = d.number;
+    return Math.max(p.next[type] || 1, max + 1);
+  }
+  /** Another document with the same series and number this year (two devices without internet can make one). */
+  function sameNumber(bizId, type, series, number, year) {
+    return docs().filter((d) => d.bizId === bizId && d.type === type && d.series === series && +d.number === +number && String(d.date).startsWith(String(year)));
+  }
+  function duplicates() {
+    const seen = new Map(), out = [];
+    for (const d of docs()) {
+      const k = [d.bizId, d.type, d.series, d.number, String(d.date).slice(0, 4)].join('|');
+      if (seen.has(k) && seen.get(k).path !== d.path) out.push(d);
+      else seen.set(k, d);
+    }
+    return out;
   }
   function remove(id) {
     saveList(list().filter((p) => p.id !== id));
@@ -233,16 +256,16 @@ const Biz = (() => {
     };
   }
   function docs() { const l = load(KEY_DOCS, []); return Array.isArray(l) ? l.map(cleanDoc).filter(Boolean) : []; }
-  function saveDocs(d) { store(KEY_DOCS, d.slice(0, 2000)); emit(); }
+  function saveDocs(d) { store(KEY_DOCS, d); emit(); }
   function addDoc(entry) {
     const d = docs().filter((x) => !entry.path || x.path !== entry.path || x.id === entry.id);
     const id = entry.id || uid();
-    d.unshift({ id, time: Date.now(), ...entry });
+    d.unshift({ id, time: Date.now(), at: Date.now(), ...entry });
     saveDocs(d);
     return id;
   }
   function updateDoc(id, patch) {
-    saveDocs(docs().map((x) => (x.id === id ? { ...x, ...patch } : x)));
+    saveDocs(docs().map((x) => (x.id === id ? { ...x, ...patch, at: Date.now() } : x)));
   }
   function removeDoc(id) { saveDocs(docs().filter((x) => x.id !== id)); }
 
@@ -311,7 +334,7 @@ const Biz = (() => {
 
   return {
     INDUSTRIES, DOC_TYPES, CURRENCIES, industry, preset, docLabel, docTitle, curSymbol,
-    list, get, active, setActive, save, remove, blankProfile, normalize, bumpNumber,
+    list, get, active, setActive, save, remove, blankProfile, normalize, bumpNumber, nextOf, sameNumber, duplicates,
     docs, addDoc, updateDoc, removeDoc, migrate, colorFor, initials, badge, onChange, reload, uid, load, store,
   };
 })();

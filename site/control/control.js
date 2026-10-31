@@ -397,18 +397,27 @@
     }));
     const msg = h('textarea', { maxlength: '300', placeholder: 'ex. Lucrăm la o actualizare de securitate. Revenim în câteva minute.' });
     msg.value = s.msg || '';
+    // "a new version is out": a note in the apps installed outside a store
+    const vers = {};
+    const verRow = (k, name) => {
+      const cur = (s.latest && s.latest[k]) || {};
+      vers[k] = { v: h('input', { placeholder: name + ': versiune, ex. 2.6.5', value: cur.v || '' }), url: h('input', { placeholder: 'Link de descărcare (https://…)', value: cur.url || '' }) };
+      return h('div', { class: 'field' }, [vers[k].v, vers[k].url]);
+    };
+    const verBox = h('div', { class: 'card' }, [h('h2', { text: 'Versiune nouă' }), h('div', { class: 'sub', text: 'Dacă aplicația instalată e mai veche, utilizatorul vede o dată un anunț cu linkul de descărcare.' }), verRow('win', 'Windows'), verRow('android', 'Android'), verRow('ios', 'iOS')]);
     const save = h('button', { class: 'btn primary', text: 'Salvează' });
     save.addEventListener('click', async () => {
       const off = {}; for (const k of Object.keys(boxes)) if (!boxes[k].checked) off[k] = true;
       const stopping = !all.checked || Object.keys(off).length;
       if (stopping && !(await confirmBox('Aplici modificările?', !all.checked ? 'Tot serviciul se oprește pentru toți utilizatorii, în câteva secunde.' : 'Funcțiile oprite nu mai pot fi folosite de nimeni până le pornești din nou.', 'Aplică', true))) return;
-      act(save, async () => { await call('switches.set', { off, all: !all.checked, msg: msg.value }); toast('Salvat. Se aplică în cel mult 15 secunde.'); show('switches'); });
+      act(save, async () => { await call('switches.set', { off, all: !all.checked, msg: msg.value, latest: Object.fromEntries(Object.entries(vers).map(([k, x]) => [k, { v: x.v.value.trim(), url: x.url.value.trim() }])) }); toast('Salvat. Se aplică în cel mult 15 secunde.'); show('switches'); });
     });
     fill(
       head('Kill switches', 'Verde = pornit · Roșu = oprit. Se aplică pe server, în toate aplicațiile, în cel mult 15 secunde.'),
       s.all ? h('div', { class: 'alert bad', text: 'Mentenanță: tot serviciul este oprit.' }) : Object.keys(s.off).length ? h('div', { class: 'alert warn', text: 'Unele funcții sunt oprite.' }) : null,
       h('div', { class: 'card' }, [h('div', { class: 'sw' }, [h('div', { class: 'tx' }, [h('b', { text: 'Tot serviciul' }), h('small', { text: 'Oprit = mentenanță: nicio conectare, sesiune sau acțiune. Pentru atacuri în desfășurare.' })]), h('span', { class: 'toggle' }, [all, h('span')])])]),
       h('div', { class: 'card' }, [list]),
+      verBox,
       h('div', { class: 'card' }, [h('h2', { text: 'Mesaj pentru utilizatori' }), h('div', { class: 'sub', text: 'Apare în aplicație cât timp ceva este oprit.' }), msg, h('div', { class: 'row' }, [h('div', { class: 'sub', text: s.at ? 'Ultima schimbare: ' + dt(s.at) : '' }), save])]),
     );
   }

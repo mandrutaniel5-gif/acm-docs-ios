@@ -21,17 +21,61 @@ const Sync = (() => {
   const SHARED = ['acm.businesses', 'acm.business', 'acm.invoiceItems', 'acm.invoiceClients', 'acm.docs', 'acm.invoiceDraft',
     'pdfeditor.signatures', 'acm.theme', 'acm.scan', 'acm.print']; // the language is chosen on each device
   const PER_ACCOUNT = ['acm.contacts.', 'acm.contacts.mac.', 'acm.sent.', 'acm.words.saved.'];
-  // lists joined on a device's first sync, so nothing made before signing in is lost
+  // Lists travel as one value, but they are joined item by item: two devices that work at the same time
+  // (or without internet) keep both sides' invoices, clients and companies; nothing is ever overwritten by the
+  // list of another device. An item leaves the other devices only through an explicit mark ("gone").
   const MERGE = ['acm.businesses', 'acm.invoiceItems', 'acm.invoiceClients', 'acm.docs', 'pdfeditor.signatures'];
-  function merge(cloud, local) {
-    try {
-      const a = JSON.parse(cloud), b = JSON.parse(local || 'null');
-      if (!Array.isArray(a) || !Array.isArray(b)) return cloud;
-      const key = (x) => (x && typeof x === 'object' && x.id != null ? 'id:' + x.id : 'v:' + JSON.stringify(x));
-      const have = new Set(a.map(key));
-      const out = a.concat(b.filter((x) => !have.has(key(x))));
-      return JSON.stringify(out);
-    } catch (e) { return cloud; }
+  const GONE_MS = 400 * 24 * 3600 * 1000;
+  const print = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36) + s.length.toString(36); };
+  const itemKey = (x) => (x && typeof x === 'object' ? (x.id != null ? 'id:' + x.id : x.name != null ? 'n:' + String(x.name).toLowerCase() : 'v:' + JSON.stringify(x)) : 'v:' + JSON.stringify(x));
+  /** A list (or a { name: item } table) as key → item. */
+  function itemsOf(json) {
+    const v = JSON.parse(json);
+    if (Array.isArray(v)) return { array: true, map: new Map(v.map((x) => [itemKey(x), x])) };
+    if (v && typeof v === 'object') return { array: false, map: new Map(Object.entries(v)) };
+    throw new Error('not a list');
+  }
+  function prints(json) {
+    const out = {};
+    try { for (const [k, x] of itemsOf(json).map) out[k] = print(JSON.stringify(x)); } catch (e) {}
+    return out;
+  }
+  const stamp = (x) => (x && typeof x === 'object' && (x.at || x.time)) || 0;
+  function joinBoth(key, a, b) {
+    const win = stamp(a) > stamp(b) ? a : b;
+    // a company changed on both sides: its numbers only go up
+    if (key === 'acm.businesses' && a && b && a.next && b.next) {
+      const next = { ...a.next };
+      for (const [t, n] of Object.entries(b.next)) next[t] = Math.max(next[t] || 0, n || 0);
+      return { ...win, next };
+    }
+    return win;
+  }
+  /** The joined value. base: the prints of what this device and the cloud last had in common. */
+  function merge3(key, base, local, cloud, gone) {
+    if (local == null) return cloud;
+    let L, C;
+    try { L = itemsOf(local); C = itemsOf(cloud); } catch (e) { return cloud; }
+    if (L.array !== C.array) return cloud;
+    const fp = (x) => print(JSON.stringify(x));
+    const out = new Map();
+    for (const [k, c] of C.map) {
+      if (!L.map.has(k)) {
+        if (base[k] !== fp(c)) out.set(k, c); // new (or changed) there; when unchanged, it was removed here
+        continue;
+      }
+      const l = L.map.get(k), lf = fp(l), cf = fp(c);
+      out.set(k, lf === cf || base[k] === lf ? c : base[k] === cf ? l : joinBoth(key, l, c));
+    }
+    for (const [k, l] of L.map) {
+      if (C.map.has(k)) continue;
+      if (gone && gone[k] && base[k] === fp(l)) continue; // removed on another device, not changed here
+      out.set(k, l);
+    }
+    if (!C.array) return JSON.stringify(Object.fromEntries(out));
+    const list = [...out.values()];
+    if (key === 'acm.docs' || key === 'acm.invoiceClients') list.sort((a, b) => ((b && b.time) || 0) - ((a && a.time) || 0));
+    return JSON.stringify(list);
   }
   const sharedKeys = () => { const u = uid(); return u ? SHARED.concat(PER_ACCOUNT.map((p) => p + u)) : []; };
 
@@ -57,7 +101,7 @@ const Sync = (() => {
   function state() {
     let s = null;
     try { s = JSON.parse(get(stateKey()) || 'null'); } catch (e) {}
-    return Object.assign({ mode: 'cloud', inited: false, lastAt: 0, lastSync: 0, seen: {}, kvT: {}, dirty: {}, files: {}, err: null, counts: {} }, s || {});
+    return Object.assign({ mode: 'cloud', inited: false, lastAt: 0, lastSync: 0, seen: {}, kvT: {}, dirty: {}, files: {}, err: null, counts: {}, base: {}, gone: {}, retry: {} }, s || {});
   }
   const saveState = (s) => put(stateKey(), JSON.stringify(s));
   const hash = (v) => (v == null ? '' : A().macText(new Uint8Array(32), 'seen', v).slice(0, 16));
@@ -183,7 +227,19 @@ const Sync = (() => {
       const t = s.dirty[key];
       if (key.startsWith('file:')) { await pushFile(s, key.slice(5), t); delete s.dirty[key]; continue; }
       const v = get(key);
-      await writeRecord(rid('kv', key), { kind: 'kv', k: key, v: toCloud(v, s), del: v == null, t });
+      const rec = { kind: 'kv', k: key, v: toCloud(v, s), del: v == null, t };
+      let now = null;
+      if (MERGE.includes(key) && v != null) {
+        // what left this list since the last common state is said out loud; anything else missing elsewhere stays
+        now = prints(v);
+        const gone = s.gone[key] = s.gone[key] || {};
+        const old = Date.now() - GONE_MS;
+        for (const k of Object.keys(s.base[key] || {})) if (!(k in now)) gone[k] = Date.now();
+        for (const k of Object.keys(gone)) if (k in now || gone[k] < old) delete gone[k];
+        rec.gone = gone;
+      }
+      await writeRecord(rid('kv', key), rec);
+      if (now) s.base[key] = now;
       s.kvT[key] = t;
       delete s.dirty[key];
       saveState(s);
@@ -230,24 +286,49 @@ const Sync = (() => {
       : f.query(vaultCol(), f.orderBy('at'));
     const snap = await f.getDocs(q);
     const recs = [];
+    let newest = s.lastAt, stopAt = null;
+    // A record that could not be read or written now (a dropped connection) is asked for again next time;
+    // only one that keeps failing is left behind, so it cannot hold up the others for ever.
+    const failed = (id, at, e) => {
+      console.warn('sync record', id, e);
+      s.retry[id] = (s.retry[id] || 0) + 1;
+      if (s.retry[id] < 5 && (stopAt === null || at < stopAt)) stopAt = at;
+    };
     for (const d of snap.docs) {
-      try { recs.push(await readRecord(d)); } catch (e) { console.warn('sync record', d.id, e); }
       const at = d.data().at && d.data().at.toMillis ? d.data().at.toMillis() : 0;
-      if (at > s.lastAt) s.lastAt = at;
+      if (at > newest) newest = at;
+      try { recs.push({ p: await readRecord(d), at, id: d.id }); } catch (e) { failed(d.id, at, e); }
     }
     // documents first, so placeholders in other values can be turned back into local paths
     let changedKV = [];
     // one document that cannot be written never stops the others (or the rest of the data)
-    for (const p of recs.filter((x) => x.kind === 'file')) { try { await applyFile(s, p); } catch (e) { console.warn('sync file', e); } }
-    for (const p of recs.filter((x) => x.kind === 'kv')) {
+    for (const r of recs.filter((x) => x.p.kind === 'file')) {
+      try { await applyFile(s, r.p); delete s.retry[r.id]; } catch (e) { failed(r.id, r.at, e); }
+    }
+    s.lastAt = stopAt === null ? newest : Math.max(s.lastAt, stopAt - 1);
+    for (const { p, id } of recs.filter((x) => x.p.kind === 'kv')) {
+      delete s.retry[id];
       // only the data that is meant to travel between devices: never device settings, keys or state
       if (typeof p.k !== 'string' || !sharedKeys().includes(p.k)) continue;
       if (p.v != null && typeof p.v !== 'string') continue;
+      if (MERGE.includes(p.k) && !p.del && p.v != null) {
+        const cloud = fromCloud(p.v, s), local = get(p.k);
+        const v = merge3(p.k, s.base[p.k] || {}, local, cloud, p.gone);
+        const inCloud = prints(cloud), joined = prints(v);
+        s.base[p.k] = inCloud;
+        if (p.gone) s.gone[p.k] = { ...(s.gone[p.k] || {}), ...p.gone };
+        if (v !== local) { put(p.k, v); changedKV.push(p.k); }
+        s.seen[p.k] = hash(get(p.k));
+        s.kvT[p.k] = Math.max(s.kvT[p.k] || 0, p.t || 0);
+        // this device has something the cloud does not: it goes up; otherwise nothing is pending
+        const same = Object.keys(joined).length === Object.keys(inCloud).length && Object.keys(joined).every((k) => joined[k] === inCloud[k]);
+        if (same) delete s.dirty[p.k]; else s.dirty[p.k] = Math.max(Date.now(), (p.t || 0) + 1);
+        continue;
+      }
       const localT = s.dirty[p.k] || s.kvT[p.k] || 0;
       // first sync of a device: what the account already has wins over this device's defaults
       if (s.inited && localT >= p.t) continue;
-      let v = p.del ? null : fromCloud(p.v, s);
-      if (!s.inited && v != null && MERGE.includes(p.k)) v = merge(v, get(p.k));
+      const v = p.del ? null : fromCloud(p.v, s);
       put(p.k, v);
       s.seen[p.k] = hash(get(p.k));
       s.kvT[p.k] = p.t;
@@ -399,6 +480,17 @@ const Sync = (() => {
   function afterPull(keys) {
     try { if (keys.includes('acm.theme') && typeof Theme !== 'undefined') Theme.set(get('acm.theme') || 'light'); } catch (e) {}
     try { if (typeof Biz !== 'undefined' && Biz.reload) Biz.reload(); } catch (e) {}
+    try {
+      // two devices without internet can give two documents the same number: said once, the owner decides
+      if (keys.includes('acm.docs') && typeof Biz !== 'undefined' && typeof UI !== 'undefined') {
+        const said = JSON.parse(get('acm.dup.said') || '[]');
+        const fresh = Biz.duplicates().filter((d) => !said.includes(d.id));
+        if (fresh.length) {
+          put('acm.dup.said', JSON.stringify(said.concat(fresh.map((d) => d.id)).slice(-200)));
+          UI.toast(`${I18n.t('Același număr pe două documente')}: ${[...new Set(fresh.map((d) => d.series + '-' + String(d.number).padStart(4, '0')))].join(', ')}`, { error: true, duration: 12000 });
+        }
+      }
+    } catch (e) { console.warn('sync duplicates', e); }
     try { App.renderView(); } catch (e) {}
   }
 
@@ -499,5 +591,5 @@ const Sync = (() => {
   }
   if (typeof Account !== 'undefined' && Account.onChange) Account.onChange(() => { if (!uid()) reset(); });
 
-  return { start, stop, reset, run, forget, touch, forgetAccount, summary, show, setMode, recover, onChange: (f) => listeners.push(f) };
+  return { start, stop, reset, run, forget, touch, forgetAccount, summary, show, setMode, recover, merge3, onChange: (f) => listeners.push(f) };
 })();

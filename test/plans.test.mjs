@@ -335,5 +335,43 @@ await check('Checkout needs the consent for immediate start', async () => {
   assert.notEqual(await code(a.c.call('billingCheckout', { plan: 'business', period: 'month', seats: 1, consent: true })), 'ok');
 });
 
+await check('A message about an older subscription never takes away the one paid now', async () => {
+  const x = await makeAccount('resub');
+  const fresh = 'sub_new_' + rid();
+  assert.equal((await hook(subEvent(fresh, x.uid, 'pro'))).status, 200);
+  assert.equal((await x.c.call('planStatus')).plan, 'pro');
+  // Stripe still retries the old card for weeks, then ends the old subscription
+  assert.equal((await hook(subEvent('sub_old_' + rid(), x.uid, 'personal', { status: 'past_due', days: -10 }))).status, 200);
+  assert.equal((await x.c.call('planStatus')).plan, 'pro');
+  assert.equal((await hook(subEvent('sub_old_' + rid(), x.uid, 'personal', { status: 'canceled', days: -10, type: 'customer.subscription.deleted' }))).status, 200);
+  assert.equal((await x.c.call('planStatus')).plan, 'pro');
+  assert.equal((await adminGet(`billing/${x.uid}`)).sub, fresh);
+  // the current one ending still counts
+  assert.equal((await hook(subEvent(fresh, x.uid, 'pro', { status: 'canceled', days: -1, type: 'customer.subscription.deleted' }))).status, 200);
+  assert.equal((await x.c.call('planStatus')).plan, 'basic');
+});
+
+await check('Deleting an account: needs the account keys, and one that stopped half way can be finished', async () => {
+  const x = await makeAccount('wipeok');
+  const sign = (acc, ts) => b64(A.signEd(acc.id, `acm-wipe\n${acc.uid}\n${acc.dev}\n${ts}`));
+  // no profile and no mark of a deletion under way: refused
+  const y = await makeAccount('wipeno');
+  const del = (path) => fetch(`${FS}/${path}`, { method: 'DELETE', headers: { Authorization: 'Bearer owner' } });
+  await del(`users/${y.uid}`);
+  assert.match(await code(y.c.call('wipeAccount', { ts: Date.now(), sig: 'x' })), /no profile/);
+  // a wrong signature is refused and leaves no mark
+  assert.notEqual(await code(x.c.call('wipeAccount', { ts: Date.now(), sig: b64(new Uint8Array(64)) })), 'ok');
+  assert.equal(await adminGet(`accounts/${x.uid}/meta/wiping`), null);
+  // stopped half way: the mark is there, the profile is already gone
+  await adminSet(`accounts/${y.uid}/meta/wiping`, { dev: y.dev });
+  assert.equal(await code(y.c.call('wipeAccount', { ts: Date.now(), sig: 'x' })), 'ok');
+  assert.equal(await adminGet(`accounts/${y.uid}/devices/${y.dev}`), null);
+  // the normal way
+  assert.equal(await code(x.c.call('wipeAccount', { ts: Date.now(), sig: sign(x, Date.now()) })), 'ok');
+  assert.equal(await adminGet(`users/${x.uid}`), null);
+  assert.equal(await adminGet(`usernames/${x.handle}`), null);
+  assert.equal(await adminGet(`accounts/${x.uid}/devices/${x.dev}`), null);
+});
+
 console.log(failed ? `\n${failed} FAILED` : '\nall passed');
 process.exit(failed ? 1 : 0);

@@ -1381,8 +1381,8 @@ const Sheet = (() => {
     tools.wrap = T('wrap', 'Încadrează textul pe mai multe rânduri', () => toggleStyle('wrap'));
     tools.merge = T('merge', 'Îmbină celulele / Anulează îmbinarea', () => toggleMerge(), { label: 'Îmbină' });
     tools.fmt = Office.select([['general', 'General'], ['num', 'Număr'], ['lei', 'Lei'], ['pct', 'Procent'], ['date', 'Dată'], ['text', 'Text']], 'general', (v) => applyStyle({ fmt: v === 'general' ? null : v, code: null, dec: null }), 'fmt', 'Formatul numerelor');
-    tools.decm = T(null, 'Mai puține zecimale', () => changeDecimals(-1), { label: ',0 −' });
-    tools.decp = T(null, 'Mai multe zecimale', () => changeDecimals(1), { label: ',00 +' });
+    tools.decm = T(null, 'Mai puține zecimale', () => changeDecimals(-1), { label: 'Zecimale −' });
+    tools.decp = T(null, 'Mai multe zecimale', () => changeDecimals(1), { label: 'Zecimale +' });
     tools.bd = T('borders', 'Chenare', (b) => {
       const r = b.getBoundingClientRect();
       UI.menu(r.left, r.bottom + 4, [

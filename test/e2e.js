@@ -1,6 +1,6 @@
 const { _electron } = require('playwright-core');
 const path = require('path');
-const OUT = process.env.OUT || '/tmp/claude-0/-home-claude/2da56d3d-6bc5-54d2-b358-3833c82145b9/scratchpad';
+const OUT = process.env.OUT || require('os').tmpdir();
 (async () => {
   const file = process.argv[2] ? path.resolve(process.argv[2]) : null;
   const app = await _electron.launch({ args: ['--no-sandbox', path.join(__dirname, '..', 'main.js'), ...(file ? [file] : [])], executablePath: require('electron') });

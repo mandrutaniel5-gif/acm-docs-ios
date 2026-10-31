@@ -56,7 +56,12 @@ export function makeContabil({ db, anaf }) {
     const h = req.get('Authorization') || '';
     const token = h.startsWith('Bearer ') ? h.slice(7) : '';
     if (!token) throw err(401, 'Neautentificat');
-    try { return await getAuth(app).verifyIdToken(token); } catch { throw err(401, 'Sesiune invalidă'); }
+    let u;
+    try { u = await getAuth(app).verifyIdToken(token); } catch { throw err(401, 'Sesiune invalidă'); }
+    // aplicația e privată: odată trecute în CONTABIL_UIDS (separate prin virgulă), doar aceste dispozitive au acces
+    const voie = String(process.env.CONTABIL_UIDS || '').split(',').map((x) => x.trim()).filter(Boolean);
+    if (voie.length && !voie.includes(u.uid)) throw err(403, 'Dispozitivul acesta nu are acces.');
+    return u;
   }
 
   /** Limită zilnică de cereri AI (pe dispozitiv și în total), ca un APK scăpat să nu consume cheia. */
@@ -87,6 +92,7 @@ export function makeContabil({ db, anaf }) {
 
   const parseJSON = (text) => { const m = text.match(/[[{][\s\S]*[\]}]/); return JSON.parse(m ? m[0] : text); };
   const filePart = (file) => ({ inlineData: { mimeType: file.type, data: file.data } });
+  const TIPURI = /^(application\/pdf|image\/(png|jpeg|webp|heic|heif))$/;
 
   /** Un apel Gemini (REST, fără SDK). parts = conținutul ultimului mesaj; istoric = mesajele de dinainte. */
   async function gemini({ system, istoric = [], parts, maxTokens, json = false }) {
@@ -100,8 +106,8 @@ export function makeContabil({ db, anaf }) {
     for (let i = 0; i < modele.length * 2; i++) {
       const model = modele[Math.floor(i / 2)];
       r = await fetch(`${GEMINI}/${model}:generateContent`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY }, body: JSON.stringify(body),
-      });
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY }, body: JSON.stringify(body), signal: AbortSignal.timeout(55000),
+      }).catch((e) => ({ ok: false, status: 503, json: async () => ({ error: { message: e.message } }) }));
       d = await r.json().catch(() => ({}));
       if (r.ok) break;
       ultim = d;
@@ -124,7 +130,7 @@ export function makeContabil({ db, anaf }) {
     await limita(u.uid);
     const { mode, messages = [], context = '', file, items } = b;
     if (mode === 'extract' || mode === 'extras') {
-      if (!file || !file.data || !file.type) throw err(400, 'Lipsește fișierul');
+      if (!file || typeof file.data !== 'string' || !file.data || typeof file.type !== 'string' || !TIPURI.test(file.type)) throw err(400, 'Lipsește fișierul sau nu este PDF / poză');
       if (file.data.length > 14_000_000) throw err(413, 'Fișier prea mare (max ~10 MB)');
       const text = await gemini({
         system: SYSTEM, json: true, maxTokens: mode === 'extras' ? 16000 : 4000,
@@ -133,9 +139,10 @@ export function makeContabil({ db, anaf }) {
       return { result: parseJSON(text) };
     }
     if (mode === 'incadrare') {
-      const text = await gemini({ system: SYSTEM, json: true, maxTokens: 6000, parts: [{ text: INCADRARE_PROMPT(items || []) + (context ? `\nContext: ${context}` : '') }] });
+      const text = await gemini({ system: SYSTEM, json: true, maxTokens: 6000, parts: [{ text: INCADRARE_PROMPT(Array.isArray(items) ? items : []) + (context ? `\nContext: ${context}` : '') }] });
       return { result: parseJSON(text) };
     }
+    if (!Array.isArray(messages)) throw err(400, 'Mesaj invalid');
     const clean = messages.slice(-20).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 20000) }));
     if (!clean.length || clean[clean.length - 1].role !== 'user') throw err(400, 'Mesaj invalid');
     const text = await gemini({
@@ -147,12 +154,13 @@ export function makeContabil({ db, anaf }) {
 
   const contabilCui = endpoint(async (b) => {
     const cui = String(b.cui || '').replace(/\D/g, '');
-    if (!cui) throw err(400, 'CUI invalid');
+    if (!cui || cui.length > 10) throw err(400, 'CUI invalid');
     const r = await fetch('https://webservicesp.anaf.ro/api/PlatitorTvaRest/v9/tva', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify([{ cui: Number(cui), data: new Date().toISOString().slice(0, 10) }]),
-    });
-    const f = (await r.json()).found?.[0];
+      body: JSON.stringify([{ cui: Number(cui), data: new Date().toISOString().slice(0, 10) }]), signal: AbortSignal.timeout(20000),
+    }).catch(() => null);
+    if (!r || !r.ok) throw err(502, 'ANAF nu răspunde acum. Încearcă din nou.');
+    const f = (await r.json().catch(() => ({}))).found?.[0];
     if (!f) throw err(404, 'CUI negăsit la ANAF');
     return { nume: f.date_generale?.denumire || '', cui, adresa: f.date_generale?.adresa || '', regCom: f.date_generale?.nrRegCom || '', platitorTVA: !!f.inregistrare_scop_Tva?.scpTVA, tvaLaIncasare: !!f.inregistrare_RTVAI?.statusTvaIncasare };
   });
@@ -188,6 +196,7 @@ export function makeContabil({ db, anaf }) {
 
   const contabilAnafRefresh = endpoint(async (b) => {
     if (typeof b.refresh !== 'string' || b.refresh.length < 8 || b.refresh.length > 8000) throw err(400, 'Cerere invalidă');
+    if (!anaf.goodPub(b.pub)) throw err(400, 'Cheia dispozitivului lipsește');
     const t = await anaf.tokenCall({ grant_type: 'refresh_token', refresh_token: b.refresh });
     return { sigilat: anaf.sealFor(b.pub, t), env: (await anaf.conf()).env === 'prod' ? 'prod' : 'test' };
   });

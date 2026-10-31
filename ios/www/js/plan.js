@@ -363,23 +363,25 @@ const Plan = (() => {
       return r;
     })()]) : null;
 
-    box.append(
-      head,
-      invBox,
-      el('h3', { class: 'plan-h', text: 'Luna aceasta' }),
+    // someone without a subscription comes here for the prices: they come first
+    const usageBlock = [el('h3', { class: 'plan-h', text: 'Luna aceasta' }),
       usage,
       el('p', { class: 'muted small' }, [el('span', { text: 'Limitele lunare se reînnoiesc pe' }), el('span', { class: 'no-tr', text: ' ' + resetDay() + '. ' }), el('span', { text: 'Același document salvat de mai multe ori se numără o singură dată.' })]),
-      groupRow,
-      el('h3', { class: 'plan-h', text: 'Abonamente' }),
+      groupRow,];
+    const plansBlock = [el('h3', { class: 'plan-h', text: 'Abonamente' }),
       ...((s.promos || []).length ? [el('div', { class: 'plan-promos' }, s.promos.map((p) => el('div', { class: 'acm-note ok' }, [
         el('span', { html: svg('star') }),
         el('span', {}, [el('b', { class: 'no-tr', text: p.title }), ' · ', ...(p.kind === 'trial' ? trialText(p) : discountText(p)),
           p.end ? el('span', {}, [' · ', el('span', { text: 'până pe' }), el('span', { class: 'no-tr', text: ' ' + new Date(p.end).toLocaleDateString(I18n.locale(), { day: 'numeric', month: 'long' }) })]) : null]),
       ])))] : []),
       seg,
-      cards,
+      cards,];
+    box.append(
+      head,
+      invBox,
+      ...(s.plan === 'basic' ? [...plansBlock, ...usageBlock] : [...usageBlock, ...plansBlock]),
       !s.payments ? el('div', { class: 'acm-note warn', html: `${svg('info')}<span>${escHtml(I18n.t('Plata abonamentelor va fi disponibilă în curând.'))}</span>` }) : null,
-      el('div', { class: 'acm-note ok', html: `${svg('shield')}<span>${escHtml(I18n.t('Toate planurile au aceeași securitate: End-to-End Encryption și Post-Quantum Cryptography. Abonamentul mărește doar limitele.'))}</span>` }),
+      el('div', { class: 'acm-note ok', html: `${svg('shield')}<span>${escHtml(I18n.t('Toate planurile au aceeași securitate. Abonamentul mărește doar limitele.'))}</span>` }),
       el('div', { class: 'actions col' }, [
         s.manage ? el('button', { class: 'btn', type: 'button', html: svg('wallet') + '<span>' + escHtml(I18n.t('Plată, facturi și anulare')) + '</span>', onclick: () => close({ do: 'manage' }) }) : null,
         el('button', { class: 'btn', type: 'button', html: svg('shield') + '<span>' + escHtml(I18n.t('Cum îți protejăm datele')) + '</span>', onclick: () => close({ do: 'security' }) }),

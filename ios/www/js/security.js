@@ -12,15 +12,15 @@ Object.assign(Icons, {
 const Security = (() => {
   // short notes around the app (Home, empty lists, sign-up): one at a time
   const TIPS = [
-    'Post-Quantum Cryptography: documentele sunt protejate cu standardele NIST pentru era computerelor cuantice.',
-    'Zero-Knowledge Architecture: cheile de criptare există doar pe dispozitivele tale.',
-    'End-to-End Encryption pentru documente, facturi și date sincronizate.',
-    'Device-Bound Keys: fiecare dispozitiv al contului are propria cheie.',
+    'Criptare de ultimă generație: documentele rămân protejate și în era computerelor cuantice.',
+    'Doar tu poți citi documentele: cheile de criptare există doar pe dispozitivele tale.',
+    'Documentele, facturile și datele sincronizate se criptează pe dispozitiv.',
+    'Fiecare dispozitiv al contului are propria cheie.',
     'Documentele .acm poartă semnătura digitală a expeditorului.',
     'Cloudul păstrează exclusiv date criptate, fără nume de fișiere.',
     'Recunoașterea textului (OCR) rulează local, pe dispozitiv.',
     'Fără reclame, fără tracking, fără profilare.',
-    'EU Data Residency: datele criptate sunt găzduite în Uniunea Europeană.',
+    'Datele criptate sunt găzduite în Uniunea Europeană.',
     'Criptare bazată pe biblioteci open-source auditate public.',
   ];
   let tipIx = (() => { try { const n = (Number(localStorage.getItem('acm.tip')) + 1) % TIPS.length; localStorage.setItem('acm.tip', String(n)); return n || 0; } catch (e) { return 0; } })();
@@ -41,7 +41,7 @@ const Security = (() => {
   function status() {
     const out = [];
     const signed = typeof Account !== 'undefined' && Account.current() && !Account.needsVerification();
-    if (!signed) return [{ ok: false, t: 'Cont neconectat', s: 'Conectează-te pentru End-to-End Encryption, sincronizare criptată și documente .acm.', go: 'account' }];
+    if (!signed) return [{ ok: false, t: 'Cont neconectat', s: 'Conectează-te pentru sincronizare criptată și documente .acm.', go: 'account' }];
     out.push({ ok: Account.wordsSaved(), t: Account.wordsSaved() ? 'Cod de recuperare notat' : 'Cod de recuperare nenotat', s: 'Cele 24 de cuvinte permit restaurarea cheilor pe un dispozitiv nou.', go: Account.wordsSaved() ? null : 'words' });
     if (Account.isPasswordUser()) {
       const on = Account.twoStep() || (AccountUI.emailTwoStep && AccountUI.emailTwoStep());

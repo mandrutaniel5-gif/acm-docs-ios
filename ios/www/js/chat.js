@@ -186,7 +186,7 @@ const Chat = (() => {
         ])),
         el('div', { class: 'chat-scroll' }, [
           el('h1', { class: 'ch-title', text: 'Mesaje' }),
-          el('div', { class: 'ch-lock', html: `${svg('lock')}<span>${escHtml(I18n.t('End-to-End Encryption · Post-Quantum Cryptography'))}</span>`, title: I18n.t('Mesajele și documentele sunt protejate prin End-to-End Encryption și Post-Quantum Cryptography. Nici ACM Docs nu le poate citi.') }),
+          el('div', { class: 'ch-lock', html: `${svg('lock')}<span>${escHtml(I18n.t('Doar membrii conversației pot citi mesajele'))}</span>`, title: I18n.t('Mesajele și documentele se criptează pe dispozitiv. Doar membrii conversației le pot citi, nici măcar ACM Docs nu poate.') }),
           el('label', { class: 'ch-search', html: svg('search') }, [q]),
           list,
         ]),
@@ -309,7 +309,7 @@ const Chat = (() => {
 
     openPage((p) => {
       p.dataset.kind = 'conv';
-      const sub = c.kind === 'group' ? `${c.members.length} ${I18n.t('membri')}` : otherP && otherP.contact && otherP.contact.verified ? I18n.t('Verificat · End-to-End Encryption') : 'End-to-End Encryption';
+      const sub = c.kind === 'group' ? `${c.members.length} ${I18n.t('membri')}` : otherP && otherP.contact && otherP.contact.verified ? I18n.t('Verificat · criptat') : I18n.t('Criptat');
       const scroller = el('div', { class: 'chat-msgs' });
       const more = el('button', { class: 'ch-more', type: 'button', text: 'Mesaje mai vechi', hidden: true });
       const warn = el('div', { class: 'chat-warn', hidden: true });
@@ -318,7 +318,7 @@ const Chat = (() => {
       const attach = iconBtn('attach', 'Trimite un document', () => sendFile());
       const composer = el('div', { class: 'chat-compose' }, [attach, input, sendB]);
       const blockedBar = el('div', { class: 'chat-blocked', hidden: true });
-      scroller.append(more, el('div', { class: 'chat-e2e' }, [el('span', { html: svg('lock') }), el('span', { text: I18n.t('Mesajele și documentele sunt protejate prin End-to-End Encryption și Post-Quantum Cryptography. Nici ACM Docs nu le poate citi.') })]));
+      scroller.append(more, el('div', { class: 'chat-e2e' }, [el('span', { html: svg('lock') }), el('span', { text: I18n.t('Mesajele și documentele se criptează pe dispozitiv. Doar membrii conversației le pot citi, nici măcar ACM Docs nu poate.') })]));
       const subEl = el('small', { text: sub });
       const convHead = el('header', { class: 'chat-head conv' }, [
         iconBtn('back', 'Înapoi', () => show()),
@@ -601,6 +601,8 @@ const Chat = (() => {
 
   // ---------------------------------------------------------------- one message on screen
   const decrypted = new Map(); // mid -> { obj, sender } (memory only)
+  /** A long file name: its start and its ending (the type) stay readable, never cut in the middle of a line. */
+  const shortName = (n) => (n.length > 28 ? n.slice(0, 15) + '…' + n.slice(-12) : n);
   async function bubble(c, mid, m, id) {
     if (m.kind === 'sys') return sysBubble(m);
     const mine = m.from === me();
@@ -657,7 +659,7 @@ const Chat = (() => {
     const icon = acm ? 'lockfile' : /^pdf$/i.test(ext) ? 'pdf' : /^(docx?|odt|rtf|txt)$/i.test(ext) ? 'wordapp' : /^(xlsx?|csv|ods)$/i.test(ext) ? 'sheetapp' : /^(pptx?|odp)$/i.test(ext) ? 'slidesapp' : 'doc';
     const card = el('div', { class: 'ch-file' + (acm ? ' acm' : '') }, [
       el('span', { class: 'ch-fi', html: svg(icon) }),
-      el('span', { class: 'ch-ft' }, [el('b', { class: 'no-tr', text: String(o.name || 'document') }), el('small', { class: 'muted', text: size(Number(o.size) || 0) + (acm ? ' · .acm · ' + I18n.t('doar pentru destinatar') : ext ? ' · ' + ext.toUpperCase() : '') })]),
+      el('span', { class: 'ch-ft' }, [el('b', { class: 'no-tr', title: String(o.name || 'document'), text: shortName(String(o.name || 'document')) }), el('small', { class: 'muted', text: size(Number(o.size) || 0) + (acm ? ' · .acm · ' + I18n.t('doar pentru destinatar') : ext ? ' · ' + ext.toUpperCase() : '') })]),
     ]);
     const lockedForMe = acm && mine;
     const acts = el('div', { class: 'ch-fa' }, [

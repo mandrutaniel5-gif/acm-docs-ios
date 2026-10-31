@@ -1,8 +1,9 @@
 // Adds the entries of an extra-<version>.json file to the app's dictionaries (EN and the others).
 //   node build/i18n-src/apply-extra.mjs build/i18n-src/extra-2.2.7.json
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 const src = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
-const ROOT = new URL('../../', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const n = src.keys.length;
 for (const [lang, list] of Object.entries(src)) {
   if (lang === 'keys') continue;

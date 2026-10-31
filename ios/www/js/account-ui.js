@@ -161,7 +161,7 @@ const AccountUI = (() => {
       form.addEventListener('submit', (e) => { e.preventDefault(); showErr(box, ''); busy(go, async () => { if (typeof Service !== 'undefined' && Service.blocked('signup')) return; try { await Account.signUp(name.input.value, email.input.value, pass.input.value, pass2.input.value); await route(); } catch (x) { showErr(box, x); if (pass.input.value !== pass2.input.value) pass2.input.focus(); } }); });
       card.append(
         el('h2', { text: 'Cont nou' }),
-        el('p', { class: 'auth-sub', text: 'Contul folosește End-to-End Encryption și Post-Quantum Cryptography. Cheile se generează pe acest dispozitiv.' }),
+        el('p', { class: 'auth-sub', text: 'Documentele tale se criptează pe acest dispozitiv, iar cheile rămân la tine.' }),
         form,
         el('p', { class: 'auth-legal muted small' }, [
           el('span', { text: 'Creând contul, accepți' }), ' ',
@@ -297,7 +297,7 @@ const AccountUI = (() => {
       card.append(
         el('div', { class: 'auth-spin' }, [el('span'), el('span'), el('span')]),
         el('h2', { text: 'Pregătim cheile tale' }),
-        el('p', { class: 'auth-sub', text: 'Se generează pe acest dispozitiv cheile contului (Post-Quantum Cryptography). Durează câteva secunde.' }),
+        el('p', { class: 'auth-sub', text: 'Se generează pe acest dispozitiv cheile contului. Durează câteva secunde.' }),
       );
     },
 
@@ -436,13 +436,13 @@ const AccountUI = (() => {
       const sec = [];
       if (typeof Security !== 'undefined') sec.push(srow('shield', 'green', 'Securitate și criptare', 'Cum îți protejăm datele și starea contului', chev(), () => Security.show()));
       if (typeof Sync !== 'undefined') sec.push(srow('refresh', 'teal', 'Sincronizare în cloud', Sync.summary(), chev(), () => Sync.show()));
-      if (typeof Devices !== 'undefined') sec.push(srow('lock', 'indigo', 'Dispozitive', 'Vezi și administrează dispozitivele conectate', chev(), () => Devices.show()));
+      if (typeof Devices !== 'undefined') sec.push(srow('devices', 'indigo', 'Dispozitive', 'Vezi și administrează dispozitivele conectate', chev(), () => Devices.show()));
       if (Account.isPasswordUser()) {
         const on = emailTwoStep() || Account.twoStep();
-        sec.push(srow('key', on ? 'green' : 'orange', 'Two-Factor Authentication', on ? (emailTwoStep() ? (Account.twoStep() ? 'Activă · cod pe email și aplicație de autentificare' : 'Activă · cod pe email') : 'Activă · aplicație de autentificare') : 'Oprită', chev(), async () => { await twoStepScreen(); App.showView('settings'); }));
+        sec.push(srow('key', on ? 'green' : 'warn', 'Two-Factor Authentication', on ? (emailTwoStep() ? (Account.twoStep() ? 'Activă · cod pe email și aplicație de autentificare' : 'Activă · cod pe email') : 'Activă · aplicație de autentificare') : 'Oprită', chev(), async () => { await twoStepScreen(); App.showView('settings'); }));
       }
       if (typeof AppLock !== 'undefined') sec.push(srow('lock', 'blue', 'Blocarea aplicației', AppLock.summary(), chev(), async () => { await AppLock.settings(); App.showView('settings'); }));
-      sec.push(srow('key', Account.wordsSaved() ? 'green' : 'orange', 'Codul de recuperare', Account.wordsSaved() ? 'Notat ✓' : 'Nenotat încă: notează-l', chev(), showWords));
+      sec.push(srow('key', Account.wordsSaved() ? 'green' : 'warn', 'Codul de recuperare', Account.wordsSaved() ? 'Notat ✓' : 'Nenotat încă: notează-l', chev(), showWords));
       if (typeof Shield !== 'undefined') sec.push(srow('shield', 'indigo', 'Protecție anti-spyware', 'Ce face aplicația și ce poți face tu', chev(), () => Shield.showInfo()));
       if (typeof Service !== 'undefined') sec.push(srow('warn', 'red', 'Raportează un cont', 'Spam, fraudă, abuz sau un cont fals', chev(), () => Service.report()));
       out.append(group('Securitate', sec, 'Cheile de criptare sunt create și păstrate doar pe dispozitivele tale. Serverul păstrează doar date criptate și cheia publică.'));

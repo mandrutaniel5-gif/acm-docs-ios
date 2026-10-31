@@ -3,8 +3,9 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const inv = fs.readFileSync(path.join(root, 'app/js/invoice.js'), 'utf8');
 const biz = fs.readFileSync(path.join(root, 'app/js/business.js'), 'utf8');
 const ef = fs.readFileSync(path.join(root, 'app/js/efactura.js'), 'utf8');
@@ -14,7 +15,8 @@ const numSrc = inv.slice(inv.indexOf('const num = (s) =>'), inv.indexOf('const i
 
 const ctx = { console, URLSearchParams, TextEncoder, TextDecoder, setTimeout, setInterval, document: { addEventListener() {}, visibilityState: 'hidden' }, window: {} };
 vm.createContext(ctx);
-vm.runInContext(`const r2 = (v) => Math.round((v + Number.EPSILON) * 100) / 100; ${numSrc}; var Invoice = { compute: ${computeSrc.replace('function compute(data = inv, b = biz)', 'function (data, b)')} };`, ctx);
+const r2Src = inv.slice(inv.indexOf('const r2 ='), inv.indexOf('\n', inv.indexOf('const r2 =')));
+vm.runInContext(`${r2Src} ${numSrc}; var Invoice = { compute: ${computeSrc.replace('function compute(data = inv, b = biz)', 'function (data, b)')} };`, ctx);
 const cats = { general: { cats: [{ id: 'serv', um: 'serv.' }, { id: 'prod', um: 'buc' }] } };
 let company;
 vm.runInContext(`var Biz = { get: () => __b, active: () => __b, industry: (i) => (${JSON.stringify(cats)})[i] || ${JSON.stringify(cats.general)}, docs: () => [] };`, ctx);
@@ -25,12 +27,25 @@ const base = { id: 'b1', industry: 'general', name: 'Test SRL', legal: 'TEST SOF
 const pjClient = { kind: 'pj', name: 'CLIENT FIRMA SRL', cui: 'RO15900825', regcom: 'J40/1/2000', address: 'Bd. Unirii 1', city: 'Sector 3', county: 'București', country: 'România' };
 const pfClient = { kind: 'pf', name: 'Ion Popescu', cnp: '', address: 'Str. Mare 5', city: 'Cluj-Napoca', county: 'Cluj', country: 'România' };
 const lines = [{ type: 'serv', desc: 'Reparație instalație sanitară', qty: 2, price: 150 }, { type: 'prod', desc: 'Robinet baterie', qty: 3, price: 89.99 }, { type: 'prod', desc: 'Garnituri (set)', qty: 1.5, price: 12.4 }];
+const same = (n, price) => Array.from({ length: n }, (_, i) => ({ type: 'serv', desc: 'Linia ' + (i + 1), qty: 1, price }));
 const cases = {
   'tva-incl-pj-bucuresti': [{ ...base }, { client: pjClient, lines, discount: 0, pay: 'Ordin de plată' }],
   'tva-excl-discount-pf': [{ ...base, pricesInclVat: false }, { client: pfClient, lines, discount: 10, pay: 'Card' }],
   'neplatitor-pf-numerar': [{ ...base, vatPayer: false, cui: '14255667' }, { client: pfClient, lines, discount: 5, pay: 'Numerar' }],
   'neplatitor-pj': [{ ...base, vatPayer: false, cui: '14255667' }, { client: pjClient, lines, discount: 0, pay: 'Transfer bancar' }],
   'tva-eur-extern': [{ ...base }, { client: { kind: 'pj', name: 'Kunde GmbH', cui: 'DE123456789', address: 'Hauptstr. 1', city: 'Berlin', county: '', country: 'Germania' }, lines, currency: 'EUR', rate: '4.9771', discount: 0, pay: 'Ordin de plată' }],
+  // the rounding cases where the VAT of the lines and the VAT of the total used to differ
+  'rotunjire-10x10': [{ ...base, pricesInclVat: false }, { client: pjClient, lines: same(10, 10.05), discount: 0, pay: 'Card' }],
+  'rotunjire-20x3': [{ ...base, pricesInclVat: false }, { client: pjClient, lines: same(20, 3.33), discount: 0, pay: 'Card' }],
+  'rotunjire-incl': [{ ...base }, { client: pjClient, lines: same(13, 19.99), discount: 0, pay: 'Card' }],
+  'cote-diferite': [{ ...base, pricesInclVat: false }, { client: pjClient, lines: [{ type: 'serv', desc: 'Serviciu', qty: 2, price: 150 }, { type: 'prod', desc: 'Carte', qty: 3, price: 40.33, vatRate: 11 }], discount: 0, pay: 'Card' }],
+  'cote-diferite-discount': [{ ...base, pricesInclVat: false }, { client: pjClient, lines: [{ type: 'serv', desc: 'Serviciu', qty: 2, price: 150 }, { type: 'prod', desc: 'Carte', qty: 3, price: 40.33, vatRate: 11 }], discount: 10, pay: 'Card' }],
+  'cote-diferite-incl': [{ ...base }, { client: pjClient, lines: [{ type: 'serv', desc: 'Serviciu', qty: 2, price: 150 }, { type: 'prod', desc: 'Carte', qty: 3, price: 40.33, vatRate: 11 }], discount: 0, pay: 'Card' }],
+  'taxare-inversa': [{ ...base }, { client: pjClient, lines, discount: 0, pay: 'Ordin de plată', taxMode: 'reverse' }],
+  'intracomunitar': [{ ...base }, { client: { kind: 'pj', name: 'Kunde GmbH', cui: 'DE123456789', address: 'Hauptstr. 1', city: 'Berlin', county: '', country: 'Germania' }, lines, discount: 0, pay: 'Ordin de plată', taxMode: 'intra' }],
+  'export': [{ ...base }, { client: { kind: 'pj', name: 'Client Inc', cui: '', address: '1 Main St', city: 'New York', county: '', country: 'SUA' }, lines, discount: 0, pay: 'Ordin de plată', taxMode: 'export' }],
+  'scutit': [{ ...base }, { client: pjClient, lines, discount: 0, pay: 'Ordin de plată', taxMode: 'exempt' }],
+  'storno': [{ ...base, pricesInclVat: false }, { client: pjClient, lines: lines.map((l) => ({ ...l, qty: -l.qty })), discount: 0, pay: 'Ordin de plată', stornoOf: { series: 'TST', number: 1, date: '2026-10-20' } }],
 };
 
 let failed = 0;
@@ -45,10 +60,19 @@ for (const [name, [b, data]] of Object.entries(cases)) {
   const r = EF.build(d);
   built[name] = r;
   ok(!r.problems.length, `${name}: no problems ${r.problems.join(' | ')}`);
-  ok(/^<\?xml/.test(r.xml) && (r.xml.match(/<cac:InvoiceLine>/g) || []).length === lines.length, `${name}: ${lines.length} lines`);
+  ok(/^<\?xml/.test(r.xml) && (r.xml.match(/<cac:InvoiceLine>/g) || []).length === data.lines.length, `${name}: ${data.lines.length} lines`);
   const t = ctx.Invoice.compute(d.data, b);
-  const pay = +/<cbc:PayableAmount[^>]*>([\d.]+)</.exec(r.xml)[1];
+  const pay = +/<cbc:PayableAmount[^>]*>(-?[\d.]+)</.exec(r.xml)[1];
   ok(Math.abs(pay - t.total) < 0.001, `${name}: payable ${pay} = PDF total ${t.total}`);
+  // the same VAT and the same base on the PDF and in the XML, and every column adds up
+  const xmlTax = +/<cac:TaxTotal><cbc:TaxAmount[^>]*>(-?[\d.]+)</.exec(r.xml)[1];
+  const xmlBase = +/<cbc:TaxExclusiveAmount[^>]*>(-?[\d.]+)</.exec(r.xml)[1];
+  ok(Math.abs(xmlTax - t.tva) < 0.001 && Math.abs(xmlBase - t.base) < 0.001, `${name}: XML VAT ${xmlTax} / base ${xmlBase} = PDF ${t.tva} / ${t.base}`);
+  ok(!/PayableRoundingAmount/.test(r.xml), `${name}: no rounding line needed`);
+  if (!t.discount) {
+    const col = (f) => Math.round(t.rows.reduce((s, x) => s + x[f], 0) * 100) / 100;
+    ok(Math.abs(col('base') - t.base) < 0.001 && Math.abs(col('tva') - t.tva) < 0.001, `${name}: line columns add up (${col('base')} + ${col('tva')})`);
+  }
   if (out) fs.writeFileSync(path.join(out, name + '.xml'), r.xml);
 }
 ok(built['tva-incl-pj-bucuresti'].xml.includes('<cbc:CityName>SECTOR3</cbc:CityName>') && built['tva-incl-pj-bucuresti'].xml.includes('RO-B<'), 'Bucharest: SECTOR3 + RO-B');

@@ -19,7 +19,21 @@ const Service = (() => {
     state = { off, all: !!(d && d.all === true), msg: d && typeof d.msg === 'string' ? d.msg.slice(0, 300) : '' };
     try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {}
     drawBanner();
+    newVersion(d && d.latest);
     listeners.forEach((f) => { try { f(state); } catch (e) {} });
+  }
+
+  const older = (a, b) => { const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) < (y[i] || 0); } return false; };
+  /** Said once for each version: the apps installed outside a store do not update by themselves. */
+  function newVersion(latest) {
+    try {
+      const item = latest && latest[Host.platform === 'electron' ? 'win' : (Host.info && Host.info.platform) || ''];
+      const mine = Host.appVersion();
+      if (!item || !/^\d+\.\d+\.\d+$/.test(String(item.v)) || !/^https:\/\//.test(String(item.url)) || !mine || !older(mine, item.v)) return;
+      if (localStorage.getItem('acm.update.said') === item.v) return;
+      localStorage.setItem('acm.update.said', item.v);
+      UI.toast(`${I18n.t('Versiune nouă disponibilă:')} ${item.v}`, { duration: 15000, action: { label: I18n.t('Descarcă'), run: () => Host.openExternal(item.url) } });
+    } catch (e) { console.warn('update note', e); }
   }
 
   /** Live: the switches document is public, so this works signed in or not. */

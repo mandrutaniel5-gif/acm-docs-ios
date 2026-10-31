@@ -48,6 +48,12 @@ export function makeAnaf({ db, needDevice, emulator }) {
     return { epk: epk.toString('base64'), iv: iv.toString('base64'), ct: ct.toString('base64') };
   }
 
+  /** A device key the sealing can use: checked before ANAF is asked, because a refresh key works only once. */
+  function goodPub(pubB64) {
+    const pub = Buffer.from(String(pubB64 || ''), 'base64');
+    return pub.length === 32 || (pub.length === 65 && pub[0] === 4);
+  }
+
   async function tokenCall(params) {
     // emulator only: a made-up code stands in for ANAF, so the whole connection can be tested
     if (emulator && (params.code === 'emulator-code' || params.refresh_token === 'emulator-refresh')) return { access: 'emulator-access', refresh: 'emulator-refresh', expiresIn: 7776000, at: Date.now() };
@@ -130,7 +136,7 @@ export function makeAnaf({ db, needDevice, emulator }) {
     await needDevice(req);
     const v = req.data || {};
     if (typeof v.refresh !== 'string' || v.refresh.length < 8 || v.refresh.length > 8000) fail('invalid-argument', 'refresh');
-    if (typeof v.pub !== 'string') fail('invalid-argument', 'device key');
+    if (typeof v.pub !== 'string' || !goodPub(v.pub)) fail('invalid-argument', 'device key');
     const t = await tokenCall({ grant_type: 'refresh_token', refresh_token: v.refresh });
     return { sealed: sealFor(v.pub, t) };
   });
@@ -142,5 +148,5 @@ export function makeAnaf({ db, needDevice, emulator }) {
     return { ready: !!(c.clientId && c.clientSecret), env: c.env === 'prod' ? 'prod' : 'test' };
   });
 
-  return { anafStart, anafCallback, anafClaim, anafRefresh, anafInfo, conf, sealFor, tokenCall, states };
+  return { anafStart, anafCallback, anafClaim, anafRefresh, anafInfo, conf, sealFor, goodPub, tokenCall, states };
 }

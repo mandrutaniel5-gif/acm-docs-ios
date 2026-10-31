@@ -103,7 +103,7 @@ Section "Install"
   ${EndIf}
 
   SetOutPath "$INSTDIR"
-  File /r "${SRC}/*.*"
+  File /r "${SRC}*.*"
   File "icon.ico"
 
   WriteUninstaller "$INSTDIR\Dezinstalare.exe"

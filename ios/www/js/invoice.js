@@ -32,7 +32,8 @@ const Invoice = (() => {
   // Helpers
   // ---------------------------------------------------------------------------
 
-  const r2 = (v) => Math.round((v + Number.EPSILON) * 100) / 100;
+  // symmetric: a storno (negative amounts) rounds exactly like the invoice it cancels
+  const r2 = (v) => { const a = Math.round((Math.abs(v) + Number.EPSILON) * 100) / 100; return (v < 0 ? -a : a) || 0; };
   const money = (v, loc) => (Number.isFinite(v) ? v : 0).toLocaleString(loc || I18n.locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const moneyC = (v, cur) => `${money(v)} ${I18n.lang !== 'ro' && (cur || 'RON') === 'RON' ? 'RON' : Biz.curSymbol(cur || 'RON')}`;
 
@@ -41,6 +42,7 @@ const Invoice = (() => {
     Servicii: 'Services', Produse: 'Products', Altele: 'Other', Livrare: 'Delivery', Manoperă: 'Labour', Piese: 'Parts', Materiale: 'Materials',
     Utilaje: 'Equipment', 'Ore lucrate': 'Hours worked', Proiecte: 'Projects', Abonamente: 'Subscriptions', Curse: 'Trips', Kilometri: 'Kilometres',
     'Servicii extra': 'Extra services', Mâncare: 'Food', Băuturi: 'Drinks',
+    'Taxare inversă': 'Reverse charge', 'Livrare intracomunitară, scutită de TVA': 'Intra-Community supply, exempt from VAT', 'Export, scutit de TVA': 'Export, exempt from VAT', 'Scutit de TVA': 'Exempt from VAT', 'FACTURĂ STORNO': 'CREDIT NOTE', 'Stornează factura': 'Cancels invoice',
     Autovehicul: 'Vehicle', Lucrare: 'Work', Proiect: 'Project', Transport: 'Transport', Eveniment: 'Event',
     'Marcă și model': 'Make and model', 'Nr. înmatriculare': 'Registration no.', 'Km la bord': 'Mileage (km)', 'Serie șasiu (VIN)': 'VIN',
     'Adresa lucrării': 'Site address', 'Ce lucrare': 'Work', Perioada: 'Period', 'Contract nr.': 'Contract no.', Traseu: 'Route',
@@ -90,6 +92,8 @@ const Invoice = (() => {
   const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return isoDate(d); };
   const dateRo = (iso) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? `${m[3]}.${m[2]}.${m[1]}` : iso || ''; };
   const pad = (n) => String(n).padStart(4, '0');
+  const pct = (rate) => String(r2(rate * 100)).replace('.', ',');
+  const TAX_NOTE = { reverse: 'Taxare inversă', intra: 'Livrare intracomunitară, scutită de TVA', export: 'Export, scutit de TVA', exempt: 'Scutit de TVA' };
   const clean = (s) => String(s || '').replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim();
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -120,7 +124,7 @@ const Invoice = (() => {
     const days = (b && b.payDays) || pr.payDays || 15;
     return {
       bizId: b ? b.id : null, docType: type,
-      series: b ? b.series[type] : Biz.DOC_TYPES[type].series, number: b ? b.next[type] : 1,
+      series: b ? b.series[type] : Biz.DOC_TYPES[type].series, number: b ? Biz.nextOf(b, type) : 1,
       date: today(), due: type !== 'invoice' ? addDays(today(), 30) : paid ? '' : addDays(today(), days),
       pay: habit('pay') || pr.pay, currency: habit('cur') || (b && b.currency) || 'RON', rate: '',
       client: { kind: habit('kind') || pr.kind, name: '', phone: '', email: '', address: '', city: '', county: '', country: 'România', cnp: '', cui: '', regcom: '' },
@@ -132,34 +136,66 @@ const Invoice = (() => {
   }
 
   function saveDraft() { if (inv) store(KEY_DRAFT, inv); }
+  /** An issued document keeps the VAT settings it was made with, whatever the company changes later. */
+  function withTaxOfNow(d) { d.tax = { vatPayer: !!biz.vatPayer, vatRate: biz.vatRate, pricesInclVat: !!biz.pricesInclVat }; return d; }
 
   // ---------------------------------------------------------------------------
   // Money
   // ---------------------------------------------------------------------------
 
+  /**
+   * The one place amounts are calculated: the PDF, the list and the e-Factura XML all read this.
+   * VAT is worked out per rate on the taxable total (the rule of EN 16931); the VAT shown on each line
+   * is adjusted by the rounding cents on the largest line, so every column adds up to the totals.
+   */
   function compute(data = inv, b = biz) {
-    const vat = !!(b && b.vatPayer), rate = (num(b && b.vatRate) || 0) / 100;
+    const payer = !!(b && b.vatPayer);
+    const mode = payer && data.taxMode && data.taxMode !== 'normal' ? data.taxMode : 'normal';
+    const vat = payer && mode === 'normal'; // VAT is charged on this document
+    const rate = (num(b && b.vatRate) || 0) / 100;
     const incl = !!(b && b.pricesInclVat);
     const rows = data.lines.map((l) => {
       const qty = num(l.qty) || 0, price = num(l.price) || 0;
+      const lr = vat ? (l.vatRate !== undefined && l.vatRate !== null && l.vatRate !== '' ? num(l.vatRate) / 100 : rate) : 0;
       let unit, base, tva, gross;
       if (vat && incl) {
-        gross = r2(qty * price); base = r2(gross / (1 + rate)); tva = r2(gross - base); unit = r2(price / (1 + rate));
+        gross = r2(qty * price); base = r2(gross / (1 + lr)); tva = r2(gross - base); unit = r2(price / (1 + lr));
       } else if (vat) {
-        unit = price; base = r2(qty * price); tva = r2(base * rate); gross = r2(base + tva);
+        unit = price; base = r2(qty * price); tva = r2(base * lr); gross = r2(base + tva);
       } else {
         unit = price; base = r2(qty * price); tva = 0; gross = base;
       }
-      return { ...l, qtyN: qty, unit, base, tva, gross };
+      return { ...l, qtyN: qty, unit, base, tva, gross, rate: lr };
     });
     const sum = (f, list = rows) => r2(list.reduce((s, x) => s + x[f], 0));
     const d = Math.min(100, Math.max(0, num(data.discount) || 0)) / 100;
-    const subGross = sum('gross'), subBase = sum('base'), subTva = sum('tva');
-    const base = r2(subBase * (1 - d)), tva = r2(subTva * (1 - d));
-    const total = vat ? r2(base + tva) : r2(subGross * (1 - d));
+    const taxes = [];
+    if (vat) {
+      for (const lr of [...new Set(rows.map((r) => r.rate))].sort((x, y) => y - x)) {
+        const rs = rows.filter((r) => r.rate === lr);
+        let base, wanted = null;
+        if (incl) {
+          // prices include VAT: the client pays exactly the prices; base + VAT must give that sum
+          wanted = r2(sum('gross', rs) * (1 - d));
+          base = r2(wanted / (1 + lr));
+          for (const x of [base, r2(base - 0.01), r2(base + 0.01)]) if (r2(x + r2(x * lr)) === wanted) { base = x; break; }
+        } else base = r2(sum('base', rs) * (1 - d));
+        const tva = r2(base * lr);
+        if (!d && rs.length) {
+          const big = rs.reduce((x, y) => (Math.abs(y.base) > Math.abs(x.base) ? y : x));
+          if (incl) big.base = r2(big.base + base - sum('base', rs));
+          big.tva = r2(big.tva + tva - sum('tva', rs));
+          if (!incl) big.gross = r2(big.base + big.tva);
+        }
+        taxes.push({ rate: lr, base, tva, gross: wanted === null ? r2(base + tva) : wanted });
+      }
+    }
+    const subGross = sum('gross'), subBase = sum('base');
+    const base = r2(taxes.reduce((s, x) => s + x.base, 0)), tva = r2(taxes.reduce((s, x) => s + x.tva, 0));
+    const total = vat ? r2(taxes.reduce((s, x) => s + x.gross, 0)) : r2(subGross * (1 - d));
     const groups = {};
     for (const r of rows) groups[r.type] = r2((groups[r.type] || 0) + r.gross);
-    return { rows, vat, rate, discount: d, subGross, subBase, discountValue: r2(subGross - total), base: vat ? base : total, tva: vat ? tva : 0, total, groups };
+    return { rows, vat, payer, mode, rate, taxes, discount: d, subGross, subBase, discountValue: r2(subGross - total), base: vat ? base : total, tva: vat ? tva : 0, total, groups };
   }
 
   // ---------------------------------------------------------------------------
@@ -244,6 +280,7 @@ const Invoice = (() => {
     const lang = docLang(data);
     const L = labelsFor(T, lang);
     const custom = { invoice: L.titleInvoice, proforma: L.titleProforma, quote: L.titleQuote }[data.docType];
+    if (data.stornoOf) return trDoc(lang, 'FACTURĂ STORNO');
     const t = Biz.docTitle(data.docType, Biz.industry(b && b.industry));
     return custom || trDoc(lang, t);
   }
@@ -274,7 +311,7 @@ const Invoice = (() => {
       n++;
       const cat = I.cats.find((x) => x.id === typeOf(r));
       return `<tr>${cols.nr ? `<td class="c">${n}</td>` : ''}<td>${esc(r.desc)}</td>${cols.um ? `<td class="c">${esc(D(r.um || (cat ? cat.um : 'buc')))}</td>` : ''}${cols.qty ? `<td class="r">${esc(r.qtyN.toLocaleString(loc, { maximumFractionDigits: 3 }))}</td>` : ''}
-        ${cols.price ? `<td class="r">${money(r.unit)}</td>` : ''}<td class="r">${money(r.base)}</td>${t.vat ? `<td class="r">${money(r.tva)}</td>` : ''}</tr>`;
+        ${cols.price ? `<td class="r">${money(r.unit)}</td>` : ''}<td class="r">${money(r.base)}</td>${t.vat ? `<td class="r">${money(r.tva)}${t.taxes.length > 1 ? ` <small>(${esc(pct(r.rate))}%)</small>` : ''}</td>` : ''}</tr>`;
     };
     let body = '';
     for (const ty of order0) {
@@ -307,13 +344,13 @@ const Invoice = (() => {
       table: () => `<table><thead><tr>${cols.nr ? `<th class="c" style="width:8mm">${esc(L.colNr)}</th>` : ''}<th>${esc(L.colDesc)}</th>
           ${cols.um ? `<th class="c" style="width:13mm">${esc(L.colUm)}</th>` : ''}${cols.qty ? `<th class="r" style="width:13mm">${esc(L.colQty)}</th>` : ''}
           ${cols.price ? `<th class="r" style="width:24mm">${esc(L.colPrice)}${t.vat ? '<br>' + D('(fără TVA)') : ''}</th>` : ''}
-          <th class="r" style="width:24mm">${esc(L.colValue)}${t.vat ? '<br>' + D('(fără TVA)') : ''}</th>${t.vat ? `<th class="r" style="width:20mm">${esc(L.totalVat)} ${esc(c.vatRate)}%</th>` : ''}</tr></thead>
+          <th class="r" style="width:24mm">${esc(L.colValue)}${t.vat ? '<br>' + D('(fără TVA)') : ''}</th>${t.vat ? `<th class="r" style="width:20mm">${esc(L.totalVat)}${t.taxes.length === 1 ? ' ' + esc(pct(t.taxes[0].rate)) + '%' : ''}</th>` : ''}</tr></thead>
         <tbody>${body}</tbody></table>`,
       totals: () => {
         let h = '';
         if (T.subtotals && used.length > 1) for (const ty of used) h += `<div><span>${esc(D('Total'))} ${esc(D(I.cats.find((x) => x.id === ty).group).toLocaleLowerCase(loc))}</span><b>${money(t.groups[ty] || 0)} ${cur}</b></div>`;
         if (t.discount > 0) h += `<div><span>${esc(L.subtotal)}</span><b>${money(t.subGross)} ${cur}</b></div><div><span>${esc(L.discount)} ${esc(String(r2(t.discount * 100)).replace('.', ','))}%</span><b>−${money(t.discountValue)} ${cur}</b></div>`;
-        if (t.vat) h += `<div><span>${esc(L.totalBase)}</span><b>${money(t.base)} ${cur}</b></div><div><span>${esc(L.totalVat)} ${esc(c.vatRate)}%</span><b>${money(t.tva)} ${cur}</b></div>`;
+        if (t.vat) h += `<div><span>${esc(L.totalBase)}</span><b>${money(t.base)} ${cur}</b></div>${t.taxes.map((x) => `<div><span>${esc(L.totalVat)} ${esc(pct(x.rate))}%</span><b>${money(x.tva)} ${cur}</b></div>`).join('')}`;
         const rate = (data.currency || 'RON') !== 'RON' ? num(data.rate) : 0;
         let ron = '';
         if (rate > 0) {
@@ -328,6 +365,8 @@ const Invoice = (() => {
           <p><span class="lbl">${esc(L.payment)}:</span> ${esc(D(data.pay))}</p>
           ${data.due ? `<p><span class="lbl">${esc(isInv ? L.due : L.valid)}:</span> ${dateRo(data.due)}</p>` : ''}
           ${!c.vatPayer && nonVat ? `<p>${esc(nonVat)}</p>` : ''}
+          ${t.mode !== 'normal' && TAX_NOTE[t.mode] ? `<p>${esc(D(TAX_NOTE[t.mode]))}</p>` : ''}
+          ${data.stornoOf ? `<p><span class="lbl">${esc(D('Stornează factura'))}:</span> ${esc(data.stornoOf.series)}-${pad(data.stornoOf.number)} / ${dateRo(data.stornoOf.date)}</p>` : ''}
           ${data.notes ? `<p><span class="lbl">${esc(L.notes)}:</span> ${esc(data.notes).replace(/\n/g, '<br>')}</p>` : ''}</div>`,
       signatures: () => `<div class="sign"><div>${esc(L.signSupplier)}</div><div>${esc(signClient)}</div></div>`,
       footer: () => `<div class="foot">${esc(T.footer || [supplierName, c.phone, c.email, c.web].filter(Boolean).join(' · '))}</div>`,
@@ -496,9 +535,9 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
 
   function setDocType(type) {
     if (inv.docType === type) return;
-    const wasAuto = inv.series === biz.series[inv.docType] && +inv.number === +biz.next[inv.docType];
+    const wasAuto = inv.series === biz.series[inv.docType] && +inv.number === +Biz.nextOf(biz, inv.docType);
     inv.docType = type;
-    if (wasAuto || !inv.series) { inv.series = biz.series[type]; inv.number = biz.next[type]; }
+    if (wasAuto || !inv.series) { inv.series = biz.series[type]; inv.number = Biz.nextOf(biz, type); }
     if (type !== 'invoice' && !inv.due) inv.due = addDays(inv.date || today(), 30);
     if (type === 'invoice') inv.due = biz.payDays ? addDays(inv.date || today(), biz.payDays) : '';
     buildForm();
@@ -542,7 +581,8 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
       }),
       inv.currency !== 'RON' ? rateField() : null,
       selectField('Limba documentului', inv.lang || 'ro', DOC_LANGS, (v) => { inv.lang = v; changed(); }),
-    ].filter(Boolean)), isInv ? payStatus() : null].filter(Boolean), typeChips));
+      biz.vatPayer ? selectField('Regim TVA', inv.taxMode || 'normal', [['normal', 'TVA normal'], ['reverse', 'Taxare inversă'], ['intra', 'Livrare intracomunitară'], ['export', 'Export'], ['exempt', 'Scutit de TVA']], (v) => { inv.taxMode = v; buildForm(); changed(); }) : null,
+    ].filter(Boolean)), inv.stornoOf ? el('p', { class: 'muted small', text: `${I18n.t('Stornează factura')} ${inv.stornoOf.series}-${pad(inv.stornoOf.number)}` }) : null, isInv ? payStatus() : null].filter(Boolean), typeChips));
 
     // Client
     const clientGrid = el('div', { class: 'grid' });
@@ -714,7 +754,15 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
       const val = el('span', { class: 'v', text: money(r2(num(l.qty) * num(l.price))) });
       const del = el('button', { class: 'ib', html: svg('del'), title: 'Șterge rândul', type: 'button' });
       del.addEventListener('click', () => { inv.lines.splice(idx, 1); renderLines(); changed(); });
-      const row = el('div', { class: 'line' }, [el('span', { class: 'n', text: String(idx + 1) }), tag, d, q, el('span', { class: 'x', text: '×' }), p, val, del]);
+      // a line can have another VAT rate than the company's usual one: a tap moves to the next rate
+      let vr = null;
+      if (biz && biz.vatPayer && (inv.taxMode || 'normal') === 'normal') {
+        const rates = [...new Set([num(biz.vatRate), 21, 11].filter((x) => x > 0))];
+        const cur = l.vatRate !== undefined && l.vatRate !== null && l.vatRate !== '' ? num(l.vatRate) : num(biz.vatRate);
+        vr = el('button', { class: 'tag vr no-tr', text: pct(cur / 100) + '%', title: I18n.t('Cota de TVA a acestui rând'), type: 'button' });
+        vr.addEventListener('click', () => { l.vatRate = rates[(rates.indexOf(cur) + 1) % rates.length]; renderLines(); changed(); });
+      }
+      const row = el('div', { class: 'line' }, [el('span', { class: 'n', text: String(idx + 1) }), tag, d, q, el('span', { class: 'x', text: '×' }), p, val, vr, del].filter(Boolean));
       row.dataset.idx = idx;
       list.append(row);
     });
@@ -1152,6 +1200,13 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     }
     inv.number = Math.max(1, Math.round(num(inv.number)) || 1);
     inv.series = String(inv.series || '').trim().toUpperCase();
+    // what another device made in the meantime: looked at first (briefly), so the number is the next free one
+    if (typeof Sync !== 'undefined' && inv.series === biz.series[inv.docType]) {
+      const wasNext = inv.number === Biz.nextOf(biz, inv.docType);
+      await Promise.race([Promise.resolve(Sync.run('pull')).catch(() => {}), new Promise((r) => setTimeout(r, 2500))]);
+      biz = Biz.get(biz.id) || biz;
+      if (wasNext) { inv.number = Biz.nextOf(biz, inv.docType); changed(); }
+    }
     // e-Factura: what ANAF would refuse, said before the invoice exists (it can still be created)
     if (inv.docType === 'invoice' && typeof EFactura !== 'undefined' && (await EFactura.connected())) {
       const problems = EFactura.problemsFor(inv, biz);
@@ -1193,6 +1248,8 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     });
     if (!target) return;
     if (Host.exists(target) && !(await UI.confirm('Fișierul există deja', `„${Host.baseName(target)}” există. Îl înlocuiesc?`, 'Înlocuiește'))) return;
+    if (Biz.sameNumber(biz.id, inv.docType, inv.series, inv.number, String(inv.date).slice(0, 4)).some((d) => d.path !== target)
+      && !(await UI.confirm(`${inv.series}-${pad(inv.number)} ${I18n.t('există deja')}`, 'Numerele documentelor nu trebuie să se repete în același an. Schimbă numărul, dacă nu ești sigur.', 'Continuă oricum', 'Schimb numărul'))) return;
     // one document of the plan per series + number (creating it again does not count twice)
     if (typeof Plan !== 'undefined' && !(await Plan.allow('invoices', [biz.id, inv.docType, inv.series, inv.number].join('|')))) return;
 
@@ -1201,7 +1258,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
       const bytes = await Host.htmlToPdf(html(inv, tplOf()));
       Host.writeFile(target, bytes);
       const t = compute();
-      const snapshot = clone(inv);
+      const snapshot = withTaxOfNow(clone(inv));
       const docId = Biz.addDoc({
         bizId: biz.id, type: inv.docType, series: inv.series, number: inv.number, client: inv.client.name.trim(), total: t.total,
         currency: inv.currency, date: inv.date, due: inv.due || '', path: target, paid: inv.docType === 'invoice' ? paidState() : null,
@@ -1241,7 +1298,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
       if (e && e.code === 'PRINT_DIALOG') {
         // Saved by the phone's own print screen: keep it in the list and move to the next number.
         const t = compute();
-        const docId = Biz.addDoc({ bizId: biz.id, type: inv.docType, series: inv.series, number: inv.number, client: inv.client.name.trim(), total: t.total, currency: inv.currency, date: inv.date, due: inv.due || '', path: '', paid: inv.docType === 'invoice' ? paidState() : null, paidAt: inv.docType === 'invoice' && paidState() ? inv.date : null, lang: inv.lang || 'ro', data: clone(inv) });
+        const docId = Biz.addDoc({ bizId: biz.id, type: inv.docType, series: inv.series, number: inv.number, client: inv.client.name.trim(), total: t.total, currency: inv.currency, date: inv.date, due: inv.due || '', path: '', paid: inv.docType === 'invoice' ? paidState() : null, paidAt: inv.docType === 'invoice' && paidState() ? inv.date : null, lang: inv.lang || 'ro', data: withTaxOfNow(clone(inv)) });
         if (inv.docType === 'invoice' && typeof EFactura !== 'undefined') EFactura.enqueue(docId);
         rememberClient(); learn();
         if (inv.series === biz.series[inv.docType]) { Biz.bumpNumber(biz.id, inv.docType, inv.number); biz = Biz.get(biz.id); }
@@ -1517,11 +1574,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
 
   /** Opens the program. opts: {type, from: issued doc to copy, as: type for the copy}. */
   async function open(opts = {}) {
-    // invoices are kept and numbered in the account: ask for it before the form, not after filling it in
-    if (typeof Account !== 'undefined' && Account.current && !Account.current() && typeof Plan !== 'undefined' && Plan.needAccount) {
-      await Plan.needAccount('invoices');
-      return;
-    }
+    // the form works without an account: the account is asked for when the document is created (the draft stays)
     Biz.migrate();
     biz = Biz.active();
     if (!biz) {
@@ -1535,7 +1588,16 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
       const b2 = Biz.get(opts.from.bizId);
       if (b2) { biz = b2; Biz.setActive(b2.id); }
       const type = opts.as || src.docType || 'invoice';
-      inv = { ...blank(type), client: src.client || blank().client, extra: src.extra || {}, lines: (src.lines || []).map((l) => ({ ...l, id: Date.now() + Math.random() })), notes: src.notes || '', discount: src.discount || 0, currency: src.currency || biz.currency, pay: src.pay || 'Numerar' };
+      inv = { ...blank(type), client: src.client || blank().client, extra: src.extra || {}, lines: (src.lines || []).map((l) => ({ ...l, id: Date.now() + Math.random() })), notes: src.notes || '', discount: src.discount || 0, currency: src.currency || biz.currency, pay: src.pay || 'Numerar', taxMode: src.taxMode || 'normal', rate: src.rate || '' };
+      if (opts.storno) {
+        // the same lines with negative quantities; a discount is moved into the prices, so the amounts cancel exactly
+        const k = 1 - Math.min(100, Math.max(0, num(src.discount) || 0)) / 100;
+        inv.lines = inv.lines.map((l) => ({ ...l, qty: -(num(l.qty) || 0), price: Math.round(num(l.price) * k * 1e6) / 1e6 }));
+        inv.discount = 0;
+        inv.paid = true;
+        inv.due = '';
+        inv.stornoOf = { series: opts.from.series, number: opts.from.number, date: opts.from.date };
+      }
     } else if (opts.type) {
       inv = draft && draft.bizId === biz.id && draft.docType === opts.type && (draft.lines.length || draft.client.name) ? draft : blank(opts.type);
     } else {
@@ -1884,7 +1946,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
     const [st, stLabel, stSub] = statusOf(d);
     const row = el('button', { class: 'row', type: 'button' }, [
       el('span', { class: 'av', style: { background: Biz.colorFor(d.client) }, text: Biz.initials(d.client) }),
-      el('span', { class: 'rt' }, [el('b', { text: d.client || '—' }), el('small', { text: `${d.series}-${pad(d.number)} · ${dateRo(d.date)}${stSub ? ' · ' + stSub : ''}` })]),
+      el('span', { class: 'rt' }, [el('b', { class: 'no-tr', text: d.client || '—' }), el('small', { text: `${d.series}-${pad(d.number)} · ${dateRo(d.date)}${stSub ? ' · ' + stSub : ''}` })]),
       el('span', { class: 'rr' }, [el('b', { text: moneyC(d.total || 0, d.currency) }), el('span', { class: 'st ' + st, html: (st === 'paid' ? svg('check') : st === 'late' ? svg('info') : st === 'due' ? svg('calendar') : '') + `<span>${esc(stLabel)}</span>` })]),
     ]);
     const ef = typeof EFactura !== 'undefined' && EFactura.badge(d);
@@ -1905,6 +1967,7 @@ thead { display: table-header-group; } tr { page-break-inside: avoid; }
       d.type === 'invoice' && d.paid !== false ? { label: 'Marchează ca neplătită', icon: 'calendar', run: () => { Biz.updateDoc(d.id, { paid: false, paidAt: null, due: d.due || addDays(d.date || today(), 15) }); refresh(); } } : null,
       d.type !== 'invoice' && d.data ? { label: 'Transformă în factură', icon: 'swap', run: () => open({ from: d, as: 'invoice' }) } : null,
       d.data ? { label: 'Duplică (document nou la fel)', icon: 'copy', run: () => open({ from: d }) } : null,
+      d.type === 'invoice' && d.data && !d.data.stornoOf ? { label: 'Stornează factura', icon: 'undo', run: () => open({ from: d, as: 'invoice', storno: true }) } : null,
       '-',
       { label: 'Scoate din listă', icon: 'del', danger: true, run: async () => { if (await UI.confirm('Scot documentul din listă?', 'Fișierul PDF rămâne unde e; doar nu mai apare aici.', 'Scoate')) { Biz.removeDoc(d.id); refresh(); } } },
     ];

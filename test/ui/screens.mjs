@@ -16,7 +16,7 @@ const ROOT = path.resolve(HERE, '../../app');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
 const QUICK = process.argv.includes('--quick');
 const OUT = path.resolve(arg('out', path.join(HERE, 'out')));
-const CHROME = process.env.CHROME || '/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell';
+const CHROME = process.env.CHROME || (process.platform === 'win32' && fs.existsSync('C:/Program Files/Google/Chrome/Application/chrome.exe') ? 'C:/Program Files/Google/Chrome/Application/chrome.exe' : undefined);
 
 // ---------------------------------------------------------------- devices (CSS pixels)
 const DEVICES = [
@@ -29,7 +29,7 @@ const DEVICES = [
   { id: 'ipad-landscape', label: 'iPad 11" orizontal', w: 1194, h: 834, dpr: 2, platform: 'ios', glass: true, touch: true },
   { id: 'desktop', label: 'Calculator (fereastră 1366×800)', w: 1366, h: 800, dpr: 1, platform: 'android', glass: false, touch: false },
 ];
-const LANGS = ['ro', 'en', 'de', 'ja'];
+const LANGS = ['ro', 'en', 'de', 'ja', 'ar'];
 
 // ---------------------------------------------------------------- what to show on each screen
 const signedIn = `(() => {

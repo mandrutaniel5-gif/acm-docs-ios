@@ -152,11 +152,14 @@ const UI = (() => {
   }
 
   const stack = []; // open dialogs (for the phone's Back button)
+  let dialogs = 0;
+  const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
   function modal(build) {
     return new Promise((resolve) => {
       const root = document.getElementById('modal-root');
       const back = el('div', { class: 'backdrop' });
-      const box = el('div', { class: 'modal' });
+      const box = el('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', tabindex: '-1' });
+      const opener = document.activeElement;
       const append0 = box.append.bind(box);
       box.append = (...nodes) => append0(...nodes.filter((n) => n != null && n !== false));
       back.append(box);
@@ -169,10 +172,19 @@ const UI = (() => {
         document.removeEventListener('keydown', onKey, true);
         const i = stack.indexOf(cancel);
         if (i >= 0) stack.splice(i, 1);
+        // the keyboard goes back where it was
+        try { if (!phone() && opener && opener !== document.body && document.contains(opener)) opener.focus({ preventScroll: true }); } catch (e) {}
         resolve(v);
       };
       const onKey = (e) => {
         if (e.key === 'Escape' && stack[stack.length - 1] === cancel) { e.preventDefault(); e.stopPropagation(); close(undefined); }
+        // Tab stays inside the dialog on top
+        if (e.key === 'Tab' && stack[stack.length - 1] === cancel) {
+          const list = [...box.querySelectorAll(FOCUSABLE)].filter((x) => x.offsetParent !== null);
+          if (!list.length) { e.preventDefault(); return; }
+          const first = list[0], last = list[list.length - 1], now = document.activeElement;
+          if (!box.contains(now) || now === box) { e.preventDefault(); (e.shiftKey ? last : first).focus(); } else if (e.shiftKey && now === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && now === last) { e.preventDefault(); first.focus(); }
+        }
       };
       document.addEventListener('keydown', onKey, true);
       back.addEventListener('pointerdown', (e) => { back._down = e.target === back; });
@@ -180,10 +192,13 @@ const UI = (() => {
       if (phone()) box.append(el('div', { class: 'sheet-grip' }));
       stack.push(cancel);
       build(box, close);
+      const title = box.querySelector('h2');
+      if (title) { title.id = title.id || 'dlg-' + (++dialogs); box.setAttribute('aria-labelledby', title.id); }
       root.append(back);
       hydrateIcons(box);
       const f = box.querySelector('[autofocus]');
       if (f) setTimeout(() => f.focus(), 30);
+      else if (!phone()) box.focus({ preventScroll: true });
     });
   }
 

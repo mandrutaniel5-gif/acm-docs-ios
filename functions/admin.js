@@ -211,7 +211,13 @@ export function makeAdmin(d) {
   async function setSwitches(v) {
     const off = {};
     for (const f of FEATURES) if (v.off && v.off[f] === true) off[f] = true;
-    const doc = { off, all: v.all === true, msg: str(v.msg, 300), at: FieldValue.serverTimestamp() };
+    // the newest version of each app, for the note shown in apps installed outside a store
+    const latest = {};
+    for (const k of ['win', 'android', 'ios']) {
+      const x = (v.latest && v.latest[k]) || {};
+      if (/^\d+\.\d+\.\d+$/.test(String(x.v || '')) && /^https:\/\/\S{1,400}$/.test(String(x.url || ''))) latest[k] = { v: String(x.v), url: String(x.url) };
+    }
+    const doc = { off, all: v.all === true, msg: str(v.msg, 300), latest, at: FieldValue.serverTimestamp() };
     await db.collection('server').doc('switches').set(doc);
     d.resetSwitches();
     return d.switches();

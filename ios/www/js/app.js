@@ -158,6 +158,8 @@ const App = (() => {
   function renderHome() {
     Biz.migrate();
     const b = Biz.active();
+    // no company yet: no empty money card, only the first steps
+    $('home-money').classList.toggle('hidden', !b);
     // invoices card
     const s = Invoice.summary();
     $('mc-amount').innerHTML = s ? `${Invoice.money(s.month)}<small>${escapeHtml(s.currency)}</small>` : `0,00<small>lei</small>`;
@@ -178,8 +180,8 @@ const App = (() => {
       );
     } else {
       bc.append(
-        el('div', { class: 'bh' }, [el('span', { class: 'bl', html: svg('building') }), el('div', { class: 'bt' }, [el('b', { text: 'Firma ta' }), el('small', { text: 'Facturi profesionale, pentru orice activitate' })])]),
-        el('p', { text: 'Configurezi o dată datele firmei și emiți facturi, proforme și oferte în câteva secunde.' }),
+        el('div', { class: 'bh' }, [el('span', { class: 'bl', html: svg('building') }), el('div', { class: 'bt' }, [el('b', { text: 'Începe în 3 pași' }), el('small', { text: 'Facturi profesionale, pentru orice activitate' })])]),
+        el('ol', { class: 'first-steps' }, ['Completează datele firmei', 'Emite prima factură', 'Trimite-o clientului'].map((t) => el('li', { text: t }))),
         el('div', { class: 'brow' }, [el('button', { class: 'pill primary', type: 'button', text: 'Configurează firma', onclick: () => Invoice.open() })]),
       );
     }
@@ -210,8 +212,9 @@ const App = (() => {
     const tag = f.kind === 'edited' ? el('span', { class: 'tag-ed', text: 'editat' }) : f.kind === 'invoice' ? el('span', { class: 'tag-inv', text: 'document emis' }) : f.kind === 'secure' ? el('span', { class: 'tag-sec', text: 'criptat' }) : null;
     const title = el('b', { class: 'no-tr' }, [name]);
     if (tag) title.append(tag);
-    const more = el('span', { class: 'rmore', html: svg('morez'), title: 'Mai multe' });
+    const more = el('span', { class: 'rmore', html: svg('morez'), title: 'Mai multe', role: 'button', tabindex: '0' });
     more.addEventListener('click', (e) => { e.stopPropagation(); fileActions(path, f.kind, more); });
+    more.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); fileActions(path, f.kind, more); } });
     const row = el('button', { class: 'row', type: 'button', title: path }, [pic, el('span', { class: 'rt' }, [title, el('small', { text: `${when(Host.mtime(path) || f.time)} · ${Host.baseName(Host.dirName(path))}` })]), more]);
     row.addEventListener('click', () => openPath(path));
     return row;
@@ -259,8 +262,9 @@ const App = (() => {
       const moreBtn = el('button', { title: 'Mai multe', html: svg('morez') });
       moreBtn.addEventListener('click', (e) => { e.stopPropagation(); fileActions(path, f.kind, moreBtn); });
       const sub = f.kind === 'edited' && f.from ? `${escapeHtml(I18n.t('din'))} ${escapeHtml(Host.baseName(f.from))}` : `${when(Host.mtime(path) || f.time)}`;
-      const c = el('div', { class: 'fcard', title: path }, [thumb, el('div', { class: 'fname', text: name }), el('div', { class: 'fsub', html: sub }), el('div', { class: 'fbtns' }, [moreBtn])]);
+      const c = el('div', { class: 'fcard', title: path, role: 'button', tabindex: '0', 'aria-label': name }, [thumb, el('div', { class: 'fname', text: name }), el('div', { class: 'fsub', html: sub }), el('div', { class: 'fbtns' }, [moreBtn])]);
       c.addEventListener('click', () => openPath(path));
+      c.addEventListener('keydown', (e) => { if (e.target === c && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openPath(path); } });
       return c;
     };
     for (const f of all.filter((x) => (tab === 'all' || x.kind === tab) && (!q || Host.baseName(x.path).toLowerCase().includes(q)))) grid.append(card(f));
@@ -346,8 +350,15 @@ const App = (() => {
     root.append(group('Date aplicație', [
       srow('refresh', 'gray', 'Golește memoria temporară', 'Previzualizări și preferințe de imprimare. Nu șterge nimic important.', chev(), async () => {
         for (const k of Object.keys(localStorage)) if (/thumb|acm\.print/i.test(k)) localStorage.removeItem(k);
+        localStorage.removeItem(THUMBS_KEY); // (kept in a file, not listed above)
         UI.toast(I18n.t('Memoria temporară a fost golită.'));
         renderView();
+      }),
+      srow('download', 'gray', 'Salvează o copie a datelor', 'Firme, clienți și lista documentelor, într-un fișier. Atenție: fișierul nu este criptat.', chev(), () => exportData()),
+      srow('refresh', 'gray', 'Restaurează dintr-o copie', 'Adaugă datele din fișier la cele existente. Nu șterge nimic.', chev(), () => importData()),
+      srow('info', 'gray', 'Jurnal de erori', 'Copiază ultimele erori, ca să le trimiți la suport.', chev(), () => {
+        Lib.clipboard.writeText(localStorage.getItem(ERRLOG) || '[]');
+        UI.toast(I18n.t('Jurnalul a fost copiat.'));
       }),
       srow('del', 'red', 'Șterge toate datele aplicației', 'Firme, clienți, lista documentelor, șabloane și setări. Fișierele salvate rămân.', chev(), () => resetAll()),
     ], 'Folosește ștergerea dacă ai avut o versiune mai veche și ceva nu arată bine. Aplicația pornește ca la prima instalare.'));
@@ -385,6 +396,48 @@ const App = (() => {
     try { sessionStorage.clear(); } catch (e) {}
     try { localStorage.setItem('acm.reset', '1'); } catch (e) {} // no import from the old "PDF Editor" data
     location.reload();
+  }
+
+  // ---------------------------------------------------------------- a copy of the data, in a file
+  const BACKUP_KEYS = ['acm.businesses', 'acm.business', 'acm.invoiceClients', 'acm.invoiceItems', 'acm.docs', 'pdfeditor.signatures'];
+  async function exportData() {
+    const data = {};
+    for (const k of BACKUP_KEYS) { const v = localStorage.getItem(k); if (v !== null) data[k] = v; }
+    const name = `ACM Docs copie ${new Date().toISOString().slice(0, 10)}.json`;
+    try {
+      const target = await Host.saveDialog(name, await Host.specialDir('documents'), 'json');
+      if (!target) return;
+      Host.writeFile(target, new TextEncoder().encode(JSON.stringify({ app: 'ACM Docs', v: 1, at: Date.now(), data })));
+      if (Host.mobile) Host.exportCopy(target);
+      else UI.toast(I18n.t('Copia a fost salvată.'), { action: { label: I18n.t('Arată în folder'), run: () => Host.showInFolder(target) } });
+    } catch (e) { UI.errorDetails('Nu am putut salva copia', e); }
+  }
+  async function importData() {
+    const path = await Host.openDialog('all');
+    if (!path) return;
+    try {
+      const o = JSON.parse(new TextDecoder().decode(await Host.readFileAsync(path)));
+      if (!o || o.app !== 'ACM Docs' || !o.data) throw new Error('format');
+      for (const k of BACKUP_KEYS) {
+        if (typeof o.data[k] !== 'string') continue;
+        const cur = localStorage.getItem(k);
+        if (cur === null || k === 'acm.business') { if (cur === null) localStorage.setItem(k, o.data[k]); continue; }
+        localStorage.setItem(k, Sync.merge3(k, {}, cur, o.data[k]));
+      }
+      Biz.reload();
+      renderView();
+      UI.toast(I18n.t('Datele au fost adăugate.'));
+    } catch (e) { UI.toast(I18n.t('Fișierul nu este o copie ACM Docs.'), { error: true }); }
+  }
+
+  // the last errors stay on this device only; they leave it only if the person copies them
+  const ERRLOG = 'acm.errlog';
+  function noteError(what) {
+    try {
+      const list = JSON.parse(localStorage.getItem(ERRLOG) || '[]');
+      list.push({ at: new Date().toISOString(), v: Host.appVersion(), e: String((what && (what.stack || what.message)) || what).slice(0, 800) });
+      localStorage.setItem(ERRLOG, JSON.stringify(list.slice(-40)));
+    } catch (e) {}
   }
 
   /** "Creează" (the + button): what can be made. */
@@ -1090,7 +1143,8 @@ const App = (() => {
     const t0 = Date.now();
     Theme.apply();
     I18n.init();
-    I18n.onChange((l) => { try { if (window.AndroidBridge && AndroidBridge.setLang) AndroidBridge.setLang(l); } catch (e) {} });
+    I18n.onChange((l) => { try { if (window.AndroidBridge && AndroidBridge.setLang) AndroidBridge.setLang(l); else if (window.ElectronHost) ElectronHost.invoke('set-lang', l); } catch (e) {} });
+    try { if (window.ElectronHost) ElectronHost.invoke('set-lang', I18n.lang); } catch (e) {}
     try { if (window.AndroidBridge && AndroidBridge.setLang) AndroidBridge.setLang(I18n.lang); } catch (e) {}
     hydrateIcons();
     try { Biz.migrate(); } catch (e) { console.error(e); }
@@ -1109,9 +1163,10 @@ const App = (() => {
     // The page itself never scrolls (only the panels inside it do).
     window.addEventListener('scroll', () => { if (window.scrollY || window.scrollX) window.scrollTo(0, 0); });
     document.addEventListener('scroll', (e) => { const t = e.target; if (t && t.classList && t.classList.contains('screen') && t.scrollTop) t.scrollTop = 0; }, true);
-    window.addEventListener('error', (e) => console.error(e.error || e.message));
+    window.addEventListener('error', (e) => { console.error(e.error || e.message); noteError(e.error || e.message); });
     window.addEventListener('unhandledrejection', (e) => {
       console.error(e.reason);
+      noteError(e.reason);
       UI.toast('A apărut o eroare: ' + ((e.reason && e.reason.message) || e.reason), { error: true, action: { label: 'Detalii', run: () => UI.errorDetails('Eroare', e.reason) } });
     });
     window.__onBack = () => { back().then((handled) => { if (!handled) Host.exitApp(); }); return true; };
@@ -1136,7 +1191,7 @@ const App = (() => {
   document.addEventListener('DOMContentLoaded', boot);
 
   return {
-    chooseTool, pickImage, openPath, newBlank, openDialog, renderHome, recentFiles: () => files().filter((f) => Host.exists(f.path)), renderView, ensureClosed: async () => (await ensureSaved()) && (await Office.ensureSaved()), quietScanHint, save, saveAs, closeDoc, addPdf, showScreen, showHome, showView, rememberFile, forgetPath, scan, back,
+    exportData, importData, chooseTool, pickImage, openPath, newBlank, openDialog, renderHome, recentFiles: () => files().filter((f) => Host.exists(f.path)), renderView, ensureClosed: async () => (await ensureSaved()) && (await Office.ensureSaved()), quietScanHint, save, saveAs, closeDoc, addPdf, showScreen, showHome, showView, rememberFile, forgetPath, scan, back,
     get copyPath() { return copyPath; },
   };
 })();

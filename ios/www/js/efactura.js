@@ -62,7 +62,7 @@ const EFactura = (() => {
 
   // ---------------------------------------------------------------- the XML (UBL 2.1, CIUS-RO)
   const x = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
-  const amt = (n) => (Math.round((+n || 0) * 100) / 100).toFixed(2);
+  const amt = (n) => { const v = Math.round(Math.abs(+n || 0) * 100) / 100; return (+n < 0 && v ? '-' : '') + v.toFixed(2); };
   const digits = (s) => String(s || '').replace(/[^0-9]/g, '');
   const cleanCui = (s) => String(s || '').toUpperCase().replace(/\s+/g, '');
   const price = (n) => { const v = (+n || 0).toFixed(6).replace(/0+$/, '').replace(/\.$/, ''); return /\./.test(v) && v.split('.')[1].length < 2 ? (+v).toFixed(2) : v.includes('.') ? v : (+v).toFixed(2); };
@@ -84,9 +84,12 @@ const EFactura = (() => {
   /** Everything ANAF needs, from the invoice as it was created. Returns { xml, problems[] }. */
   function build(d) {
     const inv = d.data || {};
-    const b = Biz.get(d.bizId) || Biz.active();
+    // never the data of another company: a document of a removed company stays unsent
+    const b0 = d.bizId ? Biz.get(d.bizId) : Biz.active();
     const problems = [];
-    if (!b) return { xml: '', problems: ['Datele firmei lipsesc.'] };
+    if (!b0) return { xml: '', problems: ['Datele firmei lipsesc.'] };
+    // the address can be corrected and sent again, the VAT stays as it was when the invoice was made
+    const b = { ...b0, ...(inv.tax || {}) };
     const t = Invoice.compute(inv, b);
     const cats = Biz.industry(b.industry).cats || [];
     const cur = inv.currency || 'RON';
@@ -113,20 +116,29 @@ const EFactura = (() => {
     if (!t.rows.length) problems.push('Factura nu are produse sau servicii.');
     if (cur !== 'RON' && t.vat && !(+inv.rate > 0)) problems.push('Completează cursul de schimb (factura în altă monedă decât lei).');
 
-    const vat = t.vat, rate = Math.round(t.rate * 10000) / 100; // e.g. 21
-    const catId = vat ? 'S' : 'O';
-    const taxCat = (inner) => `<cac:${inner}><cbc:ID>${catId}</cbc:ID>${vat ? `<cbc:Percent>${rate}</cbc:Percent>` : ''}<cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme></cac:${inner}>`;
+    // the VAT category: S with its rate, or the regime of the whole invoice
+    const vat = t.vat, payer = t.payer, mode = t.mode;
+    const REGIME = { reverse: ['AE', 'VATEX-EU-AE'], intra: ['K', 'VATEX-EU-IC'], export: ['G', 'VATEX-EU-G'], exempt: ['E', null] };
+    const percent = (r) => Math.round(r * 10000) / 100; // e.g. 21
+    const catId = vat ? 'S' : !payer ? 'O' : REGIME[mode][0];
+    const taxCat = (inner, r) => `<cac:${inner}><cbc:ID>${catId}</cbc:ID>${vat ? `<cbc:Percent>${percent(r)}</cbc:Percent>` : catId !== 'O' ? '<cbc:Percent>0</cbc:Percent>' : ''}<cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme></cac:${inner}>`;
     const lineNet = (r) => (vat ? r.base : r.gross);
-    const lineSum = Math.round(t.rows.reduce((s, r) => s + lineNet(r), 0) * 100) / 100;
-    const taxable = Math.round(t.base * 100) / 100;
-    const allowance = Math.round((lineSum - taxable) * 100) / 100;
-    const tax = vat ? Math.round(taxable * t.rate * 100) / 100 : 0;
-    const incl = Math.round((taxable + tax) * 100) / 100;
+    const rnd = (v) => Math.round(v * 100) / 100;
+    const lineSum = rnd(t.rows.reduce((s, r) => s + lineNet(r), 0));
+    const taxable = rnd(t.base);
+    const tax = vat ? t.tva : 0;
+    const incl = rnd(taxable + tax);
+    // a discount per VAT rate: the taxable amount of each rate is what compute() says
+    const allowances = vat
+      ? t.taxes.map((g) => ({ r: g.rate, amount: rnd(t.rows.filter((y) => y.rate === g.rate).reduce((s, y) => s + y.base, 0) - g.base) })).filter((a) => a.amount > 0)
+      : (rnd(lineSum - taxable) > 0 ? [{ r: 0, amount: rnd(lineSum - taxable) }] : []);
+    const allowance = rnd(allowances.reduce((s, a) => s + a.amount, 0));
+    if ((mode === 'reverse' || mode === 'intra') && !/^[A-Z]{2}/.test(cleanCui(c.cui))) problems.push('La acest regim, clientul are nevoie de cod de TVA, cu prefixul țării (de exemplu RO12345678 sau DE123456789).');
     const payable = Math.round(t.total * 100) / 100;
     const rounding = Math.round((payable - incl) * 100) / 100;
 
     const sellerName = b.legal || b.name;
-    const buyerId = pj ? digits(c.cui) || cut(c.cui, 30) : digits(c.cnp).length === 13 ? digits(c.cnp) : '0000000000000';
+    const buyerId = pj ? digits(c.cui) || cut(c.cui, 30) || (cp.country !== 'RO' ? '0000000000000' : '') : digits(c.cnp).length === 13 ? digits(c.cnp) : '0000000000000';
     const notes = [inv.notes, !vat ? b.nonVatNote : ''].filter((n) => n && String(n).trim()).map((n) => `<cbc:Note>${x(cut(n, 300))}</cbc:Note>`).join('');
     const payCode = PAY[inv.pay] || (b.iban ? '42' : '10');
     const iban = String(b.iban || '').replace(/\s+/g, '');
@@ -137,7 +149,7 @@ const EFactura = (() => {
       const net = lineNet(r);
       const name = String(r.desc || '').trim();
       return `<cac:InvoiceLine><cbc:ID>${i + 1}</cbc:ID><cbc:InvoicedQuantity unitCode="${unitCode(r.um || (cat && cat.um) || 'buc')}">${+qty.toFixed(3)}</cbc:InvoicedQuantity><cbc:LineExtensionAmount currencyID="${cur}">${amt(net)}</cbc:LineExtensionAmount>`
-        + `<cac:Item>${name.length > 100 ? `<cbc:Description>${x(cut(name, 200))}</cbc:Description>` : ''}<cbc:Name>${x(cut(name, 100))}</cbc:Name>${taxCat('ClassifiedTaxCategory')}</cac:Item>`
+        + `<cac:Item>${name.length > 100 ? `<cbc:Description>${x(cut(name, 200))}</cbc:Description>` : ''}<cbc:Name>${x(cut(name, 100))}</cbc:Name>${taxCat('ClassifiedTaxCategory', r.rate)}</cac:Item>`
         + `<cac:Price><cbc:PriceAmount currencyID="${cur}">${price(net / qty)}</cbc:PriceAmount></cac:Price></cac:InvoiceLine>`;
     }).join('');
 
@@ -147,19 +159,23 @@ const EFactura = (() => {
       + `<cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:efactura.mfinante.ro:CIUS-RO:1.0.1</cbc:CustomizationID>`
       + `<cbc:ID>${x(idOf(d))}</cbc:ID><cbc:IssueDate>${x(inv.date || d.date)}</cbc:IssueDate>${inv.due ? `<cbc:DueDate>${x(inv.due)}</cbc:DueDate>` : ''}`
       + `<cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>${notes}<cbc:DocumentCurrencyCode>${cur}</cbc:DocumentCurrencyCode>${ronTax != null ? '<cbc:TaxCurrencyCode>RON</cbc:TaxCurrencyCode>' : ''}`
+      + (inv.stornoOf ? `<cac:BillingReference><cac:InvoiceDocumentReference><cbc:ID>${x(idOf(inv.stornoOf))}</cbc:ID>${inv.stornoOf.date ? `<cbc:IssueDate>${x(inv.stornoOf.date)}</cbc:IssueDate>` : ''}</cac:InvoiceDocumentReference></cac:BillingReference>` : '')
       + `<cac:AccountingSupplierParty><cac:Party>${addressXml(sp.street, sp.city, sp.county, sp.country)}`
-      + (vat ? `<cac:PartyTaxScheme><cbc:CompanyID>RO${sCui}</cbc:CompanyID><cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme></cac:PartyTaxScheme>` : '')
-      + `<cac:PartyLegalEntity><cbc:RegistrationName>${x(cut(sellerName, 200))}</cbc:RegistrationName><cbc:CompanyID>${x(vat ? cut(b.regcom, 50) || sCui : sCui)}</cbc:CompanyID></cac:PartyLegalEntity>`
+      + (payer ? `<cac:PartyTaxScheme><cbc:CompanyID>RO${sCui}</cbc:CompanyID><cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme></cac:PartyTaxScheme>` : '')
+      + `<cac:PartyLegalEntity><cbc:RegistrationName>${x(cut(sellerName, 200))}</cbc:RegistrationName><cbc:CompanyID>${x(payer ? cut(b.regcom, 50) || sCui : sCui)}</cbc:CompanyID></cac:PartyLegalEntity>`
       + (b.phone || b.email ? `<cac:Contact>${b.phone ? `<cbc:Telephone>${x(cut(b.phone, 40))}</cbc:Telephone>` : ''}${b.email ? `<cbc:ElectronicMail>${x(cut(b.email, 100))}</cbc:ElectronicMail>` : ''}</cac:Contact>` : '')
       + `</cac:Party></cac:AccountingSupplierParty>`
       + `<cac:AccountingCustomerParty><cac:Party>${addressXml(cp.street, cp.city, cp.county, cp.country)}`
-      + (vat && pj && /^[A-Z]{2}/.test(cleanCui(c.cui)) ? `<cac:PartyTaxScheme><cbc:CompanyID>${x(cleanCui(c.cui))}</cbc:CompanyID><cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme></cac:PartyTaxScheme>` : '')
+      + (payer && pj && /^[A-Z]{2}/.test(cleanCui(c.cui)) ? `<cac:PartyTaxScheme><cbc:CompanyID>${x(cleanCui(c.cui))}</cbc:CompanyID><cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme></cac:PartyTaxScheme>` : '')
       + `<cac:PartyLegalEntity><cbc:RegistrationName>${x(cut(c.name, 200))}</cbc:RegistrationName>${buyerId ? `<cbc:CompanyID>${x(buyerId)}</cbc:CompanyID>` : ''}</cac:PartyLegalEntity>`
       + `</cac:Party></cac:AccountingCustomerParty>`
+      + (mode === 'intra' ? `<cac:Delivery><cbc:ActualDeliveryDate>${x(inv.date || d.date)}</cbc:ActualDeliveryDate><cac:DeliveryLocation><cac:Address><cbc:StreetName>${x(cut(cp.street, 150))}</cbc:StreetName><cbc:CityName>${x(cut(cp.city, 50))}</cbc:CityName><cbc:CountrySubentity>${x(cp.county || cut(c.county || cp.city, 50))}</cbc:CountrySubentity><cac:Country><cbc:IdentificationCode>${x(cp.country)}</cbc:IdentificationCode></cac:Country></cac:Address></cac:DeliveryLocation></cac:Delivery>` : '')
       + `<cac:PaymentMeans><cbc:PaymentMeansCode>${payCode}</cbc:PaymentMeansCode>${payCode === '42' && iban ? `<cac:PayeeFinancialAccount><cbc:ID>${x(iban)}</cbc:ID></cac:PayeeFinancialAccount>` : ''}</cac:PaymentMeans>`
-      + (allowance > 0 ? `<cac:AllowanceCharge><cbc:ChargeIndicator>false</cbc:ChargeIndicator><cbc:AllowanceChargeReason>Discount</cbc:AllowanceChargeReason><cbc:Amount currencyID="${cur}">${amt(allowance)}</cbc:Amount>${taxCat('TaxCategory')}</cac:AllowanceCharge>` : '')
-      + `<cac:TaxTotal><cbc:TaxAmount currencyID="${cur}">${amt(tax)}</cbc:TaxAmount><cac:TaxSubtotal><cbc:TaxableAmount currencyID="${cur}">${amt(taxable)}</cbc:TaxableAmount><cbc:TaxAmount currencyID="${cur}">${amt(tax)}</cbc:TaxAmount>`
-      + `<cac:TaxCategory><cbc:ID>${catId}</cbc:ID>${vat ? `<cbc:Percent>${rate}</cbc:Percent>` : '<cbc:TaxExemptionReasonCode>VATEX-EU-O</cbc:TaxExemptionReasonCode>'}<cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme></cac:TaxCategory></cac:TaxSubtotal></cac:TaxTotal>`
+      + allowances.map((a) => `<cac:AllowanceCharge><cbc:ChargeIndicator>false</cbc:ChargeIndicator><cbc:AllowanceChargeReason>Discount</cbc:AllowanceChargeReason><cbc:Amount currencyID="${cur}">${amt(a.amount)}</cbc:Amount>${taxCat('TaxCategory', a.r)}</cac:AllowanceCharge>`).join('')
+      + `<cac:TaxTotal><cbc:TaxAmount currencyID="${cur}">${amt(tax)}</cbc:TaxAmount>`
+      + (vat ? t.taxes : [{ rate: 0, base: taxable, tva: 0 }]).map((g) => `<cac:TaxSubtotal><cbc:TaxableAmount currencyID="${cur}">${amt(g.base)}</cbc:TaxableAmount><cbc:TaxAmount currencyID="${cur}">${amt(g.tva)}</cbc:TaxAmount>`
+        + `<cac:TaxCategory><cbc:ID>${catId}</cbc:ID>${vat ? `<cbc:Percent>${percent(g.rate)}</cbc:Percent>` : catId === 'O' ? '<cbc:TaxExemptionReasonCode>VATEX-EU-O</cbc:TaxExemptionReasonCode>' : catId === 'E' ? '<cbc:Percent>0</cbc:Percent><cbc:TaxExemptionReason>Scutit de TVA</cbc:TaxExemptionReason>' : `<cbc:Percent>0</cbc:Percent><cbc:TaxExemptionReasonCode>${REGIME[mode][1]}</cbc:TaxExemptionReasonCode>`}<cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme></cac:TaxCategory></cac:TaxSubtotal>`).join('')
+      + `</cac:TaxTotal>`
       + (ronTax != null ? `<cac:TaxTotal><cbc:TaxAmount currencyID="RON">${amt(ronTax)}</cbc:TaxAmount></cac:TaxTotal>` : '')
       + `<cac:LegalMonetaryTotal><cbc:LineExtensionAmount currencyID="${cur}">${amt(lineSum)}</cbc:LineExtensionAmount><cbc:TaxExclusiveAmount currencyID="${cur}">${amt(taxable)}</cbc:TaxExclusiveAmount><cbc:TaxInclusiveAmount currencyID="${cur}">${amt(incl)}</cbc:TaxInclusiveAmount>`
       + (allowance > 0 ? `<cbc:AllowanceTotalAmount currencyID="${cur}">${amt(allowance)}</cbc:AllowanceTotalAmount>` : '')
@@ -279,6 +295,8 @@ const EFactura = (() => {
     } catch (e) { return null; } // no answer: ANAF checks it again at upload
   }
 
+  const UNCERTAIN = 'Nu știm dacă factura a ajuns la ANAF (conexiunea s-a întrerupt). Verifică în SPV și trimite-o din nou doar dacă nu apare acolo.';
+  const deviceMark = () => { try { return (typeof Devices !== 'undefined' && Devices.myDevice()) || 'local'; } catch (e) { return 'local'; } };
   /** Sends one invoice (by its record); updates the record with what happened. */
   async function send(d) {
     const env = (await info()).env;
@@ -289,7 +307,15 @@ const EFactura = (() => {
     const tok = await access();
     const q = new URLSearchParams({ standard: 'UBL', cif: built.cif });
     if (built.extern) q.set('extern', 'DA');
-    const r = await Host.nativeHttp(`${API(env)}/${built.b2c && !built.extern ? 'uploadb2c' : 'upload'}?${q}`, { method: 'POST', headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'text/plain' }, body: built.xml });
+    // marked before it leaves: another device of the account does not send it too, and an answer lost on
+    // the way is never followed by an automatic second upload (ANAF would have the invoice twice)
+    update(d.id, { status: 'sending', by: deviceMark(), sendingAt: Date.now(), msg: null });
+    let r;
+    try {
+      r = await Host.nativeHttp(`${API(env)}/${built.b2c && !built.extern ? 'uploadb2c' : 'upload'}?${q}`, { method: 'POST', headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'text/plain' }, body: built.xml });
+    } catch (e) {
+      return update(d.id, { status: 'uncertain', msg: [UNCERTAIN] });
+    }
     const text = r.text();
     if (r.status === 401 || r.status === 403) return update(d.id, { status: 'queued', msg: ['ANAF nu a acceptat cheile de acces. Conectează din nou firma la SPV.'] });
     const h = tag(text, 'header');
@@ -357,7 +383,7 @@ const EFactura = (() => {
     if (!d || d.type !== 'invoice') return;
     const b = Biz.get(d.bizId);
     if (b && countryCode(b.country || 'România') !== 'RO') return; // only Romanian companies
-    update(id, { status: 'queued', queuedAt: Date.now() });
+    update(id, { status: 'queued', queuedAt: Date.now(), by: deviceMark() });
     process();
   }
   let running = false;
@@ -370,7 +396,10 @@ const EFactura = (() => {
       for (const d of list) {
         const s = d.efactura.status;
         try {
-          if (s === 'queued' && auto()) await send(d);
+          // the device that made the invoice sends it; another connected device takes over only after a while
+          const mine = !d.efactura.by || d.efactura.by === deviceMark() || Date.now() - (d.efactura.queuedAt || 0) > 600000;
+          if (s === 'queued' && auto() && mine) await send(d);
+          else if (s === 'sending' && Date.now() - (d.efactura.sendingAt || 0) > 300000) update(d.id, { status: 'uncertain', msg: [UNCERTAIN] }); // stopped while uploading
           else if (s === 'sent' && Date.now() - (d.efactura.checkedAt || d.efactura.sentAt || 0) > 20000) await check(d);
         } catch (e) {
           if (e && (e.code === 'not-connected' || e.code === 'expired')) { update(d.id, { msg: [e.message] }); break; }
@@ -397,6 +426,8 @@ const EFactura = (() => {
     switch (e.status) {
       case 'ok': return ['ok', 'SPV ✓', 'Validată de ANAF'];
       case 'sent': return ['wait', 'În SPV…', 'ANAF o verifică'];
+      case 'sending': return ['wait', 'Se trimite…', 'Pleacă spre ANAF'];
+      case 'uncertain': return ['warn', 'De verificat', 'Verifică în SPV dacă a ajuns'];
       case 'rejected': case 'invalid': return ['bad', 'Respinsă', 'Vezi ce trebuie corectat'];
       case 'incomplete': return ['warn', 'Date lipsă', 'Completează datele pentru SPV'];
       default: return [late ? 'bad' : 'warn', 'De trimis în SPV', late ? 'Termenul de 5 zile lucrătoare se apropie' : 'Se trimite când firma e conectată'];
@@ -417,7 +448,7 @@ const EFactura = (() => {
       if (e.msg && e.msg.length) box.append(el('div', { class: 'ef-msgs' }, e.msg.map((m) => el('div', { class: 'ef-msg', text: I18n.t(m) }))));
       if (e.index) box.append(el('p', { class: 'muted small', text: `${I18n.t('Index încărcare')}: ${e.index}${e.env === 'test' ? ' · ' + I18n.t('mediu de test') : ''}` }));
       box.append(el('div', { class: 'actions col' }, [
-        e.status !== 'ok' && e.status !== 'sent' ? el('button', { class: 'btn primary', type: 'button', text: 'Trimite în SPV', onclick: () => { close(); sendNow(d.id); } }) : null,
+        e.status !== 'ok' && e.status !== 'sent' && e.status !== 'sending' ? el('button', { class: 'btn primary', type: 'button', text: 'Trimite în SPV', onclick: () => { close(); sendNow(d.id); } }) : null,
         e.status === 'sent' ? el('button', { class: 'btn primary', type: 'button', text: 'Verifică acum', onclick: async () => { close(); UI.busy('Se verifică la ANAF…'); try { await check(d); } catch (x2) { UI.toast(x2.message, { error: true }); } finally { UI.busy(); } } }) : null,
         e.zip && Host.exists(e.zip) ? el('button', { class: 'btn', type: 'button', text: 'Arată răspunsul ANAF', onclick: () => { close(); Host.showInFolder(e.zip); } }) : null,
         el('button', { class: 'btn', type: 'button', text: 'Închide', onclick: () => close() }),

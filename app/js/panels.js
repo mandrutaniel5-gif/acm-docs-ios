@@ -108,7 +108,7 @@ const Toolbar = (() => {
     ['highlight', 'highlight', 'Evidențiere', 'Marchează cu marker (H)'],
     ['whiteout', 'whiteout', 'Acoperă', 'Acoperă cu alb (W)'],
     ['check', 'check', 'Bifă', 'Pune o bifă (C)'],
-    ['cross', 'cross', 'X', 'Pune un X (X)'],
+    ['cross', 'cross', 'Marchează X', 'Pune un X (X)'],
   ];
 
   function build() {

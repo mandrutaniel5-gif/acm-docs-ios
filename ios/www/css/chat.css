@@ -48,7 +48,7 @@
 .ch-msg.mine .ch-fi { background: rgba(255, 255, 255, .22); }
 .ch-msg.mine .ch-fi svg { fill: #fff; }
 .ch-ft { display: flex; flex-direction: column; min-width: 0; }
-.ch-ft b { font-size: 14px; word-break: break-all; }
+.ch-ft b { font-size: 14px; overflow-wrap: anywhere; }
 .ch-msg.mine .ch-ft .muted { color: rgba(255, 255, 255, .8); }
 .ch-fa { display: flex; gap: 6px; margin: 4px 0 2px; }
 .ch-fa .btn.small { min-height: 30px; padding: 4px 12px; font-size: 13px; border-radius: 99px; }

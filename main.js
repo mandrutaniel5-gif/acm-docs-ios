@@ -34,10 +34,14 @@ function fileFromArgs(argv) {
   return null;
 }
 
-// Romanian dates and number formats everywhere (date picker: zi.lună.an).
-app.commandLine.appendSwitch('lang', 'ro');
 // The app was called "PDF Editor" before: keep its data folder so nothing is lost.
 app.setPath('userData', process.env.ACM_USERDATA || path.join(app.getPath('appData'), 'PDF Editor'));
+// The date picker and number formats follow the app's language (Romanian, or English for all the others:
+// only these two language packs ship with the app). Takes effect from the next start.
+const UI_LANG = path.join(app.getPath('userData'), 'ui-lang');
+let uiLang = 'ro';
+try { if (fs.readFileSync(UI_LANG, 'utf8').trim() === 'en') uiLang = 'en-US'; } catch (e) {}
+app.commandLine.appendSwitch('lang', uiLang);
 // The graphics card draws the window (glass, animations, scrolling): drawing everything with the
 // processor made the app slow on laptops. Some old video drivers fail (blank window, crashes): when
 // the graphics part of the app crashes early, a mark is left and from then on the app draws without it.
@@ -221,6 +225,7 @@ handle('open-path', (_e, p) => {
 });
 handle('special-dir', (_e, name) => (name === 'private' ? path.join(app.getPath('userData'), 'private') : app.getPath(name)));
 // Light / dark / like Windows (also colors the window frame on Windows 10/11).
+handle('set-lang', (_e, l) => { try { fs.mkdirSync(path.dirname(UI_LANG), { recursive: true }); fs.writeFileSync(UI_LANG, l === 'ro' ? 'ro' : 'en'); } catch (e) {} return true; });
 handle('set-theme', (_e, pref) => { nativeTheme.themeSource = pref === 'dark' || pref === 'light' ? pref : 'system'; });
 
 app.on('will-quit', () => {
@@ -346,6 +351,7 @@ const HOST = {
     return fs.readFileSync(p);
   },
   appVersion: () => app.getVersion(),
+  privateDir: () => path.join(app.getPath('userData'), 'private'),
   listFonts,
   clipRead: () => clipboard.readText(),
   clipWrite: (t) => { clipboard.writeText(String(t || '')); return true; },
@@ -405,7 +411,8 @@ handle('privacy', (e, on) => {
 /** Windows Hello through the Windows Runtime (PowerShell). 'check' → Available | …; 'verify' → Verified | Canceled | … */
 function windowsHello(mode, message) {
   if (process.platform !== 'win32') return Promise.resolve('NotSupported');
-  const msg = String(message || '').replace(/'/g, "''");
+  // the text travels in an environment variable, never inside the script: whatever it contains
+  // (PowerShell also treats the typographic quotes as quotes) it can only ever be text
   const script = [
     "$ErrorActionPreference='Stop'",
     'Add-Type -AssemblyName System.Runtime.WindowsRuntime',
@@ -414,12 +421,12 @@ function windowsHello(mode, message) {
     '[Windows.Security.Credentials.UI.UserConsentVerifier,Windows.Security.Credentials.UI,ContentType=WindowsRuntime] | Out-Null',
     mode === 'check'
       ? '$r = Await ([Windows.Security.Credentials.UI.UserConsentVerifier]::CheckAvailabilityAsync()) ([Windows.Security.Credentials.UI.UserConsentVerifierAvailability])'
-      : `$r = Await ([Windows.Security.Credentials.UI.UserConsentVerifier]::RequestVerificationAsync('${msg}')) ([Windows.Security.Credentials.UI.UserConsentVerificationResult])`,
+      : '$r = Await ([Windows.Security.Credentials.UI.UserConsentVerifier]::RequestVerificationAsync($env:ACM_HELLO_MSG)) ([Windows.Security.Credentials.UI.UserConsentVerificationResult])',
     'Write-Output $r',
   ].join('; ');
   return new Promise((resolve) => {
     require('child_process').execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', script],
-      { windowsHide: true, timeout: mode === 'check' ? 15000 : 120000 }, (err, out) => resolve(err ? 'Error' : String(out || '').trim()));
+      { windowsHide: true, timeout: mode === 'check' ? 15000 : 120000, env: { ...process.env, ACM_HELLO_MSG: String(message || '') } }, (err, out) => resolve(err ? 'Error' : String(out || '').trim()));
   });
 }
 
@@ -429,7 +436,10 @@ handle('secure', async (e, op, args) => {
   if (op === 'set') {
     if (!safeStorage.isEncryptionAvailable()) throw new Error('Criptarea Windows nu este disponibilă pe acest calculator.');
     fs.mkdirSync(secureDir(), { recursive: true });
-    fs.writeFileSync(secureFile(a.name), safeStorage.encryptString(String(a.data)));
+    // next to the target first, then replace: a crash never leaves half a key
+    const target = secureFile(a.name), tmp = target + '.tmp';
+    fs.writeFileSync(tmp, safeStorage.encryptString(String(a.data)));
+    fs.renameSync(tmp, target);
     return true;
   }
   if (op === 'get') {

@@ -1,7 +1,7 @@
 'use strict';
 // Language of the app. The app is written in Romanian; in any other language every piece of text
-// shown on screen is swapped from that language's dictionary (English: window.I18N_EN, the others:
-// js/i18n/<code>.js, loaded only when chosen), also text that appears later (dialogs, menus, messages).
+// shown on screen is swapped from that language's dictionary (English: js/i18n-en.js, the others:
+// js/i18n/<code>.js, each loaded only when chosen), also text that appears later (dialogs, menus, messages).
 // Documents (invoices) have their own language, chosen per document.
 
 const I18n = (() => {
@@ -162,7 +162,7 @@ const I18n = (() => {
     if (l === 'ro' || dictOf(l)) return Promise.resolve();
     return new Promise((resolve) => {
       const sc = document.createElement('script');
-      sc.src = 'js/i18n/' + l + '.js';
+      sc.src = l === 'en' ? 'js/i18n-en.js' : 'js/i18n/' + l + '.js';
       sc.onload = sc.onerror = () => resolve();
       document.head.appendChild(sc);
     });
