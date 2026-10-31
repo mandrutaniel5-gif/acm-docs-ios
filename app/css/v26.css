@@ -49,12 +49,11 @@ html.v26[data-theme="dark"] {
 /* surfaces that are glass */
 html.v26 :where(.lg, .quick, .hero-acts button, .hero-acts .ib, .cs-tile, .otools, .money-card) { position: relative; }
 html.v26 :where(.lg, .quick, .hero-acts button, .hero-acts .ib, #tab-glass, #tabbar .tb-plus, .create-sheet, .cs-tile, .otools, .money-card, .scroll-head) { isolation: isolate; }
-html.v26 .quick { background: var(--surface); box-shadow: 0 1px 2px rgba(15, 23, 42, .05); }
-html.v26 :where(.lg, .hero-acts button, .hero-acts .ib, #tab-glass, .create-sheet, .otools) {
+html.v26 :where(.lg, .quick, .hero-acts button, .hero-acts .ib, #tab-glass, .create-sheet, .otools) {
   background: var(--lg-body); -webkit-backdrop-filter: var(--lg-blur); backdrop-filter: var(--lg-blur); box-shadow: var(--lg-depth);
 }
 /* the rim, drawn as a 1px ring with a gradient (mask keeps only the edge) */
-html.v26 :where(.lg, .hero-acts button, .hero-acts .ib, #tab-glass, #tab-lens, #tabbar .tb-plus, .create-sheet, .cs-tile, .otools, .scroll-head)::after {
+html.v26 :where(.lg, .quick, .hero-acts button, .hero-acts .ib, #tab-glass, #tab-lens, #tabbar .tb-plus, .create-sheet, .cs-tile, .otools, .money-card, .scroll-head)::after {
   content: ''; position: absolute; inset: 0; width: auto; height: auto; border-radius: inherit; padding: 1px; pointer-events: none; z-index: 3;
   background: var(--lg-rim);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
@@ -278,9 +277,7 @@ html.v26 .pill:not(.primary) {
 html.v26[data-theme="dark"] .pill:not(.primary) { background: rgba(255, 255, 255, .1); }
 
 /* the money card sits in the same family: a little calmer glow under it */
-html.v26 .money-card { box-shadow: 0 8px 20px -14px rgba(0, 80, 200, .5); background: linear-gradient(160deg, #0a7cf0 0%, #0060d8 100%); }
-html.v26 .money-card .mc-amount { text-shadow: none; }
-html.v26 .money-card.hidden { display: none; }
+html.v26 .money-card { box-shadow: 0 14px 30px -16px rgba(0, 80, 200, .55), 0 2px 5px rgba(0, 40, 120, .14); }
 
 /* ================================================================= editors and screens on the phone */
 @media (max-width: 720px) {
@@ -377,44 +374,11 @@ html.v26 .qi::after { background: linear-gradient(180deg, rgba(255, 255, 255, .1
 /* the sign-in screen's moving sky: still in light mode (it kept a third of a processor core busy) */
 :root.lowfx .auth-glow, :root.lowfx .wave svg { animation: none !important; }
 
-/* ================================================================= reading and using it without a mouse */
-:root { --accent-text: #0060c7; }
-:root[data-theme="dark"] { --accent-text: #6cb0ff; }
-#side .nav button.on, html.v26 #side .nav button.on, html #tabbar button.on, html.v26 #tabbar button.on { color: var(--accent-text); }
-.side-foot { color: var(--muted); }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* a ring for the keyboard only: on a phone a touched row must not stay marked while scrolling */
+@media (hover: hover) and (pointer: fine) {
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .fcard:focus-visible, .row:focus-visible, .srow:focus-visible { outline-offset: -2px; }
+}
 .modal:focus, .modal:focus-visible { outline: none; }
-.fcard:focus-visible, .row:focus-visible, .srow:focus-visible { outline-offset: -2px; }
-.rmore:focus-visible { border-radius: 8px; }
-
-/* ================================================================= first steps on the home screen */
-.cards2:has(> .money-card.hidden) { grid-template-columns: 1fr; }
-.first-steps { margin: 2px 0 2px; padding: 0 0 0 20px; color: var(--text); font-size: 14px; line-height: 1.7; }
-[dir="rtl"] .first-steps { padding: 0 20px 0 0; }
-
-/* ================================================================= settings: colour only where it means something */
-#settings-root .si:not(.bl):not(.flag) { background: var(--fill-2); color: var(--accent-text); }
-#settings-root .si.red { background: rgba(255, 59, 48, .12); color: #c9281d; }
-:root[data-theme="dark"] #settings-root .si.red { color: #ff6b61; }
-.si.warn, #settings-root .si.warn { background: #ff9500; color: #fff; }
-
-/* ================================================================= subscriptions, invoices, editors */
-.modal.plans { max-width: 720px; }
+.si.warn { background: #ff9500; color: #fff; }
 .line .tag.vr { flex: none; min-width: 38px; padding: 0 6px; font-variant-numeric: tabular-nums; }
-#zoombox { opacity: .78; transition: opacity .15s; }
-#zoombox:hover, #zoombox:focus-within { opacity: 1; }
-@media (pointer: coarse) {
-  .plan-seg button, .seg button, .lang-chip { min-height: 44px; }
-}
-@media (max-width: 720px) {
-  /* the things used most come first; the long lists of fonts and formats after them */
-  .otools > select, .otools > label, .otools .osel { order: 20; }
-  /* the bar goes on past the edge of the screen: it says so */
-  .otools, #tools { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent); padding-right: 30px; }
-  [dir="rtl"] .otools, [dir="rtl"] #tools { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 26px), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 26px), transparent); padding-right: 8px; padding-left: 30px; }
-  /* content scrolling under the floating bar fades out before it reaches it */
-  #tabbar::before, html.v26 #tabbar::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: calc(100% + 22px); background: linear-gradient(to bottom, transparent, var(--bg) 42%); pointer-events: none; z-index: -1; }
-  html.native-tabbar #tabbar::before, html.v26.native-tabbar #tabbar::before { display: none; }
-  /* the separators of the desktop toolbar mean nothing once the tools are reordered */
-  .otools > .vdiv, .otools > .sep { display: none; }
-}

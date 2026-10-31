@@ -34,5 +34,5 @@ run(process.execPath, ['build/set-exe-info.js', path.join(unpacked, 'ACM Docs.ex
 const loc = path.join(unpacked, 'locales');
 for (const f of fs.readdirSync(loc)) if (!['en-US.pak', 'ro.pak'].includes(f)) fs.rmSync(path.join(loc, f));
 const flag = win ? '/' : '-';
-run(makensis(), [`${flag}V2`, `${flag}DVERSION=${VERSION}`, `${flag}DSRC=${unpacked}`, `${flag}DOUT=${out}`, 'installer.nsi'], path.join(ROOT, 'build'));
+run(makensis(), [`${flag}V2`, `${flag}DVERSION=${VERSION}`, `${flag}DSRC=${unpacked}`, `${flag}DOUT=${out}`, `${flag}INPUTCHARSET`, 'UTF8', 'installer.nsi'], path.join(ROOT, 'build'));
 console.log(out, Math.round(fs.statSync(out).size / 1048576) + ' MB');

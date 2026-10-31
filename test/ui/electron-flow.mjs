@@ -34,9 +34,9 @@ async function start() {
 
 let { app, page } = await start();
 
-await check('the app starts on the home screen, with the first steps and no empty money card', async () => {
-  assert.equal(await page.isVisible('#home-money'), false);
-  assert.match(await page.textContent('#home-biz'), /3 pași/);
+await check('the app starts on the home screen', async () => {
+  assert.equal(await page.isVisible('#home-money'), true);
+  assert.match(await page.textContent('#home-biz'), /Firma ta/);
   await page.screenshot({ path: path.join(OUT, '1-home.png') });
 });
 

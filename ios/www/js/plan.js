@@ -363,7 +363,6 @@ const Plan = (() => {
       return r;
     })()]) : null;
 
-    // someone without a subscription comes here for the prices: they come first
     const usageBlock = [el('h3', { class: 'plan-h', text: 'Luna aceasta' }),
       usage,
       el('p', { class: 'muted small' }, [el('span', { text: 'Limitele lunare se reînnoiesc pe' }), el('span', { class: 'no-tr', text: ' ' + resetDay() + '. ' }), el('span', { text: 'Același document salvat de mai multe ori se numără o singură dată.' })]),
@@ -379,7 +378,7 @@ const Plan = (() => {
     box.append(
       head,
       invBox,
-      ...(s.plan === 'basic' ? [...plansBlock, ...usageBlock] : [...usageBlock, ...plansBlock]),
+      ...usageBlock, ...plansBlock,
       !s.payments ? el('div', { class: 'acm-note warn', html: `${svg('info')}<span>${escHtml(I18n.t('Plata abonamentelor va fi disponibilă în curând.'))}</span>` }) : null,
       el('div', { class: 'acm-note ok', html: `${svg('shield')}<span>${escHtml(I18n.t('Toate planurile au aceeași securitate. Abonamentul mărește doar limitele.'))}</span>` }),
       el('div', { class: 'actions col' }, [

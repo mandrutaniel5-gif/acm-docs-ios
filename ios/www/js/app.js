@@ -158,8 +158,6 @@ const App = (() => {
   function renderHome() {
     Biz.migrate();
     const b = Biz.active();
-    // no company yet: no empty money card, only the first steps
-    $('home-money').classList.toggle('hidden', !b);
     // invoices card
     const s = Invoice.summary();
     $('mc-amount').innerHTML = s ? `${Invoice.money(s.month)}<small>${escapeHtml(s.currency)}</small>` : `0,00<small>lei</small>`;
@@ -180,8 +178,8 @@ const App = (() => {
       );
     } else {
       bc.append(
-        el('div', { class: 'bh' }, [el('span', { class: 'bl', html: svg('building') }), el('div', { class: 'bt' }, [el('b', { text: 'Începe în 3 pași' }), el('small', { text: 'Facturi profesionale, pentru orice activitate' })])]),
-        el('ol', { class: 'first-steps' }, ['Completează datele firmei', 'Emite prima factură', 'Trimite-o clientului'].map((t) => el('li', { text: t }))),
+        el('div', { class: 'bh' }, [el('span', { class: 'bl', html: svg('building') }), el('div', { class: 'bt' }, [el('b', { text: 'Firma ta' }), el('small', { text: 'Facturi profesionale, pentru orice activitate' })])]),
+        el('p', { text: 'Configurezi o dată datele firmei și emiți facturi, proforme și oferte în câteva secunde.' }),
         el('div', { class: 'brow' }, [el('button', { class: 'pill primary', type: 'button', text: 'Configurează firma', onclick: () => Invoice.open() })]),
       );
     }
