@@ -362,6 +362,8 @@ public class MainActivity extends Activity {
 
     void scan(File f) {
         try {
+            // the app's private data is no business of the gallery
+            if (f.getCanonicalPath().startsWith(getNoBackupFilesDir().getCanonicalPath() + File.separator)) return;
             MediaScannerConnection.scanFile(this, new String[] { f.getAbsolutePath() }, null, null);
         } catch (Exception e) {
             // not important
