@@ -1,0 +1,118 @@
+✓ tva-incl-pj-bucuresti: no problems 
+✓ tva-incl-pj-bucuresti: 3 lines
+✓ tva-incl-pj-bucuresti: payable 588.57 = PDF total 588.57
+✓ tva-incl-pj-bucuresti: XML VAT 102.15 / base 486.42 = PDF 102.15 / 486.42
+✓ tva-incl-pj-bucuresti: no rounding line needed
+✓ tva-incl-pj-bucuresti: line columns add up (486.42 + 102.15)
+✓ tva-excl-discount-pf: no problems 
+✓ tva-excl-discount-pf: 3 lines
+✓ tva-excl-discount-pf: payable 640.95 = PDF total 640.95
+✓ tva-excl-discount-pf: XML VAT 111.24 / base 529.71 = PDF 111.24 / 529.71
+✓ tva-excl-discount-pf: no rounding line needed
+✓ neplatitor-pf-numerar: no problems 
+✓ neplatitor-pf-numerar: 3 lines
+✓ neplatitor-pf-numerar: payable 559.14 = PDF total 559.14
+✓ neplatitor-pf-numerar: XML VAT 0 / base 559.14 = PDF 0 / 559.14
+✓ neplatitor-pf-numerar: no rounding line needed
+✓ neplatitor-pj: no problems 
+✓ neplatitor-pj: 3 lines
+✓ neplatitor-pj: payable 588.57 = PDF total 588.57
+✓ neplatitor-pj: XML VAT 0 / base 588.57 = PDF 0 / 588.57
+✓ neplatitor-pj: no rounding line needed
+✓ neplatitor-pj: line columns add up (588.57 + 0)
+✓ tva-eur-extern: no problems 
+✓ tva-eur-extern: 3 lines
+✓ tva-eur-extern: payable 588.57 = PDF total 588.57
+✓ tva-eur-extern: XML VAT 102.15 / base 486.42 = PDF 102.15 / 486.42
+✓ tva-eur-extern: no rounding line needed
+✓ tva-eur-extern: line columns add up (486.42 + 102.15)
+✓ rotunjire-10x10: no problems 
+✓ rotunjire-10x10: 10 lines
+✓ rotunjire-10x10: payable 121.61 = PDF total 121.61
+✓ rotunjire-10x10: XML VAT 21.11 / base 100.5 = PDF 21.11 / 100.5
+✓ rotunjire-10x10: no rounding line needed
+✓ rotunjire-10x10: line columns add up (100.5 + 21.11)
+✓ rotunjire-20x3: no problems 
+✓ rotunjire-20x3: 20 lines
+✓ rotunjire-20x3: payable 80.59 = PDF total 80.59
+✓ rotunjire-20x3: XML VAT 13.99 / base 66.6 = PDF 13.99 / 66.6
+✓ rotunjire-20x3: no rounding line needed
+✓ rotunjire-20x3: line columns add up (66.6 + 13.99)
+✓ rotunjire-incl: no problems 
+✓ rotunjire-incl: 13 lines
+✓ rotunjire-incl: payable 259.87 = PDF total 259.87
+✓ rotunjire-incl: XML VAT 45.1 / base 214.77 = PDF 45.1 / 214.77
+✓ rotunjire-incl: no rounding line needed
+✓ rotunjire-incl: line columns add up (214.77 + 45.1)
+✓ cote-diferite: no problems 
+✓ cote-diferite: 2 lines
+✓ cote-diferite: payable 497.3 = PDF total 497.3
+✓ cote-diferite: XML VAT 76.31 / base 420.99 = PDF 76.31 / 420.99
+✓ cote-diferite: no rounding line needed
+✓ cote-diferite: line columns add up (420.99 + 76.31)
+✓ cote-diferite-discount: no problems 
+✓ cote-diferite-discount: 2 lines
+✓ cote-diferite-discount: payable 447.57 = PDF total 447.57
+✓ cote-diferite-discount: XML VAT 68.68 / base 378.89 = PDF 68.68 / 378.89
+✓ cote-diferite-discount: no rounding line needed
+✓ cote-diferite-incl: no problems 
+✓ cote-diferite-incl: 2 lines
+✓ cote-diferite-incl: payable 420.99 = PDF total 420.99
+✓ cote-diferite-incl: XML VAT 64.06 / base 356.93 = PDF 64.06 / 356.93
+✓ cote-diferite-incl: no rounding line needed
+✓ cote-diferite-incl: line columns add up (356.93 + 64.06)
+✓ taxare-inversa: no problems 
+✓ taxare-inversa: 3 lines
+✓ taxare-inversa: payable 588.57 = PDF total 588.57
+✓ taxare-inversa: XML VAT 0 / base 588.57 = PDF 0 / 588.57
+✓ taxare-inversa: no rounding line needed
+✓ taxare-inversa: line columns add up (588.57 + 0)
+✓ intracomunitar: no problems 
+✓ intracomunitar: 3 lines
+✓ intracomunitar: payable 588.57 = PDF total 588.57
+✓ intracomunitar: XML VAT 0 / base 588.57 = PDF 0 / 588.57
+✓ intracomunitar: no rounding line needed
+✓ intracomunitar: line columns add up (588.57 + 0)
+✓ export: no problems 
+✓ export: 3 lines
+✓ export: payable 588.57 = PDF total 588.57
+✓ export: XML VAT 0 / base 588.57 = PDF 0 / 588.57
+✓ export: no rounding line needed
+✓ export: line columns add up (588.57 + 0)
+✓ scutit: no problems 
+✓ scutit: 3 lines
+✓ scutit: payable 588.57 = PDF total 588.57
+✓ scutit: XML VAT 0 / base 588.57 = PDF 0 / 588.57
+✓ scutit: no rounding line needed
+✓ scutit: line columns add up (588.57 + 0)
+✓ storno: no problems 
+✓ storno: 3 lines
+✓ storno: payable -712.17 = PDF total -712.17
+✓ storno: XML VAT -123.6 / base -588.57 = PDF -123.6 / -588.57
+✓ storno: no rounding line needed
+✓ storno: line columns add up (-588.57 + -123.6)
+✓ Bucharest: SECTOR3 + RO-B
+✓ non-VAT payer: category O, no VAT ids
+✓ B2C / extern routing
+✓ EUR invoice: VAT also in RON
+✓ missing data is listed: 8
+✓ CUI check digit
+✓ county names → codes
+✓ ANAF validator: tva-incl-pj-bucuresti → ok []
+✓ ANAF validator: tva-excl-discount-pf → ok []
+✓ ANAF validator: neplatitor-pf-numerar → ok []
+✓ ANAF validator: neplatitor-pj → ok []
+✓ ANAF validator: tva-eur-extern → ok []
+✓ ANAF validator: rotunjire-10x10 → ok []
+✓ ANAF validator: rotunjire-20x3 → ok []
+✓ ANAF validator: rotunjire-incl → ok []
+✓ ANAF validator: cote-diferite → ok []
+✓ ANAF validator: cote-diferite-discount → ok []
+✓ ANAF validator: cote-diferite-incl → ok []
+✓ ANAF validator: taxare-inversa → ok []
+✓ ANAF validator: intracomunitar → ok []
+✓ ANAF validator: export → ok []
+✓ ANAF validator: scutit → ok []
+✓ ANAF validator: storno → ok []
+
+all passed
