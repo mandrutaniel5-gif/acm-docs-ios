@@ -50,6 +50,8 @@ final class ACMDocsUITests: XCTestCase {
         // exact names: "Anulează (Ctrl+Z)" is the Undo button of the editors, not a dialog's Cancel
         for label in ["Anulează", "Închide", "Renunță", "Mai târziu"] {
             let b = app.webViews.buttons.matching(NSPredicate(format: "label == %@", label)).firstMatch
+            // on a small phone the buttons of a long sheet are further down: scroll to them, as a finger would
+            if b.exists && !b.isHittable { app.webViews.firstMatch.swipeUp(); sleep(1) }
             if b.exists && b.isHittable { b.tap(); sleep(1); return }
         }
     }

@@ -248,6 +248,15 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
           const r = A.open(f, m, { password: 'parola-buna-123' });
           return { ok: new TextDecoder().decode(r.bytes) === 'contract' && r.sender.fingerprint === a.fingerprint, bytes: f.length, ms: Math.round(performance.now() - t) };
         });
+        await step('store', () => {
+          // the larger data lives in files: more than the browser's storage could ever hold, through the same calls
+          const k = 'pdfeditor.signatures', old = localStorage.getItem(k), big = 'ăx'.repeat(4 * 1024 * 1024);
+          const t = performance.now();
+          localStorage.setItem(k, big);
+          const same = localStorage.getItem(k) === big, onDisk = Host.exists(Host.info.priv + '/store/' + k + '.json');
+          if (old === null) localStorage.removeItem(k); else localStorage.setItem(k, old);
+          return { same, onDisk, ms: Math.round(performance.now() - t), back: localStorage.getItem(k) === old };
+        });
         await step('firebase', async () => { await Account.ready(); return { ready: true, user: !!Account.current() }; });
         return JSON.stringify(out, null, 1);
         """
