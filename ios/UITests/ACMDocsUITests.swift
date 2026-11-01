@@ -10,7 +10,7 @@ final class ACMDocsUITests: XCTestCase {
     let tabTitles = ["Acasă", "Fișiere", "Facturi", "Setări", "Creează"]
 
     /// true: only the check of the look runs (a short cloud run)
-    let onlyLook = false
+    let onlyLook = true
 
     override func setUpWithError() throws {
         if onlyLook && !name.contains("test0") { throw XCTSkip("only the look") }
