@@ -9,7 +9,11 @@ final class ACMDocsUITests: XCTestCase {
     let tabs = ["home", "files", "invoices", "settings"]
     let tabTitles = ["Acasă", "Fișiere", "Facturi", "Setări", "Creează"]
 
+    /// true: only the check of the look runs (a short cloud run)
+    let onlyLook = false
+
     override func setUpWithError() throws {
+        if onlyLook && !name.contains("test0") { throw XCTSkip("only the look") }
         continueAfterFailure = true
         app = XCUIApplication()
         app.launchArguments = ["-uitest"]
@@ -91,6 +95,42 @@ final class ACMDocsUITests: XCTestCase {
     }
 
     // MARK: tests
+
+    func openTab(_ tab: String, _ title: String) {
+        if app.buttons["tab-\(tab)"].exists { app.buttons["tab-\(tab)"].tap() } else if webButton(title).exists { webButton(title).tap() }
+        sleep(2)
+    }
+
+    /// The look, on real WebKit: every main screen with a company and invoices, and a finger that lands on a row
+    /// only to scroll (nothing may stay marked). The screenshots are looked at by a person.
+    func look(_ theme: String) {
+        app.terminate()
+        app.launchArguments = ["-uitest", "-uitest-seed", "-uitest-\(theme)"]
+        app.launch()
+        _ = app.webViews.firstMatch.waitForExistence(timeout: 30)
+        sleep(9)
+        shot("look-\(theme)-1-home")
+        openTab("invoices", "Facturi")
+        shot("look-\(theme)-2-invoices")
+        openTab("settings", "Setări")
+        shot("look-\(theme)-3-settings")
+        let w = app.webViews.firstMatch
+        // down on a row, move a little, up: a scroll that starts on a row
+        w.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.55)).press(forDuration: 0.1, thenDragTo: w.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3)))
+        sleep(2)
+        shot("look-\(theme)-4-settings-after-scroll")
+        w.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).press(forDuration: 0.1, thenDragTo: w.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.62)))
+        sleep(2)
+        shot("look-\(theme)-5-settings-after-scroll-back")
+        openTab("files", "Fișiere")
+        shot("look-\(theme)-6-files")
+        openTab("invoices", "Facturi")
+        w.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.7)).press(forDuration: 0.1, thenDragTo: w.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.4)))
+        sleep(2)
+        shot("look-\(theme)-7-invoices-after-scroll")
+    }
+    func test0a_LookLight() throws { look("light") }
+    func test0b_LookDark() throws { look("dark") }
 
     func test1_TabBar() throws {
         shot("01-home")

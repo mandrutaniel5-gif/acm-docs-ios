@@ -1137,8 +1137,25 @@ const App = (() => {
     setTimeout(() => sp.remove(), 450);
   }
 
+  // A finger has no hover: on a touch screen the browser keeps :hover on the last thing touched, so a row
+  // touched to start scrolling stayed grey. Without a mouse, those rules are taken out.
+  function noStickyHover() {
+    if (!window.matchMedia('(hover: none)').matches) return;
+    const walk = (owner) => {
+      for (let i = owner.cssRules.length - 1; i >= 0; i--) {
+        const r = owner.cssRules[i];
+        if (!r.selectorText) { if (r.cssRules) walk(r); continue; }
+        if (!r.selectorText.includes(':hover')) continue;
+        const keep = r.selectorText.split(',').filter((x) => !x.includes(':hover'));
+        if (keep.length) r.selectorText = keep.join(','); else owner.deleteRule(i);
+      }
+    };
+    for (const sheet of document.styleSheets) { try { walk(sheet); } catch (e) { console.warn('hover', e); } }
+  }
+
   async function boot() {
     const t0 = Date.now();
+    noStickyHover();
     Theme.apply();
     I18n.init();
     I18n.onChange((l) => { try { if (window.AndroidBridge && AndroidBridge.setLang) AndroidBridge.setLang(l); else if (window.ElectronHost) ElectronHost.invoke('set-lang', l); } catch (e) {} });

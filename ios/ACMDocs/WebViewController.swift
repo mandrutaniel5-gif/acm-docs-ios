@@ -195,6 +195,23 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
         if ProcessInfo.processInfo.arguments.contains("-selftest") {
             DispatchQueue.main.asyncAfter(deadline: .now() + 6) { self.selfTest() }
         }
+        #if DEBUG
+        // UI tests of the look: a company, some invoices and the chosen theme
+        let a = ProcessInfo.processInfo.arguments
+        if a.contains("-uitest-seed") {
+            let theme = a.contains("-uitest-dark") ? "dark" : "light"
+            let seed = """
+            (() => {
+              if (!Biz.active()) { const p = { ...Biz.blankProfile('general'), name: 'Firma Test SRL', legal: 'FIRMA TEST SRL', cui: 'RO14255667', address: 'Str. Republicii 10', city: 'Oradea', county: 'Bihor', vatPayer: true, vatRate: 21 }; Biz.save(p); Biz.setActive(p.id); }
+              const b = Biz.active(), t = new Date().toISOString().slice(0, 10);
+              if (!Biz.docs().length) for (let i = 1; i <= 6; i++) Biz.addDoc({ bizId: b.id, type: 'invoice', series: 'FCT', number: i, client: 'Client ' + i + ' SRL', total: i * 1210.5, currency: 'RON', date: t, due: t, path: '', paid: i % 2 === 0 });
+              Theme.set('\(theme)');
+              App.showView('home');
+            })(); 0
+            """
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { self.web.evaluateJavaScript(seed, completionHandler: nil) }
+        }
+        #endif
     }
 
     // MARK: automatic check used by the cloud build (simulator): writes Documents/selftest.json
