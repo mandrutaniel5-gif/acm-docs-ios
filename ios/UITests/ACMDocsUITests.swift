@@ -129,6 +129,8 @@ final class ACMDocsUITests: XCTestCase {
         sleep(2)
         shot("look-\(theme)-7-invoices-after-scroll")
     }
+    /// The first start after installing is slow on the cloud machines: the look is checked after it.
+    func test0_Warm() throws { sleep(60) }
     func test0a_LookLight() throws { look("light") }
     func test0b_LookDark() throws { look("dark") }
 

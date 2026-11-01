@@ -381,4 +381,6 @@ html.v26 .qi::after { background: linear-gradient(180deg, rgba(255, 255, 255, .1
 }
 .modal:focus, .modal:focus-visible { outline: none; }
 .si.warn { background: #ff9500; color: #fff; }
+/* the money card of the invoices keeps its colour: the common card rules above must not wash it out (white on white) */
+html.v26 .stat.hl, html.v26[data-theme="dark"] .stat.hl { background: linear-gradient(135deg, #0a84ff, #5e5ce6); color: #fff; }
 .line .tag.vr { flex: none; min-width: 38px; padding: 0 6px; font-variant-numeric: tabular-nums; }
