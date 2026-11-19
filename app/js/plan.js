@@ -113,10 +113,13 @@ const Plan = (() => {
   // ---------------------------------------------------------------- without internet
   // An action goes ahead without the server within what the plan allows this month: the count is kept on this
   // device and sent to the server as soon as there is internet (the same document still counts once).
+  // Until the launch the server can be off: then nothing done on this device is limited. At the launch: false.
+  let PRE_LAUNCH = true;
   const thisMonth = () => new Date().toISOString().slice(0, 7);
   /** true = go ahead (counted here), 'limit' = the month's actions are used up. */
   function offlineAllow(u, action, r) {
-    const s = cached() || {};
+    if (PRE_LAUNCH) return true;
+    const s = (u !== 'local' && cached()) || {};
     const fresh = s.month === thisMonth();
     const plans = s.plans || FALLBACK.plans;
     const limit = (fresh && s.usage && s.usage[action] && s.usage[action].limit) || (plans[s.plan] || plans.basic).month[action];
@@ -161,7 +164,13 @@ const Plan = (() => {
   async function allow(action, ref, opts = {}) {
     if (!ACTIONS[action]) return false;
     if (typeof Service !== 'undefined' && Service.blocked(action)) return false;
-    if (!uid()) { await needAccount(action); return false; }
+    // without an account (or with the server unreachable before signing in): the free plan's actions of the
+    // month, counted on this device; past them, an account is asked for
+    if (!uid()) {
+      if (offlineAllow('local', action, ref ? await sha(action + '|' + ref) : null) === true) return true;
+      await needAccount(action);
+      return false;
+    }
     if (Account.needsVerification()) { AccountUI.show('verify'); return false; }
     if (typeof Devices !== 'undefined' && !Devices.myDevice()) { await AccountUI.route(); return false; }
     const u = uid();
@@ -640,5 +649,5 @@ const Plan = (() => {
   }
   if (typeof Account !== 'undefined' && Account.onChange) Account.onChange(() => { last = null; });
 
-  return { allow, flush, show, refresh, current, label, summary, start, needAccount, onChange: (f) => listeners.push(f), ACTIONS, NAMES };
+  return { allow, flush, _preLaunch: (v) => { PRE_LAUNCH = !!v; }, show, refresh, current, label, summary, start, needAccount, onChange: (f) => listeners.push(f), ACTIONS, NAMES };
 })();

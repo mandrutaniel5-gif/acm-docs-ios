@@ -26,6 +26,21 @@ await page.waitForTimeout(2500);
 let failed = 0;
 const check = async (name, fn) => { try { await fn(); console.log('✓', name); } catch (e) { failed++; console.log('✗', name, '—', String(e.message || e).split('\n')[0]); } };
 
+await check('until the launch: nothing is limited on the device', async () => {
+  const r = await page.evaluate(async () => { document.getElementById('auth')?.remove(); Account.current = () => null; const out = []; for (let i = 0; i < 10; i++) out.push(await Plan.allow('scans', 'p' + i)); return out; });
+  assert.ok(r.every((x) => x === true));
+  await page.evaluate(() => Plan._preLaunch(false));
+});
+await check('without an account and without a server: the free scans of the month, then the account is asked for', async () => {
+  const r = await page.evaluate(async () => { document.getElementById('auth')?.remove(); Account.current = () => null; return [await Plan.allow('scans', 'a'), await Plan.allow('scans', 'b'), await Plan.allow('scans', 'c'), await Plan.allow('scans', 'a')]; });
+  assert.deepEqual(r, [true, true, true, true]);
+  const p = page.evaluate(() => Plan.allow('scans', 'd'));
+  await page.waitForSelector('.modal.plan-ask', { timeout: 5000 });
+  assert.match(await page.textContent('.modal.plan-ask'), /cont/);
+  await page.click('.modal.plan-ask .actions .btn:last-child');
+  assert.equal(await p, false);
+});
+
 // a signed-in account on the Basic plan (3 scans a month), and no internet
 await page.evaluate(() => {
   document.getElementById('auth')?.remove();

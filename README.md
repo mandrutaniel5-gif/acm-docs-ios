@@ -27,4 +27,5 @@ Testele de server rulează pe emulatoarele Firebase (vezi `.github/workflows/ser
 - **iOS:** se construiește pe macOS la push pe ramura `build-ios` sau pornit de mână (`ios.yml`); rezultatul ajunge pe ramura `ios-build`.
 - **Versiunea** se schimbă în `package.json`; `build:ios-web` o pune și în proiectul iOS.
 - **Textele noi:** se adaugă în toate limbile cu `build/i18n-src/extra-<versiune>.json` și `apply-extra.mjs`.
+- **La lansare:** în `app/js/plan.js`, pune `PRE_LAUNCH = false` (până atunci, fără server, nimic nu e limitat pe dispozitiv).
 - **ACM Contabil:** variabila GitHub `CONTABIL_UIDS` limitează serverul la dispozitivele trecute acolo.
