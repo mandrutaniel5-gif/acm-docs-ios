@@ -1,7 +1,7 @@
 {
   "name": "acm-docs",
   "productName": "ACM Docs",
-  "version": "2.6.8",
+  "version": "2.6.9",
   "description": "ACM Docs - PDF, documente si facturi (ACM Code SRL)",
   "author": "ACM Code SRL",
   "main": "main.js",
@@ -31,7 +31,8 @@
     "lint": "eslint .",
     "test": "node --test test/sync.test.mjs test/main-safety.test.mjs test/acmcrypto.test.mjs && node test/efactura.test.mjs && node test/t_formula.js",
     "test:anaf": "node test/efactura.test.mjs --anaf",
-    "test:screens": "node test/ui/screens.mjs --quick"
+    "test:screens": "node test/ui/screens.mjs --quick",
+    "test:offline": "node test/ui/offline-plan.mjs"
   },
   "devDependencies": {
     "buffer": "^6.0.3",

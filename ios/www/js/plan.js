@@ -16,7 +16,7 @@ const Plan = (() => {
   const SERVER_PK = 'KDiTwFGQcANLwxeLXtgux6I2eKmwf4c8yo2CEOawL3o=';
   const A = () => window.__lib.acmcrypto;
   const uid = () => (typeof Account !== 'undefined' && Account.current() ? Account.current().uid : null);
-  const LS = { status: (u) => 'acm.plan.' + u, token: (u) => 'acm.plan.tok.' + u, clock: 'acm.plan.clock' };
+  const LS = { status: (u) => 'acm.plan.' + u, token: (u) => 'acm.plan.tok.' + u, clock: 'acm.plan.clock', pending: (u) => 'acm.plan.pending.' + u };
   const ls = {
     get: (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
     set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
@@ -110,6 +110,54 @@ const Plan = (() => {
    * Asks the server for one action (edit / scan / invoice / encrypted send / open). `ref` names the
    * document so the same one counts once a month. true = go ahead.
    */
+  // ---------------------------------------------------------------- without internet
+  // An action goes ahead without the server within what the plan allows this month: the count is kept on this
+  // device and sent to the server as soon as there is internet (the same document still counts once).
+  const thisMonth = () => new Date().toISOString().slice(0, 7);
+  /** true = go ahead (counted here), 'limit' = the month's actions are used up. */
+  function offlineAllow(u, action, r) {
+    const s = cached() || {};
+    const fresh = s.month === thisMonth();
+    const plans = s.plans || FALLBACK.plans;
+    const limit = (fresh && s.usage && s.usage[action] && s.usage[action].limit) || (plans[s.plan] || plans.basic).month[action];
+    const used = (fresh && s.usage && s.usage[action] && s.usage[action].used) || 0;
+    const q = (ls.get(LS.pending(u)) || []).filter((p) => p.m === thisMonth());
+    if (r && q.some((p) => p.a === action && p.r === r)) return true;
+    if (used + q.filter((p) => p.a === action).length >= limit) return 'limit';
+    q.push({ a: action, r, m: thisMonth(), at: Date.now() });
+    ls.set(LS.pending(u), q);
+    emit();
+    return true;
+  }
+  let flushing = false;
+  /** The actions done without internet, counted on the server now. */
+  async function flush() {
+    const u = uid();
+    if (!u || flushing) return;
+    const all = ls.get(LS.pending(u)) || [];
+    if (!all.length) return;
+    flushing = true;
+    try {
+      if (!(await sessionReady())) return;
+      // another month cannot be counted any more: only this month's go up
+      let q = all.filter((p) => p.m === thisMonth());
+      while (q.length) {
+        const p = q[0];
+        try {
+          const res = await Account.call('useQuota', p.r ? { action: p.a, ref: p.r } : { action: p.a });
+          keepToken(u, res.token);
+        } catch (e) {
+          // over the limit (e.g. counted on another device meanwhile): the next action asks again; no answer: later
+          if (!/limit:/.test(String(e.server || e.message || ''))) break;
+        }
+        q = q.slice(1);
+        ls.set(LS.pending(u), q);
+      }
+      if (!q.length) ls.del(LS.pending(u));
+      refresh().catch(() => {});
+    } finally { flushing = false; }
+  }
+
   async function allow(action, ref, opts = {}) {
     if (!ACTIONS[action]) return false;
     if (typeof Service !== 'undefined' && Service.blocked(action)) return false;
@@ -147,8 +195,14 @@ const Plan = (() => {
       if (typeof Service !== 'undefined' && Service.handle(e)) return false;
       if (/limit:/.test(m)) { await limitReached(action); return false; }
       if (/no device session|device blocked|device removed/.test(m)) { await AccountUI.route(); return false; }
-      // no connection: a paid plan carries on with its signed token (up to 7 days)
+      // no connection: a paid plan carries on with its signed token (up to 7 days); without one, the action
+      // goes ahead within the month's limit and is counted on the server later
       if (t) return true;
+      if (!opts.wait) {
+        const ok = offlineAllow(u, action, r);
+        if (ok === 'limit') { await limitReached(action); return false; }
+        if (ok) return true;
+      }
       await UI.confirm('Ai nevoie de internet', 'Fără abonament, fiecare acțiune se confirmă cu serverul ACM Docs. Conectează-te la internet și încearcă din nou. Abonamentele funcționează și fără internet, până la 7 zile.', 'Am înțeles', 'Închide');
       return false;
     }
@@ -580,10 +634,11 @@ const Plan = (() => {
       lastRefresh = Date.now();
       refresh().catch(() => {});
     };
-    setTimeout(() => go(true), 6000);
-    document.addEventListener('visibilitychange', () => go(false));
+    setTimeout(() => { go(true); flush().catch(() => {}); }, 6000);
+    document.addEventListener('visibilitychange', () => { go(false); if (!document.hidden) flush().catch(() => {}); });
+    window.addEventListener('online', () => flush().catch(() => {}));
   }
   if (typeof Account !== 'undefined' && Account.onChange) Account.onChange(() => { last = null; });
 
-  return { allow, show, refresh, current, label, summary, start, needAccount, onChange: (f) => listeners.push(f), ACTIONS, NAMES };
+  return { allow, flush, show, refresh, current, label, summary, start, needAccount, onChange: (f) => listeners.push(f), ACTIONS, NAMES };
 })();
