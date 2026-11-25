@@ -60,8 +60,20 @@ const Chat = (() => {
     try {
       const { F: f, db } = F();
       const q = f.firestore.query(f.firestore.collection(db, 'chats'), f.firestore.where('members', 'array-contains', me()), f.firestore.orderBy('lastAt', 'desc'), f.firestore.limit(200));
+      let first = true;
       unlistenList = f.firestore.onSnapshot(q, (snap) => {
+        const before = chats;
         chats = new Map(snap.docs.map((d) => [d.id, { id: d.id, ...d.data() }]));
+        // a message from someone else while the app is not looked at: a notification (not for what was there at start)
+        if (!first && typeof Push !== 'undefined') {
+          for (const c of chats.values()) {
+            const old = before.get(c.id);
+            if (c.lastFrom && c.lastFrom !== me() && c.lastFrom !== 'system' && (!old || ms(c.lastAt) > ms(old.lastAt))) {
+              chatName(c).then((name) => Push.show(I18n.t('Mesaj nou'), name || '', () => { show(); setTimeout(() => openChat(c.id), 600); })).catch(() => {});
+            }
+          }
+        }
+        first = false;
         emit();
       }, (e) => { console.warn('chat list', e && e.code); stop(); setTimeout(start, 60000); });
     } catch (e) { console.warn('chat', e); }

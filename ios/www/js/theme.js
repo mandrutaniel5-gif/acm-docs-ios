@@ -3,6 +3,8 @@
 // Setting: 'light' (default), 'dark', 'auto' (follows the phone / Windows).
 // On the phone: look-alike fonts for documents made on Windows.
 if (window.AndroidBridge) document.write('<link rel="stylesheet" href="css/fonts-android.css">');
+// Android: the same glass look as on the iPhone (the iPhone app turns it on itself, with its own bottom bar)
+try { if (window.AndroidBridge && JSON.parse(window.AndroidBridge.info()).platform !== 'ios') document.documentElement.classList.add('ios-glass'); } catch (e) {}
 
 const Theme = (() => {
   const KEY = 'acm.theme';

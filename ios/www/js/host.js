@@ -648,7 +648,7 @@ const Host = (() => {
   const mobile = platform === 'android';
 
   return {
-    platform, mobile, available, info, readFile, readFileAsync, writeFile, exists, baseName, dirName, openDialog, pickImages, camera, saveDialog, startupFile, onOpenFile, setTitle, wasmBytes, listFonts,
+    call, platform, mobile, available, info, readFile, readFileAsync, writeFile, exists, baseName, dirName, openDialog, pickImages, camera, saveDialog, startupFile, onOpenFile, setTitle, wasmBytes, listFonts,
     ocr, ocrWarm, htmlToPdf, capture, ext, showInFolder, openPath, openExternal, fetchText, share, exportCopy, specialDir, listDir, mkdirp, join, mtime, remove, setTheme, exitApp, appVersion, toB64, fromB64,
     secureSet, secureGet, secureHas, secureDelete, confirmOwner, scanQR, privacy, integrity, biometricsAvailable, nativeStorage, nativeHttp,
   };

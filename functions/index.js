@@ -22,6 +22,7 @@ import { mailReady, sendSignInCode, sendAdminAlert, sendVerifyCode } from './mai
 import { makeAdmin } from './admin.js';
 import { makeAnaf } from './anaf.js';
 import { makeContabil } from './contabil.js';
+import { makePush } from './push.js';
 import { timingSafeEqual } from 'node:crypto';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
@@ -1395,8 +1396,11 @@ export const chatMsgCreated = onDocumentCreated({ document: 'chats/{cid}/msgs/{m
     tx.update(ref, { n: x.n + 1 });
     return x.n + 1 > 300;
   });
-  if (over) await ev.data.ref.delete();
+  if (over) { await ev.data.ref.delete(); return; }
+  // the other members' phones: "a new message from …" (never what it says: the server cannot read it)
+  try { await PUSH.notifyChat(ev.params.cid, d.from); } catch (e) { console.warn('push', e.message); }
 });
+const PUSH = makePush({ db, FieldValue });
 
 // ---------------------------------------------------------------- RO e-Factura (connection to ANAF)
 const ANAF = makeAnaf({ db, needDevice, emulator: process.env.FUNCTIONS_EMULATOR === 'true' });

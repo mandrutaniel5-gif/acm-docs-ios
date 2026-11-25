@@ -51,7 +51,7 @@ async function makeAccount(tag) {
   const ts = Date.now();
   const r = await c.call('registerDevice', { bundle: b64(dk.bundle), ts, proof: b64(A.signEd(id, `acm-register\n${uid}\n${dk.fingerprint}\n${ts}`)) });
   await signInWithCustomToken(c.auth, r.token);
-  return { c, uid, id, handle };
+  return { c, uid, id, handle, dev: r.dev };
 }
 const seal = (from, to, obj) => b64(A.seal({ bytes: new TextEncoder().encode(JSON.stringify(obj)), name: 'm', mime: 'application/x-acm-chat' }, from.id, to.map((x) => x.id.bundle), { hint: to.length > 2 }));
 const post = (acc, cid, box, extra = {}) => addDoc(collection(acc.c.db, 'chats', cid, 'msgs'), { from: acc.uid, at: serverTimestamp(), kind: 'text', box, ...extra });
@@ -197,6 +197,17 @@ await check('Documents: stored only by members and only after the plan counted t
   await deleteDoc(msg);
   await sleep(5000);
   assert.equal(await get(b, fid), 404);
+});
+
+await check('Notifications: a device saves only its own notification address, in the expected shape', async () => {
+  const dref = (acc, owner) => doc(acc.c.db, 'accounts', owner.uid, 'devices', owner.dev);
+  const good = { kind: 'fcm', token: 'x'.repeat(40), lang: 'ro' };
+  assert.equal(await code(updateDoc(dref(b, b), { push: good })), 'ok');
+  assert.equal(await code(updateDoc(dref(b, b), { push: { kind: 'apns', token: 'a'.repeat(64), env: 'dev' } })), 'ok');
+  assert.notEqual(await code(updateDoc(dref(b, b), { push: { kind: 'sms', token: 'x'.repeat(40) } })), 'ok', 'unknown kind');
+  assert.notEqual(await code(updateDoc(dref(b, b), { push: { ...good, extra: 1 } })), 'ok', 'extra fields');
+  assert.notEqual(await code(updateDoc(dref(b, b), { push: good, status: 'removed' })), 'ok', 'nothing else on the record');
+  assert.notEqual(await code(updateDoc(dref(a, b), { push: good })), 'ok', 'not on the device of another account');
 });
 
 await check('Kill switch: chat paused from the control panel stops new conversations and messages', async () => {

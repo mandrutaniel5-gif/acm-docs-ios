@@ -71,6 +71,13 @@ if (!single) {
 
   app.whenReady().then(() => {
     Menu.setApplicationMenu(null);
+    // Windows shows the app's notifications only for a Start menu shortcut that carries the app's id
+    if (process.platform === 'win32') {
+      const AUMID = 'ro.acmandrut.pdfeditor';
+      app.setAppUserModelId(AUMID);
+      const lnk = path.join(app.getPath('appData'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'ACM Docs', 'ACM Docs.lnk');
+      try { if (app.isPackaged && fs.existsSync(lnk)) shell.writeShortcutLink(lnk, 'update', { appUserModelId: AUMID }); } catch (e) {}
+    }
     pendingFile = fileFromArgs(process.argv);
     win = new BrowserWindow({
       width: 1360,
@@ -111,7 +118,7 @@ if (!single) {
       });
     }
     // only what the app uses: the camera (scanning) and the clipboard; nothing else is ever granted
-    const allowed = new Set(['media', 'clipboard-read', 'clipboard-sanitized-write', 'fullscreen']);
+    const allowed = new Set(['media', 'clipboard-read', 'clipboard-sanitized-write', 'fullscreen', 'notifications']);
     // the camera only for the app's own page, and never the microphone
     const own = (wc) => !!win && wc === win.webContents;
     session.defaultSession.setPermissionRequestHandler((wc, perm, cb, details) => {
@@ -225,6 +232,8 @@ handle('open-path', (_e, p) => {
 });
 handle('special-dir', (_e, name) => (name === 'private' ? path.join(app.getPath('userData'), 'private') : app.getPath(name)));
 // Light / dark / like Windows (also colors the window frame on Windows 10/11).
+// a notification was clicked: the window comes to the front
+handle('focus-window', () => { if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); } return true; });
 handle('set-lang', (_e, l) => { try { fs.mkdirSync(path.dirname(UI_LANG), { recursive: true }); fs.writeFileSync(UI_LANG, l === 'ro' ? 'ro' : 'en'); } catch (e) {} return true; });
 handle('set-theme', (_e, pref) => { nativeTheme.themeSource = pref === 'dark' || pref === 'light' ? pref : 'system'; });
 

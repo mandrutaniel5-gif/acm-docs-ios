@@ -15,3 +15,7 @@ functions/.env
 functions/.env.local
 test/ui/out/
 test/ui/out-fn/
+android/.gradle/
+android/build/
+android/assets/
+android/local.properties

@@ -1155,6 +1155,8 @@ const App = (() => {
 
   async function boot() {
     const t0 = Date.now();
+    // iPhone / iPad: two fingers never zoom the whole screen (the invoice preview and the editors zoom their own page)
+    for (const ev of ['gesturestart', 'gesturechange']) document.addEventListener(ev, (e) => e.preventDefault(), { passive: false });
     noStickyHover();
     Theme.apply();
     I18n.init();

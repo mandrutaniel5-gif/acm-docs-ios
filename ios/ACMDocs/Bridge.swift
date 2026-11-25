@@ -196,6 +196,14 @@ final class Bridge: NSObject, WKScriptMessageHandler {
     private func handle(_ id: Int, _ op: String, _ a: [String: Any]) {
         guard let vc = controller else { return reply(id, "app", nil) }
         switch op {
+        case "pushToken":
+            Push.shared.address(ask: a["ask"] as? Bool ?? false) { [weak self] t in
+                guard let t = t else { self?.reply(id, nil, nil); return }
+                let o: [String: Any] = ["kind": "apns", "token": t, "env": Push.environment]
+                let d = (try? JSONSerialization.data(withJSONObject: o)) ?? Data()
+                self?.reply(id, nil, String(data: d, encoding: .utf8))
+            }
+
         case "startup":
             let p = startupPath
             startupPath = nil

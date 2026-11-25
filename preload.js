@@ -7,7 +7,7 @@
 const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 const INVOKE = new Set(['gpu-info', 'startup-file', 'dialog-open', 'dialog-save', 'ocr-warm', 'ocr', 'show-in-folder', 'fetch-text', 'open-external',
-  'open-path', 'special-dir', 'set-theme', 'set-lang', 'html-to-pdf', 'capture', 'privacy', 'secure', 'fs-read', 'net-request']);
+  'open-path', 'special-dir', 'set-theme', 'set-lang', 'focus-window', 'html-to-pdf', 'capture', 'privacy', 'secure', 'fs-read', 'net-request']);
 const EVENTS = new Set(['open-file', 'ocr-progress']);
 
 /** A synchronous call into the main process; errors come back as errors. */

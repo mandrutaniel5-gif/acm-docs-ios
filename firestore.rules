@@ -26,6 +26,12 @@ service cloud.firestore {
       let c = get(/databases/$(database)/documents/accounts/$(uid)/meta/cloud).data;
       return grow <= 0 || c.used + grow <= c.limit;
     }
+    function validPush(p) {
+      return p is map && p.keys().hasOnly(['kind', 'token', 'lang', 'env']) && p.kind in ['fcm', 'apns']
+        && p.token is string && p.token.size() > 10 && p.token.size() < 400
+        && (!('lang' in p) || (p.lang is string && p.lang.size() <= 5))
+        && (!('env' in p) || p.env in ['dev', 'prod']);
+    }
     function validHandle(h) {
       return h is string && h.matches('^[a-z0-9_]{3,20}$')
         && !(h in ['admin', 'administrator', 'acm', 'acmdocs', 'acm_docs', 'acmcode', 'acm_code', 'support', 'suport', 'help', 'ajutor', 'root', 'system', 'official', 'oficial', 'security', 'securitate']);
@@ -82,10 +88,11 @@ service cloud.firestore {
     match /accounts/{uid} {
       match /devices/{d} {
         allow read: if activeDeviceOf(uid);
-        // a device only fills in its own (encrypted) description
+        // a device only fills in its own (encrypted) description and its notification address
         allow update: if activeDeviceOf(uid) && d == devId()
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['info'])
-          && request.resource.data.info is string && request.resource.data.info.size() < 4000;
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['info', 'push'])
+          && (request.resource.data.get('info', null) == null || (request.resource.data.info is string && request.resource.data.info.size() < 4000))
+          && (request.resource.data.get('push', null) == null || validPush(request.resource.data.push));
       }
       match /events/{e} {
         allow read: if activeDeviceOf(uid);

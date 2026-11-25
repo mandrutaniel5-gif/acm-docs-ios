@@ -10,6 +10,8 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
     private lazy var bridge = Bridge(controller: self)
     private var barDark = false
     private var loaded = false
+    /// the page has loaded (a tapped notification can open its conversation)
+    var pageReady: Bool { loaded }
 
     override var preferredStatusBarStyle: UIStatusBarStyle { barDark ? .lightContent : .darkContent }
 
@@ -196,6 +198,12 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         loaded = true
+        Push.shared.controller = self
+        // opened by tapping a notification: once the app has started
+        if let cid = Push.shared.pendingChat {
+            Push.shared.pendingChat = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) { Push.shared.openChat(cid) }
+        }
         if ProcessInfo.processInfo.arguments.contains("-selftest") {
             DispatchQueue.main.asyncAfter(deadline: .now() + 6) { self.selfTest() }
         }

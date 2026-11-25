@@ -3,6 +3,9 @@
 <plist version="1.0">
 <dict>
 	<!-- the account keys live in this app's own Keychain group (never shared, never synced) -->
+	<!-- chat notifications through Apple (Xcode switches it to production for TestFlight / the App Store) -->
+	<key>aps-environment</key>
+	<string>development</string>
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(AppIdentifierPrefix)ro.acmcode.docs</string>

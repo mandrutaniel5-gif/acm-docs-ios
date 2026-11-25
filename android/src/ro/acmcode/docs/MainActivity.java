@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
     static final String HOST = "appassets.androidplatform.net";
     static final String ORIGIN = "https://" + HOST + "/";
 
-    static final int REQ_OPEN = 11, REQ_CAMERA = 12, REQ_EXPORT = 13, REQ_CHOOSER = 14, REQ_PERM = 15, REQ_IMAGES = 16, REQ_AUTH = 17, REQ_CAM_PERM = 18;
+    static final int REQ_OPEN = 11, REQ_CAMERA = 12, REQ_EXPORT = 13, REQ_CHOOSER = 14, REQ_PERM = 15, REQ_IMAGES = 16, REQ_AUTH = 17, REQ_CAM_PERM = 18, REQ_NOTIF = 19;
     SecureStore secure, secureQuiet;
     int authId = 0;
     Runnable authRetry = null;
@@ -93,7 +93,14 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
+        // the channel of the chat notifications (Android 8+: without one nothing is shown)
+        if (Build.VERSION.SDK_INT >= 26) {
+            android.app.NotificationChannel ch = new android.app.NotificationChannel("chat", "Mesaje", android.app.NotificationManager.IMPORTANCE_HIGH);
+            ((android.app.NotificationManager) getSystemService(NOTIFICATION_SERVICE)).createNotificationChannel(ch);
+        }
         web = new WebView(this);
+        // only test builds (debug): the page can be inspected from a computer
+        if ((getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0) WebView.setWebContentsDebuggingEnabled(true);
         web.setBackgroundColor(isNight() ? Color.BLACK : Color.parseColor("#F2F2F7"));
         // The page on top; behind it, room for the hidden pages that become PDFs.
         root = new android.widget.FrameLayout(this);
@@ -133,6 +140,7 @@ public class MainActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQ_PERM) start();
+        if (requestCode == REQ_NOTIF && afterNotif != null) { Runnable r = afterNotif; afterNotif = null; r.run(); }
         if (requestCode == REQ_CAM_PERM) {
             boolean ok = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
             Runnable r = ok ? afterCamera : cameraDenied;
@@ -195,6 +203,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        openPushedChat(intent);
         String p = takeIntent(intent);
         if (p != null && pageLoaded) {
             startupPath = null;
@@ -513,7 +522,36 @@ public class MainActivity extends Activity {
         }
     }
 
+    // ------------------------------------------------------------------ notifications (Firebase Cloud Messaging)
+    Runnable afterNotif;
+    /** The device's push address; with ask, the person is asked for notifications first (Android 13+). */
+    void pushToken(final int id, boolean ask) {
+        final Runnable get = new Runnable() { public void run() {
+            try {
+                com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+                    if (!task.isSuccessful() || task.getResult() == null) { reply(id, null, null); return; }
+                    try { JSONObject o = new JSONObject(); o.put("kind", "fcm"); o.put("token", task.getResult()); reply(id, null, o.toString()); }
+                    catch (Exception e) { reply(id, null, null); }
+                });
+            } catch (Exception e) { reply(id, null, null); }
+        } };
+        if (ask && Build.VERSION.SDK_INT >= 33 && checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
+            afterNotif = get;
+            requestPermissions(new String[] { "android.permission.POST_NOTIFICATIONS" }, REQ_NOTIF);
+            return;
+        }
+        get.run();
+    }
+    /** A notification was tapped: its conversation opens. */
+    void openPushedChat(Intent intent) {
+        final String cid = intent != null ? intent.getStringExtra("cid") : null;
+        if (cid == null || !pageLoaded) return;
+        intent.removeExtra("cid");
+        js("window.__onPushOpen && window.__onPushOpen(" + JSONObject.quote(cid) + ")");
+    }
+
     void handle(final int id, String op, JSONObject a) throws Exception {
+        if ("pushToken".equals(op)) { pushToken(id, a.optBoolean("ask")); return; }
         if ("startup".equals(op)) {
             String p = startupPath;
             startupPath = null;
@@ -974,6 +1012,8 @@ public class MainActivity extends Activity {
         @Override
         public void onPageFinished(WebView view, String url) {
             pageLoaded = true;
+            // opened by tapping a notification: once the app has started
+            web.postDelayed(() -> openPushedChat(getIntent()), 4000);
         }
     }
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Firebase for the notifications (the values Google's plugin would generate from google-services.json; all public) -->
+<resources>
+  <string name="google_app_id" translatable="false">1:1013772730312:android:a7d1e1315bf2e450d58afd</string>
+  <string name="gcm_defaultSenderId" translatable="false">1013772730312</string>
+  <string name="google_api_key" translatable="false">AIzaSyDfllPKe_J111I3zPrMjqk9rBDeWkosC_g</string>
+  <string name="project_id" translatable="false">acm-docs-52280</string>
+  <string name="google_storage_bucket" translatable="false">acm-docs-52280.firebasestorage.app</string>
+</resources>
