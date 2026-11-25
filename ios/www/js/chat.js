@@ -145,7 +145,8 @@ const Chat = (() => {
     try {
       const r = await Account.call('chatDirect', { uid });
       UI.busy();
-      return openChat(r.id);
+      await openChat(r.id);
+      return r.id;
     } catch (e) {
       UI.busy();
       if (typeof Service !== 'undefined' && Service.handle(e)) return;
@@ -511,6 +512,7 @@ const Chat = (() => {
         await uploadAndPost(cur, bytes, fname, post, mode);
       }
       page.__sendFile = sendFile;
+      page.__cid = cid;
 
       async function menu() {
         const cur = chats.get(cid) || c;
@@ -879,8 +881,10 @@ const Chat = (() => {
 
   /** From outside the chat (Trimite criptat): opens the conversation with this person and sends the document there. */
   async function sendFileTo(uid, file) {
-    await withPerson(uid);
-    if (page && page.__sendFile) await page.__sendFile(file);
+    const cid = await withPerson(uid);
+    // only into that person's conversation: if it did not open, nothing is sent anywhere else
+    if (!cid || !page || page.__cid !== cid || !page.__sendFile) { if (cid) UI.toast(I18n.t('Conversația nu s-a deschis. Încearcă din nou.'), { error: true }); return; }
+    await page.__sendFile(file);
   }
   return { start, stop, show, back, openChat, withPerson, sendFileTo, button, unreadCount, onChange: (f) => listeners.add(f) };
 })();

@@ -510,13 +510,14 @@ const AcmShare = (() => {
     const choice = await pickRecipients(name);
     if (!choice) return;
     let { people, password } = choice;
+    let how = 'other';
     if (people.length === 1 && !password && typeof Chat !== 'undefined' && Chat.sendFileTo) {
-      const how = await askHow(people[0]);
+      how = await askHow(people[0]);
       if (!how) return;
-      if (how === 'chat') return Chat.sendFileTo(people[0].uid, { bytes: await Host.readFileAsync(path), name, mode: 'acm' });
     }
 
-    if (typeof Plan !== 'undefined' && !(await Plan.allow('acmSend'))) return;
+    // (the chat counts its own sending against the plan)
+    if (how !== 'chat' && typeof Plan !== 'undefined' && !(await Plan.allow('acmSend'))) return;
     let id;
     try { id = await Account.unlock(`Confirmă criptarea documentului „${name}”`); } catch (e) { if (String(e && e.message) !== 'cancel') UI.toast(Account.say(e), { error: true }); return; }
     if (!(await Contacts.checkIntegrity(id))) {
@@ -539,6 +540,9 @@ const AcmShare = (() => {
         'Trimite oricum', 'Anulează');
       if (!ok) return;
     }
+
+    // checked like any other sending: now straight into the conversation with this person
+    if (how === 'chat') return Chat.sendFileTo(people[0].uid, { bytes: await Host.readFileAsync(path), name, mode: 'acm' });
 
     UI.busy(password ? 'Se criptează (cu parolă)…' : 'Se criptează…');
     await yieldUI();
