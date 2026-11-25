@@ -394,6 +394,8 @@ export function makeAdmin(d) {
     let out;
     switch (op) {
       case 'whoami': out = { uid: who.uid, email: who.email }; break;
+      // Ieșire: every remembered session of this administrator ends (tokens stop renewing; at most an hour left)
+      case 'signOut': await getAuth().revokeRefreshTokens(who.uid); out = { ok: true }; break;
       case 'overview': out = await overview(); break;
       case 'search': out = await search(v.q); break;
       case 'account': out = await account(v.uid); break;

@@ -238,7 +238,7 @@
     root.append(h('div', { class: 'shell' }, [
       h('aside', { class: 'side' }, [
         h('div', { class: 'brand' }, [h('span', { class: 'brand-mark', text: 'ACM' }), 'Control']), nav,
-        h('div', { class: 'side-foot' }, [h('div', { class: 'who', text: auth.currentUser.email }), h('button', { text: 'Ieșire', onclick: async () => { await F.auth.signOut(auth); gate('signin'); } })]),
+        h('div', { class: 'side-foot' }, [h('div', { class: 'who', text: auth.currentUser.email }), h('button', { text: 'Ieșire', onclick: async () => { try { await call('signOut'); } catch (e) {} await F.auth.signOut(auth); gate('signin'); } })]),
       ]), main,
     ]));
     show('overview');
