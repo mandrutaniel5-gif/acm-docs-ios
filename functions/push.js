@@ -24,6 +24,8 @@ export function makePush({ db, FieldValue }) {
     return apnsJwt;
   }
   function sendApns(c, token, sandbox, alert, cid) {
+    // an Apple address is hex only: nothing else ever reaches the request's path
+    if (!/^[0-9a-f]{64,200}$/.test(token)) return Promise.reject(Object.assign(new Error('BadDeviceToken'), { code: 400 }));
     return new Promise((resolve, reject) => {
       const s = connect(sandbox ? 'https://api.sandbox.push.apple.com' : 'https://api.push.apple.com');
       s.on('error', reject);

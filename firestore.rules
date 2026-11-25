@@ -29,6 +29,7 @@ service cloud.firestore {
     function validPush(p) {
       return p is map && p.keys().hasOnly(['kind', 'token', 'lang', 'env']) && p.kind in ['fcm', 'apns']
         && p.token is string && p.token.size() > 10 && p.token.size() < 400
+        && (p.kind == 'fcm' ? p.token.matches('[A-Za-z0-9_:-]+') : p.token.matches('[0-9a-f]{64,200}'))
         && (!('lang' in p) || (p.lang is string && p.lang.size() <= 5))
         && (!('env' in p) || p.env in ['dev', 'prod']);
     }

@@ -203,9 +203,10 @@ await check('Notifications: a device saves only its own notification address, in
   const dref = (acc, owner) => doc(acc.c.db, 'accounts', owner.uid, 'devices', owner.dev);
   const good = { kind: 'fcm', token: 'x'.repeat(40), lang: 'ro' };
   assert.equal(await code(updateDoc(dref(b, b), { push: good })), 'ok');
-  assert.equal(await code(updateDoc(dref(b, b), { push: { kind: 'apns', token: 'a'.repeat(64), env: 'dev' } })), 'ok');
+  assert.equal(await code(updateDoc(dref(b, b), { push: { kind: 'apns', token: 'a1'.repeat(32), env: 'dev' } })), 'ok');
   assert.notEqual(await code(updateDoc(dref(b, b), { push: { kind: 'sms', token: 'x'.repeat(40) } })), 'ok', 'unknown kind');
   assert.notEqual(await code(updateDoc(dref(b, b), { push: { ...good, extra: 1 } })), 'ok', 'extra fields');
+  assert.notEqual(await code(updateDoc(dref(b, b), { push: { kind: 'apns', token: 'ab/../../x?y=' + 'a'.repeat(64) } })), 'ok', 'an Apple address is hex only');
   assert.notEqual(await code(updateDoc(dref(b, b), { push: good, status: 'removed' })), 'ok', 'nothing else on the record');
   assert.notEqual(await code(updateDoc(dref(a, b), { push: good })), 'ok', 'not on the device of another account');
 });
