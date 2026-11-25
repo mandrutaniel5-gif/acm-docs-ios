@@ -34,9 +34,22 @@ await page.evaluate(() => {
   Devices.myDevice = () => 'd1';
   window.__net = false; window.__calls = [];
   Devices.ensure = async () => (window.__net ? 'ok' : 'offline');
-  Account.call = async (name, data) => { if (!window.__net) throw new Error('offline'); window.__calls.push([name, data]); if (name === 'planStatus') return { plan: 'basic', month: new Date().toISOString().slice(0, 7), usage: { scans: { used: 2, limit: 3 } }, plans: null }; return { ok: true, used: 1, limit: 3, token: null }; };
+  Account.call = async (name, data) => { if (!window.__net) throw new Error('offline'); window.__calls.push([name, data]); if (name === 'planStatus') return { plan: 'basic', month: new Date().toISOString().slice(0, 7), usage: { scans: { used: 2, limit: 3 } }, plans: null, token: JSON.parse(localStorage.getItem('acm.plan.tok.U1')) }; return { ok: true, used: 1, limit: 3, token: JSON.parse(localStorage.getItem('acm.plan.tok.U1')) }; };
 });
 
+await check('without internet and without a recent server token: nothing goes ahead (blocking the server gives nothing)', async () => {
+  const p = page.evaluate(() => Plan.allow('scans', 'no-token'));
+  await page.waitForSelector('.modal', { timeout: 5000 });
+  assert.match(await page.textContent('.modal'), /internet/);
+  await page.click('.modal .actions .btn:last-child');
+  assert.equal(await p, false);
+});
+// the server's signed note of the last contact (the app checks its signature; here that check is stood in for)
+await page.evaluate(() => {
+  const body = btoa(JSON.stringify({ v: 1, u: 'U1', d: 'd1', p: 'basic', e: Date.now() + 864e5, i: Date.now() }));
+  localStorage.setItem('acm.plan.tok.U1', JSON.stringify(body + '.c2lnbg=='));
+  window.__lib.acmcrypto = { ...window.__lib.acmcrypto, verifyEd: () => true };
+});
 await check('without internet: the month\'s scans go ahead', async () => {
   const r = await page.evaluate(async () => [await Plan.allow('scans', 'scan-1'), await Plan.allow('scans', 'scan-2'), await Plan.allow('scans', 'scan-3')]);
   assert.deepEqual(r, [true, true, true]);

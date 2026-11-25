@@ -37,6 +37,10 @@ final class WebViewController: UIViewController, WKUIDelegate, WKNavigationDeleg
         web.scrollView.bounces = false
         web.scrollView.isScrollEnabled = false // the app scrolls its own panels
         web.scrollView.contentInsetAdjustmentBehavior = .never
+        // the page never zooms as a whole: two fingers zoom only the document they are on (the app does that itself)
+        web.scrollView.minimumZoomScale = 1
+        web.scrollView.maximumZoomScale = 1
+        web.scrollView.pinchGestureRecognizer?.isEnabled = false
         #if DEBUG
         if #available(iOS 16.4, *) { web.isInspectable = true } // Safari Web Inspector: test builds only
         #endif

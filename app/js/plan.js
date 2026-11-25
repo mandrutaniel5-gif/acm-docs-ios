@@ -180,7 +180,7 @@ const Plan = (() => {
     const t = tokenPlan(u);
     const over = ls.get('acm.plan.over.' + u) || {};
     // (opts.wait: the server must have counted it before going on, e.g. a document sent in a chat)
-    if (t && !opts.wait && !(over[action] && over[action] === new Date().toISOString().slice(0, 7))) {
+    if (t && t.p !== 'basic' && !opts.wait && !(over[action] && over[action] === new Date().toISOString().slice(0, 7))) {
       ask().catch((e) => {
         if (/limit:/.test(String(e.server || e.message || ''))) { over[action] = new Date().toISOString().slice(0, 7); ls.set('acm.plan.over.' + u, over); }
       });
@@ -197,8 +197,10 @@ const Plan = (() => {
       if (/no device session|device blocked|device removed/.test(m)) { await AccountUI.route(); return false; }
       // no connection: a paid plan carries on with its signed token (up to 7 days); without one, the action
       // goes ahead within the month's limit and is counted on the server later
-      if (t) return true;
-      if (!opts.wait) {
+      if (t && t.p !== 'basic') return true;
+      // the free plan works without internet only for a few days after the last contact with the server:
+      // blocking the server or clearing the app's data does not give more actions
+      if (t && !opts.wait) {
         const ok = offlineAllow(u, action, r);
         if (ok === 'limit') { await limitReached(action); return false; }
         if (ok) return true;

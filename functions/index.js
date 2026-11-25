@@ -461,7 +461,9 @@ async function signingKey() {
 }
 /** A plan token for one device: "this device of this account has this plan until exp". */
 async function planToken(uid, dev, plan, until) {
-  const exp = Math.min(until || 0, Date.now() + OFFLINE_MS);
+  // Basic too: it says that this device was in contact with the server lately (work without internet is
+  // allowed only within OFFLINE_MS of that), and with which plan
+  const exp = Math.min(plan === 'basic' ? Infinity : until || 0, Date.now() + OFFLINE_MS);
   const body = Buffer.from(JSON.stringify({ v: 1, u: uid, d: dev, p: plan, e: exp, i: Date.now() })).toString('base64');
   const sig = Buffer.from(ed25519.sign(new TextEncoder().encode('acm-plan\n' + body), await signingKey())).toString('base64');
   return body + '.' + sig;
@@ -595,7 +597,7 @@ export const useQuota = onCall(async (req) => {
     if (rref) tx.set(rref, { at: FieldValue.serverTimestamp(), expires });
     return n + 1;
   });
-  return { ok: true, plan: e.plan, used, limit, token: e.plan !== 'basic' ? await planToken(uid, dev, e.plan, e.until) : null };
+  return { ok: true, plan: e.plan, used, limit, token: await planToken(uid, dev, e.plan, e.until) };
 });
 
 /** Everything the "Subscription" screen shows, fresh from the server. */
@@ -613,7 +615,7 @@ export const planStatus = onCall(async (req) => {
     month: monthOf(), usage: Object.fromEntries(ACTIONS.map((a) => [a, { used: usage[a] || 0, limit: e.month[a] }])),
     plans: PLANS, prices: PRICES, payments: !!(await stripeConf()).key, manage: e.hasStripe, mail: mailReady(),
     promos: publicPromos(await activePromos(), b0.everSub), switches: await switches(),
-    token: e.plan !== 'basic' ? await planToken(uid, dev, e.plan, e.until) : null,
+    token: await planToken(uid, dev, e.plan, e.until),
   };
 });
 

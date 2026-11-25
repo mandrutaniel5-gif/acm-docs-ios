@@ -121,7 +121,7 @@ await check('Basic: plan, 1 device, no offline token', async () => {
   const s = await a.c.call('planStatus');
   assert.equal(s.plan, 'basic');
   assert.equal(s.devices.limit, 1);
-  assert.equal(s.token, null);
+  assert.ok(s.token, 'Basic too: a note of the last contact with the server');
   assert.equal(s.usage.docs.limit, 3);
   assert.ok(s.cloud.limit > 0);
 });
