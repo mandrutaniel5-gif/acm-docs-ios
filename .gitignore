@@ -19,3 +19,4 @@ android/.gradle/
 android/build/
 android/assets/
 android/local.properties
+test/ui/out-control/
