@@ -438,7 +438,7 @@ const Host = (() => {
   async function capture(rect) {
     if (AB) {
       try {
-        const b64 = await call('capture', { x: rect.x, y: rect.y, w: rect.w || rect.width, h: rect.h || rect.height });
+        const b64 = await call('capture', { x: rect.x, y: rect.y, w: rect.w || rect.width, h: rect.h || rect.height, max: rect.max || 220 });
         return b64 ? 'data:image/jpeg;base64,' + b64 : null;
       } catch (e) { return null; }
     }

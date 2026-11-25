@@ -10,7 +10,7 @@
 // counters, devices (ids and dates), sign-in addresses (90 days), reports and settings.
 
 const ADMIN_ORIGINS = ['https://acm-docs-52280.web.app', 'https://acm-docs-52280.firebaseapp.com', 'https://acmdocs.acmandrut.com'];
-const SESSION_MS = 12 * 3600 * 1000;
+const SESSION_MS = 30 * 24 * 3600 * 1000;
 
 export function makeAdmin(d) {
   const { db, fail, onCall, getAuth, FieldValue, Timestamp, loadStripe, PLANS, ACTIONS, FEATURES, REASONS, DAY, monthOf } = d;
@@ -143,6 +143,7 @@ export function makeAdmin(d) {
       db.collection('reports').where('from', '==', uid).get(),
       d.metaOf(uid, 'security').get(),
     ]);
+    const tester = (await db.collection('testers').doc(uid).get()).exists;
     const b = billing.data() || {};
     const last = priv.data() || {};
     const us = usage.data() || {};
@@ -161,6 +162,7 @@ export function makeAdmin(d) {
       signins: signins.docs.map((x) => { const v = x.data(); return { kind: v.kind, ip: v.ip, agent: v.agent, dev: v.dev, at: ms(v.at) }; }),
       reportsOn: reportsOn.docs.map((x) => reportRow(x)),
       reportsBy: reportsBy.size,
+      tester,
     };
   }
 
@@ -384,7 +386,7 @@ export function makeAdmin(d) {
   async function anafClear() { await anafRef().delete(); return anafStatus(); }
 
   // ---------------------------------------------------------------- the callable
-  const WRITE = new Set(['setPlan', 'suspend', 'blockDevice', 'switches.set', 'resolveReport', 'savePromo', 'deletePromo', 'stripeSet', 'stripeTax', 'stripeClear', 'anafSet', 'anafEnv', 'anafClear']);
+  const WRITE = new Set(['setTester', 'bugStatus', 'bugDelete', 'setPlan', 'suspend', 'blockDevice', 'switches.set', 'resolveReport', 'savePromo', 'deletePromo', 'stripeSet', 'stripeTax', 'stripeClear', 'anafSet', 'anafEnv', 'anafClear']);
   return onCall({ cors: emulator ? true : ADMIN_ORIGINS, memory: '512MiB', timeoutSeconds: 120 }, async (req) => {
     const who = needAdmin(req);
     const v = req.data || {};
@@ -420,7 +422,17 @@ export function makeAdmin(d) {
         out = qs.docs.map((x) => { const l = x.data(); return { op: l.op, target: l.target, detail: l.detail, email: l.email, ip: l.ip, at: ms(l.at) }; });
         break;
       }
-      case 'meta': out = { features: FEATURES, reasons: REASONS, plans: PLANS }; break;
+      case 'meta': out = { features: FEATURES, reasons: REASONS, plans: PLANS, bugCats: d.BUG_CATS }; break;
+      case 'testers': out = await d.TESTERS.testers(); break;
+      case 'setTester':
+        if (!isUid(v.uid)) fail('invalid-argument', 'uid');
+        if (!(await getAuth().getUser(v.uid).catch(() => null))) fail('not-found', 'no such account');
+        out = await d.TESTERS.setTester(v.uid, v.on === true, v.note);
+        break;
+      case 'bugReports': out = await d.TESTERS.bugReports(v.status); break;
+      case 'bugShot': out = await d.TESTERS.bugShot(v.id); break;
+      case 'bugStatus': out = await d.TESTERS.bugStatus(v.id, v.status, v.note); break;
+      case 'bugDelete': out = await d.TESTERS.bugDelete(v.id); break;
       default: fail('invalid-argument', 'op');
     }
     if (WRITE.has(op)) {
@@ -428,7 +440,7 @@ export function makeAdmin(d) {
       const detail = op === 'setPlan' ? `${v.plan} ${v.days || ''}d ${str(v.note, 80)}`.trim()
         : op === 'suspend' ? (v.on ? 'on: ' + str(v.reason, 120) : 'off')
           : op === 'switches.set' ? JSON.stringify({ all: v.all === true, off: Object.keys(v.off || {}).filter((k) => v.off[k] === true) })
-            : op === 'resolveReport' ? v.status : op === 'stripeTax' ? String(v.on === true) : op === 'anafSet' || op === 'anafEnv' ? (v.env === 'prod' ? 'prod' : 'test')
+            : op === 'resolveReport' || op === 'bugStatus' ? v.status : op === 'setTester' ? (v.on === true ? 'on' : 'off') : op === 'stripeTax' ? String(v.on === true) : op === 'anafSet' || op === 'anafEnv' ? (v.env === 'prod' ? 'prod' : 'test')
               : op === 'savePromo' ? str((v.promo || {}).title, 60) : null;
       await log(req, who, op, v.uid || v.id || (v.promo && v.promo.id) || null, detail);
     }

@@ -716,7 +716,7 @@ public class MainActivity extends Activity {
             y = Math.max(0, y);
             w = Math.max(1, Math.min(w, web.getWidth() - x));
             h = Math.max(1, Math.min(h, web.getHeight() - y));
-            float k = Math.min(1f, 220f / w);
+            float k = Math.min(1f, (float) a.optDouble("max", 220) / w);
             Bitmap bmp = Bitmap.createBitmap(Math.max(1, Math.round(w * k)), Math.max(1, Math.round(h * k)), Bitmap.Config.RGB_565);
             Canvas c = new Canvas(bmp);
             c.scale(k, k);

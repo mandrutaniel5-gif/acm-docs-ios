@@ -402,7 +402,9 @@ handle('capture', async (e, rect) => {
   if (!w) return null;
   const img = await w.webContents.capturePage({ x: Math.max(0, Math.round(rect.x)), y: Math.max(0, Math.round(rect.y)), width: Math.max(1, Math.round(rect.w)), height: Math.max(1, Math.round(rect.h)) });
   if (img.isEmpty()) return null;
-  return img.resize({ width: 220, quality: 'good' }).toJPEG(72).toString('base64');
+  // a thumbnail (220 px wide), or bigger when asked (a tester's screenshot)
+  const width = Math.min(Math.max(Number(rect.max) || 220, 50), 1800, img.getSize().width);
+  return img.resize({ width, quality: 'good' }).toJPEG(rect.max > 220 ? 85 : 72).toString('base64');
 });
 
 

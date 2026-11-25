@@ -48,6 +48,11 @@
         case 'integrity': return reply(id, null, JSON.stringify({ risk: false, signs: [] }));
         case 'privacy': case 'external': case 'share': case 'view': case 'export': return reply(id, null, 'true');
         case 'images': return reply(id, null, '[]');
+        case 'capture': { // a stand-in for the screenshot
+          const c = document.createElement('canvas'); c.width = a.w; c.height = a.h; const x = c.getContext('2d');
+          x.fillStyle = '#dfe3ea'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#8a8f98'; x.font = '20px sans-serif'; x.fillText('captura ecranului', 20, 40);
+          return reply(id, null, c.toDataURL('image/jpeg', 0.8).split(',')[1]);
+        }
         case 'fetch': return reply(id, 'offline (UI test)', null);
         case 'pdf': return reply(id, 'no native printing in the UI test', null);
         case 'storage': case 'http': {

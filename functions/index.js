@@ -23,6 +23,7 @@ import { makeAdmin } from './admin.js';
 import { makeAnaf } from './anaf.js';
 import { makeContabil } from './contabil.js';
 import { makePush } from './push.js';
+import { makeTesters, BUG_CATS } from './testers.js';
 import { timingSafeEqual } from 'node:crypto';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
@@ -1163,8 +1164,12 @@ async function couponOf(p) {
 }
 
 // ---------------------------------------------------------------- the control panel's API
+// testers before the launch: reports from the floating button (testers.js)
+const TESTERS = makeTesters({ db, fail, onCall, needDevice, rateLimit, FieldValue, getStorage, BUCKET, randomBytes, DAY });
+export const bugReport = TESTERS.bugReport;
+
 export const admin = makeAdmin({
-  db, fail, onCall, HttpsError, getAuth, FieldValue, Timestamp, loadStripe,
+  db, fail, onCall, HttpsError, getAuth, FieldValue, Timestamp, loadStripe, TESTERS, BUG_CATS,
   PLANS, PAID, ACTIONS, FEATURES, REASONS, DAY, SITE, monthOf,
   effective, refresh, metaOf, billingOf, devicesOf, signinsOf, privOf, event, clientAddress, agentOf,
   switches, resetSwitches, stripeConf, resetStripe, activePromos, resetPromos,

@@ -1,11 +1,11 @@
 'use strict';
 // ACM Docs control panel. Talks only to the server function "admin", which checks on every request
-// that the caller holds the administrator right AND signed in with the authenticator app. The session
-// lives only in this tab's memory: closing or reloading the tab signs out, and so do 20 idle minutes.
+// that the caller holds the administrator right AND signed in with the authenticator app. The browser
+// remembers the administrator: one sign-in (password + code) lasts 30 days, until Ieșire.
 (() => {
   const F = window.__lib.firebase;
   const app = F.initializeApp({ apiKey: 'AIzaSyDsXxKCjxhOeGTZYyYIsm_S6SO6zADe25w', authDomain: 'acm-docs-52280.firebaseapp.com', projectId: 'acm-docs-52280' }, 'control');
-  const auth = F.auth.initializeAuth(app, { persistence: F.auth.inMemoryPersistence });
+  const auth = F.auth.initializeAuth(app, { persistence: [F.auth.indexedDBLocalPersistence, F.auth.browserLocalPersistence] });
   const fns = F.functions.getFunctions(app, 'europe-west1');
   const adminFn = F.functions.httpsCallable(fns, 'admin', { timeout: 120000 });
   const root = document.getElementById('app');
@@ -98,10 +98,7 @@
     try { return await fn(); } catch (e) { toast(say(e), true); return undefined; } finally { if (btn) btn.disabled = false; }
   }
 
-  // idle lock: 20 minutes without activity ends the session
-  let idle = null;
-  function touch() { clearTimeout(idle); idle = setTimeout(async () => { if (auth.currentUser) { await F.auth.signOut(auth); gate('signin', 'Sesiune încheiată după 20 de minute de inactivitate.'); } }, 20 * 60 * 1000); }
-  ['click', 'keydown'].forEach((e) => document.addEventListener(e, () => { if (auth.currentUser) touch(); }));
+  function touch() {}
 
   // ---------------------------------------------------------------- sign in / authenticator app
   function gate(kind, msg) {
@@ -225,9 +222,11 @@
     promos: 'M21.41 11.58l-9-9A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7c0 .55.22 1.05.59 1.42l9 9a2 2 0 0 0 2.82 0l7-7a2 2 0 0 0 0-2.84zM5.5 7A1.5 1.5 0 1 1 7 5.5 1.5 1.5 0 0 1 5.5 7z',
     stripe: 'M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z',
     anaf: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v2H8v-2zm0 4h5v2H8v-2z',
+    testers: 'M20 8h-2.81a5.98 5.98 0 0 0-1.82-1.96L17 4.41 15.59 3l-2.17 2.17a6 6 0 0 0-2.83 0L8.41 3 7 4.41l1.62 1.63C7.88 6.55 7.26 7.22 6.81 8H4v2h2.09c-.05.33-.09.66-.09 1v1H4v2h2v1c0 .34.04.67.09 1H4v2h2.81A5.99 5.99 0 0 0 12 21a5.99 5.99 0 0 0 5.19-3H20v-2h-2.09c.05-.33.09-.66.09-1v-1h2v-2h-2v-1c0-.34-.04-.67-.09-1H20V8zm-6 8h-4v-2h4v2zm0-4h-4v-2h4v2z',
+    camera: 'M12 9a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm8-3h-3.17L15 4H9L7.17 6H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm-8 13a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z',
     log: 'M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 2.05 4.95l-1.42 1.42A9 9 0 1 0 13 3zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z',
   };
-  const VIEWS = [['overview', 'Prezentare'], ['accounts', 'Conturi'], ['switches', 'Kill switches'], ['reports', 'Rapoarte'], ['promos', 'Promoții'], ['stripe', 'Stripe'], ['anaf', 'ANAF e-Factura'], ['log', 'Jurnal']];
+  const VIEWS = [['overview', 'Prezentare'], ['accounts', 'Conturi'], ['switches', 'Kill switches'], ['testers', 'Testeri'], ['reports', 'Rapoarte'], ['promos', 'Promoții'], ['stripe', 'Stripe'], ['anaf', 'ANAF e-Factura'], ['log', 'Jurnal']];
   let main, nav, current = 'overview';
   const svg = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
 
@@ -243,12 +242,13 @@
       ]), main,
     ]));
     show('overview');
+    call('bugReports', { status: 'new' }).then((x) => bugCount(x.length)).catch(() => {});
   }
   function show(id, arg) {
     current = id;
     nav.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.v === id));
     fill(h('div', { class: 'sub', text: 'Se încarcă…' }));
-    const run = { overview, accounts, switches, reports, promos, stripe, anaf, log }[id];
+    const run = { overview, accounts, testers, switches, reports, promos, stripe, anaf, log }[id];
     run(arg).catch((e) => { fill(h('div', { class: 'alert bad', text: say(e) })); });
   }
   function head(title, sub, right) {
@@ -344,6 +344,12 @@
       if (!r) return;
       act(suspendBtn, async () => { await call('suspend', { uid, on: !u.disabled, reason: r.note }); toast('Gata.'); show('accounts', uid); });
     });
+    const testerBtn = h('button', { class: 'btn small ' + (a.tester ? 'danger' : 'primary'), text: a.tester ? 'Scoate din testeri' : 'Fă tester' });
+    testerBtn.addEventListener('click', async () => {
+      if (!a.tester) return makeTester(uid, testerBtn);
+      if (!(await confirmBox('Scoți testerul?', 'Butonul de raportare dispare din aplicația lui. Rapoartele trimise rămân.', 'Scoate', true))) return;
+      act(testerBtn, async () => { await call('setTester', { uid, on: false }); toast('Gata.'); show('accounts', uid); });
+    });
     const devRows = a.devices.map((v) => {
       const b = v.status === 'active' ? h('button', { class: 'btn small danger', text: 'Blochează' }) : null;
       if (b) b.addEventListener('click', async () => {
@@ -365,6 +371,7 @@
           h('dt', { text: 'Cod pe email' }), h('dd', {}, [a.security.emailCode ? pill('Activ', 'ok') : pill('Oprit', 'warn')]),
           h('dt', { text: 'Aplicație 2FA' }), h('dd', {}, [a.security.totp ? pill('Activă', 'ok') : pill('Nu', '')]),
           h('dt', { text: 'Rapoarte trimise' }), h('dd', { text: String(a.reportsBy) }),
+          h('dt', { text: 'Tester' }), h('dd', {}, [testerBtn]),
         ])]),
         h('div', { class: 'card' }, [h('h2', { text: 'Plan' }), h('dl', { class: 'kv' }, [
           h('dt', { text: 'Plan' }), h('dd', {}, [pill(NAMES[a.plan.plan], a.plan.plan === 'basic' ? '' : 'acc')]),
@@ -385,6 +392,132 @@
       h('div', { class: 'card' }, [h('h2', { text: 'Rapoarte despre acest cont' }), table(['Data', 'Motiv', 'Detalii', 'Stare'], a.reportsOn.map((r) => ({ cells: [dt(r.at), REASON[r.reason] || r.reason, r.details || '–', { node: pill(r.status, r.status === 'open' ? 'warn' : '') }] })))]),
     );
   }
+
+  // ---------------------------------------------------------------- testers (before the launch)
+  const BCAT = { visual: ['Vizuală', 'vis'], technical: ['Tehnică', 'tech'], idea: ['Idee', 'idea'] };
+  const BSUB = { layout: 'Aliniere / aspect', text: 'Text / traducere', colors: 'Culori / temă', animation: 'Animații / derulare', other: 'Altceva', broken: 'Nu funcționează', crash: 'Se blochează', slow: 'Merge greu', data: 'Date greșite / pierdute', sync: 'Sincronizare / cont', idea: 'Sugestie' };
+  const BSEV = { low: ['Mică', ''], medium: ['Medie', 'warn'], high: ['Gravă', 'bad'] };
+  const BST = [['new', 'Noi'], ['working', 'În lucru'], ['fixed', 'Rezolvate'], ['wontfix', 'Nu se repară'], ['all', 'Toate']];
+  const PLAT = { ios: 'iPhone / iPad', android: 'Android', electron: 'Windows', web: 'Browser' };
+  function bugCount(n) {
+    const b = nav && nav.querySelector('[data-v=testers]');
+    if (!b) return;
+    b.querySelector('.count') && b.querySelector('.count').remove();
+    if (n) b.append(h('span', { class: 'count', text: String(n) }));
+  }
+  async function testers(status) {
+    status = status || 'new';
+    const [rows, list, fresh] = await Promise.all([call('bugReports', { status: status === 'all' ? null : status }), call('testers'), status === 'new' ? null : call('bugReports', { status: 'new' })]);
+    bugCount((fresh || rows).length);
+    const tabs = h('div', { class: 'tabs' }, BST.map(([k, l]) => h('button', { class: k === status ? 'on' : '', text: l, onclick: () => show('testers', k) })));
+    const cards = rows.length ? h('div', { class: 'bugs' }, rows.map((r) => {
+      const [cl, ck] = BCAT[r.cat] || [r.cat, ''];
+      const [sl, sk] = BSEV[r.sev] || ['–', ''];
+      return h('button', { class: 'bug', onclick: () => bugView(r, status) }, [
+        h('div', { class: 'bug-top' }, [h('span', { class: 'tag ' + ck, text: cl }), h('span', { class: 'bug-sub', text: BSUB[r.sub] || r.sub }), sk ? pill(sl, sk) : null, r.shot ? h('span', { class: 'bug-cam', title: 'Are captură de ecran', html: svg(ICON.camera) }) : null]),
+        h('p', { class: 'bug-text', text: r.text }),
+        h('div', { class: 'bug-foot' }, [
+          h('span', { text: r.handle ? '@' + r.handle : r.from.slice(0, 8) }),
+          h('span', { text: [PLAT[r.meta && r.meta.platform] || (r.meta && r.meta.platform), r.meta && r.meta.version].filter(Boolean).join(' · ') }),
+          h('span', { text: dt(r.at) }),
+        ]),
+      ]);
+    })) : h('div', { class: 'card' }, [h('div', { class: 'empty', text: status === 'new' ? 'Niciun raport nou. 🎉' : 'Nimic de afișat.' })]);
+
+    // the testers themselves
+    const q = h('input', { type: 'search', placeholder: 'Adaugă un tester: email, @nume sau ID de cont' });
+    const found = h('div');
+    const addForm = h('form', { class: 'row' }, [q, h('button', { class: 'btn primary', type: 'submit', text: 'Caută' })]);
+    addForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      act(addForm.querySelector('button'), async () => {
+        const res = await call('search', { q: q.value });
+        clear(found).append(table(['Cont', 'Plan', ''], res.slice(0, 8).map((r) => {
+          const mine = list.some((t) => t.uid === r.uid);
+          const b = mine ? pill('Deja tester', 'acc') : h('button', { class: 'btn small primary', text: 'Fă tester', onclick: () => makeTester(r.uid, b) });
+          return { cells: [who(r), NAMES[r.plan] || r.plan, { node: b }] };
+        })));
+      });
+    });
+    const people = table(['Tester', 'Din', 'Rapoarte', 'Ultimul raport', ''], list.map((t) => {
+      const rm = h('button', { class: 'btn small danger', text: 'Scoate' });
+      rm.addEventListener('click', async () => {
+        if (!(await confirmBox('Scoți testerul?', 'Butonul de raportare dispare din aplicația lui. Rapoartele trimise rămân.', 'Scoate', true))) return;
+        act(rm, async () => { await call('setTester', { uid: t.uid, on: false }); toast('Gata.'); show('testers', status); });
+      });
+      return { uid: t.uid, cells: [(t.name ? t.name + ' · ' : '') + (t.handle ? '@' + t.handle : t.uid.slice(0, 10)), day(t.since), String(t.reports), t.lastReport ? dt(t.lastReport) : '–', { node: rm }] };
+    }), (r) => show('accounts', r.uid));
+
+    fill(
+      head('Testeri', 'Rapoartele trimise din aplicație cu butonul plutitor', tabs),
+      h('div', { class: 'grid' }, [
+        stat(String((fresh || rows).length), 'rapoarte noi', 'bad'),
+        stat(String(list.length), 'testeri', 'acc'),
+        stat(String(list.reduce((a, t) => a + (t.reports || 0), 0)), 'rapoarte în total', 'ok'),
+      ]),
+      cards,
+      h('div', { class: 'card' }, [h('h2', { text: 'Testeri' }), h('div', { class: 'sub', text: 'Un tester vede în aplicație un buton plutitor: captură de ecran, categorie și descriere, trimise aici.' }), addForm, found, people]),
+    );
+  }
+  async function makeTester(uid, btn) {
+    const r = await dialog((box, close) => {
+      const give = h('input', { type: 'checkbox', checked: true });
+      const days = h('input', { type: 'number', min: '1', max: '3650', value: '90' });
+      box.append(h('h3', { text: 'Faci contul tester?' }),
+        h('p', { text: 'În aplicație apare butonul plutitor de raportare (la următoarea pornire sau revenire în aplicație).' }),
+        h('label', { class: 'check' }, [give, 'Dă-i și planul Pro gratuit, ca să poată testa tot']),
+        h('label', { text: 'Pentru câte zile' }), days,
+        h('div', { class: 'actions' }, [h('button', { class: 'btn', text: 'Renunță', onclick: () => close(null) }), h('button', { class: 'btn primary', text: 'Fă tester', onclick: () => close({ pro: give.checked, days: Number(days.value) || 90 }) })]));
+    });
+    if (!r) return false;
+    return act(btn, async () => {
+      await call('setTester', { uid, on: true });
+      if (r.pro) { try { await call('setPlan', { uid, plan: 'pro', days: r.days, note: 'tester' }); } catch (e) { toast('Tester adăugat, dar planul nu: ' + say(e), true); } }
+      toast('Contul este tester.');
+      show(current === 'accounts' ? 'accounts' : 'testers', current === 'accounts' ? uid : undefined);
+      return true;
+    });
+  }
+  async function bugView(r, back) {
+    const shotBox = h('div', { class: 'bug-shot' }, [r.shot ? h('div', { class: 'sub', text: 'Se încarcă captura…' }) : h('div', { class: 'sub', text: 'Fără captură de ecran.' })]);
+    const m = r.meta || {};
+    const [cl, ck] = BCAT[r.cat] || [r.cat, ''];
+    const note = h('textarea', { placeholder: 'Notă (ce s-a făcut, în ce versiune)' });
+    note.value = r.note || '';
+    const done = dialog((box, close) => {
+      box.classList.add('wide');
+      const stBtns = h('div', { class: 'tabs' }, BST.filter(([k]) => k !== 'all').map(([k, l]) => h('button', { class: r.status === k ? 'on' : '', text: l, onclick: (e) => act(e.currentTarget, async () => { await call('bugStatus', { id: r.id, status: k, note: note.value }); toast('Salvat.'); close(true); }) })));
+      const del = h('button', { class: 'btn danger', text: 'Șterge raportul' });
+      del.addEventListener('click', async () => { if (await confirmBox('Ștergi raportul?', 'Raportul și captura lui dispar definitiv.', 'Șterge', true)) act(del, async () => { await call('bugDelete', { id: r.id }); close(true); }); });
+      box.append(...[
+        h('div', { class: 'bug-top' }, [h('span', { class: 'tag ' + ck, text: cl }), h('span', { class: 'bug-sub', text: BSUB[r.sub] || r.sub }), pill((BSEV[r.sev] || ['–'])[0], (BSEV[r.sev] || ['', ''])[1])]),
+        h('p', { class: 'bug-full', text: r.text }),
+        shotBox,
+        h('dl', { class: 'kv' }, [
+          h('dt', { text: 'Tester' }), h('dd', {}, [h('button', { class: 'link', text: (r.name ? r.name + ' · ' : '') + (r.handle ? '@' + r.handle : r.from), onclick: () => { close(false); show('accounts', r.from); } })]),
+          h('dt', { text: 'Trimis' }), h('dd', { text: dt(r.at) }),
+          h('dt', { text: 'Aplicație' }), h('dd', { text: [PLAT[m.platform] || m.platform, m.version].filter(Boolean).join(' · ') || '–' }),
+          h('dt', { text: 'Dispozitiv' }), h('dd', { text: m.model || '–' }),
+          h('dt', { text: 'Ecran' }), h('dd', { text: [m.screen, m.theme, m.lang, m.online === false ? 'fără internet' : null].filter(Boolean).join(' · ') || '–' }),
+          h('dt', { text: 'Unde era' }), h('dd', { text: m.view || '–' }),
+        ]),
+        (m.errors || []).length ? h('details', { class: 'errs' }, [h('summary', { text: `Ultimele erori ale aplicației (${m.errors.length})` }), h('pre', { text: m.errors.join('\n\n') })]) : null,
+        h('label', { text: 'Stare' }), stBtns, note,
+        h('div', { class: 'actions' }, [del, h('span', { style: 'flex:1' }), h('button', { class: 'btn', text: 'Închide', onclick: () => close(false) })]),
+      ].filter(Boolean));
+    });
+    if (r.shot) {
+      call('bugShot', { id: r.id }).then((x) => {
+        clear(shotBox);
+        if (!x.shot) { shotBox.append(h('div', { class: 'sub', text: 'Captura nu mai există.' })); return; }
+        const img = h('img', { src: x.shot, alt: 'Captura de ecran a testerului' });
+        img.addEventListener('click', () => { const w = window.open(); if (w) { w.opener = null; w.document.title = 'Captură'; const i = w.document.createElement('img'); i.src = x.shot; i.style.maxWidth = '100%'; w.document.body.append(i); } });
+        shotBox.append(img);
+      }).catch((e) => { clear(shotBox).append(h('div', { class: 'sub', text: say(e) })); });
+    }
+    if (await done) show('testers', back);
+  }
+  const stat = (n, label, kind) => h('div', { class: 'stat ' + (kind || '') }, [h('b', { text: n }), h('span', { text: label })]);
 
   // ---------------------------------------------------------------- kill switches
   async function switches() {
@@ -592,11 +725,13 @@
   // ---------------------------------------------------------------- log
   async function log() {
     const rows = await call('log');
-    const OPS = { setPlan: 'Plan manual', suspend: 'Suspendare', blockDevice: 'Dispozitiv blocat', 'switches.set': 'Kill switches', resolveReport: 'Raport închis', savePromo: 'Promoție salvată', deletePromo: 'Promoție ștearsă', stripeSet: 'Cheie Stripe', stripeTax: 'Taxe Stripe', stripeClear: 'Stripe deconectat', anafSet: 'Date ANAF', anafEnv: 'Mediu ANAF', anafClear: 'ANAF șters' };
+    const OPS = { setTester: 'Tester', bugStatus: 'Raport tester', bugDelete: 'Raport tester șters', setPlan: 'Plan manual', suspend: 'Suspendare', blockDevice: 'Dispozitiv blocat', 'switches.set': 'Kill switches', resolveReport: 'Raport închis', savePromo: 'Promoție salvată', deletePromo: 'Promoție ștearsă', stripeSet: 'Cheie Stripe', stripeTax: 'Taxe Stripe', stripeClear: 'Stripe deconectat', anafSet: 'Date ANAF', anafEnv: 'Mediu ANAF', anafClear: 'ANAF șters' };
     fill(head('Jurnal', 'Tot ce s-a schimbat din panou (păstrat 2 ani)'), h('div', { class: 'card' }, [table(['Data', 'Acțiune', 'Țintă', 'Detalii', 'Administrator', 'IP'], rows.map((r) => ({
       uid: r.target, cells: [dt(r.at), OPS[r.op] || r.op, r.target ? { node: h('span', { class: 'mono', text: String(r.target).slice(0, 12) }) } : '–', r.detail || '–', r.email, { node: h('span', { class: 'mono', text: r.ip || '–' }) }],
     })))]));
   }
 
-  gate('signin');
+  // remembered from an earlier visit: straight in (the server still checks the right and the authenticator app)
+  root.append(h('div', { class: 'gate' }, [h('div', { class: 'spinner' })]));
+  auth.authStateReady().then(() => (auth.currentUser ? enter() : gate('signin'))).catch(() => gate('signin'));
 })();

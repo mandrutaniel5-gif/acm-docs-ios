@@ -82,6 +82,8 @@ const STEPS = [
   { id: 'signup', label: 'Cont nou', run: async (p) => p.evaluate(() => AccountUI.show('signup')) },
   { id: 'verify', label: 'Confirmă emailul', run: async (p) => { await p.evaluate(fresh); await p.evaluate(() => AccountUI.show('verify')); } },
   { id: 'home-signed', label: 'Acasă (cu cont)', run: async (p) => p.evaluate(signedIn) },
+  { id: 'tester-fab', label: 'Tester: butonul plutitor', run: async (p) => { await p.evaluate(signedIn); await p.evaluate(async () => { const fs = Account.internals().F.firestore; fs.getDoc = async () => ({ exists: () => true, data: () => ({ active: true }) }); await Tester.check(); }); } },
+  { id: 'tester-report', label: 'Tester: raport', wait: 1500, run: async (p) => { await p.evaluate(signedIn); await p.evaluate(async () => { const fs = Account.internals().F.firestore; fs.getDoc = async () => ({ exists: () => true, data: () => ({ active: true }) }); await Tester.check(); Tester.report(); }); } },
   { id: 'settings-signed', label: 'Setări (cu cont)', run: async (p) => { await p.evaluate(signedIn); await p.evaluate(() => App.showView('settings')); } },
   { id: 'plans', label: 'Abonament', run: async (p) => { await p.evaluate(signedIn); await p.evaluate(() => { Plan.show(); }); }, wait: 1200 },
   { id: 'security', label: 'Securitate', run: async (p) => { await p.evaluate(signedIn); await p.evaluate(() => { Security.show(); }); } },

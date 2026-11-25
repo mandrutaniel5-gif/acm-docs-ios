@@ -404,3 +404,30 @@ html.i18n-wait body { visibility: hidden; }
 .report-form select.in { height: 48px; }
 .auth-card .code-in { font-size: 26px; letter-spacing: .3em; text-align: center; font-variant-numeric: tabular-nums; }
 .verify-hint { margin: 14px 0 0; text-align: center; line-height: 1.45; }
+
+/* ---------------------------------------------------------------- testers: the floating report button and its dialog */
+.tester-fab {
+  position: fixed; z-index: 900; width: 52px; height: 52px; padding: 0; border-radius: 50%; display: grid; place-items: center;
+  color: #fff; border: 1px solid rgba(255, 255, 255, .35); cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
+  background: linear-gradient(150deg, #ff5e7e, #ff2d55 55%, #d81b45);
+  box-shadow: 0 10px 26px rgba(255, 45, 85, .38), 0 2px 6px rgba(0, 0, 0, .18), inset 0 1px 1px rgba(255, 255, 255, .45);
+  opacity: .9; transition: top .28s var(--spring, ease), left .28s var(--spring, ease), right .28s var(--spring, ease), transform .15s ease, opacity .2s;
+}
+.tester-fab[hidden] { display: none; }
+.tester-fab svg { width: 26px; height: 26px; fill: currentColor; pointer-events: none; }
+.tester-fab:active { transform: scale(.94); }
+.tester-fab.drag { transition: none; cursor: grabbing; opacity: 1; transform: scale(1.08); }
+.tester-dlg { max-width: 560px; }
+.tester-shot { border-radius: 14px; overflow: hidden; border: 1px solid var(--line, rgba(0, 0, 0, .1)); margin: 4px 0 10px; background: rgba(127, 127, 127, .08); }
+.tester-shot canvas { display: block; width: auto; height: auto; max-width: 100%; max-height: 42vh; margin: 0 auto; touch-action: none; cursor: crosshair; }
+.tester-shot-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; }
+.tester-check { display: flex; align-items: center; gap: 8px; padding: 0 10px 10px; font-size: 14px; }
+.tester-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; opacity: .6; margin: 12px 0 6px; }
+.tester-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.tester-chips .chip {
+  border: 1px solid var(--line, rgba(0, 0, 0, .12)); background: transparent; color: inherit; border-radius: 999px;
+  padding: 7px 13px; font: inherit; font-size: 14px; cursor: pointer;
+}
+.tester-chips .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tester-dlg textarea { width: 100%; box-sizing: border-box; min-height: 96px; resize: vertical; }
+.tester-meta { display: block; margin-top: 8px; line-height: 1.4; }

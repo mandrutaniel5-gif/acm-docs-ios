@@ -211,6 +211,21 @@ await check('Notifications: a device saves only its own notification address, in
   assert.notEqual(await code(updateDoc(dref(a, b), { push: good })), 'ok', 'not on the device of another account');
 });
 
+await check('Testers: only a marked account reports; the mark and the reports stay with the server', async () => {
+  const rep = { cat: 'visual', sub: 'layout', sev: 'low', text: 'Butonul e tăiat', meta: { version: '2.6.12', platform: 'android', errors: ['e1'] } };
+  assert.match(await code(a.c.call('bugReport', rep)), /not a tester/, 'not a tester yet');
+  assert.notEqual(await code(setDoc(doc(a.c.db, 'testers', a.uid), { active: true })), 'ok', 'cannot mark itself');
+  await fetch(FS + '/testers/' + a.uid, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer owner' }, body: JSON.stringify({ fields: { active: { booleanValue: true } } }) });
+  assert.equal((await getDoc(doc(a.c.db, 'testers', a.uid))).exists(), true, 'sees its own mark');
+  assert.notEqual(await code(getDoc(doc(b.c.db, 'testers', a.uid))), 'ok', 'not the mark of another account');
+  assert.match(await code(a.c.call('bugReport', { ...rep, cat: 'visual', sub: 'crash' })), /category/);
+  assert.match(await code(a.c.call('bugReport', { ...rep, shot: 'data:image/jpeg;base64,' + Buffer.from('<svg>').toString('base64') })), /shot/, 'a JPEG only');
+  const jpg = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(200)]).toString('base64');
+  const r = await a.c.call('bugReport', { ...rep, shot: 'data:image/jpeg;base64,' + jpg });
+  assert.match(r.id, /^[0-9a-f]{32}$/);
+  assert.notEqual(await code(getDoc(doc(a.c.db, 'bugReports', r.id))), 'ok', 'reports are read only in the panel');
+});
+
 await check('Kill switch: chat paused from the control panel stops new conversations and messages', async () => {
   await adminSetSwitches({ chat: true });
   await sleep(16000);

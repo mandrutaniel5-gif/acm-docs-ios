@@ -50,6 +50,11 @@ service cloud.firestore {
         && getAfter(/databases/$(database)/documents/usernames/$(d.handle)).data.uid == uid;
     }
 
+    // testers/{uid}: marked from the control panel; the account only sees whether it is one
+    match /testers/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+    }
+
     // users/{uid}: public profile + public key, so others can lock documents for this account
     match /users/{uid} {
       allow get: if signedIn();
