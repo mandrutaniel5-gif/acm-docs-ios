@@ -339,7 +339,9 @@ const Chat = (() => {
       ]);
       p.append(convHead, warn, scroller, blockedBar, composer);
       const typed = () => composer.classList.toggle('has-text', !!input.value.trim());
-      input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = Math.min(140, input.scrollHeight) + 'px'; typed(); typing(); });
+      // the messages always end above the composer, even when it grows to several lines
+      const roomBelow = () => { if (document.documentElement.classList.contains('v26')) scroller.style.paddingBottom = `calc(${composer.offsetHeight + 30}px + var(--safe-b, 0px))`; };
+      input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = Math.min(140, input.scrollHeight) + 'px'; roomBelow(); typed(); typing(); });
       input.addEventListener('blur', () => typingStop());
       input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !Host.mobile) { e.preventDefault(); sendText(); } });
 
@@ -496,7 +498,8 @@ const Chat = (() => {
         let bytes, fname;
         if (fromBytes) ({ bytes, name: fname } = fromBytes);
         else {
-          const path = await Host.openDialog('pdf');
+          // the app's own documents first; the phone's / computer's files one tap away
+          const path = await pickDoc();
           if (!path) return;
           fname = Host.baseName(path);
           bytes = await Host.readFileAsync(path);
@@ -713,6 +716,43 @@ const Chat = (() => {
   /** How the document goes: as a normal document every member opens (the sender too), or as a .acm
    *  document locked to the recipients only (the sender cannot open it either). Both are end-to-end
    *  encrypted on the way and on the server. */
+  /** A document to send: one of the app's (newest first, searchable) or any file from the device. */
+  function pickDoc() {
+    const kinds = { pdf: 'PDF', docx: 'Word', doc: 'Word', xlsx: 'Excel', xls: 'Excel', pptx: 'PowerPoint', ppt: 'PowerPoint', jpg: 'Imagine', jpeg: 'Imagine', png: 'Imagine' };
+    const list = (typeof App !== 'undefined' && App.recentFiles ? App.recentFiles() : [])
+      .filter((f) => f.kind !== 'secure' && !/\.acm$/i.test(f.path))
+      .sort((a, b) => (b.time || 0) - (a.time || 0)).slice(0, 200);
+    return UI.modal((box, close) => {
+      box.classList.add('acm-ui', 'ch-pick');
+      const q = el('input', { class: 'in', type: 'search', placeholder: I18n.t('Caută în documentele tale') });
+      const rows = el('div', { class: 'ch-pick-list' });
+      const draw = () => {
+        const t = q.value.trim().toLowerCase();
+        const shown = list.filter((f) => !t || Host.baseName(f.path).toLowerCase().includes(t)).slice(0, 60);
+        rows.replaceChildren(...(shown.length ? shown.map((f) => {
+          const name = Host.baseName(f.path);
+          const b = el('button', { class: 'ch-pick-row', type: 'button' }, [
+            el('span', { class: 'ch-pick-i', html: svg('doc') }),
+            el('span', { class: 'ch-pick-t' }, [el('b', { class: 'no-tr', text: name }), el('small', { class: 'muted', text: [kinds[Host.ext(name)] || Host.ext(name).toUpperCase(), f.time ? new Date(f.time).toLocaleDateString(I18n.locale()) : ''].filter(Boolean).join(' · ') })]),
+          ]);
+          b.addEventListener('click', () => close(f.path));
+          return b;
+        }) : [el('p', { class: 'muted cempty', text: I18n.t(list.length ? 'Niciun document cu acest nume.' : 'Încă nu ai documente în aplicație.') })]));
+      };
+      q.addEventListener('input', draw);
+      draw();
+      box.append(
+        el('h2', { text: 'Trimite un document' }),
+        list.length > 6 ? q : null,
+        rows,
+        el('div', { class: 'actions col' }, [
+          el('button', { class: 'btn primary', type: 'button', text: Host.mobile ? 'Din telefon (alte fișiere)…' : 'Din calculator (alte fișiere)…', onclick: async () => { close(await Host.openDialog('pdf')); } }),
+          el('button', { class: 'btn', type: 'button', text: 'Anulează', onclick: () => close(null) }),
+        ]),
+      );
+    });
+  }
+
   function askMode(fname, c) {
     return UI.modal((box, close) => {
       box.classList.add('acm-ui', 'ch-mode');
@@ -837,5 +877,10 @@ const Chat = (() => {
     return b;
   }
 
-  return { start, stop, show, back, openChat, withPerson, button, unreadCount, onChange: (f) => listeners.add(f) };
+  /** From outside the chat (Trimite criptat): opens the conversation with this person and sends the document there. */
+  async function sendFileTo(uid, file) {
+    await withPerson(uid);
+    if (page && page.__sendFile) await page.__sendFile(file);
+  }
+  return { start, stop, show, back, openChat, withPerson, sendFileTo, button, unreadCount, onChange: (f) => listeners.add(f) };
 })();

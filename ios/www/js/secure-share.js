@@ -510,6 +510,11 @@ const AcmShare = (() => {
     const choice = await pickRecipients(name);
     if (!choice) return;
     let { people, password } = choice;
+    if (people.length === 1 && !password && typeof Chat !== 'undefined' && Chat.sendFileTo) {
+      const how = await askHow(people[0]);
+      if (!how) return;
+      if (how === 'chat') return Chat.sendFileTo(people[0].uid, { bytes: await Host.readFileAsync(path), name, mode: 'acm' });
+    }
 
     if (typeof Plan !== 'undefined' && !(await Plan.allow('acmSend'))) return;
     let id;
@@ -552,7 +557,7 @@ const AcmShare = (() => {
       return UI.errorDetails('Nu am putut cripta documentul', e);
     }
     UI.busy();
-    const who = people.map((c) => '@' + c.handle).join(', ');
+    const who = people.length ? people.map((c) => '@' + c.handle).join(', ') : I18n.t('oricine are parola');
     if (Host.mobile) {
       UI.toast(`Criptat pentru ${who}. Alege cum îl trimiți.`);
       await Host.share(out, 'Document criptat cu ACM Docs. Se deschide doar în aplicația ACM Docs, în contul destinatarului.');
@@ -562,10 +567,28 @@ const AcmShare = (() => {
     }
   }
 
+  /** One person: in the chat with them, or out through another app (WhatsApp, email…). */
+  function askHow(c) {
+    return UI.modal((box, close) => {
+      box.classList.add('acm-ui', 'ch-mode');
+      const opt = (v, icon, title, sub, primary) => {
+        const b = el('button', { class: 'ch-opt' + (primary ? ' on' : ''), type: 'button' }, [el('span', { class: 'ch-opt-i', html: svg(icon) }), el('span', { class: 'ch-opt-t' }, [el('b', { text: title }), el('small', { text: sub })])]);
+        b.addEventListener('click', () => close(v));
+        return b;
+      };
+      box.append(
+        el('h2', { text: 'Cum trimiți?' }),
+        opt('chat', 'chat', I18n.t('În chat cu') + ' @' + c.handle, 'Ajunge direct în conversație, criptat doar pentru el.', true),
+        opt('other', 'share', Host.mobile ? 'Altele…' : 'Salvează fișierul .acm', Host.mobile ? 'WhatsApp, email sau altă aplicație: trimiți fișierul .acm.' : 'Îl trimiți tu, pe email sau pe stick.'),
+        el('div', { class: 'actions col' }, [el('button', { class: 'btn', type: 'button', text: 'Anulează', onclick: () => close(null) })]),
+      );
+      hydrateIcons(box);
+    });
+  }
+
   function pickRecipients(name) {
     return UI.modal((box, close) => {
       box.classList.add('acm-ui', 'acm-send');
-      box.dataset.sticky = '1';
       const chosen = new Map();
       const listBox = el('div', { class: 'clist pick' });
       const summary = el('div', { class: 'send-sum' });
@@ -573,14 +596,17 @@ const AcmShare = (() => {
       const pwOn = el('input', { type: 'checkbox', id: 'acm-pw-on' });
       const pw1 = el('input', { class: 'in', type: 'password', placeholder: 'Parola documentului', autocomplete: 'new-password', id: 'acm-pw1' });
       const pw2 = el('input', { class: 'in', type: 'password', placeholder: 'Confirmă parola', autocomplete: 'new-password', id: 'acm-pw2' });
-      const pwBox = el('div', { class: 'pw-box hidden' }, [pw1, pw2, el('small', { class: 'muted', text: 'Destinatarul are nevoie și de parolă, pe lângă contul lui. Spune-i-o pe altă cale (la telefon, față în față).' })]);
-      pwOn.addEventListener('change', () => { pwBox.classList.toggle('hidden', !pwOn.checked); if (pwOn.checked) setTimeout(() => pw1.focus(), 30); });
+      const pwHint = el('small', { class: 'muted' });
+      const pwBox = el('div', { class: 'pw-box hidden' }, [pw1, pw2, pwHint]);
+      pwOn.addEventListener('change', () => { pwBox.classList.toggle('hidden', !pwOn.checked); if (pwOn.checked) setTimeout(() => pw1.focus(), 30); update(); });
       const err = el('p', { class: 'auth-err', role: 'alert' });
 
       const update = () => {
-        go.disabled = !chosen.size;
+        go.disabled = !chosen.size && !pwOn.checked;
         summary.innerHTML = '';
         const cs = [...chosen.values()];
+        pwHint.textContent = I18n.t(cs.length ? 'Destinatarul are nevoie și de parolă, pe lângă contul lui. Spune-i-o pe altă cale (la telefon, față în față).'
+          : 'Doar cu parolă: oricine are fișierul și parola îl deschide în ACM Docs. E mai puțin sigur decât pe persoane, dar util pentru un grup mare.');
         if (!cs.length) return;
         const st = cs.map(Contacts.status);
         if (st.includes('changed')) summary.append(el('div', { class: 'acm-note bad', html: `${svg('warn')}<span>Un destinatar are cheia de criptare schimbată: verifică-l din nou înainte să-i trimiți.</span>` }));
@@ -626,7 +652,7 @@ const AcmShare = (() => {
           draw(); update();
         }),
         listBox,
-        el('label', { class: 'chk' }, [pwOn, 'Adaugă și o parolă (opțional)']),
+        el('label', { class: 'chk' }, [pwOn, 'Parolă (opțional; fără persoane alese: doar cu parolă)']),
         pwBox, summary, err,
         el('div', { class: 'actions' }, [el('button', { class: 'btn', type: 'button', text: 'Anulează', onclick: () => close(null) }), go]),
       );

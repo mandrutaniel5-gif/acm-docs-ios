@@ -123,7 +123,7 @@ html.v26 .ch-dot { left: 11px; right: auto; top: 50%; bottom: auto; margin-top: 
 html.v26 .ch-time { margin-top: 2px; }
 
 /* a conversation */
-html.v26 .chat-msgs { padding: calc(70px + var(--safe-t, 0px)) 12px 92px; gap: 2px; }
+html.v26 .chat-msgs { padding: calc(70px + var(--safe-t, 0px)) 12px calc(86px + var(--safe-b, 0px)); gap: 2px; }
 html.v26 .chat-e2e { align-self: center; max-width: 300px; margin: 8px auto 4px; padding: 8px 14px; border-radius: 16px; background: rgba(118, 118, 128, .1); color: var(--muted); font-size: 12px; text-align: center; display: block; }
 html.v26 .chat-e2e svg { width: 11px; height: 11px; display: inline; vertical-align: -1px; margin-right: 4px; }
 html.v26 .ch-msg { margin-top: 1px; }
@@ -179,3 +179,13 @@ html.v26 .chat-warn { bottom: auto; top: calc(66px + var(--safe-t, 0px)); margin
 .ch-locked svg { width: 13px; height: 13px; fill: currentColor; }
 .ch-msg.mine .ch-file .ch-fi { background: rgba(255, 255, 255, .22); }
 .ch-msg.mine .ch-file .ch-fi svg { fill: #fff; }
+
+/* sending a document: the app's own documents, then the device's files */
+.ch-pick .ch-pick-list { display: flex; flex-direction: column; gap: 2px; max-height: 46vh; overflow: auto; margin: 8px 0 4px; }
+.ch-pick .ch-pick-row { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 9px 8px; border: 0; border-radius: 12px; background: none; color: inherit; font: inherit; cursor: pointer; }
+.ch-pick .ch-pick-row:active, .ch-pick .ch-pick-row:focus-visible { background: rgba(127, 127, 127, .14); }
+.ch-pick .ch-pick-i { width: 36px; height: 36px; flex: none; border-radius: 10px; display: grid; place-items: center; background: rgba(0, 122, 255, .14); }
+.ch-pick .ch-pick-i svg { width: 20px; height: 20px; fill: var(--accent); }
+.ch-pick .ch-pick-t { display: flex; flex-direction: column; min-width: 0; }
+.ch-pick .ch-pick-t b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+.ch-pick .ch-pick-t small { font-size: 12px; }

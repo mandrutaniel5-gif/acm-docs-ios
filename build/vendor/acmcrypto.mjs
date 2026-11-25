@@ -153,7 +153,21 @@ function wrapKey(recipientPub, dek, pwKey) {
 
 function unwrapKey(entry, id, pwKey) {
   // any damaged envelope (bad base64, wrong lengths) simply does not open: never an internal error
-  try { return unwrapKeyInner(entry, id, pwKey); } catch (e) { return null; }
+  try { return entry && entry.q ? unwrapPasswordOnly(entry, pwKey) : unwrapKeyInner(entry, id, pwKey); } catch (e) { return null; }
+}
+
+// Password only (no chosen people): whoever has the file AND the password opens it. Weaker than an
+// envelope per person (the password can be guessed offline), so the app says so; Argon2id slows guessing.
+function wrapPasswordOnly(dek, pwKey) {
+  const nonce = randomBytes(24);
+  const kek = kdf(pwKey, nonce, 'ACM1 password only', 32);
+  return { q: 1, n: b64(nonce), w: b64(xchacha20poly1305(kek, nonce, utf8ToBytes('ACM1 dek')).encrypt(dek)) };
+}
+function unwrapPasswordOnly(entry, pwKey) {
+  if (!pwKey) return null;
+  const nonce = unb64(entry.n);
+  const kek = kdf(pwKey, nonce, 'ACM1 password only', 32);
+  try { return xchacha20poly1305(kek, nonce, utf8ToBytes('ACM1 dek')).decrypt(unb64(entry.w)); } catch (e) { return null; }
 }
 
 function unwrapKeyInner(entry, id, pwKey) {
@@ -171,11 +185,12 @@ function unwrapKeyInner(entry, id, pwKey) {
  * Locks a document for one or more recipients.
  * @param {{bytes:Uint8Array, name:string, mime?:string}} doc
  * @param sender identity (from deriveIdentity / importSecrets) — signs the document
- * @param {Uint8Array[]} recipients public key bundles (add the sender's own to keep access)
+ * @param {Uint8Array[]} recipients public key bundles (add the sender's own to keep access); none with a password = password only
  * @param {{password?:string, argon?:{t,m,p}, handle?:string}} opts (handle: the sender's @name, signed with the document)
  */
 export function seal(doc, sender, recipients, opts = {}) {
-  if (!recipients || !recipients.length) throw new AcmError('NO_RECIPIENTS', 'Alege cel puțin o persoană.');
+  recipients = recipients || [];
+  if (!recipients.length && !opts.password) throw new AcmError('NO_RECIPIENTS', 'Alege cel puțin o persoană sau o parolă.');
   if (recipients.length > MAX_RECIPIENTS) throw new AcmError('TOO_MANY', `Cel mult ${MAX_RECIPIENTS} destinatari.`);
   const dek = randomBytes(32);
   const nonce = randomBytes(24);
@@ -194,6 +209,7 @@ export function seal(doc, sender, recipients, opts = {}) {
     if (opts.hint) w.t = envelopeTag(fingerprint(bundle), nonce);
     return w;
   });
+  if (!r.length) r.push(wrapPasswordOnly(dek, pwKey));
   for (let i = r.length - 1; i > 0; i--) { const j = randomBytes(1)[0] % (i + 1); [r[i], r[j]] = [r[j], r[i]]; }
   const header = te.encode(JSON.stringify({ v: VERSION, alg: 'x25519+mlkem768/xchacha20poly1305/ed25519+mldsa65', n: b64(nonce), pw, r }));
   const prefix = concatBytes(MAGIC, new Uint8Array([VERSION]), u32(header.length), header);
@@ -214,7 +230,7 @@ export function seal(doc, sender, recipients, opts = {}) {
 /** What can be read without keys: version, number of envelopes, whether a password is needed. */
 export function inspect(file) {
   const { header } = parse(file);
-  return { version: header.v, recipients: header.r.length, password: !!header.pw };
+  return { version: header.v, recipients: header.r.filter((e) => !(e && e.q)).length, password: !!header.pw, passwordOnly: header.r.some((e) => e && e.q) };
 }
 
 function parse(file) {

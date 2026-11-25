@@ -2,6 +2,7 @@
 // Sign-in screen (blue waves), account steps and the "Cont" section of Settings.
 
 const AccountUI = (() => {
+  let syncRow = null, syncHooked = false; // the Settings row of the cloud sync, kept up to date
   let root = null, view = null;
   const bio = () => (Host.info && Host.info.platform === 'ios' ? 'Face ID' : Host.mobile ? 'amprenta' : 'confirmarea Windows');
   const WAVE = (cls) => el('div', { class: 'wave ' + cls, html: '<svg viewBox="0 0 2880 120" preserveAspectRatio="none"><path d="M0 64 Q360 4 720 64 T1440 64 T2160 64 T2880 64 V120 H0 Z"/></svg>' });
@@ -435,7 +436,13 @@ const AccountUI = (() => {
     if (!Account.needsVerification()) {
       const sec = [];
       if (typeof Security !== 'undefined') sec.push(srow('shield', 'green', 'Securitate și criptare', 'Cum îți protejăm datele și starea contului', chev(), () => Security.show()));
-      if (typeof Sync !== 'undefined') sec.push(srow('refresh', 'teal', 'Sincronizare în cloud', Sync.summary(), chev(), () => Sync.show()));
+      if (typeof Sync !== 'undefined') {
+        const r = srow('refresh', 'teal', 'Sincronizare în cloud', Sync.summary(), chev(), () => Sync.show());
+        sec.push(r);
+        // the status follows the sync (it was written once, when Settings opened)
+        syncRow = r;
+        if (!syncHooked && Sync.onChange) { syncHooked = true; Sync.onChange(() => { const sm = syncRow && syncRow.isConnected && syncRow.querySelector('small'); if (sm) sm.textContent = I18n.t(Sync.summary()); }); }
+      }
       if (typeof Devices !== 'undefined') sec.push(srow('devices', 'indigo', 'Dispozitive', 'Vezi și administrează dispozitivele conectate', chev(), () => Devices.show()));
       if (Account.isPasswordUser()) {
         const on = emailTwoStep() || Account.twoStep();

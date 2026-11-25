@@ -384,3 +384,9 @@ html.v26 .qi::after { background: linear-gradient(180deg, rgba(255, 255, 255, .1
 /* the money card of the invoices keeps its colour: the common card rules above must not wash it out (white on white) */
 html.v26 .stat.hl, html.v26[data-theme="dark"] .stat.hl { background: linear-gradient(135deg, #0a84ff, #5e5ce6); color: #fff; }
 .line .tag.vr { flex: none; min-width: 38px; padding: 0 6px; font-variant-numeric: tabular-nums; }
+
+/* the editors' bottom toolbar scrolls sideways: its rim cannot be a child box (it would scroll with the buttons and
+   no longer surround the bar); a ring drawn with an inset shadow stays on the bar's edge */
+html.v26 .otools::after { content: none; }
+html.v26 .otools { box-shadow: var(--lg-depth), inset 0 0 0 1px rgba(255, 255, 255, .55); scroll-padding-inline: 10px; }
+html.v26[data-theme="dark"] .otools { box-shadow: var(--lg-depth), inset 0 0 0 1px rgba(255, 255, 255, .14); }

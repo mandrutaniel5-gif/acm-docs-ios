@@ -176,6 +176,27 @@ const Writer = (() => {
   // Typing right after (or before) highlighted text does not continue the highlight: only a marker
   // just picked at the caret colors what is typed.
   let markerArmed = false, lastTyped = 0;
+  // the text color chosen at a blinking caret stays for what is typed next (also after deleting back into
+  // text of another color), until the caret is put somewhere else by a tap / click
+  let colorArmed = null, deletedSinceColor = false;
+  const hex6 = (c) => { const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(c || ''); return m ? '#' + [m[1], m[2], m[3]].map((x) => (+x).toString(16).padStart(2, '0')).join('') : String(c || '').toLowerCase(); };
+  function keepColor() {
+    // only after deleting back into text of another color (typing on keeps its color by itself)
+    if (!colorArmed || !deletedSinceColor) return;
+    deletedSinceColor = false;
+    const sel = window.getSelection();
+    if (!sel.rangeCount || !sel.isCollapsed || !inPage(sel.anchorNode)) return;
+    const n = sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentNode : sel.anchorNode;
+    if (hex6(getComputedStyle(n).color) === hex6(colorArmed)) return;
+    // a piece of text in the chosen color starts right here (like the bold / italic toggles at a caret)
+    const span = document.createElement('span');
+    span.style.color = colorArmed;
+    span.textContent = '\u200b';
+    const rg = sel.getRangeAt(0);
+    rg.insertNode(span);
+    rg.setStart(span.firstChild, 1); rg.collapse(true);
+    sel.removeAllRanges(); sel.addRange(rg);
+  }
   function leaveMark() {
     if (markerArmed) return;
     const sel = window.getSelection();
@@ -613,7 +634,7 @@ const Writer = (() => {
     tools.i = T('italic', 'Cursiv (Ctrl+I)', () => cmd('italic'));
     tools.u = T('underline', 'Subliniat (Ctrl+U)', () => cmd('underline'));
     tools.s = T('strike', 'Tăiat', () => cmd('strikeThrough'));
-    tools.fc = Office.colorBtn('fontcolor', 'Culoarea textului', () => tools.fcVal || '#c00000', (c) => { tools.fcVal = c || '#000000'; cmd('foreColor', c || '#000000'); }, true);
+    tools.fc = Office.colorBtn('fontcolor', 'Culoarea textului', () => tools.fcVal || '#c00000', (c) => { tools.fcVal = c || '#000000'; cmd('foreColor', c || '#000000'); const sl = window.getSelection(); colorArmed = sl.rangeCount && sl.isCollapsed ? tools.fcVal : null; deletedSinceColor = false; }, true);
     tools.hl = Office.colorBtn('marker', 'Evidențiere (marker)', () => tools.hlOn || tools.hlVal || '#ffff00', (c) => {
       if (c) {
         tools.hlVal = c;
@@ -683,6 +704,7 @@ const Writer = (() => {
     tools.hl.classList.remove('on');
     if (tools.hl.repaint) tools.hl.repaint();
     const cs = getComputedStyle(n);
+    if (!colorArmed && tools.fc) { tools.fcVal = hex6(cs.color); if (tools.fc.repaint) tools.fc.repaint(); }
     const al = cs.textAlign;
     tools.al.classList.toggle('on', al === 'left' || al === 'start');
     tools.ac.classList.toggle('on', al === 'center');
@@ -1251,14 +1273,16 @@ ${css}
     document.head.append(base);
     p.addEventListener('beforeinput', (e) => {
       if (e.inputType === 'historyUndo') { e.preventDefault(); undo(); return; }
-      if (e.inputType === 'insertText' && !e.isComposing) leaveMark();
+      if (e.inputType === 'insertText' && !e.isComposing) { leaveMark(); keepColor(); }
+      if (/^delete/.test(e.inputType) && colorArmed) deletedSinceColor = true;
       if (e.inputType === 'historyRedo') { e.preventDefault(); redo(); return; }
       const now = Date.now();
       if (now - lastInput > 900 || /^(insertParagraph|deleteContent|insertFromPaste|insertFromDrop)/.test(e.inputType)) snapshot();
       lastInput = now;
     });
     p.addEventListener('input', () => { lastTyped = Date.now(); changed(); });
-    p.addEventListener('compositionstart', () => leaveMark()); // phone keyboards type through composition
+    p.addEventListener('compositionstart', () => { leaveMark(); keepColor(); }); // phone keyboards type through composition
+    p.addEventListener('pointerdown', () => { colorArmed = null; }); // the caret is put somewhere else: its text's color counts
     p.addEventListener('paste', (e) => {
       const dt = e.clipboardData;
       if (!dt) return;

@@ -74,6 +74,21 @@ test('password: needed, wrong one refused, right one opens', () => {
   assert.throws(() => A.open(file, eve, { password: 'Pădure-Albastră-42' }), { code: 'BAD_PASSWORD_OR_NOT_FOR_YOU' });
 });
 
+test('password only (no people): anyone with the password opens it, nobody without', () => {
+  assert.throws(() => A.seal(doc(), ana, []), { code: 'NO_RECIPIENTS' });
+  const file = A.seal(doc(), ana, [], { password: 'Grup-Firma-2026', argon: FAST, handle: 'ana' });
+  const info = A.inspect(file);
+  assert.equal(info.password, true); assert.equal(info.passwordOnly, true); assert.equal(info.recipients, 0);
+  for (const who of [mihai, eve, ana]) assert.equal(A.open(file, who, { password: 'Grup-Firma-2026' }).name, 'Contract.pdf');
+  assert.throws(() => A.open(file, mihai), { code: 'PASSWORD_REQUIRED' });
+  assert.throws(() => A.open(file, mihai, { password: 'gresita' }), { code: 'BAD_PASSWORD_OR_NOT_FOR_YOU' });
+  // still signed by the sender: a changed byte is detected
+  const bad = file.slice(); bad[bad.length - 10] ^= 1;
+  assert.throws(() => A.open(bad, mihai, { password: 'Grup-Firma-2026' }));
+  // a file for people keeps working exactly as before (no password-only envelope in it)
+  assert.equal(A.inspect(A.seal(doc(), ana, [mihai.bundle])).passwordOnly, false);
+});
+
 test('any changed byte is detected (header, envelopes, contents)', () => {
   const file = A.seal(doc('x'.repeat(5000)), ana, [mihai.bundle]);
   const positions = [9, 20, 60, 200, 1500, file.length - 200, file.length - 1];

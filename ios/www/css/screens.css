@@ -641,3 +641,19 @@ select.in { padding: 0 10px; appearance: auto; }
   /* the language is chosen at the top of the form on the phone: the preview header keeps only its title */
   .pv-label .pv-l2, .pv-label #pv-lang { display: none; }
 }
+@media (max-width: 720px) {
+  /* the preview zoomed and scrolled sideways: the header (Închide) and the zoom buttons stay where they are,
+     only the invoice moves under the fingers */
+  #invoice.pv-open .pv-label { position: sticky; left: -10px; top: 0; width: 100vw; box-sizing: border-box; }
+  #invoice.pv-open .inv-zoom { position: fixed; left: auto; right: 14px; bottom: calc(16px + var(--safe-b, 0px)); margin: 0; z-index: 3; }
+}
+/* invoice appearance, colors: on the phone the swatches take the whole row, from the left, evenly spaced,
+   and "Alta…" sits with them (no lonely second line); dark swatches keep a visible edge on the dark theme */
+@media (max-width: 720px) {
+  .adv-row:has(> .colors) { flex-direction: column; align-items: stretch; gap: 10px; }
+  .adv-row > .colors { justify-content: flex-start; gap: 8px; width: 100%; }
+  .adv-row > .colors .cdot { width: 34px; height: 34px; }
+  .adv-row > .colors .cdot i { width: 26px; height: 26px; }
+  .adv-row > .colors .cpick { height: 34px; border-radius: 17px; }
+}
+html[data-theme="dark"] .cdot i { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .28); }
