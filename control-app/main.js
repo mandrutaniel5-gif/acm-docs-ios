@@ -1,7 +1,7 @@
 // ACM Docs Control: a dedicated window for the administration panel, and nothing else.
 //  - opens only the panel's own address; any other page, link or popup is refused
 //  - no Node.js in the page, sandboxed, context isolation, no developer tools
-//  - everything lives in memory: closing the window ends the session, nothing is written to disk
+//  - the sign-in is remembered on this computer (30 days, until Ieșire); no page cache is kept
 //  - camera, microphone, location, notifications and other permissions are refused
 // Sign-in, the authenticator code and every check stay on the server: this app adds no access.
 const { app, BrowserWindow, Menu, session, shell } = require('electron');
@@ -22,8 +22,8 @@ if (!app.requestSingleInstanceLock()) app.quit();
 
 let win = null;
 function create() {
-  // in-memory session (no "persist:" prefix): no cookies, cache or storage on disk
-  const ses = session.fromPartition('acm-control', { cache: false });
+  // kept on disk ("persist:"), only for this app: the administrator stays signed in between openings
+  const ses = session.fromPartition('persist:acm-control', { cache: false });
   ses.setPermissionRequestHandler((_wc, _perm, cb) => cb(false));
   ses.setPermissionCheckHandler(() => false);
   ses.setDevicePermissionHandler(() => false);
@@ -57,7 +57,7 @@ function create() {
     if (isMain && code !== -3) win.loadFile(path.join(__dirname, 'offline.html'));
   });
   win.webContents.on('before-input-event', (e, input) => {
-    // F5 / Ctrl+R: reload the panel (it signs out); nothing else (no dev tools shortcuts)
+    // F5 / Ctrl+R: reload the panel; nothing else (no dev tools shortcuts)
     if (input.type === 'keyDown' && (input.key === 'F5' || (input.control && input.key.toLowerCase() === 'r'))) { e.preventDefault(); win.loadURL(PANEL); }
   });
   win.webContents.on('ipc-message', () => {});

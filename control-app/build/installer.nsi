@@ -55,7 +55,7 @@ Section "Install"
   Sleep 400
   SetShellVarContext current
   SetOutPath "$INSTDIR"
-  File /r "../../dist/control/win-unpacked/*.*"
+  File /r "..\..\dist\control\win-unpacked\*.*"
   File "icon.ico"
   WriteUninstaller "$INSTDIR\Dezinstalare.exe"
   CreateShortCut "$DESKTOP\${APP}.lnk" "$INSTDIR\${EXE}" "" "$INSTDIR\${EXE}" 0 SW_SHOWNORMAL "" "Panoul de administrare ACM Docs"
